@@ -3,12 +3,14 @@ import requests_mock
 from aioresponses import aioresponses
 
 from stellar_sdk.client.aiohttp_client import AiohttpClient
+from stellar_sdk.exceptions import ContentSizeLimitExceededError
 from stellar_sdk.sep.exceptions import (
     BadFederationResponseError,
     FederationServerNotFoundError,
     InvalidFederationAddress,
 )
 from stellar_sdk.sep.federation import (
+    FEDERATION_RESPONSE_MAX_SIZE,
     FederationRecord,
     _split_stellar_address,
     resolve_account_id,
@@ -209,3 +211,32 @@ class TestFederation:
     def test_split_invalid_address(self, stellar_address):
         with pytest.raises(InvalidFederationAddress):
             _split_stellar_address(stellar_address)
+
+    def test_federation_response_size_limit_exceeded_sync(self):
+        large_content = "x" * (FEDERATION_RESPONSE_MAX_SIZE + 1)
+        with requests_mock.Mocker() as m:
+            m.get(
+                "https://example.com/.well-known/stellar.toml",
+                text=self.TOML_CONTENT,
+            )
+            m.get(
+                "https://federation.example.com/?type=name&q=hello%2Aexample.com",
+                text=large_content,
+            )
+            with pytest.raises(ContentSizeLimitExceededError):
+                resolve_stellar_address(self.STELLAR_ADDRESS)
+
+    @pytest.mark.asyncio
+    async def test_federation_response_size_limit_exceeded_async(self):
+        large_content = "x" * (FEDERATION_RESPONSE_MAX_SIZE + 1)
+        with aioresponses() as m:
+            m.get(
+                "https://example.com/.well-known/stellar.toml",
+                body=self.TOML_CONTENT,
+            )
+            m.get(
+                "https://federation.example.com/?type=name&q=hello%2Aexample.com",
+                body=large_content,
+            )
+            with pytest.raises(ContentSizeLimitExceededError):
+                await resolve_stellar_address_async(self.STELLAR_ADDRESS)
