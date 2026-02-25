@@ -81,8 +81,6 @@ class TestAiohttpClient:
         assert json["headers"]["C"] == custom_headers["c"]
         await client.close()
 
-
-class TestAiohttpClientMaxContentSize:
     @pytest.mark.asyncio
     async def test_get_with_max_content_size_success(self):
         client = AiohttpClient()

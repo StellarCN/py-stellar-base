@@ -72,8 +72,6 @@ class TestRequestsClient:
         assert json["headers"]["A"] == custom_headers["a"]  # httpbin makes it upper
         assert json["headers"]["C"] == custom_headers["c"]
 
-
-class TestRequestsClientMaxContentSize:
     def test_get_with_max_content_size_success(self):
         client = RequestsClient()
         url = "https://example.com/data"
