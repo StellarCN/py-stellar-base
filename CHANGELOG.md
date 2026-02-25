@@ -3,6 +3,7 @@ Release History
 
 ### Pending
 - refactor!: remove `TransactionBuilder.append_create_stellar_asset_contract_from_address_op`, use `TransactionBuilder.append_create_contract_op` instead.
+- feat!: add `max_content_size` parameter to `BaseSyncClient.get()` and `BaseAsyncClient.get()` to prevent DoS via memory exhaustion. `fetch_stellar_toml`, `fetch_stellar_toml_async` and federation resolve functions now enforce response size limits. Custom client implementations must update their `get()` signature to include `max_content_size: int | None = None`.
 - fix: xdr-generator security hardening:
   - validate `Opaque`/`String` max sizes on unpack.
   - add remaining-input-length checks for variable-length arrays.
