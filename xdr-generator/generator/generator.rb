@@ -140,9 +140,13 @@ class Generator < Xdrgen::Generators::Base
       end
 
       out.puts "@classmethod"
-      out.puts "def unpack(cls, unpacker: Unpacker) -> #{typedef_name}:"
+      out.puts "def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> #{typedef_name}:"
       out.indent(2) do
-        decode_member(typedef, out)
+        out.puts "if depth_limit <= 0:"
+        out.indent(2) do
+          out.puts "raise ValueError(\"Maximum decoding depth reached\")"
+        end
+        decode_member(typedef, out, depth_aware: true)
         out.puts "return cls(#{typedef_name_underscore})"
       end
 
@@ -262,7 +266,7 @@ class Generator < Xdrgen::Generators::Base
 
     render_import(out, arm.declaration, union_name) if render_import_in_func
 
-    decode_member(arm, out)
+    decode_member(arm, out, depth_aware: true)
     arm_name = safe_identifier(arm.name.underscore)
     out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{arm_name})"
   end
@@ -270,7 +274,7 @@ class Generator < Xdrgen::Generators::Base
   def render_union_default_unpack(out, union, discriminant_name)
     if union.default_arm.present?
       if !union.default_arm.void?
-        decode_member(union.default_arm, out)
+        decode_member(union.default_arm, out, depth_aware: true)
         arm_name = safe_identifier(union.default_arm.name.underscore)
         out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{arm_name})"
       else
@@ -284,8 +288,12 @@ class Generator < Xdrgen::Generators::Base
 
   def render_union_unpack(out, union, union_name, discriminant_name, render_import_in_func)
     out.puts "@classmethod"
-    out.puts "def unpack(cls, unpacker: Unpacker) -> #{union_name}:"
+    out.puts "def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> #{union_name}:"
     out.indent(2) do
+      out.puts "if depth_limit <= 0:"
+      out.indent(2) do
+        out.puts "raise ValueError(\"Maximum decoding depth reached\")"
+      end
       out.puts "#{discriminant_name} = #{decode_type(union.discriminant)}"
 
       union.normal_arms.each do |arm|
@@ -396,10 +404,14 @@ class Generator < Xdrgen::Generators::Base
 
   def render_struct_unpack(out, struct, struct_name)
     out.puts "@classmethod"
-    out.puts "def unpack(cls, unpacker: Unpacker) -> #{struct_name}:"
+    out.puts "def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> #{struct_name}:"
     out.indent(2) do
+      out.puts "if depth_limit <= 0:"
+      out.indent(2) do
+        out.puts "raise ValueError(\"Maximum decoding depth reached\")"
+      end
       struct.members.each do |member|
-        decode_member(member, out)
+        decode_member(member, out, depth_aware: true)
       end
 
       out.puts "return cls("
@@ -489,9 +501,9 @@ class Generator < Xdrgen::Generators::Base
     end
   end
 
-  def decode_member(member, out)
+  def decode_member(member, out, depth_aware: false)
     member_name_underscore = safe_identifier(member.name.underscore)
-    decoded_member_declaration = decode_type(member.declaration)
+    decoded_member_declaration = decode_type(member.declaration, depth_aware: depth_aware)
 
     case member.declaration
     when AST::Declarations::Array
@@ -531,7 +543,7 @@ class Generator < Xdrgen::Generators::Base
       from enum import IntEnum
       from typing import List, Optional, TYPE_CHECKING
       from xdrlib3 import Packer, Unpacker
-      from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+      from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
       from .constants import *
     EOS
     out.break
@@ -644,7 +656,7 @@ class Generator < Xdrgen::Generators::Base
     end
   end
 
-  def decode_type(decl)
+  def decode_type(decl, depth_aware: false)
     case decl.type
     when AST::Typespecs::Int
       "Integer.unpack(unpacker)"
@@ -667,9 +679,17 @@ class Generator < Xdrgen::Generators::Base
     when AST::Typespecs::String
       "String.unpack(unpacker, #{decl.size || MAX_SIZE})"
     when AST::Typespecs::Simple
-      "#{name(decl.type.resolved_type)}.unpack(unpacker)"
+      if depth_aware && !decl.type.resolved_type.is_a?(AST::Definitions::Enum)
+        "#{name(decl.type.resolved_type)}.unpack(unpacker, depth_limit - 1)"
+      else
+        "#{name(decl.type.resolved_type)}.unpack(unpacker)"
+      end
     when AST::Concerns::NestedDefinition
-      "#{name(decl.type)}.unpack(unpacker)"
+      if depth_aware && !decl.type.is_a?(AST::Definitions::Enum)
+        "#{name(decl.type)}.unpack(unpacker, depth_limit - 1)"
+      else
+        "#{name(decl.type)}.unpack(unpacker)"
+      end
     else
       raise "Unknown typespec: #{decl.type.class.name}"
     end

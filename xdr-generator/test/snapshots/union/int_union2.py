@@ -6,7 +6,7 @@ import base64
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
 from .int_union import IntUnion
@@ -22,8 +22,10 @@ class IntUnion2:
     def pack(self, packer: Packer) -> None:
         self.int_union2.pack(packer)
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> IntUnion2:
-        int_union2 = IntUnion.unpack(unpacker)
+    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> IntUnion2:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        int_union2 = IntUnion.unpack(unpacker, depth_limit - 1)
         return cls(int_union2)
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()

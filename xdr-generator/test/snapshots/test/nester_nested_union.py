@@ -6,7 +6,7 @@ import base64
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
 from .color import Color
@@ -37,7 +37,9 @@ class NesterNestedUnion:
             raise ValueError("blah2 should not be None.")
         Integer(self.blah2).pack(packer)
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> NesterNestedUnion:
+    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> NesterNestedUnion:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         color = Color.unpack(unpacker)
         if color == Color.RED:
             return cls(color=color)

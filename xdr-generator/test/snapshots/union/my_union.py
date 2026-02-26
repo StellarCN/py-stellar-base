@@ -6,7 +6,7 @@ import base64
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
 from .union_key import UnionKey
@@ -55,10 +55,12 @@ class MyUnion:
             return
         raise ValueError("Invalid type.")
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> MyUnion:
+    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> MyUnion:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         type = UnionKey.unpack(unpacker)
         if type == UnionKey.ERROR:
-            error = Error.unpack(unpacker)
+            error = Error.unpack(unpacker, depth_limit - 1)
             return cls(type=type, error=error)
         if type == UnionKey.MULTI:
             length = unpacker.unpack_uint()
@@ -67,7 +69,7 @@ class MyUnion:
                 raise ValueError(f"things length {length} exceeds remaining input length {_remaining}")
             things = []
             for _ in range(length):
-                things.append(Multi.unpack(unpacker))
+                things.append(Multi.unpack(unpacker, depth_limit - 1))
             return cls(type=type, things=things)
         raise ValueError("Invalid type.")
     def to_xdr_bytes(self) -> bytes:

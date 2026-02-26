@@ -1,6 +1,9 @@
 from xdrlib3 import Packer, Unpacker
 
+DEFAULT_XDR_MAX_DEPTH = 512
+
 __all__ = [
+    "DEFAULT_XDR_MAX_DEPTH",
     "Integer",
     "UnsignedInteger",
     "Float",

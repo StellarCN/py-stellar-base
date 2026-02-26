@@ -6,7 +6,7 @@ import base64
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
 __all__ = ['Uint512']
@@ -24,7 +24,9 @@ class Uint512:
     def pack(self, packer: Packer) -> None:
         Opaque(self.uint512, 64, True).pack(packer)
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> Uint512:
+    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> Uint512:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         uint512 = Opaque.unpack(unpacker, 64, True)
         return cls(uint512)
     def to_xdr_bytes(self) -> bytes:

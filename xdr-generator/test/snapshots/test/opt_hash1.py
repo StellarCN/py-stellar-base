@@ -6,7 +6,7 @@ import base64
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
 from .hash import Hash
@@ -26,8 +26,10 @@ class OptHash1:
             packer.pack_uint(1)
             self.opt_hash1.pack(packer)
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> OptHash1:
-        opt_hash1 = Hash.unpack(unpacker) if unpacker.unpack_uint() else None
+    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> OptHash1:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        opt_hash1 = Hash.unpack(unpacker, depth_limit - 1) if unpacker.unpack_uint() else None
         return cls(opt_hash1)
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
