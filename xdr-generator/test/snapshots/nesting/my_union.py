@@ -6,7 +6,7 @@ import base64
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
 from .union_key import UnionKey
@@ -59,13 +59,15 @@ class MyUnion:
             return
         raise ValueError("Invalid type.")
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> MyUnion:
+    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> MyUnion:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         type = UnionKey.unpack(unpacker)
         if type == UnionKey.ONE:
-            one = MyUnionOne.unpack(unpacker)
+            one = MyUnionOne.unpack(unpacker, depth_limit - 1)
             return cls(type=type, one=one)
         if type == UnionKey.TWO:
-            two = MyUnionTwo.unpack(unpacker)
+            two = MyUnionTwo.unpack(unpacker, depth_limit - 1)
             return cls(type=type, two=two)
         if type == UnionKey.OFFER:
             return cls(type=type)

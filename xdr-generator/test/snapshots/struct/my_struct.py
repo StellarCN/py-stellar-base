@@ -6,7 +6,7 @@ import base64
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
 from .int64 import Int64
@@ -53,9 +53,11 @@ class MyStruct:
         String(self.some_string, 4294967295).pack(packer)
         String(self.max_string, 100).pack(packer)
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> MyStruct:
+    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> MyStruct:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         some_int = Integer.unpack(unpacker)
-        a_big_int = Int64.unpack(unpacker)
+        a_big_int = Int64.unpack(unpacker, depth_limit - 1)
         some_opaque = Opaque.unpack(unpacker, 10, True)
         some_string = String.unpack(unpacker, 4294967295)
         max_string = String.unpack(unpacker, 100)

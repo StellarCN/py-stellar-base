@@ -6,7 +6,7 @@ import base64
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
 __all__ = ['Str']
@@ -24,7 +24,9 @@ class Str:
     def pack(self, packer: Packer) -> None:
         String(self.str, 64).pack(packer)
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> Str:
+    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> Str:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         str = String.unpack(unpacker, 64)
         return cls(str)
     def to_xdr_bytes(self) -> bytes:

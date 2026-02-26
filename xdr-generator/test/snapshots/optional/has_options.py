@@ -6,7 +6,7 @@ import base64
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
 from .arr import Arr
@@ -48,10 +48,12 @@ class HasOptions:
             packer.pack_uint(1)
             self.third_option.pack(packer)
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> HasOptions:
+    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> HasOptions:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         first_option = Integer.unpack(unpacker) if unpacker.unpack_uint() else None
         second_option = Integer.unpack(unpacker) if unpacker.unpack_uint() else None
-        third_option = Arr.unpack(unpacker) if unpacker.unpack_uint() else None
+        third_option = Arr.unpack(unpacker, depth_limit - 1) if unpacker.unpack_uint() else None
         return cls(
             first_option=first_option,
             second_option=second_option,

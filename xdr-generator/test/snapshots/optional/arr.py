@@ -6,7 +6,7 @@ import base64
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
 __all__ = ['Arr']
@@ -25,7 +25,9 @@ class Arr:
         for arr_item in self.arr:
             Integer(arr_item).pack(packer)
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> Arr:
+    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> Arr:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         length = 2
         arr = []
         for _ in range(length):
