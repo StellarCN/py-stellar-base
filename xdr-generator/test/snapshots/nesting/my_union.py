@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
@@ -94,6 +95,41 @@ class MyUnion:
     def from_xdr(cls, xdr: str) -> MyUnion:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> MyUnion:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self):
+        if self.type == UnionKey.ONE:
+            assert self.one is not None
+            return {"one": self.one.to_json_dict()}
+        if self.type == UnionKey.TWO:
+            assert self.two is not None
+            return {"two": self.two.to_json_dict()}
+        if self.type == UnionKey.OFFER:
+            return "offer"
+        raise ValueError(f"Unknown type in MyUnion: {self.type}")
+    @classmethod
+    def from_json_dict(cls, json_value) -> MyUnion:
+        if isinstance(json_value, str):
+            if json_value not in ("offer",):
+                raise ValueError(f"Unexpected string '{json_value}' for MyUnion, must be one of: offer")
+            type = UnionKey.from_json_dict(json_value)
+            return cls(type=type)
+        if not isinstance(json_value, dict) or len(json_value) != 1:
+            raise ValueError(f"Expected a single-key object for MyUnion, got: {json_value}")
+        key = next(iter(json_value))
+        type = UnionKey.from_json_dict(key)
+        if key == "one":
+            one = MyUnionOne.from_json_dict(json_value["one"])
+            return cls(type=type, one=one)
+        if key == "two":
+            two = MyUnionTwo.from_json_dict(json_value["two"])
+            return cls(type=type, two=two)
+        raise ValueError(f"Unknown key '{key}' for MyUnion")
     def __hash__(self):
         return hash((self.type, self.one, self.two,))
     def __eq__(self, other: object):

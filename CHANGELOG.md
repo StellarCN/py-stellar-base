@@ -13,6 +13,7 @@ Release History
   - add length validation for opaque/string in typedef and struct constructors.
   - fix `CIRCLE_IMPORT_UNION` lazy import tracking.
   - add decoding depth limit (`DEFAULT_XDR_MAX_DEPTH = 512`) to prevent stack overflow via deeply nested XDR structures.
+- feat(xdr-generator): add SEP-0051 XDR-JSON support.
 
 ### Version 13.2.1
 

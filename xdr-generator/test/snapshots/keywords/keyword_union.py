@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
@@ -69,6 +70,33 @@ class KeywordUnion:
     def from_xdr(cls, xdr: str) -> KeywordUnion:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> KeywordUnion:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self):
+        if self.from_ == KeywordEnum.from_:
+            assert self.class_ is not None
+            return {"from": self.class_.to_json_dict()}
+        return self.from_.to_json_dict()
+    @classmethod
+    def from_json_dict(cls, json_value) -> KeywordUnion:
+        if isinstance(json_value, str):
+            if json_value in ("from",):
+                raise ValueError(f"'{json_value}' requires a value for KeywordUnion, use dict form instead")
+            from_ = KeywordEnum.from_json_dict(json_value)
+            return cls(from_=from_)
+        if not isinstance(json_value, dict) or len(json_value) != 1:
+            raise ValueError(f"Expected a single-key object for KeywordUnion, got: {json_value}")
+        key = next(iter(json_value))
+        from_ = KeywordEnum.from_json_dict(key)
+        if key == "from":
+            class_ = Pass.from_json_dict(json_value["from"])
+            return cls(from_=from_, class_=class_)
+        raise ValueError(f"Unknown key '{key}' for KeywordUnion")
     def __hash__(self):
         return hash((self.from_, self.class_,))
     def __eq__(self, other: object):

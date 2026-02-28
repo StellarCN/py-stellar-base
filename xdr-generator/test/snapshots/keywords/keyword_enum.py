@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
+_KEYWORD_ENUM_MAP = {0: "from", 1: "class"}
+_KEYWORD_ENUM_REVERSE_MAP = {"from": 0, "class": 1}
 __all__ = ['KeywordEnum']
 class KeywordEnum(IntEnum):
     """
@@ -50,3 +53,16 @@ class KeywordEnum(IntEnum):
     def from_xdr(cls, xdr: str) -> KeywordEnum:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> KeywordEnum:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self) -> str:
+        return _KEYWORD_ENUM_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> KeywordEnum:
+        return cls(_KEYWORD_ENUM_REVERSE_MAP[json_value])

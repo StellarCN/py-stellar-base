@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
@@ -62,6 +63,26 @@ class MyUnionTwo:
     def from_xdr(cls, xdr: str) -> MyUnionTwo:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> MyUnionTwo:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self) -> dict:
+        return {
+            "some_int": Integer.to_json_dict(self.some_int),
+            "foo": self.foo.to_json_dict(),
+        }
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> MyUnionTwo:
+        some_int = Integer.from_json_dict(json_dict["some_int"])
+        foo = Foo.from_json_dict(json_dict["foo"])
+        return cls(
+            some_int=some_int,
+            foo=foo,
+        )
     def __hash__(self):
         return hash((self.some_int, self.foo,))
     def __eq__(self, other: object):

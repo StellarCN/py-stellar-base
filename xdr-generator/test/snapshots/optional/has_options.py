@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
@@ -81,6 +82,29 @@ class HasOptions:
     def from_xdr(cls, xdr: str) -> HasOptions:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> HasOptions:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self) -> dict:
+        return {
+            "first_option": Integer.to_json_dict(self.first_option) if self.first_option is not None else None,
+            "second_option": Integer.to_json_dict(self.second_option) if self.second_option is not None else None,
+            "third_option": self.third_option.to_json_dict() if self.third_option is not None else None,
+        }
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> HasOptions:
+        first_option = Integer.from_json_dict(json_dict["first_option"]) if json_dict["first_option"] is not None else None
+        second_option = Integer.from_json_dict(json_dict["second_option"]) if json_dict["second_option"] is not None else None
+        third_option = Arr.from_json_dict(json_dict["third_option"]) if json_dict["third_option"] is not None else None
+        return cls(
+            first_option=first_option,
+            second_option=second_option,
+            third_option=third_option,
+        )
     def __hash__(self):
         return hash((self.first_option, self.second_option, self.third_option,))
     def __eq__(self, other: object):

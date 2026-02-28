@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
@@ -53,6 +54,18 @@ class OptHash2:
     def from_xdr(cls, xdr: str) -> OptHash2:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> OptHash2:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self):
+        return self.opt_hash2.to_json_dict() if self.opt_hash2 is not None else None
+    @classmethod
+    def from_json_dict(cls, json_value) -> OptHash2:
+        return cls(Hash.from_json_dict(json_value) if json_value is not None else None)
     def __hash__(self):
         return hash((self.opt_hash2,))
     def __eq__(self, other: object):

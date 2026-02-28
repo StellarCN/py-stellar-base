@@ -35,6 +35,14 @@ class Integer:
             return NotImplemented
         return self.value == other.value
 
+    @staticmethod
+    def to_json_dict(value: int) -> int:
+        return value
+
+    @staticmethod
+    def from_json_dict(value: int) -> int:
+        return value
+
     def __repr__(self):
         return f"<Integer [value={self.value}]>"
 
@@ -57,6 +65,14 @@ class UnsignedInteger:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.value == other.value
+
+    @staticmethod
+    def to_json_dict(value: int) -> int:
+        return value
+
+    @staticmethod
+    def from_json_dict(value: int) -> int:
+        return value
 
     def __repr__(self):
         return f"<UnsignedInteger [value={self.value}]>"
@@ -81,6 +97,14 @@ class Float:
             return NotImplemented
         return self.value == other.value
 
+    @staticmethod
+    def to_json_dict(value: float) -> float:
+        return value
+
+    @staticmethod
+    def from_json_dict(value: float) -> float:
+        return value
+
     def __repr__(self):
         return f"<Float [value={self.value}]>"
 
@@ -103,6 +127,14 @@ class Double:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.value == other.value
+
+    @staticmethod
+    def to_json_dict(value: float) -> float:
+        return value
+
+    @staticmethod
+    def from_json_dict(value: float) -> float:
+        return value
 
     def __repr__(self):
         return f"<Double [value={self.value}]>"
@@ -127,6 +159,14 @@ class Hyper:
             return NotImplemented
         return self.value == other.value
 
+    @staticmethod
+    def to_json_dict(value: int) -> str:
+        return str(value)
+
+    @staticmethod
+    def from_json_dict(value) -> int:
+        return int(value)
+
     def __repr__(self):
         return f"<Hyper [value={self.value}]>"
 
@@ -150,6 +190,14 @@ class UnsignedHyper:
             return NotImplemented
         return self.value == other.value
 
+    @staticmethod
+    def to_json_dict(value: int) -> str:
+        return str(value)
+
+    @staticmethod
+    def from_json_dict(value) -> int:
+        return int(value)
+
     def __repr__(self):
         return f"<UnsignedHyper [value={self.value}]>"
 
@@ -172,6 +220,14 @@ class Boolean:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.value == other.value
+
+    @staticmethod
+    def to_json_dict(value: bool) -> bool:
+        return value
+
+    @staticmethod
+    def from_json_dict(value: bool) -> bool:
+        return value
 
     def __repr__(self):
         return f"<Boolean [value={self.value}]>"
@@ -207,6 +263,85 @@ class String:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.value == other.value and self.size == other.size
+
+    @staticmethod
+    def to_json_dict(value: bytes) -> str:
+        """Encode raw bytes to a SEP-0051 "Escaped ASCII" string.
+
+        SEP-0051 escaping rules:
+          - 0x00      -> \\0   (NUL)
+          - 0x09      -> \\t   (TAB)
+          - 0x0A      -> \\n   (LF)
+          - 0x0D      -> \\r   (CR)
+          - 0x5C (92) -> \\\\  (backslash)
+          - 0x20-0x7E -> literal printable ASCII character
+          - all others -> \\xNN  (two-digit lowercase hex)
+
+        This is needed because XDR ``string`` is an arbitrary byte sequence
+        (not necessarily UTF-8), and JSON only supports UTF-8 strings.
+        """
+        result = []
+        for byte in value:
+            if byte == 0:  # NUL
+                result.append("\\0")
+            elif byte == 9:  # TAB
+                result.append("\\t")
+            elif byte == 10:  # LF
+                result.append("\\n")
+            elif byte == 13:  # CR
+                result.append("\\r")
+            elif byte == 92:  # backslash
+                result.append("\\\\")
+            elif 0x20 <= byte <= 0x7E:  # printable ASCII
+                result.append(chr(byte))
+            else:  # non-printable / non-ASCII -> hex escape
+                result.append(f"\\x{byte:02x}")
+        return "".join(result)
+
+    @staticmethod
+    def from_json_dict(value: str) -> bytes:
+        """Decode a SEP-0051 "Escaped ASCII" string back to raw bytes.
+
+        Reverses the escaping performed by :meth:`to_json_dict`:
+          - ``\\0``   -> 0x00  (NUL)
+          - ``\\t``   -> 0x09  (TAB)
+          - ``\\n``   -> 0x0A  (LF)
+          - ``\\r``   -> 0x0D  (CR)
+          - ``\\\\``  -> 0x5C  (backslash)
+          - ``\\xNN`` -> byte with hex value NN
+          - anything else -> literal ASCII byte
+        """
+        result = bytearray()
+        i = 0
+        while i < len(value):
+            if value[i] == "\\" and i + 1 < len(value):
+                next_char = value[i + 1]
+                if next_char == "0":  # \0 -> NUL
+                    result.append(0)
+                    i += 2
+                elif next_char == "t":  # \t -> TAB
+                    result.append(9)
+                    i += 2
+                elif next_char == "n":  # \n -> LF
+                    result.append(10)
+                    i += 2
+                elif next_char == "r":  # \r -> CR
+                    result.append(13)
+                    i += 2
+                elif next_char == "\\":  # \\ -> backslash
+                    result.append(92)
+                    i += 2
+                elif next_char == "x" and i + 3 < len(value):  # \xNN -> hex byte
+                    hex_str = value[i + 2 : i + 4]
+                    result.append(int(hex_str, 16))
+                    i += 4
+                else:  # unrecognized escape, treat backslash as literal
+                    result.append(ord(value[i]))
+                    i += 1
+            else:  # literal ASCII character
+                result.append(ord(value[i]))
+                i += 1
+        return bytes(result)
 
     def __repr__(self):
         return f"<String [value={self.value}, size={self.size}]>"
@@ -259,6 +394,14 @@ class Opaque:
             and self.fixed == other.fixed
             and self.size == other.size
         )
+
+    @staticmethod
+    def to_json_dict(value: bytes) -> str:
+        return value.hex()
+
+    @staticmethod
+    def from_json_dict(value: str) -> bytes:
+        return bytes.fromhex(value)
 
     def __repr__(self):
         return f"<Opaque [value={self.value}, fixed={self.fixed}, size={self.size}]>"

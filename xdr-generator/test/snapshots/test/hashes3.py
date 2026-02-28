@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
@@ -60,6 +61,18 @@ class Hashes3:
     def from_xdr(cls, xdr: str) -> Hashes3:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> Hashes3:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self):
+        return [item.to_json_dict() for item in self.hashes3]
+    @classmethod
+    def from_json_dict(cls, json_value) -> Hashes3:
+        return cls([Hash.from_json_dict(item) for item in json_value])
     def __hash__(self):
         return hash((self.hashes3,))
     def __eq__(self, other: object):

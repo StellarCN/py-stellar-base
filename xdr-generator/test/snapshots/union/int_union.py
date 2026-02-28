@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
@@ -92,6 +93,36 @@ class IntUnion:
     def from_xdr(cls, xdr: str) -> IntUnion:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> IntUnion:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self):
+        if self.type == 0:
+            assert self.error is not None
+            return {"v0": self.error.to_json_dict()}
+        if self.type == 1:
+            assert self.things is not None
+            return {"v1": [item.to_json_dict() for item in self.things]}
+        raise ValueError(f"Unknown type in IntUnion: {self.type}")
+    @classmethod
+    def from_json_dict(cls, json_value) -> IntUnion:
+        if isinstance(json_value, str):
+            raise ValueError(f"Unexpected string input for IntUnion: {json_value}")
+        if not isinstance(json_value, dict) or len(json_value) != 1:
+            raise ValueError(f"Expected a single-key object for IntUnion, got: {json_value}")
+        key = next(iter(json_value))
+        type = int(key[1:])
+        if key == "v0":
+            error = Error.from_json_dict(json_value["v0"])
+            return cls(type=type, error=error)
+        if key == "v1":
+            things = [Multi.from_json_dict(item) for item in json_value["v1"]]
+            return cls(type=type, things=things)
+        raise ValueError(f"Unknown key '{key}' for IntUnion")
     def __hash__(self):
         return hash((self.type, self.error, self.things,))
     def __eq__(self, other: object):

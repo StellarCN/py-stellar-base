@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
+_ACCOUNT_FLAGS_MAP = {1: "auth_required_flag"}
+_ACCOUNT_FLAGS_REVERSE_MAP = {"auth_required_flag": 1}
 __all__ = ['AccountFlags']
 class AccountFlags(IntEnum):
     """
@@ -49,3 +52,16 @@ class AccountFlags(IntEnum):
     def from_xdr(cls, xdr: str) -> AccountFlags:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> AccountFlags:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self) -> str:
+        return _ACCOUNT_FLAGS_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> AccountFlags:
+        return cls(_ACCOUNT_FLAGS_REVERSE_MAP[json_value])

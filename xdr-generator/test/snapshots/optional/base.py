@@ -35,6 +35,14 @@ class Integer:
             return NotImplemented
         return self.value == other.value
 
+    @staticmethod
+    def to_json_dict(value: int) -> int:
+        return value
+
+    @staticmethod
+    def from_json_dict(value: int) -> int:
+        return value
+
     def __repr__(self):
         return f"<Integer [value={self.value}]>"
 
@@ -57,6 +65,14 @@ class UnsignedInteger:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.value == other.value
+
+    @staticmethod
+    def to_json_dict(value: int) -> int:
+        return value
+
+    @staticmethod
+    def from_json_dict(value: int) -> int:
+        return value
 
     def __repr__(self):
         return f"<UnsignedInteger [value={self.value}]>"
@@ -81,6 +97,14 @@ class Float:
             return NotImplemented
         return self.value == other.value
 
+    @staticmethod
+    def to_json_dict(value: float) -> float:
+        return value
+
+    @staticmethod
+    def from_json_dict(value: float) -> float:
+        return value
+
     def __repr__(self):
         return f"<Float [value={self.value}]>"
 
@@ -103,6 +127,14 @@ class Double:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.value == other.value
+
+    @staticmethod
+    def to_json_dict(value: float) -> float:
+        return value
+
+    @staticmethod
+    def from_json_dict(value: float) -> float:
+        return value
 
     def __repr__(self):
         return f"<Double [value={self.value}]>"
@@ -127,6 +159,14 @@ class Hyper:
             return NotImplemented
         return self.value == other.value
 
+    @staticmethod
+    def to_json_dict(value: int) -> str:
+        return str(value)
+
+    @staticmethod
+    def from_json_dict(value) -> int:
+        return int(value)
+
     def __repr__(self):
         return f"<Hyper [value={self.value}]>"
 
@@ -150,6 +190,14 @@ class UnsignedHyper:
             return NotImplemented
         return self.value == other.value
 
+    @staticmethod
+    def to_json_dict(value: int) -> str:
+        return str(value)
+
+    @staticmethod
+    def from_json_dict(value) -> int:
+        return int(value)
+
     def __repr__(self):
         return f"<UnsignedHyper [value={self.value}]>"
 
@@ -172,6 +220,14 @@ class Boolean:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.value == other.value
+
+    @staticmethod
+    def to_json_dict(value: bool) -> bool:
+        return value
+
+    @staticmethod
+    def from_json_dict(value: bool) -> bool:
+        return value
 
     def __repr__(self):
         return f"<Boolean [value={self.value}]>"
@@ -207,6 +263,60 @@ class String:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.value == other.value and self.size == other.size
+
+    @staticmethod
+    def to_json_dict(value: bytes) -> str:
+        result = []
+        for byte in value:
+            if byte == 0:
+                result.append("\\0")
+            elif byte == 9:
+                result.append("\\t")
+            elif byte == 10:
+                result.append("\\n")
+            elif byte == 13:
+                result.append("\\r")
+            elif byte == 92:
+                result.append("\\\\")
+            elif 0x20 <= byte <= 0x7E:
+                result.append(chr(byte))
+            else:
+                result.append(f"\\x{byte:02x}")
+        return "".join(result)
+
+    @staticmethod
+    def from_json_dict(value: str) -> bytes:
+        result = bytearray()
+        i = 0
+        while i < len(value):
+            if value[i] == "\\" and i + 1 < len(value):
+                next_char = value[i + 1]
+                if next_char == "0":
+                    result.append(0)
+                    i += 2
+                elif next_char == "t":
+                    result.append(9)
+                    i += 2
+                elif next_char == "n":
+                    result.append(10)
+                    i += 2
+                elif next_char == "r":
+                    result.append(13)
+                    i += 2
+                elif next_char == "\\":
+                    result.append(92)
+                    i += 2
+                elif next_char == "x" and i + 3 < len(value):
+                    hex_str = value[i + 2 : i + 4]
+                    result.append(int(hex_str, 16))
+                    i += 4
+                else:
+                    result.append(ord(value[i]))
+                    i += 1
+            else:
+                result.append(ord(value[i]))
+                i += 1
+        return bytes(result)
 
     def __repr__(self):
         return f"<String [value={self.value}, size={self.size}]>"
@@ -259,6 +369,14 @@ class Opaque:
             and self.fixed == other.fixed
             and self.size == other.size
         )
+
+    @staticmethod
+    def to_json_dict(value: bytes) -> str:
+        return value.hex()
+
+    @staticmethod
+    def from_json_dict(value: str) -> bytes:
+        return bytes.fromhex(value)
 
     def __repr__(self):
         return f"<Opaque [value={self.value}, fixed={self.fixed}, size={self.size}]>"
