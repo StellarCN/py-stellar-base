@@ -1054,87 +1054,102 @@ class Generator < Xdrgen::Generators::Base
     end
     out.puts "def from_json_dict(cls, json_value: #{union_json_type}) -> #{union_name}:"
     out.indent(2) do
-      # String input handling: only valid for void arms
-      out.puts "if isinstance(json_value, str):"
-      out.indent(2) do
-        if has_void_default
-          # Void default arm: string input is valid for void arms and default,
-          # but must reject non-void arm keys (they require dict form with a value)
-          if non_void_keys.any?
-            nv_keys_str = non_void_keys.map { |k| "\"#{k}\"" }.join(", ")
-            out.puts "if json_value in (#{nv_keys_str},):"
+      if has_void
+        if has_non_void
+          # Mixed mode: check for string input first (void arms)
+          out.puts "if isinstance(json_value, str):"
+          out.indent(2) do
+            render_union_void_from_json(out, union_name, discriminant_name, disc_enum, disc_type_str, void_keys, non_void_keys, has_void_default)
+          end
+        else
+          # Only void arms: json_value is always str, handle directly
+          render_union_void_from_json(out, union_name, discriminant_name, disc_enum, disc_type_str, void_keys, non_void_keys, has_void_default)
+        end
+      end
+
+      if has_non_void
+        # Dict input validation
+        if has_void
+          out.puts "if not isinstance(json_value, dict) or len(json_value) != 1:"
+        else
+          # Only non-void arms: json_value is always dict, skip isinstance check
+          out.puts "if len(json_value) != 1:"
+        end
+        out.indent(2) do
+          out.puts "raise ValueError(f\"Expected a single-key object for #{union_name}, got: {json_value}\")"
+        end
+
+        out.puts "key = next(iter(json_value))"
+        if disc_enum
+          disc_type_name = name(disc_enum)
+          out.puts "#{discriminant_name} = #{disc_type_name}.from_json_dict(key)"
+        else
+          out.puts "#{discriminant_name} = #{non_enum_disc_parse_expr(disc_type_str, 'key')}"
+        end
+
+        union.normal_arms.each do |arm|
+          next if arm.void?
+          arm.cases.each do |union_case|
+            json_key = json_key_for_case(union_case, disc_enum)
+            arm_name = safe_identifier(arm.name.underscore)
+            local_var = safe_local_var(arm_name)
+
+            out.puts "if key == \"#{json_key}\":"
             out.indent(2) do
-              out.puts "raise ValueError(f\"'{json_value}' requires a value for #{union_name}, use dict form instead\")"
+              render_import(out, arm.declaration, union_name, track: false) if render_import_in_func
+              decode_expr = decode_union_arm_value(arm, "json_value[\"#{json_key}\"]")
+              out.puts "#{local_var} = #{decode_expr}"
+              out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{local_var})"
             end
           end
-          if disc_enum
-            disc_type_name = name(disc_enum)
-            out.puts "#{discriminant_name} = #{disc_type_name}.from_json_dict(json_value)"
-          else
-            out.puts "#{discriminant_name} = #{non_enum_disc_parse_expr(disc_type_str, 'json_value')}"
-          end
-          out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
-        elsif void_keys.any?
-          # Only specific void arms are valid as string input
-          keys_str = void_keys.map { |k| "\"#{k}\"" }.join(", ")
-          out.puts "if json_value not in (#{keys_str},):"
-          out.indent(2) do
-            out.puts "raise ValueError(f\"Unexpected string '{json_value}' for #{union_name}, must be one of: #{void_keys.join(', ')}\")"
-          end
-          if disc_enum
-            disc_type_name = name(disc_enum)
-            out.puts "#{discriminant_name} = #{disc_type_name}.from_json_dict(json_value)"
-          else
-            out.puts "#{discriminant_name} = #{non_enum_disc_parse_expr(disc_type_str, 'json_value')}"
-          end
-          out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
+        end
+
+        if union.default_arm.present? && !union.default_arm.void?
+          arm_name = safe_identifier(union.default_arm.name.underscore)
+          local_var = safe_local_var(arm_name)
+          render_import(out, union.default_arm.declaration, union_name, track: false) if render_import_in_func
+          decode_expr = decode_union_arm_value(union.default_arm, "json_value[key]")
+          out.puts "#{local_var} = #{decode_expr}"
+          out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{local_var})"
         else
-          # No void arms at all: string input is never valid
-          out.puts "raise ValueError(f\"Unexpected string input for #{union_name}: {json_value}\")"
+          out.puts "raise ValueError(f\"Unknown key '{key}' for #{union_name}\")"
         end
       end
+    end
+  end
 
-      # Dict input handling: validate single key
-      out.puts "if not isinstance(json_value, dict) or len(json_value) != 1:"
-      out.indent(2) do
-        out.puts "raise ValueError(f\"Expected a single-key object for #{union_name}, got: {json_value}\")"
+  def render_union_void_from_json(out, union_name, discriminant_name, disc_enum, disc_type_str, void_keys, non_void_keys, has_void_default)
+    if has_void_default
+      # Void default arm: string input is valid for void arms and default,
+      # but must reject non-void arm keys (they require dict form with a value)
+      if non_void_keys.any?
+        nv_keys_str = non_void_keys.map { |k| "\"#{k}\"" }.join(", ")
+        out.puts "if json_value in (#{nv_keys_str},):"
+        out.indent(2) do
+          out.puts "raise ValueError(f\"'{json_value}' requires a value for #{union_name}, use dict form instead\")"
+        end
       end
-
-      out.puts "key = next(iter(json_value))"
       if disc_enum
         disc_type_name = name(disc_enum)
-        out.puts "#{discriminant_name} = #{disc_type_name}.from_json_dict(key)"
+        out.puts "#{discriminant_name} = #{disc_type_name}.from_json_dict(json_value)"
       else
-        out.puts "#{discriminant_name} = #{non_enum_disc_parse_expr(disc_type_str, 'key')}"
+        out.puts "#{discriminant_name} = #{non_enum_disc_parse_expr(disc_type_str, 'json_value')}"
       end
-
-      union.normal_arms.each do |arm|
-        next if arm.void?
-        arm.cases.each do |union_case|
-          json_key = json_key_for_case(union_case, disc_enum)
-          arm_name = safe_identifier(arm.name.underscore)
-          local_var = safe_local_var(arm_name)
-
-          out.puts "if key == \"#{json_key}\":"
-          out.indent(2) do
-            render_import(out, arm.declaration, union_name, track: false) if render_import_in_func
-            decode_expr = decode_union_arm_value(arm, "json_value[\"#{json_key}\"]")
-            out.puts "#{local_var} = #{decode_expr}"
-            out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{local_var})"
-          end
-        end
+      out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
+    elsif void_keys.any?
+      # Only specific void arms are valid as string input
+      keys_str = void_keys.map { |k| "\"#{k}\"" }.join(", ")
+      out.puts "if json_value not in (#{keys_str},):"
+      out.indent(2) do
+        out.puts "raise ValueError(f\"Unexpected string '{json_value}' for #{union_name}, must be one of: #{void_keys.join(', ')}\")"
       end
-
-      if union.default_arm.present? && !union.default_arm.void?
-        arm_name = safe_identifier(union.default_arm.name.underscore)
-        local_var = safe_local_var(arm_name)
-        render_import(out, union.default_arm.declaration, union_name, track: false) if render_import_in_func
-        decode_expr = decode_union_arm_value(union.default_arm, "json_value[key]")
-        out.puts "#{local_var} = #{decode_expr}"
-        out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{local_var})"
+      if disc_enum
+        disc_type_name = name(disc_enum)
+        out.puts "#{discriminant_name} = #{disc_type_name}.from_json_dict(json_value)"
       else
-        out.puts "raise ValueError(f\"Unknown key '{key}' for #{union_name}\")"
+        out.puts "#{discriminant_name} = #{non_enum_disc_parse_expr(disc_type_str, 'json_value')}"
       end
+      out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
     end
   end
 

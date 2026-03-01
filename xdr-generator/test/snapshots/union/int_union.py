@@ -110,9 +110,7 @@ class IntUnion:
         raise ValueError(f"Unknown type in IntUnion: {self.type}")
     @classmethod
     def from_json_dict(cls, json_value: dict) -> IntUnion:
-        if isinstance(json_value, str):
-            raise ValueError(f"Unexpected string input for IntUnion: {json_value}")
-        if not isinstance(json_value, dict) or len(json_value) != 1:
+        if len(json_value) != 1:
             raise ValueError(f"Expected a single-key object for IntUnion, got: {json_value}")
         key = next(iter(json_value))
         type = int(key[1:])

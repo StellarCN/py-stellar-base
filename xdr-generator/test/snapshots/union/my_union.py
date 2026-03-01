@@ -112,9 +112,7 @@ class MyUnion:
         raise ValueError(f"Unknown type in MyUnion: {self.type}")
     @classmethod
     def from_json_dict(cls, json_value: dict) -> MyUnion:
-        if isinstance(json_value, str):
-            raise ValueError(f"Unexpected string input for MyUnion: {json_value}")
-        if not isinstance(json_value, dict) or len(json_value) != 1:
+        if len(json_value) != 1:
             raise ValueError(f"Expected a single-key object for MyUnion, got: {json_value}")
         key = next(iter(json_value))
         type = UnionKey.from_json_dict(key)
