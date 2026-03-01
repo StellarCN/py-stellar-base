@@ -62,7 +62,7 @@ class Uint513:
     def to_json_dict(self):
         return Opaque.to_json_dict(self.uint513)
     @classmethod
-    def from_json_dict(cls, json_value) -> Uint513:
+    def from_json_dict(cls, json_value: str) -> Uint513:
         return cls(Opaque.from_json_dict(json_value))
     def __hash__(self):
         return hash((self.uint513,))

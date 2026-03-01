@@ -83,7 +83,7 @@ class KeywordUnion:
             return {"from": self.class_.to_json_dict()}
         return self.from_.to_json_dict()
     @classmethod
-    def from_json_dict(cls, json_value) -> KeywordUnion:
+    def from_json_dict(cls, json_value: str | dict) -> KeywordUnion:
         if isinstance(json_value, str):
             if json_value in ("from",):
                 raise ValueError(f"'{json_value}' requires a value for KeywordUnion, use dict form instead")

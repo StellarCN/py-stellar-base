@@ -81,7 +81,7 @@ class NesterNestedUnion:
         assert self.blah2 is not None
         return {self.color.to_json_dict(): Integer.to_json_dict(self.blah2)}
     @classmethod
-    def from_json_dict(cls, json_value) -> NesterNestedUnion:
+    def from_json_dict(cls, json_value: str | dict) -> NesterNestedUnion:
         if isinstance(json_value, str):
             if json_value not in ("red",):
                 raise ValueError(f"Unexpected string '{json_value}' for NesterNestedUnion, must be one of: red")

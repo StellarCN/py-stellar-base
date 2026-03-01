@@ -64,7 +64,7 @@ class OptHash1:
     def to_json_dict(self):
         return self.opt_hash1.to_json_dict() if self.opt_hash1 is not None else None
     @classmethod
-    def from_json_dict(cls, json_value) -> OptHash1:
+    def from_json_dict(cls, json_value: str | None) -> OptHash1:
         return cls(Hash.from_json_dict(json_value) if json_value is not None else None)
     def __hash__(self):
         return hash((self.opt_hash1,))

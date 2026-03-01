@@ -66,7 +66,7 @@ class TestArray:
     def to_json_dict(self):
         return [Integer.to_json_dict(item) for item in self.test_array]
     @classmethod
-    def from_json_dict(cls, json_value) -> TestArray:
+    def from_json_dict(cls, json_value: list) -> TestArray:
         return cls([Integer.from_json_dict(item) for item in json_value])
     def __hash__(self):
         return hash((self.test_array,))

@@ -59,7 +59,7 @@ class Int64:
     def to_json_dict(self):
         return Hyper.to_json_dict(self.int64)
     @classmethod
-    def from_json_dict(cls, json_value) -> Int64:
+    def from_json_dict(cls, json_value: str) -> Int64:
         return cls(Hyper.from_json_dict(json_value))
     def __hash__(self):
         return hash((self.int64,))

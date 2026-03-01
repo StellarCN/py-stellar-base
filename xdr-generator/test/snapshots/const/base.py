@@ -266,54 +266,79 @@ class String:
 
     @staticmethod
     def to_json_dict(value: bytes) -> str:
+        """Encode raw bytes to a SEP-0051 "Escaped ASCII" string.
+
+        SEP-0051 escaping rules:
+          - 0x00      -> \\0   (NUL)
+          - 0x09      -> \\t   (TAB)
+          - 0x0A      -> \\n   (LF)
+          - 0x0D      -> \\r   (CR)
+          - 0x5C (92) -> \\\\  (backslash)
+          - 0x20-0x7E -> literal printable ASCII character
+          - all others -> \\xNN  (two-digit lowercase hex)
+
+        This is needed because XDR ``string`` is an arbitrary byte sequence
+        (not necessarily UTF-8), and JSON only supports UTF-8 strings.
+        """
         result = []
         for byte in value:
-            if byte == 0:
+            if byte == 0:  # NUL
                 result.append("\\0")
-            elif byte == 9:
+            elif byte == 9:  # TAB
                 result.append("\\t")
-            elif byte == 10:
+            elif byte == 10:  # LF
                 result.append("\\n")
-            elif byte == 13:
+            elif byte == 13:  # CR
                 result.append("\\r")
-            elif byte == 92:
+            elif byte == 92:  # backslash
                 result.append("\\\\")
-            elif 0x20 <= byte <= 0x7E:
+            elif 0x20 <= byte <= 0x7E:  # printable ASCII
                 result.append(chr(byte))
-            else:
+            else:  # non-printable / non-ASCII -> hex escape
                 result.append(f"\\x{byte:02x}")
         return "".join(result)
 
     @staticmethod
     def from_json_dict(value: str) -> bytes:
+        """Decode a SEP-0051 "Escaped ASCII" string back to raw bytes.
+
+        Reverses the escaping performed by :meth:`to_json_dict`:
+          - ``\\0``   -> 0x00  (NUL)
+          - ``\\t``   -> 0x09  (TAB)
+          - ``\\n``   -> 0x0A  (LF)
+          - ``\\r``   -> 0x0D  (CR)
+          - ``\\\\``  -> 0x5C  (backslash)
+          - ``\\xNN`` -> byte with hex value NN
+          - anything else -> literal ASCII byte
+        """
         result = bytearray()
         i = 0
         while i < len(value):
             if value[i] == "\\" and i + 1 < len(value):
                 next_char = value[i + 1]
-                if next_char == "0":
+                if next_char == "0":  # \0 -> NUL
                     result.append(0)
                     i += 2
-                elif next_char == "t":
+                elif next_char == "t":  # \t -> TAB
                     result.append(9)
                     i += 2
-                elif next_char == "n":
+                elif next_char == "n":  # \n -> LF
                     result.append(10)
                     i += 2
-                elif next_char == "r":
+                elif next_char == "r":  # \r -> CR
                     result.append(13)
                     i += 2
-                elif next_char == "\\":
+                elif next_char == "\\":  # \\ -> backslash
                     result.append(92)
                     i += 2
-                elif next_char == "x" and i + 3 < len(value):
+                elif next_char == "x" and i + 3 < len(value):  # \xNN -> hex byte
                     hex_str = value[i + 2 : i + 4]
                     result.append(int(hex_str, 16))
                     i += 4
-                else:
+                else:  # unrecognized escape, treat backslash as literal
                     result.append(ord(value[i]))
                     i += 1
-            else:
+            else:  # literal ASCII character
                 result.append(ord(value[i]))
                 i += 1
         return bytes(result)

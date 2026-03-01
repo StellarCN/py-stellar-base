@@ -59,7 +59,7 @@ class Error:
     def to_json_dict(self):
         return Integer.to_json_dict(self.error)
     @classmethod
-    def from_json_dict(cls, json_value) -> Error:
+    def from_json_dict(cls, json_value: int) -> Error:
         return cls(Integer.from_json_dict(json_value))
     def __hash__(self):
         return hash((self.error,))

@@ -59,7 +59,7 @@ class Pass:
     def to_json_dict(self):
         return Integer.to_json_dict(self.pass_)
     @classmethod
-    def from_json_dict(cls, json_value) -> Pass:
+    def from_json_dict(cls, json_value: int) -> Pass:
         return cls(Integer.from_json_dict(json_value))
     def __hash__(self):
         return hash((self.pass_,))

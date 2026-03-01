@@ -59,7 +59,7 @@ class Int1:
     def to_json_dict(self):
         return Integer.to_json_dict(self.int1)
     @classmethod
-    def from_json_dict(cls, json_value) -> Int1:
+    def from_json_dict(cls, json_value: int) -> Int1:
         return cls(Integer.from_json_dict(json_value))
     def __hash__(self):
         return hash((self.int1,))

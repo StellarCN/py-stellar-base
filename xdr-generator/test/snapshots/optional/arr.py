@@ -66,7 +66,7 @@ class Arr:
     def to_json_dict(self):
         return [Integer.to_json_dict(item) for item in self.arr]
     @classmethod
-    def from_json_dict(cls, json_value) -> Arr:
+    def from_json_dict(cls, json_value: list) -> Arr:
         return cls([Integer.from_json_dict(item) for item in json_value])
     def __hash__(self):
         return hash((self.arr,))

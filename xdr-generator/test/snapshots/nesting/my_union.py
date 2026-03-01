@@ -113,7 +113,7 @@ class MyUnion:
             return "offer"
         raise ValueError(f"Unknown type in MyUnion: {self.type}")
     @classmethod
-    def from_json_dict(cls, json_value) -> MyUnion:
+    def from_json_dict(cls, json_value: str | dict) -> MyUnion:
         if isinstance(json_value, str):
             if json_value not in ("offer",):
                 raise ValueError(f"Unexpected string '{json_value}' for MyUnion, must be one of: offer")

@@ -71,7 +71,7 @@ class Hashes3:
     def to_json_dict(self):
         return [item.to_json_dict() for item in self.hashes3]
     @classmethod
-    def from_json_dict(cls, json_value) -> Hashes3:
+    def from_json_dict(cls, json_value: list) -> Hashes3:
         return cls([Hash.from_json_dict(item) for item in json_value])
     def __hash__(self):
         return hash((self.hashes3,))

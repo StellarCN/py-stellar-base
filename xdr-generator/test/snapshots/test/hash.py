@@ -62,7 +62,7 @@ class Hash:
     def to_json_dict(self):
         return Opaque.to_json_dict(self.hash)
     @classmethod
-    def from_json_dict(cls, json_value) -> Hash:
+    def from_json_dict(cls, json_value: str) -> Hash:
         return cls(Opaque.from_json_dict(json_value))
     def __hash__(self):
         return hash((self.hash,))

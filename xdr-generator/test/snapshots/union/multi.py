@@ -59,7 +59,7 @@ class Multi:
     def to_json_dict(self):
         return Integer.to_json_dict(self.multi)
     @classmethod
-    def from_json_dict(cls, json_value) -> Multi:
+    def from_json_dict(cls, json_value: int) -> Multi:
         return cls(Integer.from_json_dict(json_value))
     def __hash__(self):
         return hash((self.multi,))

@@ -62,7 +62,7 @@ class Str2:
     def to_json_dict(self):
         return String.to_json_dict(self.str2)
     @classmethod
-    def from_json_dict(cls, json_value) -> Str2:
+    def from_json_dict(cls, json_value: str) -> Str2:
         return cls(String.from_json_dict(json_value))
     def __hash__(self):
         return hash((self.str2,))

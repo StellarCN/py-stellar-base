@@ -59,7 +59,7 @@ class Int4:
     def to_json_dict(self):
         return UnsignedHyper.to_json_dict(self.int4)
     @classmethod
-    def from_json_dict(cls, json_value) -> Int4:
+    def from_json_dict(cls, json_value: str) -> Int4:
         return cls(UnsignedHyper.from_json_dict(json_value))
     def __hash__(self):
         return hash((self.int4,))

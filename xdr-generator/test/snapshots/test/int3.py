@@ -59,7 +59,7 @@ class Int3:
     def to_json_dict(self):
         return UnsignedInteger.to_json_dict(self.int3)
     @classmethod
-    def from_json_dict(cls, json_value) -> Int3:
+    def from_json_dict(cls, json_value: int) -> Int3:
         return cls(UnsignedInteger.from_json_dict(json_value))
     def __hash__(self):
         return hash((self.int3,))

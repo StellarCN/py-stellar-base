@@ -111,7 +111,7 @@ class MyUnion:
             return {"multi": [item.to_json_dict() for item in self.things]}
         raise ValueError(f"Unknown type in MyUnion: {self.type}")
     @classmethod
-    def from_json_dict(cls, json_value) -> MyUnion:
+    def from_json_dict(cls, json_value: dict) -> MyUnion:
         if isinstance(json_value, str):
             raise ValueError(f"Unexpected string input for MyUnion: {json_value}")
         if not isinstance(json_value, dict) or len(json_value) != 1:
