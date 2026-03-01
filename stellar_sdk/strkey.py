@@ -1,16 +1,11 @@
 import base64
 import binascii
 import struct
-import warnings
 from enum import Enum
 
-from xdrlib3 import Packer, Unpacker
-
-from . import xdr as stellar_xdr
 from .exceptions import (
     Ed25519PublicKeyInvalidError,
     Ed25519SecretSeedInvalidError,
-    MuxedEd25519AccountInvalidError,
 )
 
 __all__ = ["StrKey"]
@@ -166,73 +161,6 @@ class StrKey:
         :return: ``True`` if the given key is valid
         """
         return _is_valid(_VersionByte.SHA256_HASH, sha256_hash)
-
-    @staticmethod
-    def encode_muxed_account(data: stellar_xdr.MuxedAccount) -> str:
-        """Encodes data to encoded muxed account strkey (M... or G...).
-
-        :param data: data to encode
-        :return: encoded muxed account strkey
-        :raises:
-            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
-        """
-        warnings.warn(
-            "The `encode_muxed_account` method is deprecated, use `stellar_sdk.MuxedAccount` instead.",
-            DeprecationWarning,
-        )
-
-        if data.type == stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519:
-            assert data.ed25519 is not None
-            return StrKey.encode_ed25519_public_key(data.ed25519.uint256)
-
-        assert data.med25519 is not None
-        packer = Packer()
-        data.med25519.ed25519.pack(packer)
-        data.med25519.id.pack(packer)
-        return _encode_check(_VersionByte.MED25519_PUBLIC_KEY, packer.get_buffer())
-
-    @staticmethod
-    def decode_muxed_account(data: str) -> stellar_xdr.MuxedAccount:
-        """Decodes encoded muxed account strkey (M... or G...) to raw data.
-
-        :param data: encoded muxed account strkey
-        :return: raw bytes
-        :raises:
-            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
-        """
-        warnings.warn(
-            "The `decode_muxed_account` method is deprecated, use `stellar_sdk.MuxedAccount` instead.",
-            DeprecationWarning,
-        )
-
-        data_length = len(data)
-        if data_length == 56:
-            muxed = stellar_xdr.MuxedAccount(
-                type=stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519,
-                ed25519=stellar_xdr.Uint256(StrKey.decode_ed25519_public_key(data)),
-            )
-        elif data_length == 69:
-            # let's optimize it in v3.
-            try:
-                xdr_bytes = _decode_check(_VersionByte.MED25519_PUBLIC_KEY, data)
-            except Exception:
-                raise MuxedEd25519AccountInvalidError(
-                    "Invalid Muxed Account: {}".format(data)
-                )
-
-            unpacker = Unpacker(xdr_bytes)
-            ed25519 = stellar_xdr.Uint256.unpack(unpacker)
-            id = stellar_xdr.Uint64.unpack(unpacker)
-            med25519 = stellar_xdr.MuxedAccountMed25519(
-                id=id,
-                ed25519=ed25519,
-            )
-            muxed = stellar_xdr.MuxedAccount(
-                type=stellar_xdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519
-            )
-        else:
-            raise ValueError("Invalid encoded string, this is not a valid account.")
-        return muxed
 
     @staticmethod
     def encode_med25519_public_key(data: bytes) -> str:
