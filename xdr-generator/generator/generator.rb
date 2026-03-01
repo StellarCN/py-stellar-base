@@ -1043,7 +1043,16 @@ class Generator < Xdrgen::Generators::Base
 
     # from_json_dict
     out.puts "@classmethod"
-    out.puts "def from_json_dict(cls, json_value) -> #{union_name}:"
+    has_void = void_keys.any? || has_void_default
+    has_non_void = non_void_keys.any? || (union.default_arm.present? && !union.default_arm.void?)
+    union_json_type = if has_void && has_non_void
+      "str | dict"
+    elsif has_void
+      "str"
+    else
+      "dict"
+    end
+    out.puts "def from_json_dict(cls, json_value: #{union_json_type}) -> #{union_name}:"
     out.indent(2) do
       # String input handling: only valid for void arms
       out.puts "if isinstance(json_value, str):"
@@ -1148,10 +1157,74 @@ class Generator < Xdrgen::Generators::Base
 
     # from_json_dict
     out.puts "@classmethod"
-    out.puts "def from_json_dict(cls, json_value) -> #{typedef_name}:"
+    json_type = json_type_for_declaration(typedef.declaration)
+    if json_type
+      out.puts "def from_json_dict(cls, json_value: #{json_type}) -> #{typedef_name}:"
+    else
+      out.puts "def from_json_dict(cls, json_value) -> #{typedef_name}:"
+    end
     out.indent(2) do
       decode_expr = decode_value_from_json(typedef.declaration, "json_value")
       out.puts "return cls(#{decode_expr})"
+    end
+  end
+
+  # ============================================================================
+  # JSON type annotation helpers
+  # ============================================================================
+
+  # Returns the Python type annotation string for a JSON value corresponding
+  # to the given XDR declaration, or nil if the type cannot be determined.
+  def json_type_for_declaration(decl)
+    case decl
+    when AST::Declarations::Array
+      "list"
+    else
+      type = decl.type
+      base_type = json_type_for_typespec(type)
+      if base_type && type.sub_type == :optional
+        "#{base_type} | None"
+      else
+        base_type
+      end
+    end
+  end
+
+  def json_type_for_typespec(type)
+    case type
+    when AST::Typespecs::Int, AST::Typespecs::UnsignedInt
+      "int"
+    when AST::Typespecs::Hyper, AST::Typespecs::UnsignedHyper,
+         AST::Typespecs::Opaque, AST::Typespecs::String
+      "str"
+    when AST::Typespecs::Float, AST::Typespecs::Double
+      "float"
+    when AST::Typespecs::Bool
+      "bool"
+    when AST::Typespecs::Simple
+      resolved = type.resolved_type
+      case resolved
+      when AST::Definitions::Enum
+        "str"
+      when AST::Definitions::Struct
+        stellar_specific_type?(name(resolved)) ? "str" : "dict"
+      when AST::Definitions::Union
+        stellar_specific_type?(name(resolved)) ? "str" : nil
+      when AST::Definitions::Typedef
+        json_type_for_declaration(resolved.declaration)
+      else
+        nil
+      end
+    when AST::Concerns::NestedDefinition
+      if type.is_a?(AST::Definitions::Enum)
+        "str"
+      elsif type.is_a?(AST::Definitions::Struct)
+        "dict"
+      else
+        nil
+      end
+    else
+      nil
     end
   end
 
