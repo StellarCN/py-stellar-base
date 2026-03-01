@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
@@ -85,6 +86,29 @@ class Nester:
     def from_xdr(cls, xdr: str) -> Nester:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> Nester:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self) -> dict:
+        return {
+            "nested_enum": self.nested_enum.to_json_dict(),
+            "nested_struct": self.nested_struct.to_json_dict(),
+            "nested_union": self.nested_union.to_json_dict(),
+        }
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> Nester:
+        nested_enum = NesterNestedEnum.from_json_dict(json_dict["nested_enum"])
+        nested_struct = NesterNestedStruct.from_json_dict(json_dict["nested_struct"])
+        nested_union = NesterNestedUnion.from_json_dict(json_dict["nested_union"])
+        return cls(
+            nested_enum=nested_enum,
+            nested_struct=nested_struct,
+            nested_union=nested_union,
+        )
     def __hash__(self):
         return hash((self.nested_enum, self.nested_struct, self.nested_union,))
     def __eq__(self, other: object):

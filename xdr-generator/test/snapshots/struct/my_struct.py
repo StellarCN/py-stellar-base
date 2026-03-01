@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
@@ -90,6 +91,35 @@ class MyStruct:
     def from_xdr(cls, xdr: str) -> MyStruct:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> MyStruct:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self) -> dict:
+        return {
+            "some_int": Integer.to_json_dict(self.some_int),
+            "a_big_int": self.a_big_int.to_json_dict(),
+            "some_opaque": Opaque.to_json_dict(self.some_opaque),
+            "some_string": String.to_json_dict(self.some_string),
+            "max_string": String.to_json_dict(self.max_string),
+        }
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> MyStruct:
+        some_int = Integer.from_json_dict(json_dict["some_int"])
+        a_big_int = Int64.from_json_dict(json_dict["a_big_int"])
+        some_opaque = Opaque.from_json_dict(json_dict["some_opaque"])
+        some_string = String.from_json_dict(json_dict["some_string"])
+        max_string = String.from_json_dict(json_dict["max_string"])
+        return cls(
+            some_int=some_int,
+            a_big_int=a_big_int,
+            some_opaque=some_opaque,
+            some_string=some_string,
+            max_string=max_string,
+        )
     def __hash__(self):
         return hash((self.some_int, self.a_big_int, self.some_opaque, self.some_string, self.max_string,))
     def __eq__(self, other: object):

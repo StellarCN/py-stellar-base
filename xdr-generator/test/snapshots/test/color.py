@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
 
+_COLOR_MAP = {0: "red", 5: "blue", 6: "green"}
+_COLOR_REVERSE_MAP = {"red": 0, "blue": 5, "green": 6}
 __all__ = ['Color']
 class Color(IntEnum):
     """
@@ -52,3 +55,16 @@ class Color(IntEnum):
     def from_xdr(cls, xdr: str) -> Color:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> Color:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self) -> str:
+        return _COLOR_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> Color:
+        return cls(_COLOR_REVERSE_MAP[json_value])

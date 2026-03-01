@@ -18,6 +18,23 @@ class Generator < Xdrgen::Generators::Base
     nonlocal not or pass raise return try while with yield case
   ].freeze
 
+  STELLAR_SPECIFIC_TYPES = %w[
+    AccountID PublicKey MuxedAccount SCAddress SignerKey
+    PoolID ClaimableBalanceID
+    AssetCode4 AssetCode12
+    UInt128Parts Int128Parts UInt256Parts Int256Parts
+  ].freeze
+
+  STELLAR_STRKEY_TYPES = %w[
+    AccountID PublicKey MuxedAccount SCAddress SignerKey
+    PoolID ClaimableBalanceID
+  ].freeze
+
+  # Python builtins that may be used in generated code (isinstance checks, int() calls, etc.)
+  # If a union arm name matches one of these, we suffix the local variable with _val
+  # to avoid shadowing the builtin.
+  PYTHON_BUILTINS = %w[str bytes int float bool list dict map type set].freeze
+
   def generate
     initialize_output_files
     render_base_classes
@@ -50,7 +67,7 @@ class Generator < Xdrgen::Generators::Base
     register_init_import(definition_name)
     @imported_types = Set.new
     out = @output.open("#{python_module_name(definition_name)}.py")
-    render_common_import(out)
+    render_common_import(out, definition_name)
     out
   end
 
@@ -92,6 +109,9 @@ class Generator < Xdrgen::Generators::Base
     enum_name = name(enum)
     out = open_definition_file(enum_name)
 
+    prefix_len = enum_prefix_length(enum)
+    render_enum_maps(out, enum, enum_name, prefix_len)
+
     out.puts "__all__ = ['#{enum_name}']"
     out.puts "class #{enum_name}(IntEnum):"
     out.indent(2) do
@@ -111,6 +131,7 @@ class Generator < Xdrgen::Generators::Base
       HEREDOC
 
       render_xdr_utils(out, enum_name)
+      render_enum_to_json(out, enum_name)
     end
 
     out.close
@@ -151,6 +172,7 @@ class Generator < Xdrgen::Generators::Base
       end
 
       render_xdr_utils(out, typedef_name)
+      render_typedef_to_json(out, typedef, typedef_name, typedef_name_underscore)
       render_hash_and_eq(out, [typedef_name_underscore])
       out.puts <<~HEREDOC
         def __repr__(self):
@@ -264,7 +286,7 @@ class Generator < Xdrgen::Generators::Base
       return
     end
 
-    render_import(out, arm.declaration, union_name) if render_import_in_func
+    render_import(out, arm.declaration, union_name, track: false) if render_import_in_func
 
     decode_member(arm, out, depth_aware: true)
     arm_name = safe_identifier(arm.name.underscore)
@@ -355,6 +377,7 @@ class Generator < Xdrgen::Generators::Base
       render_union_unpack(out, union, union_name, discriminant_name, render_import_in_func)
 
       render_xdr_utils(out, union_name)
+      render_union_to_json(out, union, union_name, discriminant_name, render_import_in_func)
 
       attribute_names = [discriminant_name] + non_void_arms(union).map { |arm| safe_identifier(arm.name.underscore) }
       render_hash_and_eq(out, attribute_names)
@@ -457,6 +480,7 @@ class Generator < Xdrgen::Generators::Base
       render_struct_unpack(out, struct, struct_name)
 
       render_xdr_utils(out, struct_name)
+      render_struct_to_json(out, struct, struct_name)
 
       member_names = struct_member_names(struct)
       render_hash_and_eq(out, member_names)
@@ -533,13 +557,14 @@ class Generator < Xdrgen::Generators::Base
     end
   end
 
-  def render_common_import(out)
+  def render_common_import(out, definition_name = nil)
     out.puts <<~EOS
       # This is an automatically generated file.
       # DO NOT EDIT or your changes may be overwritten
       from __future__ import annotations
 
       import base64
+      import json
       from enum import IntEnum
       from typing import List, Optional, TYPE_CHECKING
       from xdrlib3 import Packer, Unpacker
@@ -619,6 +644,13 @@ class Generator < Xdrgen::Generators::Base
       def from_xdr(cls, xdr: str) -> #{name}:
           xdr_bytes = base64.b64decode(xdr.encode())
           return cls.from_xdr_bytes(xdr_bytes)
+
+      def to_json(self) -> str:
+          return json.dumps(self.to_json_dict())
+
+      @classmethod
+      def from_json(cls, json_str: str) -> #{name}:
+          return cls.from_json_dict(json.loads(json_str))
     HEREDOC
   end
 
@@ -694,6 +726,839 @@ class Generator < Xdrgen::Generators::Base
       raise "Unknown typespec: #{decl.type.class.name}"
     end
   end
+
+  # ============================================================================
+  # JSON encoding/decoding helpers (SEP-0051)
+  # ============================================================================
+
+  def encode_type_to_json(decl, value)
+    case decl.type
+    when AST::Typespecs::Int
+      "Integer.to_json_dict(#{value})"
+    when AST::Typespecs::UnsignedInt
+      "UnsignedInteger.to_json_dict(#{value})"
+    when AST::Typespecs::Hyper
+      "Hyper.to_json_dict(#{value})"
+    when AST::Typespecs::UnsignedHyper
+      "UnsignedHyper.to_json_dict(#{value})"
+    when AST::Typespecs::Float
+      "Float.to_json_dict(#{value})"
+    when AST::Typespecs::Double
+      "Double.to_json_dict(#{value})"
+    when AST::Typespecs::Bool
+      "Boolean.to_json_dict(#{value})"
+    when AST::Typespecs::Opaque
+      "Opaque.to_json_dict(#{value})"
+    when AST::Typespecs::String
+      "String.to_json_dict(#{value})"
+    else
+      "#{value}.to_json_dict()"
+    end
+  end
+
+  def decode_type_from_json(decl, json_expr)
+    case decl.type
+    when AST::Typespecs::Int
+      "Integer.from_json_dict(#{json_expr})"
+    when AST::Typespecs::UnsignedInt
+      "UnsignedInteger.from_json_dict(#{json_expr})"
+    when AST::Typespecs::Hyper
+      "Hyper.from_json_dict(#{json_expr})"
+    when AST::Typespecs::UnsignedHyper
+      "UnsignedHyper.from_json_dict(#{json_expr})"
+    when AST::Typespecs::Float
+      "Float.from_json_dict(#{json_expr})"
+    when AST::Typespecs::Double
+      "Double.from_json_dict(#{json_expr})"
+    when AST::Typespecs::Bool
+      "Boolean.from_json_dict(#{json_expr})"
+    when AST::Typespecs::Opaque
+      "Opaque.from_json_dict(#{json_expr})"
+    when AST::Typespecs::String
+      "String.from_json_dict(#{json_expr})"
+    when AST::Typespecs::Simple
+      "#{name(decl.type.resolved_type)}.from_json_dict(#{json_expr})"
+    when AST::Concerns::NestedDefinition
+      "#{name(decl.type)}.from_json_dict(#{json_expr})"
+    else
+      raise "Unknown typespec for JSON decode: #{decl.type.class.name}"
+    end
+  end
+
+  def encode_value_to_json(decl, value)
+    case decl
+    when AST::Declarations::Array
+      item_expr = encode_type_to_json(decl, "item")
+      "[#{item_expr} for item in #{value}]"
+    else
+      if decl.type.sub_type == :optional
+        "#{encode_type_to_json(decl, value)} if #{value} is not None else None"
+      else
+        encode_type_to_json(decl, value)
+      end
+    end
+  end
+
+  def decode_value_from_json(decl, json_expr)
+    case decl
+    when AST::Declarations::Array
+      item_expr = decode_type_from_json(decl, "item")
+      "[#{item_expr} for item in #{json_expr}]"
+    else
+      if decl.type.sub_type == :optional
+        "#{decode_type_from_json(decl, json_expr)} if #{json_expr} is not None else None"
+      else
+        decode_type_from_json(decl, json_expr)
+      end
+    end
+  end
+
+  # ============================================================================
+  # Enum JSON helpers
+  # ============================================================================
+
+  def enum_prefix_length(enum)
+    names = enum.members.map { |m| m.name }
+    return 0 if names.size <= 1
+
+    prefix = names.first.dup
+    names[1..].each do |n|
+      while !n.start_with?(prefix) && !prefix.empty?
+        prefix = prefix[0...-1]
+      end
+    end
+
+    return 0 if prefix.empty?
+
+    last_underscore = prefix.rindex('_')
+    return 0 if last_underscore.nil?
+
+    last_underscore + 1
+  end
+
+  def enum_json_name(member_name, prefix_len)
+    member_name[prefix_len..].downcase
+  end
+
+  def render_enum_maps(out, enum, enum_name, prefix_len)
+    map_name = "_#{enum_name.underscore.upcase}_MAP"
+    reverse_map_name = "_#{enum_name.underscore.upcase}_REVERSE_MAP"
+
+    entries = enum.members.map { |m| "#{m.value}: \"#{enum_json_name(m.name, prefix_len)}\"" }
+    out.puts "#{map_name} = {#{entries.join(', ')}}"
+
+    reverse_entries = enum.members.map { |m| "\"#{enum_json_name(m.name, prefix_len)}\": #{m.value}" }
+    out.puts "#{reverse_map_name} = {#{reverse_entries.join(', ')}}"
+  end
+
+  def render_enum_to_json(out, enum_name)
+    map_name = "_#{enum_name.underscore.upcase}_MAP"
+    reverse_map_name = "_#{enum_name.underscore.upcase}_REVERSE_MAP"
+
+    out.puts <<~HEREDOC
+      def to_json_dict(self) -> str:
+          return #{map_name}[self.value]
+
+      @classmethod
+      def from_json_dict(cls, json_value: str) -> #{enum_name}:
+          return cls(#{reverse_map_name}[json_value])
+    HEREDOC
+  end
+
+  # ============================================================================
+  # Struct JSON helpers
+  # ============================================================================
+
+  def render_struct_to_json(out, struct, struct_name)
+    if stellar_specific_type?(struct_name)
+      render_stellar_struct_to_json(out, struct, struct_name)
+      return
+    end
+
+    # to_json_dict
+    out.puts "def to_json_dict(self) -> dict:"
+    out.indent(2) do
+      out.puts "return {"
+      out.indent(2) do
+        struct.members.each do |member|
+          original_name = member.name.underscore
+          member_name = safe_identifier(original_name)
+          expr = encode_value_to_json(member.declaration, "self.#{member_name}")
+          out.puts "\"#{original_name}\": #{expr},"
+        end
+      end
+      out.puts "}"
+    end
+
+    # from_json_dict
+    out.puts "@classmethod"
+    out.puts "def from_json_dict(cls, json_dict: dict) -> #{struct_name}:"
+    out.indent(2) do
+      struct.members.each do |member|
+        original_name = member.name.underscore
+        member_name = safe_identifier(original_name)
+        decode_expr = decode_value_from_json(member.declaration, "json_dict[\"#{original_name}\"]")
+        out.puts "#{member_name} = #{decode_expr}"
+      end
+
+      out.puts "return cls("
+      out.indent(2) do
+        struct.members.each do |member|
+          member_name = safe_identifier(member.name.underscore)
+          out.puts "#{member_name}=#{member_name},"
+        end
+      end
+      out.puts ")"
+    end
+  end
+
+  # ============================================================================
+  # Union JSON helpers
+  # ============================================================================
+
+  def get_discriminant_enum(union)
+    type = union.discriminant.type
+    case type
+    when AST::Typespecs::Simple
+      resolved = type.resolved_type
+      return resolved if resolved.is_a?(AST::Definitions::Enum)
+    when AST::Concerns::NestedDefinition
+      return type if type.is_a?(AST::Definitions::Enum)
+    end
+    nil
+  end
+
+  def json_key_for_case(union_case, disc_enum)
+    if union_case.value.is_a?(AST::Identifier)
+      case_name = union_case.value.name
+      if disc_enum
+        prefix_len = enum_prefix_length(disc_enum)
+        enum_json_name(case_name, prefix_len)
+      else
+        case_name.downcase
+      end
+    else
+      "v#{union_case.value.value}"
+    end
+  end
+
+  def encode_union_arm_value(arm, arm_name)
+    case arm.declaration
+    when AST::Declarations::Array
+      item_expr = encode_type_to_json(arm.declaration, "item")
+      "[#{item_expr} for item in self.#{arm_name}]"
+    else
+      encode_type_to_json(arm.declaration, "self.#{arm_name}")
+    end
+  end
+
+  def decode_union_arm_value(arm, json_expr)
+    case arm.declaration
+    when AST::Declarations::Array
+      item_expr = decode_type_from_json(arm.declaration, "item")
+      "[#{item_expr} for item in #{json_expr}]"
+    else
+      decode_type_from_json(arm.declaration, json_expr)
+    end
+  end
+
+  # Generate parse expression for non-enum discriminant from a "vN" string.
+  # expr is the variable holding the full "vN" string (e.g., 'json_value' or 'key').
+  def non_enum_disc_parse_expr(disc_type_str, expr)
+    if disc_type_str == "int"
+      "int(#{expr}[1:])"
+    else
+      "#{disc_type_str}(int(#{expr}[1:]))"
+    end
+  end
+
+  def render_union_to_json(out, union, union_name, discriminant_name, render_import_in_func)
+    if stellar_specific_type?(union_name)
+      render_stellar_union_to_json(out, union, union_name, discriminant_name)
+      return
+    end
+
+    disc_enum = get_discriminant_enum(union)
+
+    # Collect void and non-void arm JSON keys for validation
+    void_keys = []
+    non_void_keys = []
+    union.normal_arms.each do |arm|
+      arm.cases.each do |union_case|
+        key = json_key_for_case(union_case, disc_enum)
+        if arm.void?
+          void_keys << key
+        else
+          non_void_keys << key
+        end
+      end
+    end
+    has_void_default = union.default_arm.present? && union.default_arm.void?
+
+    # Determine discriminant type string for non-enum discriminants
+    disc_type_str = disc_enum ? nil : type_string(union.discriminant.type)
+
+    # to_json_dict
+    out.puts "def to_json_dict(self):"
+    out.indent(2) do
+      union.normal_arms.each do |arm|
+        arm.cases.each do |union_case|
+          json_key = json_key_for_case(union_case, disc_enum)
+          condition = render_union_case_condition(union.discriminant.type, "self.#{discriminant_name}", union_case)
+          out.puts condition
+          out.indent(2) do
+            if arm.void?
+              out.puts "return \"#{json_key}\""
+            else
+              arm_name = safe_identifier(arm.name.underscore)
+              out.puts "assert self.#{arm_name} is not None"
+              value_expr = encode_union_arm_value(arm, arm_name)
+              out.puts "return {\"#{json_key}\": #{value_expr}}"
+            end
+          end
+        end
+      end
+
+      if union.default_arm.present?
+        if union.default_arm.void?
+          if disc_enum
+            out.puts "return self.#{discriminant_name}.to_json_dict()"
+          else
+            out.puts "return f\"v{self.#{discriminant_name}}\""
+          end
+        else
+          arm_name = safe_identifier(union.default_arm.name.underscore)
+          out.puts "assert self.#{arm_name} is not None"
+          value_expr = encode_union_arm_value(union.default_arm, arm_name)
+          if disc_enum
+            out.puts "return {self.#{discriminant_name}.to_json_dict(): #{value_expr}}"
+          else
+            out.puts "return {f\"v{self.#{discriminant_name}}\": #{value_expr}}"
+          end
+        end
+      else
+        out.puts "raise ValueError(f\"Unknown #{discriminant_name} in #{union_name}: {self.#{discriminant_name}}\")"
+      end
+    end
+
+    # from_json_dict
+    out.puts "@classmethod"
+    has_void = void_keys.any? || has_void_default
+    has_non_void = non_void_keys.any? || (union.default_arm.present? && !union.default_arm.void?)
+    union_json_type = if has_void && has_non_void
+      "str | dict"
+    elsif has_void
+      "str"
+    else
+      "dict"
+    end
+    out.puts "def from_json_dict(cls, json_value: #{union_json_type}) -> #{union_name}:"
+    out.indent(2) do
+      if has_void
+        if has_non_void
+          # Mixed mode: check for string input first (void arms)
+          out.puts "if isinstance(json_value, str):"
+          out.indent(2) do
+            render_union_void_from_json(out, union_name, discriminant_name, disc_enum, disc_type_str, void_keys, non_void_keys, has_void_default)
+          end
+        else
+          # Only void arms: json_value is always str, handle directly
+          render_union_void_from_json(out, union_name, discriminant_name, disc_enum, disc_type_str, void_keys, non_void_keys, has_void_default)
+        end
+      end
+
+      if has_non_void
+        # Dict input validation
+        if has_void
+          out.puts "if not isinstance(json_value, dict) or len(json_value) != 1:"
+        else
+          # Only non-void arms: json_value is always dict, skip isinstance check
+          out.puts "if len(json_value) != 1:"
+        end
+        out.indent(2) do
+          out.puts "raise ValueError(f\"Expected a single-key object for #{union_name}, got: {json_value}\")"
+        end
+
+        out.puts "key = next(iter(json_value))"
+        if disc_enum
+          disc_type_name = name(disc_enum)
+          out.puts "#{discriminant_name} = #{disc_type_name}.from_json_dict(key)"
+        else
+          out.puts "#{discriminant_name} = #{non_enum_disc_parse_expr(disc_type_str, 'key')}"
+        end
+
+        union.normal_arms.each do |arm|
+          next if arm.void?
+          arm.cases.each do |union_case|
+            json_key = json_key_for_case(union_case, disc_enum)
+            arm_name = safe_identifier(arm.name.underscore)
+            local_var = safe_local_var(arm_name)
+
+            out.puts "if key == \"#{json_key}\":"
+            out.indent(2) do
+              render_import(out, arm.declaration, union_name, track: false) if render_import_in_func
+              decode_expr = decode_union_arm_value(arm, "json_value[\"#{json_key}\"]")
+              out.puts "#{local_var} = #{decode_expr}"
+              out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{local_var})"
+            end
+          end
+        end
+
+        if union.default_arm.present? && !union.default_arm.void?
+          arm_name = safe_identifier(union.default_arm.name.underscore)
+          local_var = safe_local_var(arm_name)
+          render_import(out, union.default_arm.declaration, union_name, track: false) if render_import_in_func
+          decode_expr = decode_union_arm_value(union.default_arm, "json_value[key]")
+          out.puts "#{local_var} = #{decode_expr}"
+          out.puts "return cls(#{discriminant_name}=#{discriminant_name}, #{arm_name}=#{local_var})"
+        else
+          out.puts "raise ValueError(f\"Unknown key '{key}' for #{union_name}\")"
+        end
+      end
+    end
+  end
+
+  def render_union_void_from_json(out, union_name, discriminant_name, disc_enum, disc_type_str, void_keys, non_void_keys, has_void_default)
+    if has_void_default
+      # Void default arm: string input is valid for void arms and default,
+      # but must reject non-void arm keys (they require dict form with a value)
+      if non_void_keys.any?
+        nv_keys_str = non_void_keys.map { |k| "\"#{k}\"" }.join(", ")
+        out.puts "if json_value in (#{nv_keys_str},):"
+        out.indent(2) do
+          out.puts "raise ValueError(f\"'{json_value}' requires a value for #{union_name}, use dict form instead\")"
+        end
+      end
+      if disc_enum
+        disc_type_name = name(disc_enum)
+        out.puts "#{discriminant_name} = #{disc_type_name}.from_json_dict(json_value)"
+      else
+        out.puts "#{discriminant_name} = #{non_enum_disc_parse_expr(disc_type_str, 'json_value')}"
+      end
+      out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
+    elsif void_keys.any?
+      # Only specific void arms are valid as string input
+      keys_str = void_keys.map { |k| "\"#{k}\"" }.join(", ")
+      out.puts "if json_value not in (#{keys_str},):"
+      out.indent(2) do
+        out.puts "raise ValueError(f\"Unexpected string '{json_value}' for #{union_name}, must be one of: #{void_keys.join(', ')}\")"
+      end
+      if disc_enum
+        disc_type_name = name(disc_enum)
+        out.puts "#{discriminant_name} = #{disc_type_name}.from_json_dict(json_value)"
+      else
+        out.puts "#{discriminant_name} = #{non_enum_disc_parse_expr(disc_type_str, 'json_value')}"
+      end
+      out.puts "return cls(#{discriminant_name}=#{discriminant_name})"
+    end
+  end
+
+  # ============================================================================
+  # Typedef JSON helpers
+  # ============================================================================
+
+  def render_typedef_to_json(out, typedef, typedef_name, typedef_name_underscore)
+    if stellar_specific_type?(typedef_name)
+      render_stellar_typedef_to_json(out, typedef, typedef_name, typedef_name_underscore)
+      return
+    end
+
+    # to_json_dict
+    out.puts "def to_json_dict(self):"
+    out.indent(2) do
+      expr = encode_value_to_json(typedef.declaration, "self.#{typedef_name_underscore}")
+      out.puts "return #{expr}"
+    end
+
+    # from_json_dict
+    out.puts "@classmethod"
+    json_type = json_type_for_declaration(typedef.declaration)
+    if json_type
+      out.puts "def from_json_dict(cls, json_value: #{json_type}) -> #{typedef_name}:"
+    else
+      out.puts "def from_json_dict(cls, json_value) -> #{typedef_name}:"
+    end
+    out.indent(2) do
+      decode_expr = decode_value_from_json(typedef.declaration, "json_value")
+      out.puts "return cls(#{decode_expr})"
+    end
+  end
+
+  # ============================================================================
+  # JSON type annotation helpers
+  # ============================================================================
+
+  # Returns the Python type annotation string for a JSON value corresponding
+  # to the given XDR declaration, or nil if the type cannot be determined.
+  def json_type_for_declaration(decl)
+    case decl
+    when AST::Declarations::Array
+      "list"
+    else
+      type = decl.type
+      base_type = json_type_for_typespec(type)
+      if base_type && type.sub_type == :optional
+        "#{base_type} | None"
+      else
+        base_type
+      end
+    end
+  end
+
+  def json_type_for_typespec(type)
+    case type
+    when AST::Typespecs::Int, AST::Typespecs::UnsignedInt
+      "int"
+    when AST::Typespecs::Hyper, AST::Typespecs::UnsignedHyper,
+         AST::Typespecs::Opaque, AST::Typespecs::String
+      "str"
+    when AST::Typespecs::Float, AST::Typespecs::Double
+      "float"
+    when AST::Typespecs::Bool
+      "bool"
+    when AST::Typespecs::Simple
+      resolved = type.resolved_type
+      case resolved
+      when AST::Definitions::Enum
+        "str"
+      when AST::Definitions::Struct
+        stellar_specific_type?(name(resolved)) ? "str" : "dict"
+      when AST::Definitions::Union
+        stellar_specific_type?(name(resolved)) ? "str" : nil
+      when AST::Definitions::Typedef
+        json_type_for_declaration(resolved.declaration)
+      else
+        nil
+      end
+    when AST::Concerns::NestedDefinition
+      if type.is_a?(AST::Definitions::Enum)
+        "str"
+      elsif type.is_a?(AST::Definitions::Struct)
+        "dict"
+      else
+        nil
+      end
+    else
+      nil
+    end
+  end
+
+  # ============================================================================
+  # Stellar-specific type helpers
+  # ============================================================================
+
+  def stellar_specific_type?(type_name)
+    STELLAR_SPECIFIC_TYPES.include?(type_name)
+  end
+
+  def needs_strkey_import?(type_name)
+    STELLAR_STRKEY_TYPES.include?(type_name)
+  end
+
+  def render_stellar_struct_to_json(out, struct, struct_name)
+    case struct_name
+    when "UInt128Parts"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            value_bytes = self.hi.uint64.to_bytes(8, "big", signed=False) + self.lo.uint64.to_bytes(8, "big", signed=False)
+            return str(int.from_bytes(value_bytes, "big", signed=False))
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{struct_name}:
+            from .uint64 import Uint64
+            value_bytes = int(json_value).to_bytes(16, "big", signed=False)
+            return cls(
+                hi=Uint64(int.from_bytes(value_bytes[0:8], "big", signed=False)),
+                lo=Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
+            )
+      HEREDOC
+    when "Int128Parts"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            value_bytes = self.hi.int64.to_bytes(8, "big", signed=True) + self.lo.uint64.to_bytes(8, "big", signed=False)
+            return str(int.from_bytes(value_bytes, "big", signed=True))
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{struct_name}:
+            from .int64 import Int64
+            from .uint64 import Uint64
+            value_bytes = int(json_value).to_bytes(16, "big", signed=True)
+            return cls(
+                hi=Int64(int.from_bytes(value_bytes[0:8], "big", signed=True)),
+                lo=Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
+            )
+      HEREDOC
+    when "UInt256Parts"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            value_bytes = (
+                self.hi_hi.uint64.to_bytes(8, "big", signed=False)
+                + self.hi_lo.uint64.to_bytes(8, "big", signed=False)
+                + self.lo_hi.uint64.to_bytes(8, "big", signed=False)
+                + self.lo_lo.uint64.to_bytes(8, "big", signed=False)
+            )
+            return str(int.from_bytes(value_bytes, "big", signed=False))
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{struct_name}:
+            from .uint64 import Uint64
+            value_bytes = int(json_value).to_bytes(32, "big", signed=False)
+            return cls(
+                hi_hi=Uint64(int.from_bytes(value_bytes[0:8], "big", signed=False)),
+                hi_lo=Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
+                lo_hi=Uint64(int.from_bytes(value_bytes[16:24], "big", signed=False)),
+                lo_lo=Uint64(int.from_bytes(value_bytes[24:32], "big", signed=False)),
+            )
+      HEREDOC
+    when "Int256Parts"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            value_bytes = (
+                self.hi_hi.int64.to_bytes(8, "big", signed=True)
+                + self.hi_lo.uint64.to_bytes(8, "big", signed=False)
+                + self.lo_hi.uint64.to_bytes(8, "big", signed=False)
+                + self.lo_lo.uint64.to_bytes(8, "big", signed=False)
+            )
+            return str(int.from_bytes(value_bytes, "big", signed=True))
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{struct_name}:
+            from .int64 import Int64
+            from .uint64 import Uint64
+            value_bytes = int(json_value).to_bytes(32, "big", signed=True)
+            return cls(
+                hi_hi=Int64(int.from_bytes(value_bytes[0:8], "big", signed=True)),
+                hi_lo=Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
+                lo_hi=Uint64(int.from_bytes(value_bytes[16:24], "big", signed=False)),
+                lo_lo=Uint64(int.from_bytes(value_bytes[24:32], "big", signed=False)),
+            )
+      HEREDOC
+    end
+  end
+
+  def render_stellar_union_to_json(out, union, union_name, discriminant_name)
+    case union_name
+    when "PublicKey"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            from ..strkey import StrKey
+            assert self.ed25519 is not None
+            return StrKey.encode_ed25519_public_key(self.ed25519.uint256)
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{union_name}:
+            from ..strkey import StrKey
+            from .public_key_type import PublicKeyType
+            from .uint256 import Uint256
+            raw = StrKey.decode_ed25519_public_key(json_value)
+            return cls(type=PublicKeyType.PUBLIC_KEY_TYPE_ED25519, ed25519=Uint256(raw))
+      HEREDOC
+    when "MuxedAccount"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            from ..strkey import StrKey
+            from .crypto_key_type import CryptoKeyType
+            if self.type == CryptoKeyType.KEY_TYPE_ED25519:
+                assert self.ed25519 is not None
+                return StrKey.encode_ed25519_public_key(self.ed25519.uint256)
+            assert self.med25519 is not None
+            from .muxed_account_med25519 import MuxedAccountMed25519
+            from xdrlib3 import Packer as _Packer
+            packer = _Packer()
+            self.med25519.ed25519.pack(packer)
+            self.med25519.id.pack(packer)
+            return StrKey.encode_med25519_public_key(packer.get_buffer())
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{union_name}:
+            from ..strkey import StrKey
+            from .crypto_key_type import CryptoKeyType
+            from .uint256 import Uint256
+            if json_value.startswith("G"):
+                raw = StrKey.decode_ed25519_public_key(json_value)
+                return cls(type=CryptoKeyType.KEY_TYPE_ED25519, ed25519=Uint256(raw))
+            from .muxed_account_med25519 import MuxedAccountMed25519
+            from .uint64 import Uint64
+            from xdrlib3 import Unpacker as _Unpacker
+            raw = StrKey.decode_med25519_public_key(json_value)
+            unpacker = _Unpacker(raw)
+            ed25519 = Uint256.unpack(unpacker)
+            id = Uint64.unpack(unpacker)
+            med25519 = MuxedAccountMed25519(id=id, ed25519=ed25519)
+            return cls(type=CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519)
+      HEREDOC
+    when "SCAddress"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            from ..strkey import StrKey
+            from .sc_address_type import SCAddressType
+            if self.type == SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
+                assert self.account_id is not None
+                return self.account_id.to_json_dict()
+            if self.type == SCAddressType.SC_ADDRESS_TYPE_CONTRACT:
+                assert self.contract_id is not None
+                return StrKey.encode_contract(self.contract_id.contract_id.hash)
+            if self.type == SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT:
+                assert self.muxed_account is not None
+                from xdrlib3 import Packer as _Packer
+                packer = _Packer()
+                self.muxed_account.ed25519.pack(packer)
+                self.muxed_account.id.pack(packer)
+                return StrKey.encode_med25519_public_key(packer.get_buffer())
+            if self.type == SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE:
+                assert self.claimable_balance_id is not None
+                return self.claimable_balance_id.to_json_dict()
+            if self.type == SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL:
+                assert self.liquidity_pool_id is not None
+                return self.liquidity_pool_id.to_json_dict()
+            raise ValueError(f"Unknown SCAddress type: {self.type}")
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{union_name}:
+            from ..strkey import StrKey
+            from .sc_address_type import SCAddressType
+            if json_value.startswith("G"):
+                from .account_id import AccountID
+                return cls(type=SCAddressType.SC_ADDRESS_TYPE_ACCOUNT, account_id=AccountID.from_json_dict(json_value))
+            if json_value.startswith("C"):
+                from .contract_id import ContractID
+                from .hash import Hash
+                raw = StrKey.decode_contract(json_value)
+                return cls(type=SCAddressType.SC_ADDRESS_TYPE_CONTRACT, contract_id=ContractID(Hash(raw)))
+            if json_value.startswith("M"):
+                from .muxed_ed25519_account import MuxedEd25519Account
+                from .uint256 import Uint256
+                from .uint64 import Uint64
+                from xdrlib3 import Unpacker as _Unpacker
+                raw = StrKey.decode_med25519_public_key(json_value)
+                unpacker = _Unpacker(raw)
+                ed25519 = Uint256.unpack(unpacker)
+                id = Uint64.unpack(unpacker)
+                return cls(type=SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT, muxed_account=MuxedEd25519Account(id=id, ed25519=ed25519))
+            if json_value.startswith("B"):
+                from .claimable_balance_id import ClaimableBalanceID
+                return cls(type=SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE, claimable_balance_id=ClaimableBalanceID.from_json_dict(json_value))
+            if json_value.startswith("L"):
+                from .pool_id import PoolID
+                return cls(type=SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL, liquidity_pool_id=PoolID.from_json_dict(json_value))
+            raise ValueError(f"Invalid SCAddress strkey: {json_value}")
+      HEREDOC
+    when "SignerKey"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            from ..strkey import StrKey
+            from .signer_key_type import SignerKeyType
+            if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
+                assert self.ed25519 is not None
+                return StrKey.encode_ed25519_public_key(self.ed25519.uint256)
+            if self.type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
+                assert self.pre_auth_tx is not None
+                return StrKey.encode_pre_auth_tx(self.pre_auth_tx.uint256)
+            if self.type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
+                assert self.hash_x is not None
+                return StrKey.encode_sha256_hash(self.hash_x.uint256)
+            if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD:
+                assert self.ed25519_signed_payload is not None
+                from xdrlib3 import Packer as _Packer
+                packer = _Packer()
+                self.ed25519_signed_payload.pack(packer)
+                return StrKey.encode_ed25519_signed_payload(packer.get_buffer())
+            raise ValueError(f"Unknown SignerKey type: {self.type}")
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{union_name}:
+            from ..strkey import StrKey
+            from .signer_key_type import SignerKeyType
+            from .uint256 import Uint256
+            if json_value.startswith("G"):
+                raw = StrKey.decode_ed25519_public_key(json_value)
+                return cls(type=SignerKeyType.SIGNER_KEY_TYPE_ED25519, ed25519=Uint256(raw))
+            if json_value.startswith("T"):
+                raw = StrKey.decode_pre_auth_tx(json_value)
+                return cls(type=SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX, pre_auth_tx=Uint256(raw))
+            if json_value.startswith("X"):
+                raw = StrKey.decode_sha256_hash(json_value)
+                return cls(type=SignerKeyType.SIGNER_KEY_TYPE_HASH_X, hash_x=Uint256(raw))
+            if json_value.startswith("P"):
+                from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
+                from xdrlib3 import Unpacker as _Unpacker
+                raw = StrKey.decode_ed25519_signed_payload(json_value)
+                unpacker = _Unpacker(raw)
+                payload = SignerKeyEd25519SignedPayload.unpack(unpacker)
+                return cls(type=SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD, ed25519_signed_payload=payload)
+            raise ValueError(f"Invalid SignerKey strkey: {json_value}")
+      HEREDOC
+    when "ClaimableBalanceID"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            from ..strkey import StrKey
+            return StrKey.encode_claimable_balance(self.to_xdr_bytes()[3:])
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{union_name}:
+            from ..strkey import StrKey
+            raw = StrKey.decode_claimable_balance(json_value)
+            return cls.from_xdr_bytes(b"\\x00\\x00\\x00" + raw)
+      HEREDOC
+    end
+  end
+
+  def render_stellar_typedef_to_json(out, typedef, typedef_name, typedef_name_underscore)
+    case typedef_name
+    when "AccountID"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            from ..strkey import StrKey
+            assert self.account_id.ed25519 is not None
+            return StrKey.encode_ed25519_public_key(self.account_id.ed25519.uint256)
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{typedef_name}:
+            from ..strkey import StrKey
+            from .public_key import PublicKey
+            from .public_key_type import PublicKeyType
+            from .uint256 import Uint256
+            raw = StrKey.decode_ed25519_public_key(json_value)
+            return cls(PublicKey(type=PublicKeyType.PUBLIC_KEY_TYPE_ED25519, ed25519=Uint256(raw)))
+      HEREDOC
+    when "PoolID"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            from ..strkey import StrKey
+            return StrKey.encode_liquidity_pool(self.pool_id.hash)
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{typedef_name}:
+            from ..strkey import StrKey
+            from .hash import Hash
+            raw = StrKey.decode_liquidity_pool(json_value)
+            return cls(Hash(raw))
+      HEREDOC
+    when "AssetCode4"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            return self.asset_code4.rstrip(b"\\x00").decode("ascii")
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{typedef_name}:
+            return cls(json_value.encode("ascii").ljust(4, b"\\x00"))
+      HEREDOC
+    when "AssetCode12"
+      out.puts <<~HEREDOC
+        def to_json_dict(self) -> str:
+            trimmed = self.asset_code12.rstrip(b"\\x00")
+            return self.asset_code12[:max(len(trimmed), 5)].decode("ascii")
+
+        @classmethod
+        def from_json_dict(cls, json_value: str) -> #{typedef_name}:
+            return cls(json_value.encode("ascii").ljust(12, b"\\x00"))
+      HEREDOC
+    end
+  end
+
+  # ============================================================================
+  # Source comments
+  # ============================================================================
 
   def render_source_comment(out, defn)
     return if defn.is_a?(AST::Definitions::Namespace)
@@ -789,6 +1654,15 @@ class Generator < Xdrgen::Generators::Base
   def safe_identifier(identifier)
     identifier = identifier.to_s
     return "#{identifier}_" if PYTHON_RESERVED_WORDS.include?(identifier)
+
+    identifier
+  end
+
+  # Returns a safe local variable name that won't shadow Python builtins.
+  # Used in from_json_dict where arm names like "str", "bytes", "map" would
+  # shadow builtins used by isinstance() or int() calls in the same function.
+  def safe_local_var(identifier)
+    return "#{identifier}_val" if PYTHON_BUILTINS.include?(identifier)
 
     identifier
   end

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 from typing import List, Optional, TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
@@ -95,6 +96,41 @@ class MyStruct:
     def from_xdr(cls, xdr: str) -> MyStruct:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> MyStruct:
+        return cls.from_json_dict(json.loads(json_str))
+    def to_json_dict(self) -> dict:
+        return {
+            "field1": self.field1.to_json_dict(),
+            "field2": self.field2.to_json_dict(),
+            "field3": self.field3.to_json_dict(),
+            "field4": UnsignedInteger.to_json_dict(self.field4),
+            "field5": Float.to_json_dict(self.field5),
+            "field6": Double.to_json_dict(self.field6),
+            "field7": Boolean.to_json_dict(self.field7),
+        }
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> MyStruct:
+        field1 = Uint512.from_json_dict(json_dict["field1"])
+        field2 = OptHash1.from_json_dict(json_dict["field2"])
+        field3 = Int1.from_json_dict(json_dict["field3"])
+        field4 = UnsignedInteger.from_json_dict(json_dict["field4"])
+        field5 = Float.from_json_dict(json_dict["field5"])
+        field6 = Double.from_json_dict(json_dict["field6"])
+        field7 = Boolean.from_json_dict(json_dict["field7"])
+        return cls(
+            field1=field1,
+            field2=field2,
+            field3=field3,
+            field4=field4,
+            field5=field5,
+            field6=field6,
+            field7=field7,
+        )
     def __hash__(self):
         return hash((self.field1, self.field2, self.field3, self.field4, self.field5, self.field6, self.field7,))
     def __eq__(self, other: object):
