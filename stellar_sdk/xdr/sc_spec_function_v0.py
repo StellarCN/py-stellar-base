@@ -25,7 +25,7 @@ class SCSpecFunctionV0:
         {
             string doc<SC_SPEC_DOC_LIMIT>;
             SCSymbol name;
-            SCSpecFunctionInputV0 inputs<10>;
+            SCSpecFunctionInputV0 inputs<>;
             SCSpecTypeDef outputs<1>;
         };
     """
@@ -42,7 +42,7 @@ class SCSpecFunctionV0:
             raise ValueError(
                 f"The maximum length of `doc` should be {_expect_max_length}, but got {len(doc)}."
             )
-        _expect_max_length = 10
+        _expect_max_length = 4294967295
         if inputs and len(inputs) > _expect_max_length:
             raise ValueError(
                 f"The maximum length of `inputs` should be {_expect_max_length}, but got {len(inputs)}."

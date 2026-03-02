@@ -23,7 +23,7 @@ class SCSpecUDTUnionCaseTupleV0:
         {
             string doc<SC_SPEC_DOC_LIMIT>;
             string name<60>;
-            SCSpecTypeDef type<12>;
+            SCSpecTypeDef type<>;
         };
     """
 
@@ -43,7 +43,7 @@ class SCSpecUDTUnionCaseTupleV0:
             raise ValueError(
                 f"The maximum length of `name` should be {_expect_max_length}, but got {len(name)}."
             )
-        _expect_max_length = 12
+        _expect_max_length = 4294967295
         if type and len(type) > _expect_max_length:
             raise ValueError(
                 f"The maximum length of `type` should be {_expect_max_length}, but got {len(type)}."
