@@ -15,6 +15,7 @@ Release History
   - fix `CIRCLE_IMPORT_UNION` lazy import tracking.
   - add decoding depth limit (`DEFAULT_XDR_MAX_DEPTH = 512`) to prevent stack overflow via deeply nested XDR structures.
 - feat(xdr-generator): add SEP-0051 XDR-JSON support.
+- feat: add `close_time`, `header_xdr`, and `metadata_xdr` to `GetLatestLedgerResponse`.
 
 ### Version 13.2.1
 
