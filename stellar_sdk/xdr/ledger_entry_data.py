@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry import AccountEntry
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .claimable_balance_entry import ClaimableBalanceEntry
 from .config_setting_entry import ConfigSettingEntry
 from .contract_code_entry import ContractCodeEntry
@@ -129,41 +131,46 @@ class LedgerEntryData:
                 raise ValueError("ttl should not be None.")
             self.ttl.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> LedgerEntryData:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> LedgerEntryData:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         type = LedgerEntryType.unpack(unpacker)
         if type == LedgerEntryType.ACCOUNT:
-            account = AccountEntry.unpack(unpacker)
+            account = AccountEntry.unpack(unpacker, depth_limit - 1)
             return cls(type=type, account=account)
         if type == LedgerEntryType.TRUSTLINE:
-            trust_line = TrustLineEntry.unpack(unpacker)
+            trust_line = TrustLineEntry.unpack(unpacker, depth_limit - 1)
             return cls(type=type, trust_line=trust_line)
         if type == LedgerEntryType.OFFER:
-            offer = OfferEntry.unpack(unpacker)
+            offer = OfferEntry.unpack(unpacker, depth_limit - 1)
             return cls(type=type, offer=offer)
         if type == LedgerEntryType.DATA:
-            data = DataEntry.unpack(unpacker)
+            data = DataEntry.unpack(unpacker, depth_limit - 1)
             return cls(type=type, data=data)
         if type == LedgerEntryType.CLAIMABLE_BALANCE:
-            claimable_balance = ClaimableBalanceEntry.unpack(unpacker)
+            claimable_balance = ClaimableBalanceEntry.unpack(unpacker, depth_limit - 1)
             return cls(type=type, claimable_balance=claimable_balance)
         if type == LedgerEntryType.LIQUIDITY_POOL:
-            liquidity_pool = LiquidityPoolEntry.unpack(unpacker)
+            liquidity_pool = LiquidityPoolEntry.unpack(unpacker, depth_limit - 1)
             return cls(type=type, liquidity_pool=liquidity_pool)
         if type == LedgerEntryType.CONTRACT_DATA:
-            contract_data = ContractDataEntry.unpack(unpacker)
+            contract_data = ContractDataEntry.unpack(unpacker, depth_limit - 1)
             return cls(type=type, contract_data=contract_data)
         if type == LedgerEntryType.CONTRACT_CODE:
-            contract_code = ContractCodeEntry.unpack(unpacker)
+            contract_code = ContractCodeEntry.unpack(unpacker, depth_limit - 1)
             return cls(type=type, contract_code=contract_code)
         if type == LedgerEntryType.CONFIG_SETTING:
-            config_setting = ConfigSettingEntry.unpack(unpacker)
+            config_setting = ConfigSettingEntry.unpack(unpacker, depth_limit - 1)
             return cls(type=type, config_setting=config_setting)
         if type == LedgerEntryType.TTL:
-            ttl = TTLEntry.unpack(unpacker)
+            ttl = TTLEntry.unpack(unpacker, depth_limit - 1)
             return cls(type=type, ttl=ttl)
-        return cls(type=type)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -173,7 +180,11 @@ class LedgerEntryData:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LedgerEntryData:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -183,6 +194,96 @@ class LedgerEntryData:
     def from_xdr(cls, xdr: str) -> LedgerEntryData:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> LedgerEntryData:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.type == LedgerEntryType.ACCOUNT:
+            assert self.account is not None
+            return {"account": self.account.to_json_dict()}
+        if self.type == LedgerEntryType.TRUSTLINE:
+            assert self.trust_line is not None
+            return {"trustline": self.trust_line.to_json_dict()}
+        if self.type == LedgerEntryType.OFFER:
+            assert self.offer is not None
+            return {"offer": self.offer.to_json_dict()}
+        if self.type == LedgerEntryType.DATA:
+            assert self.data is not None
+            return {"data": self.data.to_json_dict()}
+        if self.type == LedgerEntryType.CLAIMABLE_BALANCE:
+            assert self.claimable_balance is not None
+            return {"claimable_balance": self.claimable_balance.to_json_dict()}
+        if self.type == LedgerEntryType.LIQUIDITY_POOL:
+            assert self.liquidity_pool is not None
+            return {"liquidity_pool": self.liquidity_pool.to_json_dict()}
+        if self.type == LedgerEntryType.CONTRACT_DATA:
+            assert self.contract_data is not None
+            return {"contract_data": self.contract_data.to_json_dict()}
+        if self.type == LedgerEntryType.CONTRACT_CODE:
+            assert self.contract_code is not None
+            return {"contract_code": self.contract_code.to_json_dict()}
+        if self.type == LedgerEntryType.CONFIG_SETTING:
+            assert self.config_setting is not None
+            return {"config_setting": self.config_setting.to_json_dict()}
+        if self.type == LedgerEntryType.TTL:
+            assert self.ttl is not None
+            return {"ttl": self.ttl.to_json_dict()}
+        raise ValueError(f"Unknown type in LedgerEntryData: {self.type}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: dict) -> LedgerEntryData:
+        if len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for LedgerEntryData, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        type = LedgerEntryType.from_json_dict(key)
+        if key == "account":
+            account = AccountEntry.from_json_dict(json_value["account"])
+            return cls(type=type, account=account)
+        if key == "trustline":
+            trust_line = TrustLineEntry.from_json_dict(json_value["trustline"])
+            return cls(type=type, trust_line=trust_line)
+        if key == "offer":
+            offer = OfferEntry.from_json_dict(json_value["offer"])
+            return cls(type=type, offer=offer)
+        if key == "data":
+            data = DataEntry.from_json_dict(json_value["data"])
+            return cls(type=type, data=data)
+        if key == "claimable_balance":
+            claimable_balance = ClaimableBalanceEntry.from_json_dict(
+                json_value["claimable_balance"]
+            )
+            return cls(type=type, claimable_balance=claimable_balance)
+        if key == "liquidity_pool":
+            liquidity_pool = LiquidityPoolEntry.from_json_dict(
+                json_value["liquidity_pool"]
+            )
+            return cls(type=type, liquidity_pool=liquidity_pool)
+        if key == "contract_data":
+            contract_data = ContractDataEntry.from_json_dict(
+                json_value["contract_data"]
+            )
+            return cls(type=type, contract_data=contract_data)
+        if key == "contract_code":
+            contract_code = ContractCodeEntry.from_json_dict(
+                json_value["contract_code"]
+            )
+            return cls(type=type, contract_code=contract_code)
+        if key == "config_setting":
+            config_setting = ConfigSettingEntry.from_json_dict(
+                json_value["config_setting"]
+            )
+            return cls(type=type, config_setting=config_setting)
+        if key == "ttl":
+            ttl = TTLEntry.from_json_dict(json_value["ttl"])
+            return cls(type=type, ttl=ttl)
+        raise ValueError(f"Unknown key '{key}' for LedgerEntryData")
 
     def __hash__(self):
         return hash(
@@ -221,38 +322,24 @@ class LedgerEntryData:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(f"account={self.account}") if self.account is not None else None
-        (
+        if self.account is not None:
+            out.append(f"account={self.account}")
+        if self.trust_line is not None:
             out.append(f"trust_line={self.trust_line}")
-            if self.trust_line is not None
-            else None
-        )
-        out.append(f"offer={self.offer}") if self.offer is not None else None
-        out.append(f"data={self.data}") if self.data is not None else None
-        (
+        if self.offer is not None:
+            out.append(f"offer={self.offer}")
+        if self.data is not None:
+            out.append(f"data={self.data}")
+        if self.claimable_balance is not None:
             out.append(f"claimable_balance={self.claimable_balance}")
-            if self.claimable_balance is not None
-            else None
-        )
-        (
+        if self.liquidity_pool is not None:
             out.append(f"liquidity_pool={self.liquidity_pool}")
-            if self.liquidity_pool is not None
-            else None
-        )
-        (
+        if self.contract_data is not None:
             out.append(f"contract_data={self.contract_data}")
-            if self.contract_data is not None
-            else None
-        )
-        (
+        if self.contract_code is not None:
             out.append(f"contract_code={self.contract_code}")
-            if self.contract_code is not None
-            else None
-        )
-        (
+        if self.config_setting is not None:
             out.append(f"config_setting={self.config_setting}")
-            if self.config_setting is not None
-            else None
-        )
-        out.append(f"ttl={self.ttl}") if self.ttl is not None else None
+        if self.ttl is not None:
+            out.append(f"ttl={self.ttl}")
         return f"<LedgerEntryData [{', '.join(out)}]>"

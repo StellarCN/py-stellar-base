@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .diagnostic_event import DiagnosticEvent
 from .extension_point import ExtensionPoint
 from .ledger_entry_changes import LedgerEntryChanges
@@ -91,27 +93,46 @@ class TransactionMetaV4:
             diagnostic_events_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> TransactionMetaV4:
-        ext = ExtensionPoint.unpack(unpacker)
-        tx_changes_before = LedgerEntryChanges.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TransactionMetaV4:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ext = ExtensionPoint.unpack(unpacker, depth_limit - 1)
+        tx_changes_before = LedgerEntryChanges.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"operations length {length} exceeds remaining input length {_remaining}"
+            )
         operations = []
         for _ in range(length):
-            operations.append(OperationMetaV2.unpack(unpacker))
-        tx_changes_after = LedgerEntryChanges.unpack(unpacker)
+            operations.append(OperationMetaV2.unpack(unpacker, depth_limit - 1))
+        tx_changes_after = LedgerEntryChanges.unpack(unpacker, depth_limit - 1)
         soroban_meta = (
-            SorobanTransactionMetaV2.unpack(unpacker)
+            SorobanTransactionMetaV2.unpack(unpacker, depth_limit - 1)
             if unpacker.unpack_uint()
             else None
         )
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"events length {length} exceeds remaining input length {_remaining}"
+            )
         events = []
         for _ in range(length):
-            events.append(TransactionEvent.unpack(unpacker))
+            events.append(TransactionEvent.unpack(unpacker, depth_limit - 1))
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"diagnostic_events length {length} exceeds remaining input length {_remaining}"
+            )
         diagnostic_events = []
         for _ in range(length):
-            diagnostic_events.append(DiagnosticEvent.unpack(unpacker))
+            diagnostic_events.append(DiagnosticEvent.unpack(unpacker, depth_limit - 1))
         return cls(
             ext=ext,
             tx_changes_before=tx_changes_before,
@@ -130,7 +151,11 @@ class TransactionMetaV4:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TransactionMetaV4:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -140,6 +165,62 @@ class TransactionMetaV4:
     def from_xdr(cls, xdr: str) -> TransactionMetaV4:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TransactionMetaV4:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ext": self.ext.to_json_dict(),
+            "tx_changes_before": self.tx_changes_before.to_json_dict(),
+            "operations": [item.to_json_dict() for item in self.operations],
+            "tx_changes_after": self.tx_changes_after.to_json_dict(),
+            "soroban_meta": (
+                self.soroban_meta.to_json_dict()
+                if self.soroban_meta is not None
+                else None
+            ),
+            "events": [item.to_json_dict() for item in self.events],
+            "diagnostic_events": [
+                item.to_json_dict() for item in self.diagnostic_events
+            ],
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> TransactionMetaV4:
+        ext = ExtensionPoint.from_json_dict(json_dict["ext"])
+        tx_changes_before = LedgerEntryChanges.from_json_dict(
+            json_dict["tx_changes_before"]
+        )
+        operations = [
+            OperationMetaV2.from_json_dict(item) for item in json_dict["operations"]
+        ]
+        tx_changes_after = LedgerEntryChanges.from_json_dict(
+            json_dict["tx_changes_after"]
+        )
+        soroban_meta = (
+            SorobanTransactionMetaV2.from_json_dict(json_dict["soroban_meta"])
+            if json_dict["soroban_meta"] is not None
+            else None
+        )
+        events = [TransactionEvent.from_json_dict(item) for item in json_dict["events"]]
+        diagnostic_events = [
+            DiagnosticEvent.from_json_dict(item)
+            for item in json_dict["diagnostic_events"]
+        ]
+        return cls(
+            ext=ext,
+            tx_changes_before=tx_changes_before,
+            operations=operations,
+            tx_changes_after=tx_changes_after,
+            soroban_meta=soroban_meta,
+            events=events,
+            diagnostic_events=diagnostic_events,
+        )
 
     def __hash__(self):
         return hash(

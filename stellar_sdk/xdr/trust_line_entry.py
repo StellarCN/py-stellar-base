@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .int64 import Int64
 from .trust_line_asset import TrustLineAsset
 from .trust_line_entry_ext import TrustLineEntryExt
@@ -78,13 +80,17 @@ class TrustLineEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> TrustLineEntry:
-        account_id = AccountID.unpack(unpacker)
-        asset = TrustLineAsset.unpack(unpacker)
-        balance = Int64.unpack(unpacker)
-        limit = Int64.unpack(unpacker)
-        flags = Uint32.unpack(unpacker)
-        ext = TrustLineEntryExt.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TrustLineEntry:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        account_id = AccountID.unpack(unpacker, depth_limit - 1)
+        asset = TrustLineAsset.unpack(unpacker, depth_limit - 1)
+        balance = Int64.unpack(unpacker, depth_limit - 1)
+        limit = Int64.unpack(unpacker, depth_limit - 1)
+        flags = Uint32.unpack(unpacker, depth_limit - 1)
+        ext = TrustLineEntryExt.unpack(unpacker, depth_limit - 1)
         return cls(
             account_id=account_id,
             asset=asset,
@@ -102,7 +108,11 @@ class TrustLineEntry:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TrustLineEntry:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -112,6 +122,40 @@ class TrustLineEntry:
     def from_xdr(cls, xdr: str) -> TrustLineEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TrustLineEntry:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "account_id": self.account_id.to_json_dict(),
+            "asset": self.asset.to_json_dict(),
+            "balance": self.balance.to_json_dict(),
+            "limit": self.limit.to_json_dict(),
+            "flags": self.flags.to_json_dict(),
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> TrustLineEntry:
+        account_id = AccountID.from_json_dict(json_dict["account_id"])
+        asset = TrustLineAsset.from_json_dict(json_dict["asset"])
+        balance = Int64.from_json_dict(json_dict["balance"])
+        limit = Int64.from_json_dict(json_dict["limit"])
+        flags = Uint32.from_json_dict(json_dict["flags"])
+        ext = TrustLineEntryExt.from_json_dict(json_dict["ext"])
+        return cls(
+            account_id=account_id,
+            asset=asset,
+            balance=balance,
+            limit=limit,
+            flags=flags,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

@@ -3,10 +3,53 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_TRANSACTION_RESULT_CODE_MAP = {
+    1: "txfee_bump_inner_success",
+    0: "txsuccess",
+    -1: "txfailed",
+    -2: "txtoo_early",
+    -3: "txtoo_late",
+    -4: "txmissing_operation",
+    -5: "txbad_seq",
+    -6: "txbad_auth",
+    -7: "txinsufficient_balance",
+    -8: "txno_account",
+    -9: "txinsufficient_fee",
+    -10: "txbad_auth_extra",
+    -11: "txinternal_error",
+    -12: "txnot_supported",
+    -13: "txfee_bump_inner_failed",
+    -14: "txbad_sponsorship",
+    -15: "txbad_min_seq_age_or_gap",
+    -16: "txmalformed",
+    -17: "txsoroban_invalid",
+}
+_TRANSACTION_RESULT_CODE_REVERSE_MAP = {
+    "txfee_bump_inner_success": 1,
+    "txsuccess": 0,
+    "txfailed": -1,
+    "txtoo_early": -2,
+    "txtoo_late": -3,
+    "txmissing_operation": -4,
+    "txbad_seq": -5,
+    "txbad_auth": -6,
+    "txinsufficient_balance": -7,
+    "txno_account": -8,
+    "txinsufficient_fee": -9,
+    "txbad_auth_extra": -10,
+    "txinternal_error": -11,
+    "txnot_supported": -12,
+    "txfee_bump_inner_failed": -13,
+    "txbad_sponsorship": -14,
+    "txbad_min_seq_age_or_gap": -15,
+    "txmalformed": -16,
+    "txsoroban_invalid": -17,
+}
 __all__ = ["TransactionResultCode"]
 
 
@@ -78,7 +121,11 @@ class TransactionResultCode(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TransactionResultCode:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -88,3 +135,17 @@ class TransactionResultCode(IntEnum):
     def from_xdr(cls, xdr: str) -> TransactionResultCode:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TransactionResultCode:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _TRANSACTION_RESULT_CODE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> TransactionResultCode:
+        return cls(_TRANSACTION_RESULT_CODE_REVERSE_MAP[json_value])

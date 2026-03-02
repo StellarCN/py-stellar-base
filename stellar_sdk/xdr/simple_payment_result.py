@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
 from .asset import Asset
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .int64 import Int64
 
 __all__ = ["SimplePaymentResult"]
@@ -41,10 +43,14 @@ class SimplePaymentResult:
         self.amount.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SimplePaymentResult:
-        destination = AccountID.unpack(unpacker)
-        asset = Asset.unpack(unpacker)
-        amount = Int64.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SimplePaymentResult:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        destination = AccountID.unpack(unpacker, depth_limit - 1)
+        asset = Asset.unpack(unpacker, depth_limit - 1)
+        amount = Int64.unpack(unpacker, depth_limit - 1)
         return cls(
             destination=destination,
             asset=asset,
@@ -59,7 +65,11 @@ class SimplePaymentResult:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SimplePaymentResult:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -69,6 +79,31 @@ class SimplePaymentResult:
     def from_xdr(cls, xdr: str) -> SimplePaymentResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SimplePaymentResult:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "destination": self.destination.to_json_dict(),
+            "asset": self.asset.to_json_dict(),
+            "amount": self.amount.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SimplePaymentResult:
+        destination = AccountID.from_json_dict(json_dict["destination"])
+        asset = Asset.from_json_dict(json_dict["asset"])
+        amount = Int64.from_json_dict(json_dict["amount"])
+        return cls(
+            destination=destination,
+            asset=asset,
+            amount=amount,
+        )
 
     def __hash__(self):
         return hash(

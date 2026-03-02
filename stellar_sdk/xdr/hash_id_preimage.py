@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .envelope_type import EnvelopeType
 from .hash_id_preimage_contract_id import HashIDPreimageContractID
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID
@@ -91,23 +93,30 @@ class HashIDPreimage:
                 raise ValueError("soroban_authorization should not be None.")
             self.soroban_authorization.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> HashIDPreimage:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> HashIDPreimage:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         type = EnvelopeType.unpack(unpacker)
         if type == EnvelopeType.ENVELOPE_TYPE_OP_ID:
-            operation_id = HashIDPreimageOperationID.unpack(unpacker)
+            operation_id = HashIDPreimageOperationID.unpack(unpacker, depth_limit - 1)
             return cls(type=type, operation_id=operation_id)
         if type == EnvelopeType.ENVELOPE_TYPE_POOL_REVOKE_OP_ID:
-            revoke_id = HashIDPreimageRevokeID.unpack(unpacker)
+            revoke_id = HashIDPreimageRevokeID.unpack(unpacker, depth_limit - 1)
             return cls(type=type, revoke_id=revoke_id)
         if type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID:
-            contract_id = HashIDPreimageContractID.unpack(unpacker)
+            contract_id = HashIDPreimageContractID.unpack(unpacker, depth_limit - 1)
             return cls(type=type, contract_id=contract_id)
         if type == EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION:
-            soroban_authorization = HashIDPreimageSorobanAuthorization.unpack(unpacker)
+            soroban_authorization = HashIDPreimageSorobanAuthorization.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(type=type, soroban_authorization=soroban_authorization)
-        return cls(type=type)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -117,7 +126,11 @@ class HashIDPreimage:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> HashIDPreimage:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -127,6 +140,56 @@ class HashIDPreimage:
     def from_xdr(cls, xdr: str) -> HashIDPreimage:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> HashIDPreimage:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.type == EnvelopeType.ENVELOPE_TYPE_OP_ID:
+            assert self.operation_id is not None
+            return {"op_id": self.operation_id.to_json_dict()}
+        if self.type == EnvelopeType.ENVELOPE_TYPE_POOL_REVOKE_OP_ID:
+            assert self.revoke_id is not None
+            return {"pool_revoke_op_id": self.revoke_id.to_json_dict()}
+        if self.type == EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID:
+            assert self.contract_id is not None
+            return {"contract_id": self.contract_id.to_json_dict()}
+        if self.type == EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION:
+            assert self.soroban_authorization is not None
+            return {"soroban_authorization": self.soroban_authorization.to_json_dict()}
+        raise ValueError(f"Unknown type in HashIDPreimage: {self.type}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: dict) -> HashIDPreimage:
+        if len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for HashIDPreimage, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        type = EnvelopeType.from_json_dict(key)
+        if key == "op_id":
+            operation_id = HashIDPreimageOperationID.from_json_dict(json_value["op_id"])
+            return cls(type=type, operation_id=operation_id)
+        if key == "pool_revoke_op_id":
+            revoke_id = HashIDPreimageRevokeID.from_json_dict(
+                json_value["pool_revoke_op_id"]
+            )
+            return cls(type=type, revoke_id=revoke_id)
+        if key == "contract_id":
+            contract_id = HashIDPreimageContractID.from_json_dict(
+                json_value["contract_id"]
+            )
+            return cls(type=type, contract_id=contract_id)
+        if key == "soroban_authorization":
+            soroban_authorization = HashIDPreimageSorobanAuthorization.from_json_dict(
+                json_value["soroban_authorization"]
+            )
+            return cls(type=type, soroban_authorization=soroban_authorization)
+        raise ValueError(f"Unknown key '{key}' for HashIDPreimage")
 
     def __hash__(self):
         return hash(
@@ -153,24 +216,12 @@ class HashIDPreimage:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        (
+        if self.operation_id is not None:
             out.append(f"operation_id={self.operation_id}")
-            if self.operation_id is not None
-            else None
-        )
-        (
+        if self.revoke_id is not None:
             out.append(f"revoke_id={self.revoke_id}")
-            if self.revoke_id is not None
-            else None
-        )
-        (
+        if self.contract_id is not None:
             out.append(f"contract_id={self.contract_id}")
-            if self.contract_id is not None
-            else None
-        )
-        (
+        if self.soroban_authorization is not None:
             out.append(f"soroban_authorization={self.soroban_authorization}")
-            if self.soroban_authorization is not None
-            else None
-        )
         return f"<HashIDPreimage [{', '.join(out)}]>"

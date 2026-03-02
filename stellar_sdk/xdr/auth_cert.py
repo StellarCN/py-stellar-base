@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .curve25519_public import Curve25519Public
 from .signature import Signature
 from .uint64 import Uint64
@@ -41,10 +43,14 @@ class AuthCert:
         self.sig.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> AuthCert:
-        pubkey = Curve25519Public.unpack(unpacker)
-        expiration = Uint64.unpack(unpacker)
-        sig = Signature.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> AuthCert:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        pubkey = Curve25519Public.unpack(unpacker, depth_limit - 1)
+        expiration = Uint64.unpack(unpacker, depth_limit - 1)
+        sig = Signature.unpack(unpacker, depth_limit - 1)
         return cls(
             pubkey=pubkey,
             expiration=expiration,
@@ -59,7 +65,11 @@ class AuthCert:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> AuthCert:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -69,6 +79,31 @@ class AuthCert:
     def from_xdr(cls, xdr: str) -> AuthCert:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> AuthCert:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "pubkey": self.pubkey.to_json_dict(),
+            "expiration": self.expiration.to_json_dict(),
+            "sig": self.sig.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> AuthCert:
+        pubkey = Curve25519Public.from_json_dict(json_dict["pubkey"])
+        expiration = Uint64.from_json_dict(json_dict["expiration"])
+        sig = Signature.from_json_dict(json_dict["sig"])
+        return cls(
+            pubkey=pubkey,
+            expiration=expiration,
+            sig=sig,
+        )
 
     def __hash__(self):
         return hash(

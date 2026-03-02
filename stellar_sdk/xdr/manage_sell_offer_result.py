@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .manage_offer_success_result import ManageOfferSuccessResult
 from .manage_sell_offer_result_code import ManageSellOfferResultCode
 
@@ -76,12 +78,17 @@ class ManageSellOfferResult:
             return
         if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_LOW_RESERVE:
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ManageSellOfferResult:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ManageSellOfferResult:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         code = ManageSellOfferResultCode.unpack(unpacker)
         if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SUCCESS:
-            success = ManageOfferSuccessResult.unpack(unpacker)
+            success = ManageOfferSuccessResult.unpack(unpacker, depth_limit - 1)
             return cls(code=code, success=success)
         if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_MALFORMED:
             return cls(code=code)
@@ -107,7 +114,7 @@ class ManageSellOfferResult:
             return cls(code=code)
         if code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_LOW_RESERVE:
             return cls(code=code)
-        return cls(code=code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -117,7 +124,11 @@ class ManageSellOfferResult:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ManageSellOfferResult:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -127,6 +138,76 @@ class ManageSellOfferResult:
     def from_xdr(cls, xdr: str) -> ManageSellOfferResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ManageSellOfferResult:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SUCCESS:
+            assert self.success is not None
+            return {"success": self.success.to_json_dict()}
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_MALFORMED:
+            return "malformed"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NO_TRUST:
+            return "sell_no_trust"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NO_TRUST:
+            return "buy_no_trust"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NOT_AUTHORIZED:
+            return "sell_not_authorized"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NOT_AUTHORIZED:
+            return "buy_not_authorized"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_LINE_FULL:
+            return "line_full"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_UNDERFUNDED:
+            return "underfunded"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_CROSS_SELF:
+            return "cross_self"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_SELL_NO_ISSUER:
+            return "sell_no_issuer"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_BUY_NO_ISSUER:
+            return "buy_no_issuer"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_NOT_FOUND:
+            return "not_found"
+        if self.code == ManageSellOfferResultCode.MANAGE_SELL_OFFER_LOW_RESERVE:
+            return "low_reserve"
+        raise ValueError(f"Unknown code in ManageSellOfferResult: {self.code}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: str | dict) -> ManageSellOfferResult:
+        if isinstance(json_value, str):
+            if json_value not in (
+                "malformed",
+                "sell_no_trust",
+                "buy_no_trust",
+                "sell_not_authorized",
+                "buy_not_authorized",
+                "line_full",
+                "underfunded",
+                "cross_self",
+                "sell_no_issuer",
+                "buy_no_issuer",
+                "not_found",
+                "low_reserve",
+            ):
+                raise ValueError(
+                    f"Unexpected string '{json_value}' for ManageSellOfferResult, must be one of: malformed, sell_no_trust, buy_no_trust, sell_not_authorized, buy_not_authorized, line_full, underfunded, cross_self, sell_no_issuer, buy_no_issuer, not_found, low_reserve"
+                )
+            code = ManageSellOfferResultCode.from_json_dict(json_value)
+            return cls(code=code)
+        if not isinstance(json_value, dict) or len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for ManageSellOfferResult, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        code = ManageSellOfferResultCode.from_json_dict(key)
+        if key == "success":
+            success = ManageOfferSuccessResult.from_json_dict(json_value["success"])
+            return cls(code=code, success=success)
+        raise ValueError(f"Unknown key '{key}' for ManageSellOfferResult")
 
     def __hash__(self):
         return hash(
@@ -144,5 +225,6 @@ class ManageSellOfferResult:
     def __repr__(self):
         out = []
         out.append(f"code={self.code}")
-        out.append(f"success={self.success}") if self.success is not None else None
+        if self.success is not None:
+            out.append(f"success={self.success}")
         return f"<ManageSellOfferResult [{', '.join(out)}]>"

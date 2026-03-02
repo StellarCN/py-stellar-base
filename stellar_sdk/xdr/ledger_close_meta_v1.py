@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .generalized_transaction_set import GeneralizedTransactionSet
 from .ledger_close_meta_ext import LedgerCloseMetaExt
 from .ledger_entry import LedgerEntry
@@ -126,31 +128,64 @@ class LedgerCloseMetaV1:
             unused_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> LedgerCloseMetaV1:
-        ext = LedgerCloseMetaExt.unpack(unpacker)
-        ledger_header = LedgerHeaderHistoryEntry.unpack(unpacker)
-        tx_set = GeneralizedTransactionSet.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> LedgerCloseMetaV1:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ext = LedgerCloseMetaExt.unpack(unpacker, depth_limit - 1)
+        ledger_header = LedgerHeaderHistoryEntry.unpack(unpacker, depth_limit - 1)
+        tx_set = GeneralizedTransactionSet.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"tx_processing length {length} exceeds remaining input length {_remaining}"
+            )
         tx_processing = []
         for _ in range(length):
-            tx_processing.append(TransactionResultMeta.unpack(unpacker))
+            tx_processing.append(
+                TransactionResultMeta.unpack(unpacker, depth_limit - 1)
+            )
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"upgrades_processing length {length} exceeds remaining input length {_remaining}"
+            )
         upgrades_processing = []
         for _ in range(length):
-            upgrades_processing.append(UpgradeEntryMeta.unpack(unpacker))
+            upgrades_processing.append(
+                UpgradeEntryMeta.unpack(unpacker, depth_limit - 1)
+            )
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"scp_info length {length} exceeds remaining input length {_remaining}"
+            )
         scp_info = []
         for _ in range(length):
-            scp_info.append(SCPHistoryEntry.unpack(unpacker))
-        total_byte_size_of_live_soroban_state = Uint64.unpack(unpacker)
+            scp_info.append(SCPHistoryEntry.unpack(unpacker, depth_limit - 1))
+        total_byte_size_of_live_soroban_state = Uint64.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"evicted_keys length {length} exceeds remaining input length {_remaining}"
+            )
         evicted_keys = []
         for _ in range(length):
-            evicted_keys.append(LedgerKey.unpack(unpacker))
+            evicted_keys.append(LedgerKey.unpack(unpacker, depth_limit - 1))
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"unused length {length} exceeds remaining input length {_remaining}"
+            )
         unused = []
         for _ in range(length):
-            unused.append(LedgerEntry.unpack(unpacker))
+            unused.append(LedgerEntry.unpack(unpacker, depth_limit - 1))
         return cls(
             ext=ext,
             ledger_header=ledger_header,
@@ -171,7 +206,11 @@ class LedgerCloseMetaV1:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LedgerCloseMetaV1:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -181,6 +220,65 @@ class LedgerCloseMetaV1:
     def from_xdr(cls, xdr: str) -> LedgerCloseMetaV1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> LedgerCloseMetaV1:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ext": self.ext.to_json_dict(),
+            "ledger_header": self.ledger_header.to_json_dict(),
+            "tx_set": self.tx_set.to_json_dict(),
+            "tx_processing": [item.to_json_dict() for item in self.tx_processing],
+            "upgrades_processing": [
+                item.to_json_dict() for item in self.upgrades_processing
+            ],
+            "scp_info": [item.to_json_dict() for item in self.scp_info],
+            "total_byte_size_of_live_soroban_state": self.total_byte_size_of_live_soroban_state.to_json_dict(),
+            "evicted_keys": [item.to_json_dict() for item in self.evicted_keys],
+            "unused": [item.to_json_dict() for item in self.unused],
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> LedgerCloseMetaV1:
+        ext = LedgerCloseMetaExt.from_json_dict(json_dict["ext"])
+        ledger_header = LedgerHeaderHistoryEntry.from_json_dict(
+            json_dict["ledger_header"]
+        )
+        tx_set = GeneralizedTransactionSet.from_json_dict(json_dict["tx_set"])
+        tx_processing = [
+            TransactionResultMeta.from_json_dict(item)
+            for item in json_dict["tx_processing"]
+        ]
+        upgrades_processing = [
+            UpgradeEntryMeta.from_json_dict(item)
+            for item in json_dict["upgrades_processing"]
+        ]
+        scp_info = [
+            SCPHistoryEntry.from_json_dict(item) for item in json_dict["scp_info"]
+        ]
+        total_byte_size_of_live_soroban_state = Uint64.from_json_dict(
+            json_dict["total_byte_size_of_live_soroban_state"]
+        )
+        evicted_keys = [
+            LedgerKey.from_json_dict(item) for item in json_dict["evicted_keys"]
+        ]
+        unused = [LedgerEntry.from_json_dict(item) for item in json_dict["unused"]]
+        return cls(
+            ext=ext,
+            ledger_header=ledger_header,
+            tx_set=tx_set,
+            tx_processing=tx_processing,
+            upgrades_processing=upgrades_processing,
+            scp_info=scp_info,
+            total_byte_size_of_live_soroban_state=total_byte_size_of_live_soroban_state,
+            evicted_keys=evicted_keys,
+            unused=unused,
+        )
 
     def __hash__(self):
         return hash(

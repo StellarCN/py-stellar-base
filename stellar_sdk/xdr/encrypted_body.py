@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Opaque
 
 __all__ = ["EncryptedBody"]
 
@@ -19,13 +20,22 @@ class EncryptedBody:
     """
 
     def __init__(self, encrypted_body: bytes) -> None:
+        _expect_max_length = 64000
+        if encrypted_body and len(encrypted_body) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `encrypted_body` should be {_expect_max_length}, but got {len(encrypted_body)}."
+            )
         self.encrypted_body = encrypted_body
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.encrypted_body, 64000, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> EncryptedBody:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> EncryptedBody:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         encrypted_body = Opaque.unpack(unpacker, 64000, False)
         return cls(encrypted_body)
 
@@ -37,7 +47,11 @@ class EncryptedBody:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> EncryptedBody:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -48,8 +62,22 @@ class EncryptedBody:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> EncryptedBody:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        return Opaque.to_json_dict(self.encrypted_body)
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> EncryptedBody:
+        return cls(Opaque.from_json_dict(json_value))
+
     def __hash__(self):
-        return hash(self.encrypted_body)
+        return hash((self.encrypted_body,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

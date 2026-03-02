@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .path_payment_strict_send_result_code import PathPaymentStrictSendResultCode
 from .path_payment_strict_send_result_success import PathPaymentStrictSendResultSuccess
 
@@ -127,12 +129,19 @@ class PathPaymentStrictSendResult:
             == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_UNDER_DESTMIN
         ):
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> PathPaymentStrictSendResult:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> PathPaymentStrictSendResult:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         code = PathPaymentStrictSendResultCode.unpack(unpacker)
         if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SUCCESS:
-            success = PathPaymentStrictSendResultSuccess.unpack(unpacker)
+            success = PathPaymentStrictSendResultSuccess.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(code=code, success=success)
         if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_MALFORMED:
             return cls(code=code)
@@ -163,7 +172,7 @@ class PathPaymentStrictSendResult:
         if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_LINE_FULL:
             return cls(code=code)
         if code == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_ISSUER:
-            no_issuer = Asset.unpack(unpacker)
+            no_issuer = Asset.unpack(unpacker, depth_limit - 1)
             return cls(code=code, no_issuer=no_issuer)
         if (
             code
@@ -180,7 +189,7 @@ class PathPaymentStrictSendResult:
             == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_UNDER_DESTMIN
         ):
             return cls(code=code)
-        return cls(code=code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -190,7 +199,11 @@ class PathPaymentStrictSendResult:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> PathPaymentStrictSendResult:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -200,6 +213,120 @@ class PathPaymentStrictSendResult:
     def from_xdr(cls, xdr: str) -> PathPaymentStrictSendResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> PathPaymentStrictSendResult:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SUCCESS
+        ):
+            assert self.success is not None
+            return {"success": self.success.to_json_dict()}
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_MALFORMED
+        ):
+            return "malformed"
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_UNDERFUNDED
+        ):
+            return "underfunded"
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SRC_NO_TRUST
+        ):
+            return "src_no_trust"
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_SRC_NOT_AUTHORIZED
+        ):
+            return "src_not_authorized"
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_DESTINATION
+        ):
+            return "no_destination"
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_TRUST
+        ):
+            return "no_trust"
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NOT_AUTHORIZED
+        ):
+            return "not_authorized"
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_LINE_FULL
+        ):
+            return "line_full"
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_NO_ISSUER
+        ):
+            assert self.no_issuer is not None
+            return {"no_issuer": self.no_issuer.to_json_dict()}
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_TOO_FEW_OFFERS
+        ):
+            return "too_few_offers"
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_OFFER_CROSS_SELF
+        ):
+            return "offer_cross_self"
+        if (
+            self.code
+            == PathPaymentStrictSendResultCode.PATH_PAYMENT_STRICT_SEND_UNDER_DESTMIN
+        ):
+            return "under_destmin"
+        raise ValueError(f"Unknown code in PathPaymentStrictSendResult: {self.code}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: str | dict) -> PathPaymentStrictSendResult:
+        if isinstance(json_value, str):
+            if json_value not in (
+                "malformed",
+                "underfunded",
+                "src_no_trust",
+                "src_not_authorized",
+                "no_destination",
+                "no_trust",
+                "not_authorized",
+                "line_full",
+                "too_few_offers",
+                "offer_cross_self",
+                "under_destmin",
+            ):
+                raise ValueError(
+                    f"Unexpected string '{json_value}' for PathPaymentStrictSendResult, must be one of: malformed, underfunded, src_no_trust, src_not_authorized, no_destination, no_trust, not_authorized, line_full, too_few_offers, offer_cross_self, under_destmin"
+                )
+            code = PathPaymentStrictSendResultCode.from_json_dict(json_value)
+            return cls(code=code)
+        if not isinstance(json_value, dict) or len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for PathPaymentStrictSendResult, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        code = PathPaymentStrictSendResultCode.from_json_dict(key)
+        if key == "success":
+            success = PathPaymentStrictSendResultSuccess.from_json_dict(
+                json_value["success"]
+            )
+            return cls(code=code, success=success)
+        if key == "no_issuer":
+            no_issuer = Asset.from_json_dict(json_value["no_issuer"])
+            return cls(code=code, no_issuer=no_issuer)
+        raise ValueError(f"Unknown key '{key}' for PathPaymentStrictSendResult")
 
     def __hash__(self):
         return hash(
@@ -222,10 +349,8 @@ class PathPaymentStrictSendResult:
     def __repr__(self):
         out = []
         out.append(f"code={self.code}")
-        out.append(f"success={self.success}") if self.success is not None else None
-        (
+        if self.success is not None:
+            out.append(f"success={self.success}")
+        if self.no_issuer is not None:
             out.append(f"no_issuer={self.no_issuer}")
-            if self.no_issuer is not None
-            else None
-        )
         return f"<PathPaymentStrictSendResult [{', '.join(out)}]>"

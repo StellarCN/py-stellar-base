@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
 from .stellar_value_ext import StellarValueExt
 from .time_point import TimePoint
@@ -69,14 +71,23 @@ class StellarValue:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> StellarValue:
-        tx_set_hash = Hash.unpack(unpacker)
-        close_time = TimePoint.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> StellarValue:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        tx_set_hash = Hash.unpack(unpacker, depth_limit - 1)
+        close_time = TimePoint.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"upgrades length {length} exceeds remaining input length {_remaining}"
+            )
         upgrades = []
         for _ in range(length):
-            upgrades.append(UpgradeType.unpack(unpacker))
-        ext = StellarValueExt.unpack(unpacker)
+            upgrades.append(UpgradeType.unpack(unpacker, depth_limit - 1))
+        ext = StellarValueExt.unpack(unpacker, depth_limit - 1)
         return cls(
             tx_set_hash=tx_set_hash,
             close_time=close_time,
@@ -92,7 +103,11 @@ class StellarValue:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> StellarValue:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -102,6 +117,34 @@ class StellarValue:
     def from_xdr(cls, xdr: str) -> StellarValue:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> StellarValue:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "tx_set_hash": self.tx_set_hash.to_json_dict(),
+            "close_time": self.close_time.to_json_dict(),
+            "upgrades": [item.to_json_dict() for item in self.upgrades],
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> StellarValue:
+        tx_set_hash = Hash.from_json_dict(json_dict["tx_set_hash"])
+        close_time = TimePoint.from_json_dict(json_dict["close_time"])
+        upgrades = [UpgradeType.from_json_dict(item) for item in json_dict["upgrades"]]
+        ext = StellarValueExt.from_json_dict(json_dict["ext"])
+        return cls(
+            tx_set_hash=tx_set_hash,
+            close_time=close_time,
+            upgrades=upgrades,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

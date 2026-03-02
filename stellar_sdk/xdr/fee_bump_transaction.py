@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .fee_bump_transaction_ext import FeeBumpTransactionExt
 from .fee_bump_transaction_inner_tx import FeeBumpTransactionInnerTx
 from .int64 import Int64
@@ -56,11 +58,15 @@ class FeeBumpTransaction:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> FeeBumpTransaction:
-        fee_source = MuxedAccount.unpack(unpacker)
-        fee = Int64.unpack(unpacker)
-        inner_tx = FeeBumpTransactionInnerTx.unpack(unpacker)
-        ext = FeeBumpTransactionExt.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> FeeBumpTransaction:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        fee_source = MuxedAccount.unpack(unpacker, depth_limit - 1)
+        fee = Int64.unpack(unpacker, depth_limit - 1)
+        inner_tx = FeeBumpTransactionInnerTx.unpack(unpacker, depth_limit - 1)
+        ext = FeeBumpTransactionExt.unpack(unpacker, depth_limit - 1)
         return cls(
             fee_source=fee_source,
             fee=fee,
@@ -76,7 +82,11 @@ class FeeBumpTransaction:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> FeeBumpTransaction:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -86,6 +96,34 @@ class FeeBumpTransaction:
     def from_xdr(cls, xdr: str) -> FeeBumpTransaction:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> FeeBumpTransaction:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "fee_source": self.fee_source.to_json_dict(),
+            "fee": self.fee.to_json_dict(),
+            "inner_tx": self.inner_tx.to_json_dict(),
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> FeeBumpTransaction:
+        fee_source = MuxedAccount.from_json_dict(json_dict["fee_source"])
+        fee = Int64.from_json_dict(json_dict["fee"])
+        inner_tx = FeeBumpTransactionInnerTx.from_json_dict(json_dict["inner_tx"])
+        ext = FeeBumpTransactionExt.from_json_dict(json_dict["ext"])
+        return cls(
+            fee_source=fee_source,
+            fee=fee,
+            inner_tx=inner_tx,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
 from .ledger_header import LedgerHeader
 from .ledger_header_history_entry_ext import LedgerHeaderHistoryEntryExt
@@ -48,10 +50,14 @@ class LedgerHeaderHistoryEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> LedgerHeaderHistoryEntry:
-        hash = Hash.unpack(unpacker)
-        header = LedgerHeader.unpack(unpacker)
-        ext = LedgerHeaderHistoryEntryExt.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> LedgerHeaderHistoryEntry:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        hash = Hash.unpack(unpacker, depth_limit - 1)
+        header = LedgerHeader.unpack(unpacker, depth_limit - 1)
+        ext = LedgerHeaderHistoryEntryExt.unpack(unpacker, depth_limit - 1)
         return cls(
             hash=hash,
             header=header,
@@ -66,7 +72,11 @@ class LedgerHeaderHistoryEntry:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LedgerHeaderHistoryEntry:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -76,6 +86,31 @@ class LedgerHeaderHistoryEntry:
     def from_xdr(cls, xdr: str) -> LedgerHeaderHistoryEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> LedgerHeaderHistoryEntry:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "hash": self.hash.to_json_dict(),
+            "header": self.header.to_json_dict(),
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> LedgerHeaderHistoryEntry:
+        hash = Hash.from_json_dict(json_dict["hash"])
+        header = LedgerHeader.from_json_dict(json_dict["header"])
+        ext = LedgerHeaderHistoryEntryExt.from_json_dict(json_dict["ext"])
+        return cls(
+            hash=hash,
+            header=header,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

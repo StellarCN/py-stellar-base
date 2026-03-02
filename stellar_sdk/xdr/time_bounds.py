@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .time_point import TimePoint
 
 __all__ = ["TimeBounds"]
@@ -35,9 +37,13 @@ class TimeBounds:
         self.max_time.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> TimeBounds:
-        min_time = TimePoint.unpack(unpacker)
-        max_time = TimePoint.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TimeBounds:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        min_time = TimePoint.unpack(unpacker, depth_limit - 1)
+        max_time = TimePoint.unpack(unpacker, depth_limit - 1)
         return cls(
             min_time=min_time,
             max_time=max_time,
@@ -51,7 +57,11 @@ class TimeBounds:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TimeBounds:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -61,6 +71,28 @@ class TimeBounds:
     def from_xdr(cls, xdr: str) -> TimeBounds:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TimeBounds:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "min_time": self.min_time.to_json_dict(),
+            "max_time": self.max_time.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> TimeBounds:
+        min_time = TimePoint.from_json_dict(json_dict["min_time"])
+        max_time = TimePoint.from_json_dict(json_dict["max_time"])
+        return cls(
+            min_time=min_time,
+            max_time=max_time,
+        )
 
     def __hash__(self):
         return hash(

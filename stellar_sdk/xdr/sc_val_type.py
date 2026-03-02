@@ -3,10 +3,59 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_SC_VAL_TYPE_MAP = {
+    0: "bool",
+    1: "void",
+    2: "error",
+    3: "u32",
+    4: "i32",
+    5: "u64",
+    6: "i64",
+    7: "timepoint",
+    8: "duration",
+    9: "u128",
+    10: "i128",
+    11: "u256",
+    12: "i256",
+    13: "bytes",
+    14: "string",
+    15: "symbol",
+    16: "vec",
+    17: "map",
+    18: "address",
+    19: "contract_instance",
+    20: "ledger_key_contract_instance",
+    21: "ledger_key_nonce",
+}
+_SC_VAL_TYPE_REVERSE_MAP = {
+    "bool": 0,
+    "void": 1,
+    "error": 2,
+    "u32": 3,
+    "i32": 4,
+    "u64": 5,
+    "i64": 6,
+    "timepoint": 7,
+    "duration": 8,
+    "u128": 9,
+    "i128": 10,
+    "u256": 11,
+    "i256": 12,
+    "bytes": 13,
+    "string": 14,
+    "symbol": 15,
+    "vec": 16,
+    "map": 17,
+    "address": 18,
+    "contract_instance": 19,
+    "ledger_key_contract_instance": 20,
+    "ledger_key_nonce": 21,
+}
 __all__ = ["SCValType"]
 
 
@@ -109,7 +158,11 @@ class SCValType(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCValType:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -119,3 +172,17 @@ class SCValType(IntEnum):
     def from_xdr(cls, xdr: str) -> SCValType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCValType:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _SC_VAL_TYPE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> SCValType:
+        return cls(_SC_VAL_TYPE_REVERSE_MAP[json_value])

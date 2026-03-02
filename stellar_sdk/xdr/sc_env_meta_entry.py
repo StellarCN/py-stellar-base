@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .sc_env_meta_entry_interface_version import SCEnvMetaEntryInterfaceVersion
 from .sc_env_meta_kind import SCEnvMetaKind
 
@@ -42,14 +44,21 @@ class SCEnvMetaEntry:
                 raise ValueError("interface_version should not be None.")
             self.interface_version.pack(packer)
             return
+        raise ValueError("Invalid kind.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SCEnvMetaEntry:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SCEnvMetaEntry:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         kind = SCEnvMetaKind.unpack(unpacker)
         if kind == SCEnvMetaKind.SC_ENV_META_KIND_INTERFACE_VERSION:
-            interface_version = SCEnvMetaEntryInterfaceVersion.unpack(unpacker)
+            interface_version = SCEnvMetaEntryInterfaceVersion.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(kind=kind, interface_version=interface_version)
-        return cls(kind=kind)
+        raise ValueError("Invalid kind.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -59,7 +68,11 @@ class SCEnvMetaEntry:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCEnvMetaEntry:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -69,6 +82,36 @@ class SCEnvMetaEntry:
     def from_xdr(cls, xdr: str) -> SCEnvMetaEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCEnvMetaEntry:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.kind == SCEnvMetaKind.SC_ENV_META_KIND_INTERFACE_VERSION:
+            assert self.interface_version is not None
+            return {
+                "sc_env_meta_kind_interface_version": self.interface_version.to_json_dict()
+            }
+        raise ValueError(f"Unknown kind in SCEnvMetaEntry: {self.kind}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: dict) -> SCEnvMetaEntry:
+        if len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for SCEnvMetaEntry, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        kind = SCEnvMetaKind.from_json_dict(key)
+        if key == "sc_env_meta_kind_interface_version":
+            interface_version = SCEnvMetaEntryInterfaceVersion.from_json_dict(
+                json_value["sc_env_meta_kind_interface_version"]
+            )
+            return cls(kind=kind, interface_version=interface_version)
+        raise ValueError(f"Unknown key '{key}' for SCEnvMetaEntry")
 
     def __hash__(self):
         return hash(
@@ -89,9 +132,6 @@ class SCEnvMetaEntry:
     def __repr__(self):
         out = []
         out.append(f"kind={self.kind}")
-        (
+        if self.interface_version is not None:
             out.append(f"interface_version={self.interface_version}")
-            if self.interface_version is not None
-            else None
-        )
         return f"<SCEnvMetaEntry [{', '.join(out)}]>"

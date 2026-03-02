@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .muxed_account import MuxedAccount
 from .operation_body import OperationBody
 
@@ -102,11 +104,17 @@ class Operation:
         self.body.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> Operation:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> Operation:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         source_account = (
-            MuxedAccount.unpack(unpacker) if unpacker.unpack_uint() else None
+            MuxedAccount.unpack(unpacker, depth_limit - 1)
+            if unpacker.unpack_uint()
+            else None
         )
-        body = OperationBody.unpack(unpacker)
+        body = OperationBody.unpack(unpacker, depth_limit - 1)
         return cls(
             source_account=source_account,
             body=body,
@@ -120,7 +128,11 @@ class Operation:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> Operation:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -130,6 +142,36 @@ class Operation:
     def from_xdr(cls, xdr: str) -> Operation:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> Operation:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "source_account": (
+                self.source_account.to_json_dict()
+                if self.source_account is not None
+                else None
+            ),
+            "body": self.body.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> Operation:
+        source_account = (
+            MuxedAccount.from_json_dict(json_dict["source_account"])
+            if json_dict["source_account"] is not None
+            else None
+        )
+        body = OperationBody.from_json_dict(json_dict["body"])
+        return cls(
+            source_account=source_account,
+            body=body,
+        )
 
     def __hash__(self):
         return hash(

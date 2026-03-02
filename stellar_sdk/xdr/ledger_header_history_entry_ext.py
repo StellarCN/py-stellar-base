@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Integer
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 
 __all__ = ["LedgerHeaderHistoryEntryExt"]
 
@@ -32,13 +33,18 @@ class LedgerHeaderHistoryEntryExt:
         Integer(self.v).pack(packer)
         if self.v == 0:
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> LedgerHeaderHistoryEntryExt:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> LedgerHeaderHistoryEntryExt:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v=v)
-        return cls(v=v)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -48,7 +54,11 @@ class LedgerHeaderHistoryEntryExt:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LedgerHeaderHistoryEntryExt:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -58,6 +68,27 @@ class LedgerHeaderHistoryEntryExt:
     def from_xdr(cls, xdr: str) -> LedgerHeaderHistoryEntryExt:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> LedgerHeaderHistoryEntryExt:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.v == 0:
+            return "v0"
+        raise ValueError(f"Unknown v in LedgerHeaderHistoryEntryExt: {self.v}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> LedgerHeaderHistoryEntryExt:
+        if json_value not in ("v0",):
+            raise ValueError(
+                f"Unexpected string '{json_value}' for LedgerHeaderHistoryEntryExt, must be one of: v0"
+            )
+        v = int(json_value[1:])
+        return cls(v=v)
 
     def __hash__(self):
         return hash((self.v,))

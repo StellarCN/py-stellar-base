@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .uint32 import Uint32
 
 __all__ = ["ConfigSettingContractExecutionLanesV0"]
@@ -32,8 +34,12 @@ class ConfigSettingContractExecutionLanesV0:
         self.ledger_max_tx_count.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ConfigSettingContractExecutionLanesV0:
-        ledger_max_tx_count = Uint32.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ConfigSettingContractExecutionLanesV0:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ledger_max_tx_count = Uint32.unpack(unpacker, depth_limit - 1)
         return cls(
             ledger_max_tx_count=ledger_max_tx_count,
         )
@@ -46,7 +52,11 @@ class ConfigSettingContractExecutionLanesV0:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ConfigSettingContractExecutionLanesV0:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -56,6 +66,25 @@ class ConfigSettingContractExecutionLanesV0:
     def from_xdr(cls, xdr: str) -> ConfigSettingContractExecutionLanesV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ConfigSettingContractExecutionLanesV0:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ledger_max_tx_count": self.ledger_max_tx_count.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> ConfigSettingContractExecutionLanesV0:
+        ledger_max_tx_count = Uint32.from_json_dict(json_dict["ledger_max_tx_count"])
+        return cls(
+            ledger_max_tx_count=ledger_max_tx_count,
+        )
 
     def __hash__(self):
         return hash((self.ledger_max_tx_count,))

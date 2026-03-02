@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Boolean
+from .base import DEFAULT_XDR_MAX_DEPTH, Boolean
 from .uint32 import Uint32
 
 __all__ = ["TimeSlicedNodeData"]
@@ -74,17 +75,21 @@ class TimeSlicedNodeData:
         self.max_outbound_peer_count.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> TimeSlicedNodeData:
-        added_authenticated_peers = Uint32.unpack(unpacker)
-        dropped_authenticated_peers = Uint32.unpack(unpacker)
-        total_inbound_peer_count = Uint32.unpack(unpacker)
-        total_outbound_peer_count = Uint32.unpack(unpacker)
-        p75_scp_first_to_self_latency_ms = Uint32.unpack(unpacker)
-        p75_scp_self_to_other_latency_ms = Uint32.unpack(unpacker)
-        lost_sync_count = Uint32.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TimeSlicedNodeData:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        added_authenticated_peers = Uint32.unpack(unpacker, depth_limit - 1)
+        dropped_authenticated_peers = Uint32.unpack(unpacker, depth_limit - 1)
+        total_inbound_peer_count = Uint32.unpack(unpacker, depth_limit - 1)
+        total_outbound_peer_count = Uint32.unpack(unpacker, depth_limit - 1)
+        p75_scp_first_to_self_latency_ms = Uint32.unpack(unpacker, depth_limit - 1)
+        p75_scp_self_to_other_latency_ms = Uint32.unpack(unpacker, depth_limit - 1)
+        lost_sync_count = Uint32.unpack(unpacker, depth_limit - 1)
         is_validator = Boolean.unpack(unpacker)
-        max_inbound_peer_count = Uint32.unpack(unpacker)
-        max_outbound_peer_count = Uint32.unpack(unpacker)
+        max_inbound_peer_count = Uint32.unpack(unpacker, depth_limit - 1)
+        max_outbound_peer_count = Uint32.unpack(unpacker, depth_limit - 1)
         return cls(
             added_authenticated_peers=added_authenticated_peers,
             dropped_authenticated_peers=dropped_authenticated_peers,
@@ -106,7 +111,11 @@ class TimeSlicedNodeData:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TimeSlicedNodeData:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -116,6 +125,68 @@ class TimeSlicedNodeData:
     def from_xdr(cls, xdr: str) -> TimeSlicedNodeData:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TimeSlicedNodeData:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "added_authenticated_peers": self.added_authenticated_peers.to_json_dict(),
+            "dropped_authenticated_peers": self.dropped_authenticated_peers.to_json_dict(),
+            "total_inbound_peer_count": self.total_inbound_peer_count.to_json_dict(),
+            "total_outbound_peer_count": self.total_outbound_peer_count.to_json_dict(),
+            "p75_scp_first_to_self_latency_ms": self.p75_scp_first_to_self_latency_ms.to_json_dict(),
+            "p75_scp_self_to_other_latency_ms": self.p75_scp_self_to_other_latency_ms.to_json_dict(),
+            "lost_sync_count": self.lost_sync_count.to_json_dict(),
+            "is_validator": Boolean.to_json_dict(self.is_validator),
+            "max_inbound_peer_count": self.max_inbound_peer_count.to_json_dict(),
+            "max_outbound_peer_count": self.max_outbound_peer_count.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> TimeSlicedNodeData:
+        added_authenticated_peers = Uint32.from_json_dict(
+            json_dict["added_authenticated_peers"]
+        )
+        dropped_authenticated_peers = Uint32.from_json_dict(
+            json_dict["dropped_authenticated_peers"]
+        )
+        total_inbound_peer_count = Uint32.from_json_dict(
+            json_dict["total_inbound_peer_count"]
+        )
+        total_outbound_peer_count = Uint32.from_json_dict(
+            json_dict["total_outbound_peer_count"]
+        )
+        p75_scp_first_to_self_latency_ms = Uint32.from_json_dict(
+            json_dict["p75_scp_first_to_self_latency_ms"]
+        )
+        p75_scp_self_to_other_latency_ms = Uint32.from_json_dict(
+            json_dict["p75_scp_self_to_other_latency_ms"]
+        )
+        lost_sync_count = Uint32.from_json_dict(json_dict["lost_sync_count"])
+        is_validator = Boolean.from_json_dict(json_dict["is_validator"])
+        max_inbound_peer_count = Uint32.from_json_dict(
+            json_dict["max_inbound_peer_count"]
+        )
+        max_outbound_peer_count = Uint32.from_json_dict(
+            json_dict["max_outbound_peer_count"]
+        )
+        return cls(
+            added_authenticated_peers=added_authenticated_peers,
+            dropped_authenticated_peers=dropped_authenticated_peers,
+            total_inbound_peer_count=total_inbound_peer_count,
+            total_outbound_peer_count=total_outbound_peer_count,
+            p75_scp_first_to_self_latency_ms=p75_scp_first_to_self_latency_ms,
+            p75_scp_self_to_other_latency_ms=p75_scp_self_to_other_latency_ms,
+            lost_sync_count=lost_sync_count,
+            is_validator=is_validator,
+            max_inbound_peer_count=max_inbound_peer_count,
+            max_outbound_peer_count=max_outbound_peer_count,
+        )
 
     def __hash__(self):
         return hash(

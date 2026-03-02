@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .claim_atom_type import ClaimAtomType
 from .claim_liquidity_atom import ClaimLiquidityAtom
 from .claim_offer_atom import ClaimOfferAtom
@@ -59,20 +61,25 @@ class ClaimAtom:
                 raise ValueError("liquidity_pool should not be None.")
             self.liquidity_pool.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ClaimAtom:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ClaimAtom:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         type = ClaimAtomType.unpack(unpacker)
         if type == ClaimAtomType.CLAIM_ATOM_TYPE_V0:
-            v0 = ClaimOfferAtomV0.unpack(unpacker)
+            v0 = ClaimOfferAtomV0.unpack(unpacker, depth_limit - 1)
             return cls(type=type, v0=v0)
         if type == ClaimAtomType.CLAIM_ATOM_TYPE_ORDER_BOOK:
-            order_book = ClaimOfferAtom.unpack(unpacker)
+            order_book = ClaimOfferAtom.unpack(unpacker, depth_limit - 1)
             return cls(type=type, order_book=order_book)
         if type == ClaimAtomType.CLAIM_ATOM_TYPE_LIQUIDITY_POOL:
-            liquidity_pool = ClaimLiquidityAtom.unpack(unpacker)
+            liquidity_pool = ClaimLiquidityAtom.unpack(unpacker, depth_limit - 1)
             return cls(type=type, liquidity_pool=liquidity_pool)
-        return cls(type=type)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -82,7 +89,11 @@ class ClaimAtom:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ClaimAtom:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -92,6 +103,46 @@ class ClaimAtom:
     def from_xdr(cls, xdr: str) -> ClaimAtom:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ClaimAtom:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.type == ClaimAtomType.CLAIM_ATOM_TYPE_V0:
+            assert self.v0 is not None
+            return {"v0": self.v0.to_json_dict()}
+        if self.type == ClaimAtomType.CLAIM_ATOM_TYPE_ORDER_BOOK:
+            assert self.order_book is not None
+            return {"order_book": self.order_book.to_json_dict()}
+        if self.type == ClaimAtomType.CLAIM_ATOM_TYPE_LIQUIDITY_POOL:
+            assert self.liquidity_pool is not None
+            return {"liquidity_pool": self.liquidity_pool.to_json_dict()}
+        raise ValueError(f"Unknown type in ClaimAtom: {self.type}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: dict) -> ClaimAtom:
+        if len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for ClaimAtom, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        type = ClaimAtomType.from_json_dict(key)
+        if key == "v0":
+            v0 = ClaimOfferAtomV0.from_json_dict(json_value["v0"])
+            return cls(type=type, v0=v0)
+        if key == "order_book":
+            order_book = ClaimOfferAtom.from_json_dict(json_value["order_book"])
+            return cls(type=type, order_book=order_book)
+        if key == "liquidity_pool":
+            liquidity_pool = ClaimLiquidityAtom.from_json_dict(
+                json_value["liquidity_pool"]
+            )
+            return cls(type=type, liquidity_pool=liquidity_pool)
+        raise ValueError(f"Unknown key '{key}' for ClaimAtom")
 
     def __hash__(self):
         return hash(
@@ -116,15 +167,10 @@ class ClaimAtom:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(f"v0={self.v0}") if self.v0 is not None else None
-        (
+        if self.v0 is not None:
+            out.append(f"v0={self.v0}")
+        if self.order_book is not None:
             out.append(f"order_book={self.order_book}")
-            if self.order_book is not None
-            else None
-        )
-        (
+        if self.liquidity_pool is not None:
             out.append(f"liquidity_pool={self.liquidity_pool}")
-            if self.liquidity_pool is not None
-            else None
-        )
         return f"<ClaimAtom [{', '.join(out)}]>"

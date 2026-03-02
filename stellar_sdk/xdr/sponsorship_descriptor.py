@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
+from .base import DEFAULT_XDR_MAX_DEPTH
 
 __all__ = ["SponsorshipDescriptor"]
 
@@ -30,9 +32,15 @@ class SponsorshipDescriptor:
             self.sponsorship_descriptor.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SponsorshipDescriptor:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SponsorshipDescriptor:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         sponsorship_descriptor = (
-            AccountID.unpack(unpacker) if unpacker.unpack_uint() else None
+            AccountID.unpack(unpacker, depth_limit - 1)
+            if unpacker.unpack_uint()
+            else None
         )
         return cls(sponsorship_descriptor)
 
@@ -44,7 +52,11 @@ class SponsorshipDescriptor:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SponsorshipDescriptor:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -55,8 +67,28 @@ class SponsorshipDescriptor:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SponsorshipDescriptor:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        return (
+            self.sponsorship_descriptor.to_json_dict()
+            if self.sponsorship_descriptor is not None
+            else None
+        )
+
+    @classmethod
+    def from_json_dict(cls, json_value: str | None) -> SponsorshipDescriptor:
+        return cls(
+            AccountID.from_json_dict(json_value) if json_value is not None else None
+        )
+
     def __hash__(self):
-        return hash(self.sponsorship_descriptor)
+        return hash((self.sponsorship_descriptor,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

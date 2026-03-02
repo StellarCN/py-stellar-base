@@ -3,10 +3,21 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_TRUST_LINE_FLAGS_MAP = {
+    1: "authorized_flag",
+    2: "authorized_to_maintain_liabilities_flag",
+    4: "trustline_clawback_enabled_flag",
+}
+_TRUST_LINE_FLAGS_REVERSE_MAP = {
+    "authorized_flag": 1,
+    "authorized_to_maintain_liabilities_flag": 2,
+    "trustline_clawback_enabled_flag": 4,
+}
 __all__ = ["TrustLineFlags"]
 
 
@@ -47,7 +58,11 @@ class TrustLineFlags(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TrustLineFlags:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -57,3 +72,17 @@ class TrustLineFlags(IntEnum):
     def from_xdr(cls, xdr: str) -> TrustLineFlags:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TrustLineFlags:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _TRUST_LINE_FLAGS_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> TrustLineFlags:
+        return cls(_TRUST_LINE_FLAGS_REVERSE_MAP[json_value])

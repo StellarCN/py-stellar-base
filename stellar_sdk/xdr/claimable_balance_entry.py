@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .claimable_balance_entry_ext import ClaimableBalanceEntryExt
 from .claimable_balance_id import ClaimableBalanceID
 from .claimant import Claimant
@@ -75,15 +77,24 @@ class ClaimableBalanceEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ClaimableBalanceEntry:
-        balance_id = ClaimableBalanceID.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ClaimableBalanceEntry:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        balance_id = ClaimableBalanceID.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"claimants length {length} exceeds remaining input length {_remaining}"
+            )
         claimants = []
         for _ in range(length):
-            claimants.append(Claimant.unpack(unpacker))
-        asset = Asset.unpack(unpacker)
-        amount = Int64.unpack(unpacker)
-        ext = ClaimableBalanceEntryExt.unpack(unpacker)
+            claimants.append(Claimant.unpack(unpacker, depth_limit - 1))
+        asset = Asset.unpack(unpacker, depth_limit - 1)
+        amount = Int64.unpack(unpacker, depth_limit - 1)
+        ext = ClaimableBalanceEntryExt.unpack(unpacker, depth_limit - 1)
         return cls(
             balance_id=balance_id,
             claimants=claimants,
@@ -100,7 +111,11 @@ class ClaimableBalanceEntry:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ClaimableBalanceEntry:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -110,6 +125,37 @@ class ClaimableBalanceEntry:
     def from_xdr(cls, xdr: str) -> ClaimableBalanceEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ClaimableBalanceEntry:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "balance_id": self.balance_id.to_json_dict(),
+            "claimants": [item.to_json_dict() for item in self.claimants],
+            "asset": self.asset.to_json_dict(),
+            "amount": self.amount.to_json_dict(),
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> ClaimableBalanceEntry:
+        balance_id = ClaimableBalanceID.from_json_dict(json_dict["balance_id"])
+        claimants = [Claimant.from_json_dict(item) for item in json_dict["claimants"]]
+        asset = Asset.from_json_dict(json_dict["asset"])
+        amount = Int64.from_json_dict(json_dict["amount"])
+        ext = ClaimableBalanceEntryExt.from_json_dict(json_dict["ext"])
+        return cls(
+            balance_id=balance_id,
+            claimants=claimants,
+            asset=asset,
+            amount=amount,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

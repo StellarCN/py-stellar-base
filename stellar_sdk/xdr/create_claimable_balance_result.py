@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .claimable_balance_id import ClaimableBalanceID
 from .create_claimable_balance_result_code import CreateClaimableBalanceResultCode
 
@@ -74,12 +76,17 @@ class CreateClaimableBalanceResult:
             == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_UNDERFUNDED
         ):
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> CreateClaimableBalanceResult:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> CreateClaimableBalanceResult:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         code = CreateClaimableBalanceResultCode.unpack(unpacker)
         if code == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_SUCCESS:
-            balance_id = ClaimableBalanceID.unpack(unpacker)
+            balance_id = ClaimableBalanceID.unpack(unpacker, depth_limit - 1)
             return cls(code=code, balance_id=balance_id)
         if code == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_MALFORMED:
             return cls(code=code)
@@ -100,7 +107,7 @@ class CreateClaimableBalanceResult:
             == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_UNDERFUNDED
         ):
             return cls(code=code)
-        return cls(code=code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -110,7 +117,11 @@ class CreateClaimableBalanceResult:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> CreateClaimableBalanceResult:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -120,6 +131,73 @@ class CreateClaimableBalanceResult:
     def from_xdr(cls, xdr: str) -> CreateClaimableBalanceResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> CreateClaimableBalanceResult:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_SUCCESS
+        ):
+            assert self.balance_id is not None
+            return {"success": self.balance_id.to_json_dict()}
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_MALFORMED
+        ):
+            return "malformed"
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_LOW_RESERVE
+        ):
+            return "low_reserve"
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_NO_TRUST
+        ):
+            return "no_trust"
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_NOT_AUTHORIZED
+        ):
+            return "not_authorized"
+        if (
+            self.code
+            == CreateClaimableBalanceResultCode.CREATE_CLAIMABLE_BALANCE_UNDERFUNDED
+        ):
+            return "underfunded"
+        raise ValueError(f"Unknown code in CreateClaimableBalanceResult: {self.code}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: str | dict) -> CreateClaimableBalanceResult:
+        if isinstance(json_value, str):
+            if json_value not in (
+                "malformed",
+                "low_reserve",
+                "no_trust",
+                "not_authorized",
+                "underfunded",
+            ):
+                raise ValueError(
+                    f"Unexpected string '{json_value}' for CreateClaimableBalanceResult, must be one of: malformed, low_reserve, no_trust, not_authorized, underfunded"
+                )
+            code = CreateClaimableBalanceResultCode.from_json_dict(json_value)
+            return cls(code=code)
+        if not isinstance(json_value, dict) or len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for CreateClaimableBalanceResult, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        code = CreateClaimableBalanceResultCode.from_json_dict(key)
+        if key == "success":
+            balance_id = ClaimableBalanceID.from_json_dict(json_value["success"])
+            return cls(code=code, balance_id=balance_id)
+        raise ValueError(f"Unknown key '{key}' for CreateClaimableBalanceResult")
 
     def __hash__(self):
         return hash(
@@ -137,9 +215,6 @@ class CreateClaimableBalanceResult:
     def __repr__(self):
         out = []
         out.append(f"code={self.code}")
-        (
+        if self.balance_id is not None:
             out.append(f"balance_id={self.balance_id}")
-            if self.balance_id is not None
-            else None
-        )
         return f"<CreateClaimableBalanceResult [{', '.join(out)}]>"

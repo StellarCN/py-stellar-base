@@ -3,10 +3,37 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_SET_OPTIONS_RESULT_CODE_MAP = {
+    0: "success",
+    -1: "low_reserve",
+    -2: "too_many_signers",
+    -3: "bad_flags",
+    -4: "invalid_inflation",
+    -5: "cant_change",
+    -6: "unknown_flag",
+    -7: "threshold_out_of_range",
+    -8: "bad_signer",
+    -9: "invalid_home_domain",
+    -10: "auth_revocable_required",
+}
+_SET_OPTIONS_RESULT_CODE_REVERSE_MAP = {
+    "success": 0,
+    "low_reserve": -1,
+    "too_many_signers": -2,
+    "bad_flags": -3,
+    "invalid_inflation": -4,
+    "cant_change": -5,
+    "unknown_flag": -6,
+    "threshold_out_of_range": -7,
+    "bad_signer": -8,
+    "invalid_home_domain": -9,
+    "auth_revocable_required": -10,
+}
 __all__ = ["SetOptionsResultCode"]
 
 
@@ -61,7 +88,11 @@ class SetOptionsResultCode(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SetOptionsResultCode:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -71,3 +102,17 @@ class SetOptionsResultCode(IntEnum):
     def from_xdr(cls, xdr: str) -> SetOptionsResultCode:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SetOptionsResultCode:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _SET_OPTIONS_RESULT_CODE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> SetOptionsResultCode:
+        return cls(_SET_OPTIONS_RESULT_CODE_REVERSE_MAP[json_value])

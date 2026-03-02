@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_INFLATION_RESULT_CODE_MAP = {0: "success", -1: "not_time"}
+_INFLATION_RESULT_CODE_REVERSE_MAP = {"success": 0, "not_time": -1}
 __all__ = ["InflationResultCode"]
 
 
@@ -42,7 +45,11 @@ class InflationResultCode(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> InflationResultCode:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -52,3 +59,17 @@ class InflationResultCode(IntEnum):
     def from_xdr(cls, xdr: str) -> InflationResultCode:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> InflationResultCode:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _INFLATION_RESULT_CODE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> InflationResultCode:
+        return cls(_INFLATION_RESULT_CODE_REVERSE_MAP[json_value])

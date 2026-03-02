@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .data_entry_ext import DataEntryExt
 from .data_value import DataValue
 from .string64 import String64
@@ -53,11 +55,15 @@ class DataEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> DataEntry:
-        account_id = AccountID.unpack(unpacker)
-        data_name = String64.unpack(unpacker)
-        data_value = DataValue.unpack(unpacker)
-        ext = DataEntryExt.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> DataEntry:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        account_id = AccountID.unpack(unpacker, depth_limit - 1)
+        data_name = String64.unpack(unpacker, depth_limit - 1)
+        data_value = DataValue.unpack(unpacker, depth_limit - 1)
+        ext = DataEntryExt.unpack(unpacker, depth_limit - 1)
         return cls(
             account_id=account_id,
             data_name=data_name,
@@ -73,7 +79,11 @@ class DataEntry:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> DataEntry:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -83,6 +93,34 @@ class DataEntry:
     def from_xdr(cls, xdr: str) -> DataEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> DataEntry:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "account_id": self.account_id.to_json_dict(),
+            "data_name": self.data_name.to_json_dict(),
+            "data_value": self.data_value.to_json_dict(),
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> DataEntry:
+        account_id = AccountID.from_json_dict(json_dict["account_id"])
+        data_name = String64.from_json_dict(json_dict["data_name"])
+        data_value = DataValue.from_json_dict(json_dict["data_value"])
+        ext = DataEntryExt.from_json_dict(json_dict["ext"])
+        return cls(
+            account_id=account_id,
+            data_name=data_name,
+            data_value=data_value,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .allow_trust_result_code import AllowTrustResultCode
+from .base import DEFAULT_XDR_MAX_DEPTH
 
 __all__ = ["AllowTrustResult"]
 
@@ -51,9 +53,14 @@ class AllowTrustResult:
             return
         if self.code == AllowTrustResultCode.ALLOW_TRUST_LOW_RESERVE:
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> AllowTrustResult:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> AllowTrustResult:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         code = AllowTrustResultCode.unpack(unpacker)
         if code == AllowTrustResultCode.ALLOW_TRUST_SUCCESS:
             return cls(code=code)
@@ -69,7 +76,7 @@ class AllowTrustResult:
             return cls(code=code)
         if code == AllowTrustResultCode.ALLOW_TRUST_LOW_RESERVE:
             return cls(code=code)
-        return cls(code=code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -79,7 +86,11 @@ class AllowTrustResult:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> AllowTrustResult:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -89,6 +100,47 @@ class AllowTrustResult:
     def from_xdr(cls, xdr: str) -> AllowTrustResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> AllowTrustResult:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_SUCCESS:
+            return "success"
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_MALFORMED:
+            return "malformed"
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_NO_TRUST_LINE:
+            return "no_trust_line"
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_TRUST_NOT_REQUIRED:
+            return "trust_not_required"
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_CANT_REVOKE:
+            return "cant_revoke"
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_SELF_NOT_ALLOWED:
+            return "self_not_allowed"
+        if self.code == AllowTrustResultCode.ALLOW_TRUST_LOW_RESERVE:
+            return "low_reserve"
+        raise ValueError(f"Unknown code in AllowTrustResult: {self.code}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> AllowTrustResult:
+        if json_value not in (
+            "success",
+            "malformed",
+            "no_trust_line",
+            "trust_not_required",
+            "cant_revoke",
+            "self_not_allowed",
+            "low_reserve",
+        ):
+            raise ValueError(
+                f"Unexpected string '{json_value}' for AllowTrustResult, must be one of: success, malformed, no_trust_line, trust_not_required, cant_revoke, self_not_allowed, low_reserve"
+            )
+        code = AllowTrustResultCode.from_json_dict(json_value)
+        return cls(code=code)
 
     def __hash__(self):
         return hash((self.code,))

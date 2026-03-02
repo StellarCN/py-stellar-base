@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .host_function import HostFunction
 from .soroban_authorization_entry import SorobanAuthorizationEntry
 
@@ -46,12 +48,21 @@ class InvokeHostFunctionOp:
             auth_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> InvokeHostFunctionOp:
-        host_function = HostFunction.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> InvokeHostFunctionOp:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        host_function = HostFunction.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"auth length {length} exceeds remaining input length {_remaining}"
+            )
         auth = []
         for _ in range(length):
-            auth.append(SorobanAuthorizationEntry.unpack(unpacker))
+            auth.append(SorobanAuthorizationEntry.unpack(unpacker, depth_limit - 1))
         return cls(
             host_function=host_function,
             auth=auth,
@@ -65,7 +76,11 @@ class InvokeHostFunctionOp:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> InvokeHostFunctionOp:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -75,6 +90,30 @@ class InvokeHostFunctionOp:
     def from_xdr(cls, xdr: str) -> InvokeHostFunctionOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> InvokeHostFunctionOp:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "host_function": self.host_function.to_json_dict(),
+            "auth": [item.to_json_dict() for item in self.auth],
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> InvokeHostFunctionOp:
+        host_function = HostFunction.from_json_dict(json_dict["host_function"])
+        auth = [
+            SorobanAuthorizationEntry.from_json_dict(item) for item in json_dict["auth"]
+        ]
+        return cls(
+            host_function=host_function,
+            auth=auth,
+        )
 
     def __hash__(self):
         return hash(

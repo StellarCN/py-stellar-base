@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .ledger_header_extension_v1_ext import LedgerHeaderExtensionV1Ext
 from .uint32 import Uint32
 
@@ -42,9 +44,13 @@ class LedgerHeaderExtensionV1:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> LedgerHeaderExtensionV1:
-        flags = Uint32.unpack(unpacker)
-        ext = LedgerHeaderExtensionV1Ext.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> LedgerHeaderExtensionV1:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        flags = Uint32.unpack(unpacker, depth_limit - 1)
+        ext = LedgerHeaderExtensionV1Ext.unpack(unpacker, depth_limit - 1)
         return cls(
             flags=flags,
             ext=ext,
@@ -58,7 +64,11 @@ class LedgerHeaderExtensionV1:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LedgerHeaderExtensionV1:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -68,6 +78,28 @@ class LedgerHeaderExtensionV1:
     def from_xdr(cls, xdr: str) -> LedgerHeaderExtensionV1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> LedgerHeaderExtensionV1:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "flags": self.flags.to_json_dict(),
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> LedgerHeaderExtensionV1:
+        flags = Uint32.from_json_dict(json_dict["flags"])
+        ext = LedgerHeaderExtensionV1Ext.from_json_dict(json_dict["ext"])
+        return cls(
+            flags=flags,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

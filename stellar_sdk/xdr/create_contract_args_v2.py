@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .contract_executable import ContractExecutable
 from .contract_id_preimage import ContractIDPreimage
 from .sc_val import SCVal
@@ -50,13 +52,22 @@ class CreateContractArgsV2:
             constructor_args_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> CreateContractArgsV2:
-        contract_id_preimage = ContractIDPreimage.unpack(unpacker)
-        executable = ContractExecutable.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> CreateContractArgsV2:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        contract_id_preimage = ContractIDPreimage.unpack(unpacker, depth_limit - 1)
+        executable = ContractExecutable.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"constructor_args length {length} exceeds remaining input length {_remaining}"
+            )
         constructor_args = []
         for _ in range(length):
-            constructor_args.append(SCVal.unpack(unpacker))
+            constructor_args.append(SCVal.unpack(unpacker, depth_limit - 1))
         return cls(
             contract_id_preimage=contract_id_preimage,
             executable=executable,
@@ -71,7 +82,11 @@ class CreateContractArgsV2:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> CreateContractArgsV2:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -81,6 +96,35 @@ class CreateContractArgsV2:
     def from_xdr(cls, xdr: str) -> CreateContractArgsV2:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> CreateContractArgsV2:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "contract_id_preimage": self.contract_id_preimage.to_json_dict(),
+            "executable": self.executable.to_json_dict(),
+            "constructor_args": [item.to_json_dict() for item in self.constructor_args],
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> CreateContractArgsV2:
+        contract_id_preimage = ContractIDPreimage.from_json_dict(
+            json_dict["contract_id_preimage"]
+        )
+        executable = ContractExecutable.from_json_dict(json_dict["executable"])
+        constructor_args = [
+            SCVal.from_json_dict(item) for item in json_dict["constructor_args"]
+        ]
+        return cls(
+            contract_id_preimage=contract_id_preimage,
+            executable=executable,
+            constructor_args=constructor_args,
+        )
 
     def __hash__(self):
         return hash(

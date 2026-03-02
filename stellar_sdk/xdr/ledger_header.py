@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
 from .int64 import Int64
 from .ledger_header_ext import LedgerHeaderExt
@@ -120,25 +122,29 @@ class LedgerHeader:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> LedgerHeader:
-        ledger_version = Uint32.unpack(unpacker)
-        previous_ledger_hash = Hash.unpack(unpacker)
-        scp_value = StellarValue.unpack(unpacker)
-        tx_set_result_hash = Hash.unpack(unpacker)
-        bucket_list_hash = Hash.unpack(unpacker)
-        ledger_seq = Uint32.unpack(unpacker)
-        total_coins = Int64.unpack(unpacker)
-        fee_pool = Int64.unpack(unpacker)
-        inflation_seq = Uint32.unpack(unpacker)
-        id_pool = Uint64.unpack(unpacker)
-        base_fee = Uint32.unpack(unpacker)
-        base_reserve = Uint32.unpack(unpacker)
-        max_tx_set_size = Uint32.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> LedgerHeader:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ledger_version = Uint32.unpack(unpacker, depth_limit - 1)
+        previous_ledger_hash = Hash.unpack(unpacker, depth_limit - 1)
+        scp_value = StellarValue.unpack(unpacker, depth_limit - 1)
+        tx_set_result_hash = Hash.unpack(unpacker, depth_limit - 1)
+        bucket_list_hash = Hash.unpack(unpacker, depth_limit - 1)
+        ledger_seq = Uint32.unpack(unpacker, depth_limit - 1)
+        total_coins = Int64.unpack(unpacker, depth_limit - 1)
+        fee_pool = Int64.unpack(unpacker, depth_limit - 1)
+        inflation_seq = Uint32.unpack(unpacker, depth_limit - 1)
+        id_pool = Uint64.unpack(unpacker, depth_limit - 1)
+        base_fee = Uint32.unpack(unpacker, depth_limit - 1)
+        base_reserve = Uint32.unpack(unpacker, depth_limit - 1)
+        max_tx_set_size = Uint32.unpack(unpacker, depth_limit - 1)
         length = 4
         skip_list = []
         for _ in range(length):
-            skip_list.append(Hash.unpack(unpacker))
-        ext = LedgerHeaderExt.unpack(unpacker)
+            skip_list.append(Hash.unpack(unpacker, depth_limit - 1))
+        ext = LedgerHeaderExt.unpack(unpacker, depth_limit - 1)
         return cls(
             ledger_version=ledger_version,
             previous_ledger_hash=previous_ledger_hash,
@@ -165,7 +171,11 @@ class LedgerHeader:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LedgerHeader:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -175,6 +185,67 @@ class LedgerHeader:
     def from_xdr(cls, xdr: str) -> LedgerHeader:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> LedgerHeader:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ledger_version": self.ledger_version.to_json_dict(),
+            "previous_ledger_hash": self.previous_ledger_hash.to_json_dict(),
+            "scp_value": self.scp_value.to_json_dict(),
+            "tx_set_result_hash": self.tx_set_result_hash.to_json_dict(),
+            "bucket_list_hash": self.bucket_list_hash.to_json_dict(),
+            "ledger_seq": self.ledger_seq.to_json_dict(),
+            "total_coins": self.total_coins.to_json_dict(),
+            "fee_pool": self.fee_pool.to_json_dict(),
+            "inflation_seq": self.inflation_seq.to_json_dict(),
+            "id_pool": self.id_pool.to_json_dict(),
+            "base_fee": self.base_fee.to_json_dict(),
+            "base_reserve": self.base_reserve.to_json_dict(),
+            "max_tx_set_size": self.max_tx_set_size.to_json_dict(),
+            "skip_list": [item.to_json_dict() for item in self.skip_list],
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> LedgerHeader:
+        ledger_version = Uint32.from_json_dict(json_dict["ledger_version"])
+        previous_ledger_hash = Hash.from_json_dict(json_dict["previous_ledger_hash"])
+        scp_value = StellarValue.from_json_dict(json_dict["scp_value"])
+        tx_set_result_hash = Hash.from_json_dict(json_dict["tx_set_result_hash"])
+        bucket_list_hash = Hash.from_json_dict(json_dict["bucket_list_hash"])
+        ledger_seq = Uint32.from_json_dict(json_dict["ledger_seq"])
+        total_coins = Int64.from_json_dict(json_dict["total_coins"])
+        fee_pool = Int64.from_json_dict(json_dict["fee_pool"])
+        inflation_seq = Uint32.from_json_dict(json_dict["inflation_seq"])
+        id_pool = Uint64.from_json_dict(json_dict["id_pool"])
+        base_fee = Uint32.from_json_dict(json_dict["base_fee"])
+        base_reserve = Uint32.from_json_dict(json_dict["base_reserve"])
+        max_tx_set_size = Uint32.from_json_dict(json_dict["max_tx_set_size"])
+        skip_list = [Hash.from_json_dict(item) for item in json_dict["skip_list"]]
+        ext = LedgerHeaderExt.from_json_dict(json_dict["ext"])
+        return cls(
+            ledger_version=ledger_version,
+            previous_ledger_hash=previous_ledger_hash,
+            scp_value=scp_value,
+            tx_set_result_hash=tx_set_result_hash,
+            bucket_list_hash=bucket_list_hash,
+            ledger_seq=ledger_seq,
+            total_coins=total_coins,
+            fee_pool=fee_pool,
+            inflation_seq=inflation_seq,
+            id_pool=id_pool,
+            base_fee=base_fee,
+            base_reserve=base_reserve,
+            max_tx_set_size=max_tx_set_size,
+            skip_list=skip_list,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

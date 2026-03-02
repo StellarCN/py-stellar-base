@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .scp_envelope import SCPEnvelope
 from .scp_quorum_set import SCPQuorumSet
 from .stored_transaction_set import StoredTransactionSet
@@ -63,19 +65,38 @@ class PersistedSCPStateV0:
             tx_sets_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> PersistedSCPStateV0:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> PersistedSCPStateV0:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"scp_envelopes length {length} exceeds remaining input length {_remaining}"
+            )
         scp_envelopes = []
         for _ in range(length):
-            scp_envelopes.append(SCPEnvelope.unpack(unpacker))
+            scp_envelopes.append(SCPEnvelope.unpack(unpacker, depth_limit - 1))
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"quorum_sets length {length} exceeds remaining input length {_remaining}"
+            )
         quorum_sets = []
         for _ in range(length):
-            quorum_sets.append(SCPQuorumSet.unpack(unpacker))
+            quorum_sets.append(SCPQuorumSet.unpack(unpacker, depth_limit - 1))
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"tx_sets length {length} exceeds remaining input length {_remaining}"
+            )
         tx_sets = []
         for _ in range(length):
-            tx_sets.append(StoredTransactionSet.unpack(unpacker))
+            tx_sets.append(StoredTransactionSet.unpack(unpacker, depth_limit - 1))
         return cls(
             scp_envelopes=scp_envelopes,
             quorum_sets=quorum_sets,
@@ -90,7 +111,11 @@ class PersistedSCPStateV0:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> PersistedSCPStateV0:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -100,6 +125,37 @@ class PersistedSCPStateV0:
     def from_xdr(cls, xdr: str) -> PersistedSCPStateV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> PersistedSCPStateV0:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "scp_envelopes": [item.to_json_dict() for item in self.scp_envelopes],
+            "quorum_sets": [item.to_json_dict() for item in self.quorum_sets],
+            "tx_sets": [item.to_json_dict() for item in self.tx_sets],
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> PersistedSCPStateV0:
+        scp_envelopes = [
+            SCPEnvelope.from_json_dict(item) for item in json_dict["scp_envelopes"]
+        ]
+        quorum_sets = [
+            SCPQuorumSet.from_json_dict(item) for item in json_dict["quorum_sets"]
+        ]
+        tx_sets = [
+            StoredTransactionSet.from_json_dict(item) for item in json_dict["tx_sets"]
+        ]
+        return cls(
+            scp_envelopes=scp_envelopes,
+            quorum_sets=quorum_sets,
+            tx_sets=tx_sets,
+        )
 
     def __hash__(self):
         return hash(

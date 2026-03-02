@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .constants import *
 from .memo import Memo
 from .operation import Operation
@@ -79,17 +81,30 @@ class TransactionV0:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> TransactionV0:
-        source_account_ed25519 = Uint256.unpack(unpacker)
-        fee = Uint32.unpack(unpacker)
-        seq_num = SequenceNumber.unpack(unpacker)
-        time_bounds = TimeBounds.unpack(unpacker) if unpacker.unpack_uint() else None
-        memo = Memo.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TransactionV0:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        source_account_ed25519 = Uint256.unpack(unpacker, depth_limit - 1)
+        fee = Uint32.unpack(unpacker, depth_limit - 1)
+        seq_num = SequenceNumber.unpack(unpacker, depth_limit - 1)
+        time_bounds = (
+            TimeBounds.unpack(unpacker, depth_limit - 1)
+            if unpacker.unpack_uint()
+            else None
+        )
+        memo = Memo.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"operations length {length} exceeds remaining input length {_remaining}"
+            )
         operations = []
         for _ in range(length):
-            operations.append(Operation.unpack(unpacker))
-        ext = TransactionV0Ext.unpack(unpacker)
+            operations.append(Operation.unpack(unpacker, depth_limit - 1))
+        ext = TransactionV0Ext.unpack(unpacker, depth_limit - 1)
         return cls(
             source_account_ed25519=source_account_ed25519,
             fee=fee,
@@ -108,7 +123,11 @@ class TransactionV0:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TransactionV0:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -118,6 +137,55 @@ class TransactionV0:
     def from_xdr(cls, xdr: str) -> TransactionV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TransactionV0:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "source_account_ed25519": self.source_account_ed25519.to_json_dict(),
+            "fee": self.fee.to_json_dict(),
+            "seq_num": self.seq_num.to_json_dict(),
+            "time_bounds": (
+                self.time_bounds.to_json_dict()
+                if self.time_bounds is not None
+                else None
+            ),
+            "memo": self.memo.to_json_dict(),
+            "operations": [item.to_json_dict() for item in self.operations],
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> TransactionV0:
+        source_account_ed25519 = Uint256.from_json_dict(
+            json_dict["source_account_ed25519"]
+        )
+        fee = Uint32.from_json_dict(json_dict["fee"])
+        seq_num = SequenceNumber.from_json_dict(json_dict["seq_num"])
+        time_bounds = (
+            TimeBounds.from_json_dict(json_dict["time_bounds"])
+            if json_dict["time_bounds"] is not None
+            else None
+        )
+        memo = Memo.from_json_dict(json_dict["memo"])
+        operations = [
+            Operation.from_json_dict(item) for item in json_dict["operations"]
+        ]
+        ext = TransactionV0Ext.from_json_dict(json_dict["ext"])
+        return cls(
+            source_account_ed25519=source_account_ed25519,
+            fee=fee,
+            seq_num=seq_num,
+            time_bounds=time_bounds,
+            memo=memo,
+            operations=operations,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_BINARY_FUSE_FILTER_TYPE_MAP = {0: "8_bit", 1: "16_bit", 2: "32_bit"}
+_BINARY_FUSE_FILTER_TYPE_REVERSE_MAP = {"8_bit": 0, "16_bit": 1, "32_bit": 2}
 __all__ = ["BinaryFuseFilterType"]
 
 
@@ -42,7 +45,11 @@ class BinaryFuseFilterType(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> BinaryFuseFilterType:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -52,3 +59,17 @@ class BinaryFuseFilterType(IntEnum):
     def from_xdr(cls, xdr: str) -> BinaryFuseFilterType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> BinaryFuseFilterType:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _BINARY_FUSE_FILTER_TYPE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> BinaryFuseFilterType:
+        return cls(_BINARY_FUSE_FILTER_TYPE_REVERSE_MAP[json_value])

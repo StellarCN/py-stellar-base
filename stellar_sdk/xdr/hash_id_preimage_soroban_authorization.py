@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
 from .int64 import Int64
 from .soroban_authorized_invocation import SorobanAuthorizedInvocation
@@ -46,11 +48,15 @@ class HashIDPreimageSorobanAuthorization:
         self.invocation.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> HashIDPreimageSorobanAuthorization:
-        network_id = Hash.unpack(unpacker)
-        nonce = Int64.unpack(unpacker)
-        signature_expiration_ledger = Uint32.unpack(unpacker)
-        invocation = SorobanAuthorizedInvocation.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> HashIDPreimageSorobanAuthorization:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        network_id = Hash.unpack(unpacker, depth_limit - 1)
+        nonce = Int64.unpack(unpacker, depth_limit - 1)
+        signature_expiration_ledger = Uint32.unpack(unpacker, depth_limit - 1)
+        invocation = SorobanAuthorizedInvocation.unpack(unpacker, depth_limit - 1)
         return cls(
             network_id=network_id,
             nonce=nonce,
@@ -66,7 +72,11 @@ class HashIDPreimageSorobanAuthorization:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> HashIDPreimageSorobanAuthorization:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -76,6 +86,36 @@ class HashIDPreimageSorobanAuthorization:
     def from_xdr(cls, xdr: str) -> HashIDPreimageSorobanAuthorization:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> HashIDPreimageSorobanAuthorization:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "network_id": self.network_id.to_json_dict(),
+            "nonce": self.nonce.to_json_dict(),
+            "signature_expiration_ledger": self.signature_expiration_ledger.to_json_dict(),
+            "invocation": self.invocation.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> HashIDPreimageSorobanAuthorization:
+        network_id = Hash.from_json_dict(json_dict["network_id"])
+        nonce = Int64.from_json_dict(json_dict["nonce"])
+        signature_expiration_ledger = Uint32.from_json_dict(
+            json_dict["signature_expiration_ledger"]
+        )
+        invocation = SorobanAuthorizedInvocation.from_json_dict(json_dict["invocation"])
+        return cls(
+            network_id=network_id,
+            nonce=nonce,
+            signature_expiration_ledger=signature_expiration_ledger,
+            invocation=invocation,
+        )
 
     def __hash__(self):
         return hash(

@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
 from .asset import Asset
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .uint32 import Uint32
 
 __all__ = ["SetTrustLineFlagsOp"]
@@ -46,11 +48,15 @@ class SetTrustLineFlagsOp:
         self.set_flags.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SetTrustLineFlagsOp:
-        trustor = AccountID.unpack(unpacker)
-        asset = Asset.unpack(unpacker)
-        clear_flags = Uint32.unpack(unpacker)
-        set_flags = Uint32.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SetTrustLineFlagsOp:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        trustor = AccountID.unpack(unpacker, depth_limit - 1)
+        asset = Asset.unpack(unpacker, depth_limit - 1)
+        clear_flags = Uint32.unpack(unpacker, depth_limit - 1)
+        set_flags = Uint32.unpack(unpacker, depth_limit - 1)
         return cls(
             trustor=trustor,
             asset=asset,
@@ -66,7 +72,11 @@ class SetTrustLineFlagsOp:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SetTrustLineFlagsOp:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -76,6 +86,34 @@ class SetTrustLineFlagsOp:
     def from_xdr(cls, xdr: str) -> SetTrustLineFlagsOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SetTrustLineFlagsOp:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "trustor": self.trustor.to_json_dict(),
+            "asset": self.asset.to_json_dict(),
+            "clear_flags": self.clear_flags.to_json_dict(),
+            "set_flags": self.set_flags.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SetTrustLineFlagsOp:
+        trustor = AccountID.from_json_dict(json_dict["trustor"])
+        asset = Asset.from_json_dict(json_dict["asset"])
+        clear_flags = Uint32.from_json_dict(json_dict["clear_flags"])
+        set_flags = Uint32.from_json_dict(json_dict["set_flags"])
+        return cls(
+            trustor=trustor,
+            asset=asset,
+            clear_flags=clear_flags,
+            set_flags=set_flags,
+        )
 
     def __hash__(self):
         return hash(

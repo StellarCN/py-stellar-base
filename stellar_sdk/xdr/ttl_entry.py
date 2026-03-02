@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
 from .uint32 import Uint32
 
@@ -36,9 +38,13 @@ class TTLEntry:
         self.live_until_ledger_seq.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> TTLEntry:
-        key_hash = Hash.unpack(unpacker)
-        live_until_ledger_seq = Uint32.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TTLEntry:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        key_hash = Hash.unpack(unpacker, depth_limit - 1)
+        live_until_ledger_seq = Uint32.unpack(unpacker, depth_limit - 1)
         return cls(
             key_hash=key_hash,
             live_until_ledger_seq=live_until_ledger_seq,
@@ -52,7 +58,11 @@ class TTLEntry:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TTLEntry:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -62,6 +72,30 @@ class TTLEntry:
     def from_xdr(cls, xdr: str) -> TTLEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TTLEntry:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "key_hash": self.key_hash.to_json_dict(),
+            "live_until_ledger_seq": self.live_until_ledger_seq.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> TTLEntry:
+        key_hash = Hash.from_json_dict(json_dict["key_hash"])
+        live_until_ledger_seq = Uint32.from_json_dict(
+            json_dict["live_until_ledger_seq"]
+        )
+        return cls(
+            key_hash=key_hash,
+            live_until_ledger_seq=live_until_ledger_seq,
+        )
 
     def __hash__(self):
         return hash(

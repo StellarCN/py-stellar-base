@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .contract_executable import ContractExecutable
 from .sc_map import SCMap
 
@@ -40,9 +42,15 @@ class SCContractInstance:
             self.storage.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SCContractInstance:
-        executable = ContractExecutable.unpack(unpacker)
-        storage = SCMap.unpack(unpacker) if unpacker.unpack_uint() else None
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SCContractInstance:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        executable = ContractExecutable.unpack(unpacker, depth_limit - 1)
+        storage = (
+            SCMap.unpack(unpacker, depth_limit - 1) if unpacker.unpack_uint() else None
+        )
         return cls(
             executable=executable,
             storage=storage,
@@ -56,7 +64,11 @@ class SCContractInstance:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCContractInstance:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -66,6 +78,34 @@ class SCContractInstance:
     def from_xdr(cls, xdr: str) -> SCContractInstance:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCContractInstance:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "executable": self.executable.to_json_dict(),
+            "storage": (
+                self.storage.to_json_dict() if self.storage is not None else None
+            ),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SCContractInstance:
+        executable = ContractExecutable.from_json_dict(json_dict["executable"])
+        storage = (
+            SCMap.from_json_dict(json_dict["storage"])
+            if json_dict["storage"] is not None
+            else None
+        )
+        return cls(
+            executable=executable,
+            storage=storage,
+        )
 
     def __hash__(self):
         return hash(

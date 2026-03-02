@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
+from .base import DEFAULT_XDR_MAX_DEPTH
 
 __all__ = ["BeginSponsoringFutureReservesOp"]
 
@@ -31,8 +33,12 @@ class BeginSponsoringFutureReservesOp:
         self.sponsored_id.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> BeginSponsoringFutureReservesOp:
-        sponsored_id = AccountID.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> BeginSponsoringFutureReservesOp:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        sponsored_id = AccountID.unpack(unpacker, depth_limit - 1)
         return cls(
             sponsored_id=sponsored_id,
         )
@@ -45,7 +51,11 @@ class BeginSponsoringFutureReservesOp:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> BeginSponsoringFutureReservesOp:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -55,6 +65,25 @@ class BeginSponsoringFutureReservesOp:
     def from_xdr(cls, xdr: str) -> BeginSponsoringFutureReservesOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> BeginSponsoringFutureReservesOp:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "sponsored_id": self.sponsored_id.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> BeginSponsoringFutureReservesOp:
+        sponsored_id = AccountID.from_json_dict(json_dict["sponsored_id"])
+        return cls(
+            sponsored_id=sponsored_id,
+        )
 
     def __hash__(self):
         return hash((self.sponsored_id,))

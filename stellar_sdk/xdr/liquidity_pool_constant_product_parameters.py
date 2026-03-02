@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .int32 import Int32
 
 __all__ = ["LiquidityPoolConstantProductParameters"]
@@ -40,10 +42,14 @@ class LiquidityPoolConstantProductParameters:
         self.fee.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> LiquidityPoolConstantProductParameters:
-        asset_a = Asset.unpack(unpacker)
-        asset_b = Asset.unpack(unpacker)
-        fee = Int32.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> LiquidityPoolConstantProductParameters:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        asset_a = Asset.unpack(unpacker, depth_limit - 1)
+        asset_b = Asset.unpack(unpacker, depth_limit - 1)
+        fee = Int32.unpack(unpacker, depth_limit - 1)
         return cls(
             asset_a=asset_a,
             asset_b=asset_b,
@@ -58,7 +64,11 @@ class LiquidityPoolConstantProductParameters:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LiquidityPoolConstantProductParameters:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -68,6 +78,31 @@ class LiquidityPoolConstantProductParameters:
     def from_xdr(cls, xdr: str) -> LiquidityPoolConstantProductParameters:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> LiquidityPoolConstantProductParameters:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "asset_a": self.asset_a.to_json_dict(),
+            "asset_b": self.asset_b.to_json_dict(),
+            "fee": self.fee.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> LiquidityPoolConstantProductParameters:
+        asset_a = Asset.from_json_dict(json_dict["asset_a"])
+        asset_b = Asset.from_json_dict(json_dict["asset_b"])
+        fee = Int32.from_json_dict(json_dict["fee"])
+        return cls(
+            asset_a=asset_a,
+            asset_b=asset_b,
+            fee=fee,
+        )
 
     def __hash__(self):
         return hash(

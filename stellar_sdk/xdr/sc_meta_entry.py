@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .sc_meta_kind import SCMetaKind
 from .sc_meta_v0 import SCMetaV0
 
@@ -39,14 +41,19 @@ class SCMetaEntry:
                 raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
             return
+        raise ValueError("Invalid kind.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SCMetaEntry:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SCMetaEntry:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         kind = SCMetaKind.unpack(unpacker)
         if kind == SCMetaKind.SC_META_V0:
-            v0 = SCMetaV0.unpack(unpacker)
+            v0 = SCMetaV0.unpack(unpacker, depth_limit - 1)
             return cls(kind=kind, v0=v0)
-        return cls(kind=kind)
+        raise ValueError("Invalid kind.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -56,7 +63,11 @@ class SCMetaEntry:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCMetaEntry:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -66,6 +77,32 @@ class SCMetaEntry:
     def from_xdr(cls, xdr: str) -> SCMetaEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCMetaEntry:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.kind == SCMetaKind.SC_META_V0:
+            assert self.v0 is not None
+            return {"sc_meta_v0": self.v0.to_json_dict()}
+        raise ValueError(f"Unknown kind in SCMetaEntry: {self.kind}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: dict) -> SCMetaEntry:
+        if len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for SCMetaEntry, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        kind = SCMetaKind.from_json_dict(key)
+        if key == "sc_meta_v0":
+            v0 = SCMetaV0.from_json_dict(json_value["sc_meta_v0"])
+            return cls(kind=kind, v0=v0)
+        raise ValueError(f"Unknown key '{key}' for SCMetaEntry")
 
     def __hash__(self):
         return hash(
@@ -83,5 +120,6 @@ class SCMetaEntry:
     def __repr__(self):
         out = []
         out.append(f"kind={self.kind}")
-        out.append(f"v0={self.v0}") if self.v0 is not None else None
+        if self.v0 is not None:
+            out.append(f"v0={self.v0}")
         return f"<SCMetaEntry [{', '.join(out)}]>"
