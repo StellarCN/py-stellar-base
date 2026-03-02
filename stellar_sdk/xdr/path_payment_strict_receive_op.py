@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .int64 import Int64
 from .muxed_account import MuxedAccount
 
@@ -65,16 +67,25 @@ class PathPaymentStrictReceiveOp:
             path_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> PathPaymentStrictReceiveOp:
-        send_asset = Asset.unpack(unpacker)
-        send_max = Int64.unpack(unpacker)
-        destination = MuxedAccount.unpack(unpacker)
-        dest_asset = Asset.unpack(unpacker)
-        dest_amount = Int64.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> PathPaymentStrictReceiveOp:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        send_asset = Asset.unpack(unpacker, depth_limit - 1)
+        send_max = Int64.unpack(unpacker, depth_limit - 1)
+        destination = MuxedAccount.unpack(unpacker, depth_limit - 1)
+        dest_asset = Asset.unpack(unpacker, depth_limit - 1)
+        dest_amount = Int64.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"path length {length} exceeds remaining input length {_remaining}"
+            )
         path = []
         for _ in range(length):
-            path.append(Asset.unpack(unpacker))
+            path.append(Asset.unpack(unpacker, depth_limit - 1))
         return cls(
             send_asset=send_asset,
             send_max=send_max,
@@ -92,7 +103,11 @@ class PathPaymentStrictReceiveOp:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> PathPaymentStrictReceiveOp:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -102,6 +117,40 @@ class PathPaymentStrictReceiveOp:
     def from_xdr(cls, xdr: str) -> PathPaymentStrictReceiveOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> PathPaymentStrictReceiveOp:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "send_asset": self.send_asset.to_json_dict(),
+            "send_max": self.send_max.to_json_dict(),
+            "destination": self.destination.to_json_dict(),
+            "dest_asset": self.dest_asset.to_json_dict(),
+            "dest_amount": self.dest_amount.to_json_dict(),
+            "path": [item.to_json_dict() for item in self.path],
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> PathPaymentStrictReceiveOp:
+        send_asset = Asset.from_json_dict(json_dict["send_asset"])
+        send_max = Int64.from_json_dict(json_dict["send_max"])
+        destination = MuxedAccount.from_json_dict(json_dict["destination"])
+        dest_asset = Asset.from_json_dict(json_dict["dest_asset"])
+        dest_amount = Int64.from_json_dict(json_dict["dest_amount"])
+        path = [Asset.from_json_dict(item) for item in json_dict["path"]]
+        return cls(
+            send_asset=send_asset,
+            send_max=send_max,
+            destination=destination,
+            dest_asset=dest_asset,
+            dest_amount=dest_amount,
+            path=path,
+        )
 
     def __hash__(self):
         return hash(

@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .ledger_entry_changes import LedgerEntryChanges
 from .transaction_meta import TransactionMeta
 from .transaction_result_pair import TransactionResultPair
@@ -41,10 +43,14 @@ class TransactionResultMeta:
         self.tx_apply_processing.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> TransactionResultMeta:
-        result = TransactionResultPair.unpack(unpacker)
-        fee_processing = LedgerEntryChanges.unpack(unpacker)
-        tx_apply_processing = TransactionMeta.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TransactionResultMeta:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        result = TransactionResultPair.unpack(unpacker, depth_limit - 1)
+        fee_processing = LedgerEntryChanges.unpack(unpacker, depth_limit - 1)
+        tx_apply_processing = TransactionMeta.unpack(unpacker, depth_limit - 1)
         return cls(
             result=result,
             fee_processing=fee_processing,
@@ -59,7 +65,11 @@ class TransactionResultMeta:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TransactionResultMeta:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -69,6 +79,33 @@ class TransactionResultMeta:
     def from_xdr(cls, xdr: str) -> TransactionResultMeta:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TransactionResultMeta:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "result": self.result.to_json_dict(),
+            "fee_processing": self.fee_processing.to_json_dict(),
+            "tx_apply_processing": self.tx_apply_processing.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> TransactionResultMeta:
+        result = TransactionResultPair.from_json_dict(json_dict["result"])
+        fee_processing = LedgerEntryChanges.from_json_dict(json_dict["fee_processing"])
+        tx_apply_processing = TransactionMeta.from_json_dict(
+            json_dict["tx_apply_processing"]
+        )
+        return cls(
+            result=result,
+            fee_processing=fee_processing,
+            tx_apply_processing=tx_apply_processing,
+        )
 
     def __hash__(self):
         return hash(

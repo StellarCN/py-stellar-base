@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .tx_demand_vector import TxDemandVector
 
 __all__ = ["FloodDemand"]
@@ -31,8 +33,12 @@ class FloodDemand:
         self.tx_hashes.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> FloodDemand:
-        tx_hashes = TxDemandVector.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> FloodDemand:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        tx_hashes = TxDemandVector.unpack(unpacker, depth_limit - 1)
         return cls(
             tx_hashes=tx_hashes,
         )
@@ -45,7 +51,11 @@ class FloodDemand:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> FloodDemand:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -55,6 +65,25 @@ class FloodDemand:
     def from_xdr(cls, xdr: str) -> FloodDemand:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> FloodDemand:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "tx_hashes": self.tx_hashes.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> FloodDemand:
+        tx_hashes = TxDemandVector.from_json_dict(json_dict["tx_hashes"])
+        return cls(
+            tx_hashes=tx_hashes,
+        )
 
     def __hash__(self):
         return hash((self.tx_hashes,))

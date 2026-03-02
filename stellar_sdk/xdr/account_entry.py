@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry_ext import AccountEntryExt
 from .account_id import AccountID
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .constants import *
 from .int64 import Int64
 from .sequence_number import SequenceNumber
@@ -102,20 +104,33 @@ class AccountEntry:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> AccountEntry:
-        account_id = AccountID.unpack(unpacker)
-        balance = Int64.unpack(unpacker)
-        seq_num = SequenceNumber.unpack(unpacker)
-        num_sub_entries = Uint32.unpack(unpacker)
-        inflation_dest = AccountID.unpack(unpacker) if unpacker.unpack_uint() else None
-        flags = Uint32.unpack(unpacker)
-        home_domain = String32.unpack(unpacker)
-        thresholds = Thresholds.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> AccountEntry:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        account_id = AccountID.unpack(unpacker, depth_limit - 1)
+        balance = Int64.unpack(unpacker, depth_limit - 1)
+        seq_num = SequenceNumber.unpack(unpacker, depth_limit - 1)
+        num_sub_entries = Uint32.unpack(unpacker, depth_limit - 1)
+        inflation_dest = (
+            AccountID.unpack(unpacker, depth_limit - 1)
+            if unpacker.unpack_uint()
+            else None
+        )
+        flags = Uint32.unpack(unpacker, depth_limit - 1)
+        home_domain = String32.unpack(unpacker, depth_limit - 1)
+        thresholds = Thresholds.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"signers length {length} exceeds remaining input length {_remaining}"
+            )
         signers = []
         for _ in range(length):
-            signers.append(Signer.unpack(unpacker))
-        ext = AccountEntryExt.unpack(unpacker)
+            signers.append(Signer.unpack(unpacker, depth_limit - 1))
+        ext = AccountEntryExt.unpack(unpacker, depth_limit - 1)
         return cls(
             account_id=account_id,
             balance=balance,
@@ -137,7 +152,11 @@ class AccountEntry:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> AccountEntry:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -147,6 +166,60 @@ class AccountEntry:
     def from_xdr(cls, xdr: str) -> AccountEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> AccountEntry:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "account_id": self.account_id.to_json_dict(),
+            "balance": self.balance.to_json_dict(),
+            "seq_num": self.seq_num.to_json_dict(),
+            "num_sub_entries": self.num_sub_entries.to_json_dict(),
+            "inflation_dest": (
+                self.inflation_dest.to_json_dict()
+                if self.inflation_dest is not None
+                else None
+            ),
+            "flags": self.flags.to_json_dict(),
+            "home_domain": self.home_domain.to_json_dict(),
+            "thresholds": self.thresholds.to_json_dict(),
+            "signers": [item.to_json_dict() for item in self.signers],
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> AccountEntry:
+        account_id = AccountID.from_json_dict(json_dict["account_id"])
+        balance = Int64.from_json_dict(json_dict["balance"])
+        seq_num = SequenceNumber.from_json_dict(json_dict["seq_num"])
+        num_sub_entries = Uint32.from_json_dict(json_dict["num_sub_entries"])
+        inflation_dest = (
+            AccountID.from_json_dict(json_dict["inflation_dest"])
+            if json_dict["inflation_dest"] is not None
+            else None
+        )
+        flags = Uint32.from_json_dict(json_dict["flags"])
+        home_domain = String32.from_json_dict(json_dict["home_domain"])
+        thresholds = Thresholds.from_json_dict(json_dict["thresholds"])
+        signers = [Signer.from_json_dict(item) for item in json_dict["signers"]]
+        ext = AccountEntryExt.from_json_dict(json_dict["ext"])
+        return cls(
+            account_id=account_id,
+            balance=balance,
+            seq_num=seq_num,
+            num_sub_entries=num_sub_entries,
+            inflation_dest=inflation_dest,
+            flags=flags,
+            home_domain=home_domain,
+            thresholds=thresholds,
+            signers=signers,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

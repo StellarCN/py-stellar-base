@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Opaque
 from .contract_code_entry_ext import ContractCodeEntryExt
 from .hash import Hash
 
@@ -41,6 +42,11 @@ class ContractCodeEntry:
         hash: Hash,
         code: bytes,
     ) -> None:
+        _expect_max_length = 4294967295
+        if code and len(code) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `code` should be {_expect_max_length}, but got {len(code)}."
+            )
         self.ext = ext
         self.hash = hash
         self.code = code
@@ -51,9 +57,13 @@ class ContractCodeEntry:
         Opaque(self.code, 4294967295, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ContractCodeEntry:
-        ext = ContractCodeEntryExt.unpack(unpacker)
-        hash = Hash.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ContractCodeEntry:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ext = ContractCodeEntryExt.unpack(unpacker, depth_limit - 1)
+        hash = Hash.unpack(unpacker, depth_limit - 1)
         code = Opaque.unpack(unpacker, 4294967295, False)
         return cls(
             ext=ext,
@@ -69,7 +79,11 @@ class ContractCodeEntry:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ContractCodeEntry:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -79,6 +93,31 @@ class ContractCodeEntry:
     def from_xdr(cls, xdr: str) -> ContractCodeEntry:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ContractCodeEntry:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ext": self.ext.to_json_dict(),
+            "hash": self.hash.to_json_dict(),
+            "code": Opaque.to_json_dict(self.code),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> ContractCodeEntry:
+        ext = ContractCodeEntryExt.from_json_dict(json_dict["ext"])
+        hash = Hash.from_json_dict(json_dict["hash"])
+        code = Opaque.from_json_dict(json_dict["code"])
+        return cls(
+            ext=ext,
+            hash=hash,
+            code=code,
+        )
 
     def __hash__(self):
         return hash(

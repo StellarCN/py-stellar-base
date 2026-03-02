@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Integer
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 from .contract_event_v0 import ContractEventV0
 
 __all__ = ["ContractEventBody"]
@@ -43,14 +44,19 @@ class ContractEventBody:
                 raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ContractEventBody:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ContractEventBody:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         v = Integer.unpack(unpacker)
         if v == 0:
-            v0 = ContractEventV0.unpack(unpacker)
+            v0 = ContractEventV0.unpack(unpacker, depth_limit - 1)
             return cls(v=v, v0=v0)
-        return cls(v=v)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -60,7 +66,11 @@ class ContractEventBody:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ContractEventBody:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -70,6 +80,32 @@ class ContractEventBody:
     def from_xdr(cls, xdr: str) -> ContractEventBody:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ContractEventBody:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.v == 0:
+            assert self.v0 is not None
+            return {"v0": self.v0.to_json_dict()}
+        raise ValueError(f"Unknown v in ContractEventBody: {self.v}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: dict) -> ContractEventBody:
+        if len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for ContractEventBody, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        v = int(key[1:])
+        if key == "v0":
+            v0 = ContractEventV0.from_json_dict(json_value["v0"])
+            return cls(v=v, v0=v0)
+        raise ValueError(f"Unknown key '{key}' for ContractEventBody")
 
     def __hash__(self):
         return hash(
@@ -87,5 +123,6 @@ class ContractEventBody:
     def __repr__(self):
         out = []
         out.append(f"v={self.v}")
-        out.append(f"v0={self.v0}") if self.v0 is not None else None
+        if self.v0 is not None:
+            out.append(f"v0={self.v0}")
         return f"<ContractEventBody [{', '.join(out)}]>"

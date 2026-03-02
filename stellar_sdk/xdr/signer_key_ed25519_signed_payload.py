@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Opaque
 from .uint256 import Uint256
 
 __all__ = ["SignerKeyEd25519SignedPayload"]
@@ -30,6 +31,11 @@ class SignerKeyEd25519SignedPayload:
         ed25519: Uint256,
         payload: bytes,
     ) -> None:
+        _expect_max_length = 64
+        if payload and len(payload) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `payload` should be {_expect_max_length}, but got {len(payload)}."
+            )
         self.ed25519 = ed25519
         self.payload = payload
 
@@ -38,8 +44,12 @@ class SignerKeyEd25519SignedPayload:
         Opaque(self.payload, 64, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SignerKeyEd25519SignedPayload:
-        ed25519 = Uint256.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SignerKeyEd25519SignedPayload:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ed25519 = Uint256.unpack(unpacker, depth_limit - 1)
         payload = Opaque.unpack(unpacker, 64, False)
         return cls(
             ed25519=ed25519,
@@ -54,7 +64,11 @@ class SignerKeyEd25519SignedPayload:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SignerKeyEd25519SignedPayload:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -64,6 +78,28 @@ class SignerKeyEd25519SignedPayload:
     def from_xdr(cls, xdr: str) -> SignerKeyEd25519SignedPayload:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SignerKeyEd25519SignedPayload:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ed25519": self.ed25519.to_json_dict(),
+            "payload": Opaque.to_json_dict(self.payload),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SignerKeyEd25519SignedPayload:
+        ed25519 = Uint256.from_json_dict(json_dict["ed25519"])
+        payload = Opaque.from_json_dict(json_dict["payload"])
+        return cls(
+            ed25519=ed25519,
+            payload=payload,
+        )
 
     def __hash__(self):
         return hash(

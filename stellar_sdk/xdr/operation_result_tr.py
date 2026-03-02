@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_merge_result import AccountMergeResult
 from .allow_trust_result import AllowTrustResult
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .begin_sponsoring_future_reserves_result import BeginSponsoringFutureReservesResult
 from .bump_sequence_result import BumpSequenceResult
 from .change_trust_result import ChangeTrustResult
@@ -318,60 +320,73 @@ class OperationResultTr:
                 raise ValueError("restore_footprint_result should not be None.")
             self.restore_footprint_result.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> OperationResultTr:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> OperationResultTr:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         type = OperationType.unpack(unpacker)
         if type == OperationType.CREATE_ACCOUNT:
-            create_account_result = CreateAccountResult.unpack(unpacker)
+            create_account_result = CreateAccountResult.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(type=type, create_account_result=create_account_result)
         if type == OperationType.PAYMENT:
-            payment_result = PaymentResult.unpack(unpacker)
+            payment_result = PaymentResult.unpack(unpacker, depth_limit - 1)
             return cls(type=type, payment_result=payment_result)
         if type == OperationType.PATH_PAYMENT_STRICT_RECEIVE:
             path_payment_strict_receive_result = PathPaymentStrictReceiveResult.unpack(
-                unpacker
+                unpacker, depth_limit - 1
             )
             return cls(
                 type=type,
                 path_payment_strict_receive_result=path_payment_strict_receive_result,
             )
         if type == OperationType.MANAGE_SELL_OFFER:
-            manage_sell_offer_result = ManageSellOfferResult.unpack(unpacker)
+            manage_sell_offer_result = ManageSellOfferResult.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(type=type, manage_sell_offer_result=manage_sell_offer_result)
         if type == OperationType.CREATE_PASSIVE_SELL_OFFER:
-            create_passive_sell_offer_result = ManageSellOfferResult.unpack(unpacker)
+            create_passive_sell_offer_result = ManageSellOfferResult.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(
                 type=type,
                 create_passive_sell_offer_result=create_passive_sell_offer_result,
             )
         if type == OperationType.SET_OPTIONS:
-            set_options_result = SetOptionsResult.unpack(unpacker)
+            set_options_result = SetOptionsResult.unpack(unpacker, depth_limit - 1)
             return cls(type=type, set_options_result=set_options_result)
         if type == OperationType.CHANGE_TRUST:
-            change_trust_result = ChangeTrustResult.unpack(unpacker)
+            change_trust_result = ChangeTrustResult.unpack(unpacker, depth_limit - 1)
             return cls(type=type, change_trust_result=change_trust_result)
         if type == OperationType.ALLOW_TRUST:
-            allow_trust_result = AllowTrustResult.unpack(unpacker)
+            allow_trust_result = AllowTrustResult.unpack(unpacker, depth_limit - 1)
             return cls(type=type, allow_trust_result=allow_trust_result)
         if type == OperationType.ACCOUNT_MERGE:
-            account_merge_result = AccountMergeResult.unpack(unpacker)
+            account_merge_result = AccountMergeResult.unpack(unpacker, depth_limit - 1)
             return cls(type=type, account_merge_result=account_merge_result)
         if type == OperationType.INFLATION:
-            inflation_result = InflationResult.unpack(unpacker)
+            inflation_result = InflationResult.unpack(unpacker, depth_limit - 1)
             return cls(type=type, inflation_result=inflation_result)
         if type == OperationType.MANAGE_DATA:
-            manage_data_result = ManageDataResult.unpack(unpacker)
+            manage_data_result = ManageDataResult.unpack(unpacker, depth_limit - 1)
             return cls(type=type, manage_data_result=manage_data_result)
         if type == OperationType.BUMP_SEQUENCE:
-            bump_seq_result = BumpSequenceResult.unpack(unpacker)
+            bump_seq_result = BumpSequenceResult.unpack(unpacker, depth_limit - 1)
             return cls(type=type, bump_seq_result=bump_seq_result)
         if type == OperationType.MANAGE_BUY_OFFER:
-            manage_buy_offer_result = ManageBuyOfferResult.unpack(unpacker)
+            manage_buy_offer_result = ManageBuyOfferResult.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(type=type, manage_buy_offer_result=manage_buy_offer_result)
         if type == OperationType.PATH_PAYMENT_STRICT_SEND:
             path_payment_strict_send_result = PathPaymentStrictSendResult.unpack(
-                unpacker
+                unpacker, depth_limit - 1
             )
             return cls(
                 type=type,
@@ -379,7 +394,7 @@ class OperationResultTr:
             )
         if type == OperationType.CREATE_CLAIMABLE_BALANCE:
             create_claimable_balance_result = CreateClaimableBalanceResult.unpack(
-                unpacker
+                unpacker, depth_limit - 1
             )
             return cls(
                 type=type,
@@ -387,14 +402,14 @@ class OperationResultTr:
             )
         if type == OperationType.CLAIM_CLAIMABLE_BALANCE:
             claim_claimable_balance_result = ClaimClaimableBalanceResult.unpack(
-                unpacker
+                unpacker, depth_limit - 1
             )
             return cls(
                 type=type, claim_claimable_balance_result=claim_claimable_balance_result
             )
         if type == OperationType.BEGIN_SPONSORING_FUTURE_RESERVES:
             begin_sponsoring_future_reserves_result = (
-                BeginSponsoringFutureReservesResult.unpack(unpacker)
+                BeginSponsoringFutureReservesResult.unpack(unpacker, depth_limit - 1)
             )
             return cls(
                 type=type,
@@ -402,57 +417,69 @@ class OperationResultTr:
             )
         if type == OperationType.END_SPONSORING_FUTURE_RESERVES:
             end_sponsoring_future_reserves_result = (
-                EndSponsoringFutureReservesResult.unpack(unpacker)
+                EndSponsoringFutureReservesResult.unpack(unpacker, depth_limit - 1)
             )
             return cls(
                 type=type,
                 end_sponsoring_future_reserves_result=end_sponsoring_future_reserves_result,
             )
         if type == OperationType.REVOKE_SPONSORSHIP:
-            revoke_sponsorship_result = RevokeSponsorshipResult.unpack(unpacker)
+            revoke_sponsorship_result = RevokeSponsorshipResult.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(type=type, revoke_sponsorship_result=revoke_sponsorship_result)
         if type == OperationType.CLAWBACK:
-            clawback_result = ClawbackResult.unpack(unpacker)
+            clawback_result = ClawbackResult.unpack(unpacker, depth_limit - 1)
             return cls(type=type, clawback_result=clawback_result)
         if type == OperationType.CLAWBACK_CLAIMABLE_BALANCE:
             clawback_claimable_balance_result = ClawbackClaimableBalanceResult.unpack(
-                unpacker
+                unpacker, depth_limit - 1
             )
             return cls(
                 type=type,
                 clawback_claimable_balance_result=clawback_claimable_balance_result,
             )
         if type == OperationType.SET_TRUST_LINE_FLAGS:
-            set_trust_line_flags_result = SetTrustLineFlagsResult.unpack(unpacker)
+            set_trust_line_flags_result = SetTrustLineFlagsResult.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(
                 type=type, set_trust_line_flags_result=set_trust_line_flags_result
             )
         if type == OperationType.LIQUIDITY_POOL_DEPOSIT:
-            liquidity_pool_deposit_result = LiquidityPoolDepositResult.unpack(unpacker)
+            liquidity_pool_deposit_result = LiquidityPoolDepositResult.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(
                 type=type, liquidity_pool_deposit_result=liquidity_pool_deposit_result
             )
         if type == OperationType.LIQUIDITY_POOL_WITHDRAW:
             liquidity_pool_withdraw_result = LiquidityPoolWithdrawResult.unpack(
-                unpacker
+                unpacker, depth_limit - 1
             )
             return cls(
                 type=type, liquidity_pool_withdraw_result=liquidity_pool_withdraw_result
             )
         if type == OperationType.INVOKE_HOST_FUNCTION:
-            invoke_host_function_result = InvokeHostFunctionResult.unpack(unpacker)
+            invoke_host_function_result = InvokeHostFunctionResult.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(
                 type=type, invoke_host_function_result=invoke_host_function_result
             )
         if type == OperationType.EXTEND_FOOTPRINT_TTL:
-            extend_footprint_ttl_result = ExtendFootprintTTLResult.unpack(unpacker)
+            extend_footprint_ttl_result = ExtendFootprintTTLResult.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(
                 type=type, extend_footprint_ttl_result=extend_footprint_ttl_result
             )
         if type == OperationType.RESTORE_FOOTPRINT:
-            restore_footprint_result = RestoreFootprintResult.unpack(unpacker)
+            restore_footprint_result = RestoreFootprintResult.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(type=type, restore_footprint_result=restore_footprint_result)
-        return cls(type=type)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -462,7 +489,11 @@ class OperationResultTr:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> OperationResultTr:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -472,6 +503,307 @@ class OperationResultTr:
     def from_xdr(cls, xdr: str) -> OperationResultTr:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> OperationResultTr:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.type == OperationType.CREATE_ACCOUNT:
+            assert self.create_account_result is not None
+            return {"create_account": self.create_account_result.to_json_dict()}
+        if self.type == OperationType.PAYMENT:
+            assert self.payment_result is not None
+            return {"payment": self.payment_result.to_json_dict()}
+        if self.type == OperationType.PATH_PAYMENT_STRICT_RECEIVE:
+            assert self.path_payment_strict_receive_result is not None
+            return {
+                "path_payment_strict_receive": self.path_payment_strict_receive_result.to_json_dict()
+            }
+        if self.type == OperationType.MANAGE_SELL_OFFER:
+            assert self.manage_sell_offer_result is not None
+            return {"manage_sell_offer": self.manage_sell_offer_result.to_json_dict()}
+        if self.type == OperationType.CREATE_PASSIVE_SELL_OFFER:
+            assert self.create_passive_sell_offer_result is not None
+            return {
+                "create_passive_sell_offer": self.create_passive_sell_offer_result.to_json_dict()
+            }
+        if self.type == OperationType.SET_OPTIONS:
+            assert self.set_options_result is not None
+            return {"set_options": self.set_options_result.to_json_dict()}
+        if self.type == OperationType.CHANGE_TRUST:
+            assert self.change_trust_result is not None
+            return {"change_trust": self.change_trust_result.to_json_dict()}
+        if self.type == OperationType.ALLOW_TRUST:
+            assert self.allow_trust_result is not None
+            return {"allow_trust": self.allow_trust_result.to_json_dict()}
+        if self.type == OperationType.ACCOUNT_MERGE:
+            assert self.account_merge_result is not None
+            return {"account_merge": self.account_merge_result.to_json_dict()}
+        if self.type == OperationType.INFLATION:
+            assert self.inflation_result is not None
+            return {"inflation": self.inflation_result.to_json_dict()}
+        if self.type == OperationType.MANAGE_DATA:
+            assert self.manage_data_result is not None
+            return {"manage_data": self.manage_data_result.to_json_dict()}
+        if self.type == OperationType.BUMP_SEQUENCE:
+            assert self.bump_seq_result is not None
+            return {"bump_sequence": self.bump_seq_result.to_json_dict()}
+        if self.type == OperationType.MANAGE_BUY_OFFER:
+            assert self.manage_buy_offer_result is not None
+            return {"manage_buy_offer": self.manage_buy_offer_result.to_json_dict()}
+        if self.type == OperationType.PATH_PAYMENT_STRICT_SEND:
+            assert self.path_payment_strict_send_result is not None
+            return {
+                "path_payment_strict_send": self.path_payment_strict_send_result.to_json_dict()
+            }
+        if self.type == OperationType.CREATE_CLAIMABLE_BALANCE:
+            assert self.create_claimable_balance_result is not None
+            return {
+                "create_claimable_balance": self.create_claimable_balance_result.to_json_dict()
+            }
+        if self.type == OperationType.CLAIM_CLAIMABLE_BALANCE:
+            assert self.claim_claimable_balance_result is not None
+            return {
+                "claim_claimable_balance": self.claim_claimable_balance_result.to_json_dict()
+            }
+        if self.type == OperationType.BEGIN_SPONSORING_FUTURE_RESERVES:
+            assert self.begin_sponsoring_future_reserves_result is not None
+            return {
+                "begin_sponsoring_future_reserves": self.begin_sponsoring_future_reserves_result.to_json_dict()
+            }
+        if self.type == OperationType.END_SPONSORING_FUTURE_RESERVES:
+            assert self.end_sponsoring_future_reserves_result is not None
+            return {
+                "end_sponsoring_future_reserves": self.end_sponsoring_future_reserves_result.to_json_dict()
+            }
+        if self.type == OperationType.REVOKE_SPONSORSHIP:
+            assert self.revoke_sponsorship_result is not None
+            return {"revoke_sponsorship": self.revoke_sponsorship_result.to_json_dict()}
+        if self.type == OperationType.CLAWBACK:
+            assert self.clawback_result is not None
+            return {"clawback": self.clawback_result.to_json_dict()}
+        if self.type == OperationType.CLAWBACK_CLAIMABLE_BALANCE:
+            assert self.clawback_claimable_balance_result is not None
+            return {
+                "clawback_claimable_balance": self.clawback_claimable_balance_result.to_json_dict()
+            }
+        if self.type == OperationType.SET_TRUST_LINE_FLAGS:
+            assert self.set_trust_line_flags_result is not None
+            return {
+                "set_trust_line_flags": self.set_trust_line_flags_result.to_json_dict()
+            }
+        if self.type == OperationType.LIQUIDITY_POOL_DEPOSIT:
+            assert self.liquidity_pool_deposit_result is not None
+            return {
+                "liquidity_pool_deposit": self.liquidity_pool_deposit_result.to_json_dict()
+            }
+        if self.type == OperationType.LIQUIDITY_POOL_WITHDRAW:
+            assert self.liquidity_pool_withdraw_result is not None
+            return {
+                "liquidity_pool_withdraw": self.liquidity_pool_withdraw_result.to_json_dict()
+            }
+        if self.type == OperationType.INVOKE_HOST_FUNCTION:
+            assert self.invoke_host_function_result is not None
+            return {
+                "invoke_host_function": self.invoke_host_function_result.to_json_dict()
+            }
+        if self.type == OperationType.EXTEND_FOOTPRINT_TTL:
+            assert self.extend_footprint_ttl_result is not None
+            return {
+                "extend_footprint_ttl": self.extend_footprint_ttl_result.to_json_dict()
+            }
+        if self.type == OperationType.RESTORE_FOOTPRINT:
+            assert self.restore_footprint_result is not None
+            return {"restore_footprint": self.restore_footprint_result.to_json_dict()}
+        raise ValueError(f"Unknown type in OperationResultTr: {self.type}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: dict) -> OperationResultTr:
+        if len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for OperationResultTr, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        type = OperationType.from_json_dict(key)
+        if key == "create_account":
+            create_account_result = CreateAccountResult.from_json_dict(
+                json_value["create_account"]
+            )
+            return cls(type=type, create_account_result=create_account_result)
+        if key == "payment":
+            payment_result = PaymentResult.from_json_dict(json_value["payment"])
+            return cls(type=type, payment_result=payment_result)
+        if key == "path_payment_strict_receive":
+            path_payment_strict_receive_result = (
+                PathPaymentStrictReceiveResult.from_json_dict(
+                    json_value["path_payment_strict_receive"]
+                )
+            )
+            return cls(
+                type=type,
+                path_payment_strict_receive_result=path_payment_strict_receive_result,
+            )
+        if key == "manage_sell_offer":
+            manage_sell_offer_result = ManageSellOfferResult.from_json_dict(
+                json_value["manage_sell_offer"]
+            )
+            return cls(type=type, manage_sell_offer_result=manage_sell_offer_result)
+        if key == "create_passive_sell_offer":
+            create_passive_sell_offer_result = ManageSellOfferResult.from_json_dict(
+                json_value["create_passive_sell_offer"]
+            )
+            return cls(
+                type=type,
+                create_passive_sell_offer_result=create_passive_sell_offer_result,
+            )
+        if key == "set_options":
+            set_options_result = SetOptionsResult.from_json_dict(
+                json_value["set_options"]
+            )
+            return cls(type=type, set_options_result=set_options_result)
+        if key == "change_trust":
+            change_trust_result = ChangeTrustResult.from_json_dict(
+                json_value["change_trust"]
+            )
+            return cls(type=type, change_trust_result=change_trust_result)
+        if key == "allow_trust":
+            allow_trust_result = AllowTrustResult.from_json_dict(
+                json_value["allow_trust"]
+            )
+            return cls(type=type, allow_trust_result=allow_trust_result)
+        if key == "account_merge":
+            account_merge_result = AccountMergeResult.from_json_dict(
+                json_value["account_merge"]
+            )
+            return cls(type=type, account_merge_result=account_merge_result)
+        if key == "inflation":
+            inflation_result = InflationResult.from_json_dict(json_value["inflation"])
+            return cls(type=type, inflation_result=inflation_result)
+        if key == "manage_data":
+            manage_data_result = ManageDataResult.from_json_dict(
+                json_value["manage_data"]
+            )
+            return cls(type=type, manage_data_result=manage_data_result)
+        if key == "bump_sequence":
+            bump_seq_result = BumpSequenceResult.from_json_dict(
+                json_value["bump_sequence"]
+            )
+            return cls(type=type, bump_seq_result=bump_seq_result)
+        if key == "manage_buy_offer":
+            manage_buy_offer_result = ManageBuyOfferResult.from_json_dict(
+                json_value["manage_buy_offer"]
+            )
+            return cls(type=type, manage_buy_offer_result=manage_buy_offer_result)
+        if key == "path_payment_strict_send":
+            path_payment_strict_send_result = (
+                PathPaymentStrictSendResult.from_json_dict(
+                    json_value["path_payment_strict_send"]
+                )
+            )
+            return cls(
+                type=type,
+                path_payment_strict_send_result=path_payment_strict_send_result,
+            )
+        if key == "create_claimable_balance":
+            create_claimable_balance_result = (
+                CreateClaimableBalanceResult.from_json_dict(
+                    json_value["create_claimable_balance"]
+                )
+            )
+            return cls(
+                type=type,
+                create_claimable_balance_result=create_claimable_balance_result,
+            )
+        if key == "claim_claimable_balance":
+            claim_claimable_balance_result = ClaimClaimableBalanceResult.from_json_dict(
+                json_value["claim_claimable_balance"]
+            )
+            return cls(
+                type=type, claim_claimable_balance_result=claim_claimable_balance_result
+            )
+        if key == "begin_sponsoring_future_reserves":
+            begin_sponsoring_future_reserves_result = (
+                BeginSponsoringFutureReservesResult.from_json_dict(
+                    json_value["begin_sponsoring_future_reserves"]
+                )
+            )
+            return cls(
+                type=type,
+                begin_sponsoring_future_reserves_result=begin_sponsoring_future_reserves_result,
+            )
+        if key == "end_sponsoring_future_reserves":
+            end_sponsoring_future_reserves_result = (
+                EndSponsoringFutureReservesResult.from_json_dict(
+                    json_value["end_sponsoring_future_reserves"]
+                )
+            )
+            return cls(
+                type=type,
+                end_sponsoring_future_reserves_result=end_sponsoring_future_reserves_result,
+            )
+        if key == "revoke_sponsorship":
+            revoke_sponsorship_result = RevokeSponsorshipResult.from_json_dict(
+                json_value["revoke_sponsorship"]
+            )
+            return cls(type=type, revoke_sponsorship_result=revoke_sponsorship_result)
+        if key == "clawback":
+            clawback_result = ClawbackResult.from_json_dict(json_value["clawback"])
+            return cls(type=type, clawback_result=clawback_result)
+        if key == "clawback_claimable_balance":
+            clawback_claimable_balance_result = (
+                ClawbackClaimableBalanceResult.from_json_dict(
+                    json_value["clawback_claimable_balance"]
+                )
+            )
+            return cls(
+                type=type,
+                clawback_claimable_balance_result=clawback_claimable_balance_result,
+            )
+        if key == "set_trust_line_flags":
+            set_trust_line_flags_result = SetTrustLineFlagsResult.from_json_dict(
+                json_value["set_trust_line_flags"]
+            )
+            return cls(
+                type=type, set_trust_line_flags_result=set_trust_line_flags_result
+            )
+        if key == "liquidity_pool_deposit":
+            liquidity_pool_deposit_result = LiquidityPoolDepositResult.from_json_dict(
+                json_value["liquidity_pool_deposit"]
+            )
+            return cls(
+                type=type, liquidity_pool_deposit_result=liquidity_pool_deposit_result
+            )
+        if key == "liquidity_pool_withdraw":
+            liquidity_pool_withdraw_result = LiquidityPoolWithdrawResult.from_json_dict(
+                json_value["liquidity_pool_withdraw"]
+            )
+            return cls(
+                type=type, liquidity_pool_withdraw_result=liquidity_pool_withdraw_result
+            )
+        if key == "invoke_host_function":
+            invoke_host_function_result = InvokeHostFunctionResult.from_json_dict(
+                json_value["invoke_host_function"]
+            )
+            return cls(
+                type=type, invoke_host_function_result=invoke_host_function_result
+            )
+        if key == "extend_footprint_ttl":
+            extend_footprint_ttl_result = ExtendFootprintTTLResult.from_json_dict(
+                json_value["extend_footprint_ttl"]
+            )
+            return cls(
+                type=type, extend_footprint_ttl_result=extend_footprint_ttl_result
+            )
+        if key == "restore_footprint":
+            restore_footprint_result = RestoreFootprintResult.from_json_dict(
+                json_value["restore_footprint"]
+            )
+            return cls(type=type, restore_footprint_result=restore_footprint_result)
+        raise ValueError(f"Unknown key '{key}' for OperationResultTr")
 
     def __hash__(self):
         return hash(
@@ -554,165 +886,84 @@ class OperationResultTr:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        (
+        if self.create_account_result is not None:
             out.append(f"create_account_result={self.create_account_result}")
-            if self.create_account_result is not None
-            else None
-        )
-        (
+        if self.payment_result is not None:
             out.append(f"payment_result={self.payment_result}")
-            if self.payment_result is not None
-            else None
-        )
-        (
+        if self.path_payment_strict_receive_result is not None:
             out.append(
                 f"path_payment_strict_receive_result={self.path_payment_strict_receive_result}"
             )
-            if self.path_payment_strict_receive_result is not None
-            else None
-        )
-        (
+        if self.manage_sell_offer_result is not None:
             out.append(f"manage_sell_offer_result={self.manage_sell_offer_result}")
-            if self.manage_sell_offer_result is not None
-            else None
-        )
-        (
+        if self.create_passive_sell_offer_result is not None:
             out.append(
                 f"create_passive_sell_offer_result={self.create_passive_sell_offer_result}"
             )
-            if self.create_passive_sell_offer_result is not None
-            else None
-        )
-        (
+        if self.set_options_result is not None:
             out.append(f"set_options_result={self.set_options_result}")
-            if self.set_options_result is not None
-            else None
-        )
-        (
+        if self.change_trust_result is not None:
             out.append(f"change_trust_result={self.change_trust_result}")
-            if self.change_trust_result is not None
-            else None
-        )
-        (
+        if self.allow_trust_result is not None:
             out.append(f"allow_trust_result={self.allow_trust_result}")
-            if self.allow_trust_result is not None
-            else None
-        )
-        (
+        if self.account_merge_result is not None:
             out.append(f"account_merge_result={self.account_merge_result}")
-            if self.account_merge_result is not None
-            else None
-        )
-        (
+        if self.inflation_result is not None:
             out.append(f"inflation_result={self.inflation_result}")
-            if self.inflation_result is not None
-            else None
-        )
-        (
+        if self.manage_data_result is not None:
             out.append(f"manage_data_result={self.manage_data_result}")
-            if self.manage_data_result is not None
-            else None
-        )
-        (
+        if self.bump_seq_result is not None:
             out.append(f"bump_seq_result={self.bump_seq_result}")
-            if self.bump_seq_result is not None
-            else None
-        )
-        (
+        if self.manage_buy_offer_result is not None:
             out.append(f"manage_buy_offer_result={self.manage_buy_offer_result}")
-            if self.manage_buy_offer_result is not None
-            else None
-        )
-        (
+        if self.path_payment_strict_send_result is not None:
             out.append(
                 f"path_payment_strict_send_result={self.path_payment_strict_send_result}"
             )
-            if self.path_payment_strict_send_result is not None
-            else None
-        )
-        (
+        if self.create_claimable_balance_result is not None:
             out.append(
                 f"create_claimable_balance_result={self.create_claimable_balance_result}"
             )
-            if self.create_claimable_balance_result is not None
-            else None
-        )
-        (
+        if self.claim_claimable_balance_result is not None:
             out.append(
                 f"claim_claimable_balance_result={self.claim_claimable_balance_result}"
             )
-            if self.claim_claimable_balance_result is not None
-            else None
-        )
-        (
+        if self.begin_sponsoring_future_reserves_result is not None:
             out.append(
                 f"begin_sponsoring_future_reserves_result={self.begin_sponsoring_future_reserves_result}"
             )
-            if self.begin_sponsoring_future_reserves_result is not None
-            else None
-        )
-        (
+        if self.end_sponsoring_future_reserves_result is not None:
             out.append(
                 f"end_sponsoring_future_reserves_result={self.end_sponsoring_future_reserves_result}"
             )
-            if self.end_sponsoring_future_reserves_result is not None
-            else None
-        )
-        (
+        if self.revoke_sponsorship_result is not None:
             out.append(f"revoke_sponsorship_result={self.revoke_sponsorship_result}")
-            if self.revoke_sponsorship_result is not None
-            else None
-        )
-        (
+        if self.clawback_result is not None:
             out.append(f"clawback_result={self.clawback_result}")
-            if self.clawback_result is not None
-            else None
-        )
-        (
+        if self.clawback_claimable_balance_result is not None:
             out.append(
                 f"clawback_claimable_balance_result={self.clawback_claimable_balance_result}"
             )
-            if self.clawback_claimable_balance_result is not None
-            else None
-        )
-        (
+        if self.set_trust_line_flags_result is not None:
             out.append(
                 f"set_trust_line_flags_result={self.set_trust_line_flags_result}"
             )
-            if self.set_trust_line_flags_result is not None
-            else None
-        )
-        (
+        if self.liquidity_pool_deposit_result is not None:
             out.append(
                 f"liquidity_pool_deposit_result={self.liquidity_pool_deposit_result}"
             )
-            if self.liquidity_pool_deposit_result is not None
-            else None
-        )
-        (
+        if self.liquidity_pool_withdraw_result is not None:
             out.append(
                 f"liquidity_pool_withdraw_result={self.liquidity_pool_withdraw_result}"
             )
-            if self.liquidity_pool_withdraw_result is not None
-            else None
-        )
-        (
+        if self.invoke_host_function_result is not None:
             out.append(
                 f"invoke_host_function_result={self.invoke_host_function_result}"
             )
-            if self.invoke_host_function_result is not None
-            else None
-        )
-        (
+        if self.extend_footprint_ttl_result is not None:
             out.append(
                 f"extend_footprint_ttl_result={self.extend_footprint_ttl_result}"
             )
-            if self.extend_footprint_ttl_result is not None
-            else None
-        )
-        (
+        if self.restore_footprint_result is not None:
             out.append(f"restore_footprint_result={self.restore_footprint_result}")
-            if self.restore_footprint_result is not None
-            else None
-        )
         return f"<OperationResultTr [{', '.join(out)}]>"

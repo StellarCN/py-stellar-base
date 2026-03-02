@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .int64 import Int64
 from .liquidity_pool_constant_product_parameters import (
     LiquidityPoolConstantProductParameters,
@@ -52,12 +54,18 @@ class LiquidityPoolEntryConstantProduct:
         self.pool_shares_trust_line_count.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> LiquidityPoolEntryConstantProduct:
-        params = LiquidityPoolConstantProductParameters.unpack(unpacker)
-        reserve_a = Int64.unpack(unpacker)
-        reserve_b = Int64.unpack(unpacker)
-        total_pool_shares = Int64.unpack(unpacker)
-        pool_shares_trust_line_count = Int64.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> LiquidityPoolEntryConstantProduct:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        params = LiquidityPoolConstantProductParameters.unpack(
+            unpacker, depth_limit - 1
+        )
+        reserve_a = Int64.unpack(unpacker, depth_limit - 1)
+        reserve_b = Int64.unpack(unpacker, depth_limit - 1)
+        total_pool_shares = Int64.unpack(unpacker, depth_limit - 1)
+        pool_shares_trust_line_count = Int64.unpack(unpacker, depth_limit - 1)
         return cls(
             params=params,
             reserve_a=reserve_a,
@@ -74,7 +82,11 @@ class LiquidityPoolEntryConstantProduct:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LiquidityPoolEntryConstantProduct:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -84,6 +96,41 @@ class LiquidityPoolEntryConstantProduct:
     def from_xdr(cls, xdr: str) -> LiquidityPoolEntryConstantProduct:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> LiquidityPoolEntryConstantProduct:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "params": self.params.to_json_dict(),
+            "reserve_a": self.reserve_a.to_json_dict(),
+            "reserve_b": self.reserve_b.to_json_dict(),
+            "total_pool_shares": self.total_pool_shares.to_json_dict(),
+            "pool_shares_trust_line_count": self.pool_shares_trust_line_count.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> LiquidityPoolEntryConstantProduct:
+        params = LiquidityPoolConstantProductParameters.from_json_dict(
+            json_dict["params"]
+        )
+        reserve_a = Int64.from_json_dict(json_dict["reserve_a"])
+        reserve_b = Int64.from_json_dict(json_dict["reserve_b"])
+        total_pool_shares = Int64.from_json_dict(json_dict["total_pool_shares"])
+        pool_shares_trust_line_count = Int64.from_json_dict(
+            json_dict["pool_shares_trust_line_count"]
+        )
+        return cls(
+            params=params,
+            reserve_a=reserve_a,
+            reserve_b=reserve_b,
+            total_pool_shares=total_pool_shares,
+            pool_shares_trust_line_count=pool_shares_trust_line_count,
+        )
 
     def __hash__(self):
         return hash(

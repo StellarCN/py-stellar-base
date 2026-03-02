@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .contract_event import ContractEvent
 from .sc_val import SCVal
 
@@ -44,12 +46,21 @@ class InvokeHostFunctionSuccessPreImage:
             events_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> InvokeHostFunctionSuccessPreImage:
-        return_value = SCVal.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> InvokeHostFunctionSuccessPreImage:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        return_value = SCVal.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"events length {length} exceeds remaining input length {_remaining}"
+            )
         events = []
         for _ in range(length):
-            events.append(ContractEvent.unpack(unpacker))
+            events.append(ContractEvent.unpack(unpacker, depth_limit - 1))
         return cls(
             return_value=return_value,
             events=events,
@@ -63,7 +74,11 @@ class InvokeHostFunctionSuccessPreImage:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> InvokeHostFunctionSuccessPreImage:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -73,6 +88,28 @@ class InvokeHostFunctionSuccessPreImage:
     def from_xdr(cls, xdr: str) -> InvokeHostFunctionSuccessPreImage:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> InvokeHostFunctionSuccessPreImage:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "return_value": self.return_value.to_json_dict(),
+            "events": [item.to_json_dict() for item in self.events],
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> InvokeHostFunctionSuccessPreImage:
+        return_value = SCVal.from_json_dict(json_dict["return_value"])
+        events = [ContractEvent.from_json_dict(item) for item in json_dict["events"]]
+        return cls(
+            return_value=return_value,
+            events=events,
+        )
 
     def __hash__(self):
         return hash(

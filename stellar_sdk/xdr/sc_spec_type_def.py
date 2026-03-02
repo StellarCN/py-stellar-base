@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import TYPE_CHECKING, Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .sc_spec_type import SCSpecType
 
 if TYPE_CHECKING:
@@ -158,9 +160,14 @@ class SCSpecTypeDef:
                 raise ValueError("udt should not be None.")
             self.udt.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SCSpecTypeDef:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SCSpecTypeDef:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         type = SCSpecType.unpack(unpacker)
         if type == SCSpecType.SC_SPEC_TYPE_VAL:
             return cls(type=type)
@@ -203,39 +210,39 @@ class SCSpecTypeDef:
         if type == SCSpecType.SC_SPEC_TYPE_OPTION:
             from .sc_spec_type_option import SCSpecTypeOption
 
-            option = SCSpecTypeOption.unpack(unpacker)
+            option = SCSpecTypeOption.unpack(unpacker, depth_limit - 1)
             return cls(type=type, option=option)
         if type == SCSpecType.SC_SPEC_TYPE_RESULT:
             from .sc_spec_type_result import SCSpecTypeResult
 
-            result = SCSpecTypeResult.unpack(unpacker)
+            result = SCSpecTypeResult.unpack(unpacker, depth_limit - 1)
             return cls(type=type, result=result)
         if type == SCSpecType.SC_SPEC_TYPE_VEC:
             from .sc_spec_type_vec import SCSpecTypeVec
 
-            vec = SCSpecTypeVec.unpack(unpacker)
+            vec = SCSpecTypeVec.unpack(unpacker, depth_limit - 1)
             return cls(type=type, vec=vec)
         if type == SCSpecType.SC_SPEC_TYPE_MAP:
             from .sc_spec_type_map import SCSpecTypeMap
 
-            map = SCSpecTypeMap.unpack(unpacker)
+            map = SCSpecTypeMap.unpack(unpacker, depth_limit - 1)
             return cls(type=type, map=map)
         if type == SCSpecType.SC_SPEC_TYPE_TUPLE:
             from .sc_spec_type_tuple import SCSpecTypeTuple
 
-            tuple = SCSpecTypeTuple.unpack(unpacker)
+            tuple = SCSpecTypeTuple.unpack(unpacker, depth_limit - 1)
             return cls(type=type, tuple=tuple)
         if type == SCSpecType.SC_SPEC_TYPE_BYTES_N:
             from .sc_spec_type_bytes_n import SCSpecTypeBytesN
 
-            bytes_n = SCSpecTypeBytesN.unpack(unpacker)
+            bytes_n = SCSpecTypeBytesN.unpack(unpacker, depth_limit - 1)
             return cls(type=type, bytes_n=bytes_n)
         if type == SCSpecType.SC_SPEC_TYPE_UDT:
             from .sc_spec_type_udt import SCSpecTypeUDT
 
-            udt = SCSpecTypeUDT.unpack(unpacker)
+            udt = SCSpecTypeUDT.unpack(unpacker, depth_limit - 1)
             return cls(type=type, udt=udt)
-        return cls(type=type)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -245,7 +252,11 @@ class SCSpecTypeDef:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCSpecTypeDef:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -255,6 +266,147 @@ class SCSpecTypeDef:
     def from_xdr(cls, xdr: str) -> SCSpecTypeDef:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCSpecTypeDef:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.type == SCSpecType.SC_SPEC_TYPE_VAL:
+            return "val"
+        if self.type == SCSpecType.SC_SPEC_TYPE_BOOL:
+            return "bool"
+        if self.type == SCSpecType.SC_SPEC_TYPE_VOID:
+            return "void"
+        if self.type == SCSpecType.SC_SPEC_TYPE_ERROR:
+            return "error"
+        if self.type == SCSpecType.SC_SPEC_TYPE_U32:
+            return "u32"
+        if self.type == SCSpecType.SC_SPEC_TYPE_I32:
+            return "i32"
+        if self.type == SCSpecType.SC_SPEC_TYPE_U64:
+            return "u64"
+        if self.type == SCSpecType.SC_SPEC_TYPE_I64:
+            return "i64"
+        if self.type == SCSpecType.SC_SPEC_TYPE_TIMEPOINT:
+            return "timepoint"
+        if self.type == SCSpecType.SC_SPEC_TYPE_DURATION:
+            return "duration"
+        if self.type == SCSpecType.SC_SPEC_TYPE_U128:
+            return "u128"
+        if self.type == SCSpecType.SC_SPEC_TYPE_I128:
+            return "i128"
+        if self.type == SCSpecType.SC_SPEC_TYPE_U256:
+            return "u256"
+        if self.type == SCSpecType.SC_SPEC_TYPE_I256:
+            return "i256"
+        if self.type == SCSpecType.SC_SPEC_TYPE_BYTES:
+            return "bytes"
+        if self.type == SCSpecType.SC_SPEC_TYPE_STRING:
+            return "string"
+        if self.type == SCSpecType.SC_SPEC_TYPE_SYMBOL:
+            return "symbol"
+        if self.type == SCSpecType.SC_SPEC_TYPE_ADDRESS:
+            return "address"
+        if self.type == SCSpecType.SC_SPEC_TYPE_MUXED_ADDRESS:
+            return "muxed_address"
+        if self.type == SCSpecType.SC_SPEC_TYPE_OPTION:
+            assert self.option is not None
+            return {"option": self.option.to_json_dict()}
+        if self.type == SCSpecType.SC_SPEC_TYPE_RESULT:
+            assert self.result is not None
+            return {"result": self.result.to_json_dict()}
+        if self.type == SCSpecType.SC_SPEC_TYPE_VEC:
+            assert self.vec is not None
+            return {"vec": self.vec.to_json_dict()}
+        if self.type == SCSpecType.SC_SPEC_TYPE_MAP:
+            assert self.map is not None
+            return {"map": self.map.to_json_dict()}
+        if self.type == SCSpecType.SC_SPEC_TYPE_TUPLE:
+            assert self.tuple is not None
+            return {"tuple": self.tuple.to_json_dict()}
+        if self.type == SCSpecType.SC_SPEC_TYPE_BYTES_N:
+            assert self.bytes_n is not None
+            return {"bytes_n": self.bytes_n.to_json_dict()}
+        if self.type == SCSpecType.SC_SPEC_TYPE_UDT:
+            assert self.udt is not None
+            return {"udt": self.udt.to_json_dict()}
+        raise ValueError(f"Unknown type in SCSpecTypeDef: {self.type}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: str | dict) -> SCSpecTypeDef:
+        if isinstance(json_value, str):
+            if json_value not in (
+                "val",
+                "bool",
+                "void",
+                "error",
+                "u32",
+                "i32",
+                "u64",
+                "i64",
+                "timepoint",
+                "duration",
+                "u128",
+                "i128",
+                "u256",
+                "i256",
+                "bytes",
+                "string",
+                "symbol",
+                "address",
+                "muxed_address",
+            ):
+                raise ValueError(
+                    f"Unexpected string '{json_value}' for SCSpecTypeDef, must be one of: val, bool, void, error, u32, i32, u64, i64, timepoint, duration, u128, i128, u256, i256, bytes, string, symbol, address, muxed_address"
+                )
+            type = SCSpecType.from_json_dict(json_value)
+            return cls(type=type)
+        if not isinstance(json_value, dict) or len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for SCSpecTypeDef, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        type = SCSpecType.from_json_dict(key)
+        if key == "option":
+            from .sc_spec_type_option import SCSpecTypeOption
+
+            option = SCSpecTypeOption.from_json_dict(json_value["option"])
+            return cls(type=type, option=option)
+        if key == "result":
+            from .sc_spec_type_result import SCSpecTypeResult
+
+            result = SCSpecTypeResult.from_json_dict(json_value["result"])
+            return cls(type=type, result=result)
+        if key == "vec":
+            from .sc_spec_type_vec import SCSpecTypeVec
+
+            vec = SCSpecTypeVec.from_json_dict(json_value["vec"])
+            return cls(type=type, vec=vec)
+        if key == "map":
+            from .sc_spec_type_map import SCSpecTypeMap
+
+            map_val = SCSpecTypeMap.from_json_dict(json_value["map"])
+            return cls(type=type, map=map_val)
+        if key == "tuple":
+            from .sc_spec_type_tuple import SCSpecTypeTuple
+
+            tuple = SCSpecTypeTuple.from_json_dict(json_value["tuple"])
+            return cls(type=type, tuple=tuple)
+        if key == "bytes_n":
+            from .sc_spec_type_bytes_n import SCSpecTypeBytesN
+
+            bytes_n = SCSpecTypeBytesN.from_json_dict(json_value["bytes_n"])
+            return cls(type=type, bytes_n=bytes_n)
+        if key == "udt":
+            from .sc_spec_type_udt import SCSpecTypeUDT
+
+            udt = SCSpecTypeUDT.from_json_dict(json_value["udt"])
+            return cls(type=type, udt=udt)
+        raise ValueError(f"Unknown key '{key}' for SCSpecTypeDef")
 
     def __hash__(self):
         return hash(
@@ -287,11 +439,18 @@ class SCSpecTypeDef:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(f"option={self.option}") if self.option is not None else None
-        out.append(f"result={self.result}") if self.result is not None else None
-        out.append(f"vec={self.vec}") if self.vec is not None else None
-        out.append(f"map={self.map}") if self.map is not None else None
-        out.append(f"tuple={self.tuple}") if self.tuple is not None else None
-        out.append(f"bytes_n={self.bytes_n}") if self.bytes_n is not None else None
-        out.append(f"udt={self.udt}") if self.udt is not None else None
+        if self.option is not None:
+            out.append(f"option={self.option}")
+        if self.result is not None:
+            out.append(f"result={self.result}")
+        if self.vec is not None:
+            out.append(f"vec={self.vec}")
+        if self.map is not None:
+            out.append(f"map={self.map}")
+        if self.tuple is not None:
+            out.append(f"tuple={self.tuple}")
+        if self.bytes_n is not None:
+            out.append(f"bytes_n={self.bytes_n}")
+        if self.udt is not None:
+            out.append(f"udt={self.udt}")
         return f"<SCSpecTypeDef [{', '.join(out)}]>"

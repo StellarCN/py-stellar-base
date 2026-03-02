@@ -3,10 +3,27 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_INVOKE_HOST_FUNCTION_RESULT_CODE_MAP = {
+    0: "success",
+    -1: "malformed",
+    -2: "trapped",
+    -3: "resource_limit_exceeded",
+    -4: "entry_archived",
+    -5: "insufficient_refundable_fee",
+}
+_INVOKE_HOST_FUNCTION_RESULT_CODE_REVERSE_MAP = {
+    "success": 0,
+    "malformed": -1,
+    "trapped": -2,
+    "resource_limit_exceeded": -3,
+    "entry_archived": -4,
+    "insufficient_refundable_fee": -5,
+}
 __all__ = ["InvokeHostFunctionResultCode"]
 
 
@@ -51,7 +68,11 @@ class InvokeHostFunctionResultCode(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> InvokeHostFunctionResultCode:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -61,3 +82,17 @@ class InvokeHostFunctionResultCode(IntEnum):
     def from_xdr(cls, xdr: str) -> InvokeHostFunctionResultCode:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> InvokeHostFunctionResultCode:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _INVOKE_HOST_FUNCTION_RESULT_CODE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> InvokeHostFunctionResultCode:
+        return cls(_INVOKE_HOST_FUNCTION_RESULT_CODE_REVERSE_MAP[json_value])

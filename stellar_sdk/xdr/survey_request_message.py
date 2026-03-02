@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .curve25519_public import Curve25519Public
 from .node_id import NodeID
 from .survey_message_command_type import SurveyMessageCommandType
@@ -50,11 +52,15 @@ class SurveyRequestMessage:
         self.command_type.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SurveyRequestMessage:
-        surveyor_peer_id = NodeID.unpack(unpacker)
-        surveyed_peer_id = NodeID.unpack(unpacker)
-        ledger_num = Uint32.unpack(unpacker)
-        encryption_key = Curve25519Public.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SurveyRequestMessage:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        surveyor_peer_id = NodeID.unpack(unpacker, depth_limit - 1)
+        surveyed_peer_id = NodeID.unpack(unpacker, depth_limit - 1)
+        ledger_num = Uint32.unpack(unpacker, depth_limit - 1)
+        encryption_key = Curve25519Public.unpack(unpacker, depth_limit - 1)
         command_type = SurveyMessageCommandType.unpack(unpacker)
         return cls(
             surveyor_peer_id=surveyor_peer_id,
@@ -72,7 +78,11 @@ class SurveyRequestMessage:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SurveyRequestMessage:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -82,6 +92,39 @@ class SurveyRequestMessage:
     def from_xdr(cls, xdr: str) -> SurveyRequestMessage:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SurveyRequestMessage:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "surveyor_peer_id": self.surveyor_peer_id.to_json_dict(),
+            "surveyed_peer_id": self.surveyed_peer_id.to_json_dict(),
+            "ledger_num": self.ledger_num.to_json_dict(),
+            "encryption_key": self.encryption_key.to_json_dict(),
+            "command_type": self.command_type.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SurveyRequestMessage:
+        surveyor_peer_id = NodeID.from_json_dict(json_dict["surveyor_peer_id"])
+        surveyed_peer_id = NodeID.from_json_dict(json_dict["surveyed_peer_id"])
+        ledger_num = Uint32.from_json_dict(json_dict["ledger_num"])
+        encryption_key = Curve25519Public.from_json_dict(json_dict["encryption_key"])
+        command_type = SurveyMessageCommandType.from_json_dict(
+            json_dict["command_type"]
+        )
+        return cls(
+            surveyor_peer_id=surveyor_peer_id,
+            surveyed_peer_id=surveyed_peer_id,
+            ledger_num=ledger_num,
+            encryption_key=encryption_key,
+            command_type=command_type,
+        )
 
     def __hash__(self):
         return hash(

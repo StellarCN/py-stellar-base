@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .contract_id_preimage import ContractIDPreimage
 from .hash import Hash
 
@@ -36,9 +38,13 @@ class HashIDPreimageContractID:
         self.contract_id_preimage.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> HashIDPreimageContractID:
-        network_id = Hash.unpack(unpacker)
-        contract_id_preimage = ContractIDPreimage.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> HashIDPreimageContractID:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        network_id = Hash.unpack(unpacker, depth_limit - 1)
+        contract_id_preimage = ContractIDPreimage.unpack(unpacker, depth_limit - 1)
         return cls(
             network_id=network_id,
             contract_id_preimage=contract_id_preimage,
@@ -52,7 +58,11 @@ class HashIDPreimageContractID:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> HashIDPreimageContractID:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -62,6 +72,30 @@ class HashIDPreimageContractID:
     def from_xdr(cls, xdr: str) -> HashIDPreimageContractID:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> HashIDPreimageContractID:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "network_id": self.network_id.to_json_dict(),
+            "contract_id_preimage": self.contract_id_preimage.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> HashIDPreimageContractID:
+        network_id = Hash.from_json_dict(json_dict["network_id"])
+        contract_id_preimage = ContractIDPreimage.from_json_dict(
+            json_dict["contract_id_preimage"]
+        )
+        return cls(
+            network_id=network_id,
+            contract_id_preimage=contract_id_preimage,
+        )
 
     def __hash__(self):
         return hash(

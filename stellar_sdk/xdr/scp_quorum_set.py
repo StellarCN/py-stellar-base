@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .node_id import NodeID
 from .uint32 import Uint32
 
@@ -55,16 +57,30 @@ class SCPQuorumSet:
             inner_sets_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SCPQuorumSet:
-        threshold = Uint32.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SCPQuorumSet:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        threshold = Uint32.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"validators length {length} exceeds remaining input length {_remaining}"
+            )
         validators = []
         for _ in range(length):
-            validators.append(NodeID.unpack(unpacker))
+            validators.append(NodeID.unpack(unpacker, depth_limit - 1))
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"inner_sets length {length} exceeds remaining input length {_remaining}"
+            )
         inner_sets = []
         for _ in range(length):
-            inner_sets.append(SCPQuorumSet.unpack(unpacker))
+            inner_sets.append(SCPQuorumSet.unpack(unpacker, depth_limit - 1))
         return cls(
             threshold=threshold,
             validators=validators,
@@ -79,7 +95,11 @@ class SCPQuorumSet:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCPQuorumSet:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -89,6 +109,33 @@ class SCPQuorumSet:
     def from_xdr(cls, xdr: str) -> SCPQuorumSet:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCPQuorumSet:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "threshold": self.threshold.to_json_dict(),
+            "validators": [item.to_json_dict() for item in self.validators],
+            "inner_sets": [item.to_json_dict() for item in self.inner_sets],
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SCPQuorumSet:
+        threshold = Uint32.from_json_dict(json_dict["threshold"])
+        validators = [NodeID.from_json_dict(item) for item in json_dict["validators"]]
+        inner_sets = [
+            SCPQuorumSet.from_json_dict(item) for item in json_dict["inner_sets"]
+        ]
+        return cls(
+            threshold=threshold,
+            validators=validators,
+            inner_sets=inner_sets,
+        )
 
     def __hash__(self):
         return hash(

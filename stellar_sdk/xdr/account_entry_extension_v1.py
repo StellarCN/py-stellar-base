@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry_extension_v1_ext import AccountEntryExtensionV1Ext
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .liabilities import Liabilities
 
 __all__ = ["AccountEntryExtensionV1"]
@@ -44,9 +46,13 @@ class AccountEntryExtensionV1:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> AccountEntryExtensionV1:
-        liabilities = Liabilities.unpack(unpacker)
-        ext = AccountEntryExtensionV1Ext.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> AccountEntryExtensionV1:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        liabilities = Liabilities.unpack(unpacker, depth_limit - 1)
+        ext = AccountEntryExtensionV1Ext.unpack(unpacker, depth_limit - 1)
         return cls(
             liabilities=liabilities,
             ext=ext,
@@ -60,7 +66,11 @@ class AccountEntryExtensionV1:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> AccountEntryExtensionV1:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -70,6 +80,28 @@ class AccountEntryExtensionV1:
     def from_xdr(cls, xdr: str) -> AccountEntryExtensionV1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> AccountEntryExtensionV1:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "liabilities": self.liabilities.to_json_dict(),
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> AccountEntryExtensionV1:
+        liabilities = Liabilities.from_json_dict(json_dict["liabilities"])
+        ext = AccountEntryExtensionV1Ext.from_json_dict(json_dict["ext"])
+        return cls(
+            liabilities=liabilities,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

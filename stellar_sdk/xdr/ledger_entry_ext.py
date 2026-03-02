@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Integer
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 from .ledger_entry_extension_v1 import LedgerEntryExtensionV1
 
 __all__ = ["LedgerEntryExt"]
@@ -43,16 +44,21 @@ class LedgerEntryExt:
                 raise ValueError("v1 should not be None.")
             self.v1.pack(packer)
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> LedgerEntryExt:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> LedgerEntryExt:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v=v)
         if v == 1:
-            v1 = LedgerEntryExtensionV1.unpack(unpacker)
+            v1 = LedgerEntryExtensionV1.unpack(unpacker, depth_limit - 1)
             return cls(v=v, v1=v1)
-        return cls(v=v)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -62,7 +68,11 @@ class LedgerEntryExt:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LedgerEntryExt:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -72,6 +82,41 @@ class LedgerEntryExt:
     def from_xdr(cls, xdr: str) -> LedgerEntryExt:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> LedgerEntryExt:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.v == 0:
+            return "v0"
+        if self.v == 1:
+            assert self.v1 is not None
+            return {"v1": self.v1.to_json_dict()}
+        raise ValueError(f"Unknown v in LedgerEntryExt: {self.v}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: str | dict) -> LedgerEntryExt:
+        if isinstance(json_value, str):
+            if json_value not in ("v0",):
+                raise ValueError(
+                    f"Unexpected string '{json_value}' for LedgerEntryExt, must be one of: v0"
+                )
+            v = int(json_value[1:])
+            return cls(v=v)
+        if not isinstance(json_value, dict) or len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for LedgerEntryExt, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        v = int(key[1:])
+        if key == "v1":
+            v1 = LedgerEntryExtensionV1.from_json_dict(json_value["v1"])
+            return cls(v=v, v1=v1)
+        raise ValueError(f"Unknown key '{key}' for LedgerEntryExt")
 
     def __hash__(self):
         return hash(
@@ -89,5 +134,6 @@ class LedgerEntryExt:
     def __repr__(self):
         out = []
         out.append(f"v={self.v}")
-        out.append(f"v1={self.v1}") if self.v1 is not None else None
+        if self.v1 is not None:
+            out.append(f"v1={self.v1}")
         return f"<LedgerEntryExt [{', '.join(out)}]>"

@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
 from .value import Value
 
@@ -55,16 +57,30 @@ class SCPNomination:
             accepted_item.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SCPNomination:
-        quorum_set_hash = Hash.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SCPNomination:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        quorum_set_hash = Hash.unpack(unpacker, depth_limit - 1)
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"votes length {length} exceeds remaining input length {_remaining}"
+            )
         votes = []
         for _ in range(length):
-            votes.append(Value.unpack(unpacker))
+            votes.append(Value.unpack(unpacker, depth_limit - 1))
         length = unpacker.unpack_uint()
+        _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
+        if _remaining < length:
+            raise ValueError(
+                f"accepted length {length} exceeds remaining input length {_remaining}"
+            )
         accepted = []
         for _ in range(length):
-            accepted.append(Value.unpack(unpacker))
+            accepted.append(Value.unpack(unpacker, depth_limit - 1))
         return cls(
             quorum_set_hash=quorum_set_hash,
             votes=votes,
@@ -79,7 +95,11 @@ class SCPNomination:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCPNomination:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -89,6 +109,31 @@ class SCPNomination:
     def from_xdr(cls, xdr: str) -> SCPNomination:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCPNomination:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "quorum_set_hash": self.quorum_set_hash.to_json_dict(),
+            "votes": [item.to_json_dict() for item in self.votes],
+            "accepted": [item.to_json_dict() for item in self.accepted],
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SCPNomination:
+        quorum_set_hash = Hash.from_json_dict(json_dict["quorum_set_hash"])
+        votes = [Value.from_json_dict(item) for item in json_dict["votes"]]
+        accepted = [Value.from_json_dict(item) for item in json_dict["accepted"]]
+        return cls(
+            quorum_set_hash=quorum_set_hash,
+            votes=votes,
+            accepted=accepted,
+        )
 
     def __hash__(self):
         return hash(

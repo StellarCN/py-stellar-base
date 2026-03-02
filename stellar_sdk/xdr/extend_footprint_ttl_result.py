@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .extend_footprint_ttl_result_code import ExtendFootprintTTLResultCode
 
 __all__ = ["ExtendFootprintTTLResult"]
@@ -48,9 +50,14 @@ class ExtendFootprintTTLResult:
             == ExtendFootprintTTLResultCode.EXTEND_FOOTPRINT_TTL_INSUFFICIENT_REFUNDABLE_FEE
         ):
             return
+        raise ValueError("Invalid code.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ExtendFootprintTTLResult:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ExtendFootprintTTLResult:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         code = ExtendFootprintTTLResultCode.unpack(unpacker)
         if code == ExtendFootprintTTLResultCode.EXTEND_FOOTPRINT_TTL_SUCCESS:
             return cls(code=code)
@@ -66,7 +73,7 @@ class ExtendFootprintTTLResult:
             == ExtendFootprintTTLResultCode.EXTEND_FOOTPRINT_TTL_INSUFFICIENT_REFUNDABLE_FEE
         ):
             return cls(code=code)
-        return cls(code=code)
+        raise ValueError("Invalid code.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -76,7 +83,11 @@ class ExtendFootprintTTLResult:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ExtendFootprintTTLResult:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -86,6 +97,44 @@ class ExtendFootprintTTLResult:
     def from_xdr(cls, xdr: str) -> ExtendFootprintTTLResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ExtendFootprintTTLResult:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.code == ExtendFootprintTTLResultCode.EXTEND_FOOTPRINT_TTL_SUCCESS:
+            return "success"
+        if self.code == ExtendFootprintTTLResultCode.EXTEND_FOOTPRINT_TTL_MALFORMED:
+            return "malformed"
+        if (
+            self.code
+            == ExtendFootprintTTLResultCode.EXTEND_FOOTPRINT_TTL_RESOURCE_LIMIT_EXCEEDED
+        ):
+            return "resource_limit_exceeded"
+        if (
+            self.code
+            == ExtendFootprintTTLResultCode.EXTEND_FOOTPRINT_TTL_INSUFFICIENT_REFUNDABLE_FEE
+        ):
+            return "insufficient_refundable_fee"
+        raise ValueError(f"Unknown code in ExtendFootprintTTLResult: {self.code}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> ExtendFootprintTTLResult:
+        if json_value not in (
+            "success",
+            "malformed",
+            "resource_limit_exceeded",
+            "insufficient_refundable_fee",
+        ):
+            raise ValueError(
+                f"Unexpected string '{json_value}' for ExtendFootprintTTLResult, must be one of: success, malformed, resource_limit_exceeded, insufficient_refundable_fee"
+            )
+        code = ExtendFootprintTTLResultCode.from_json_dict(json_value)
+        return cls(code=code)
 
     def __hash__(self):
         return hash((self.code,))

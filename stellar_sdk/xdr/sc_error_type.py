@@ -3,10 +3,35 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_SC_ERROR_TYPE_MAP = {
+    0: "contract",
+    1: "wasm_vm",
+    2: "context",
+    3: "storage",
+    4: "object",
+    5: "crypto",
+    6: "events",
+    7: "budget",
+    8: "value",
+    9: "auth",
+}
+_SC_ERROR_TYPE_REVERSE_MAP = {
+    "contract": 0,
+    "wasm_vm": 1,
+    "context": 2,
+    "storage": 3,
+    "object": 4,
+    "crypto": 5,
+    "events": 6,
+    "budget": 7,
+    "value": 8,
+    "auth": 9,
+}
 __all__ = ["SCErrorType"]
 
 
@@ -56,7 +81,11 @@ class SCErrorType(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCErrorType:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -66,3 +95,17 @@ class SCErrorType(IntEnum):
     def from_xdr(cls, xdr: str) -> SCErrorType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCErrorType:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _SC_ERROR_TYPE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> SCErrorType:
+        return cls(_SC_ERROR_TYPE_REVERSE_MAP[json_value])

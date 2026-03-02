@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .uint64 import Uint64
 
 __all__ = ["UInt128Parts"]
@@ -34,9 +36,13 @@ class UInt128Parts:
         self.lo.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> UInt128Parts:
-        hi = Uint64.unpack(unpacker)
-        lo = Uint64.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> UInt128Parts:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        hi = Uint64.unpack(unpacker, depth_limit - 1)
+        lo = Uint64.unpack(unpacker, depth_limit - 1)
         return cls(
             hi=hi,
             lo=lo,
@@ -50,7 +56,11 @@ class UInt128Parts:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> UInt128Parts:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -60,6 +70,29 @@ class UInt128Parts:
     def from_xdr(cls, xdr: str) -> UInt128Parts:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> UInt128Parts:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        value_bytes = self.hi.uint64.to_bytes(
+            8, "big", signed=False
+        ) + self.lo.uint64.to_bytes(8, "big", signed=False)
+        return str(int.from_bytes(value_bytes, "big", signed=False))
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> UInt128Parts:
+        from .uint64 import Uint64
+
+        value_bytes = int(json_value).to_bytes(16, "big", signed=False)
+        return cls(
+            hi=Uint64(int.from_bytes(value_bytes[0:8], "big", signed=False)),
+            lo=Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
+        )
 
     def __hash__(self):
         return hash(

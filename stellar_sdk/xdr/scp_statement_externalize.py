@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
 from .scp_ballot import SCPBallot
 from .uint32 import Uint32
@@ -41,10 +43,14 @@ class SCPStatementExternalize:
         self.commit_quorum_set_hash.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SCPStatementExternalize:
-        commit = SCPBallot.unpack(unpacker)
-        n_h = Uint32.unpack(unpacker)
-        commit_quorum_set_hash = Hash.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SCPStatementExternalize:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        commit = SCPBallot.unpack(unpacker, depth_limit - 1)
+        n_h = Uint32.unpack(unpacker, depth_limit - 1)
+        commit_quorum_set_hash = Hash.unpack(unpacker, depth_limit - 1)
         return cls(
             commit=commit,
             n_h=n_h,
@@ -59,7 +65,11 @@ class SCPStatementExternalize:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCPStatementExternalize:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -69,6 +79,33 @@ class SCPStatementExternalize:
     def from_xdr(cls, xdr: str) -> SCPStatementExternalize:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCPStatementExternalize:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "commit": self.commit.to_json_dict(),
+            "n_h": self.n_h.to_json_dict(),
+            "commit_quorum_set_hash": self.commit_quorum_set_hash.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SCPStatementExternalize:
+        commit = SCPBallot.from_json_dict(json_dict["commit"])
+        n_h = Uint32.from_json_dict(json_dict["n_h"])
+        commit_quorum_set_hash = Hash.from_json_dict(
+            json_dict["commit_quorum_set_hash"]
+        )
+        return cls(
+            commit=commit,
+            n_h=n_h,
+            commit_quorum_set_hash=commit_quorum_set_hash,
+        )
 
     def __hash__(self):
         return hash(

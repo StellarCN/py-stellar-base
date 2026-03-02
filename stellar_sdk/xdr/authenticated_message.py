@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .authenticated_message_v0 import AuthenticatedMessageV0
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .uint32 import Uint32
 
 __all__ = ["AuthenticatedMessage"]
@@ -44,14 +46,19 @@ class AuthenticatedMessage:
                 raise ValueError("v0 should not be None.")
             self.v0.pack(packer)
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> AuthenticatedMessage:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> AuthenticatedMessage:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         v = Uint32.unpack(unpacker)
         if v.uint32 == 0:
-            v0 = AuthenticatedMessageV0.unpack(unpacker)
+            v0 = AuthenticatedMessageV0.unpack(unpacker, depth_limit - 1)
             return cls(v=v, v0=v0)
-        return cls(v=v)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -61,7 +68,11 @@ class AuthenticatedMessage:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> AuthenticatedMessage:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -71,6 +82,32 @@ class AuthenticatedMessage:
     def from_xdr(cls, xdr: str) -> AuthenticatedMessage:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> AuthenticatedMessage:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.v.uint32 == 0:
+            assert self.v0 is not None
+            return {"v0": self.v0.to_json_dict()}
+        raise ValueError(f"Unknown v in AuthenticatedMessage: {self.v}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: dict) -> AuthenticatedMessage:
+        if len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for AuthenticatedMessage, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        v = Uint32(int(key[1:]))
+        if key == "v0":
+            v0 = AuthenticatedMessageV0.from_json_dict(json_value["v0"])
+            return cls(v=v, v0=v0)
+        raise ValueError(f"Unknown key '{key}' for AuthenticatedMessage")
 
     def __hash__(self):
         return hash(
@@ -88,5 +125,6 @@ class AuthenticatedMessage:
     def __repr__(self):
         out = []
         out.append(f"v={self.v}")
-        out.append(f"v0={self.v0}") if self.v0 is not None else None
+        if self.v0 is not None:
+            out.append(f"v0={self.v0}")
         return f"<AuthenticatedMessage [{', '.join(out)}]>"

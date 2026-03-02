@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .int32 import Int32
 from .trust_line_entry_extension_v2_ext import TrustLineEntryExtensionV2Ext
 
@@ -42,9 +44,13 @@ class TrustLineEntryExtensionV2:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> TrustLineEntryExtensionV2:
-        liquidity_pool_use_count = Int32.unpack(unpacker)
-        ext = TrustLineEntryExtensionV2Ext.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TrustLineEntryExtensionV2:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        liquidity_pool_use_count = Int32.unpack(unpacker, depth_limit - 1)
+        ext = TrustLineEntryExtensionV2Ext.unpack(unpacker, depth_limit - 1)
         return cls(
             liquidity_pool_use_count=liquidity_pool_use_count,
             ext=ext,
@@ -58,7 +64,11 @@ class TrustLineEntryExtensionV2:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TrustLineEntryExtensionV2:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -68,6 +78,30 @@ class TrustLineEntryExtensionV2:
     def from_xdr(cls, xdr: str) -> TrustLineEntryExtensionV2:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TrustLineEntryExtensionV2:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "liquidity_pool_use_count": self.liquidity_pool_use_count.to_json_dict(),
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> TrustLineEntryExtensionV2:
+        liquidity_pool_use_count = Int32.from_json_dict(
+            json_dict["liquidity_pool_use_count"]
+        )
+        ext = TrustLineEntryExtensionV2Ext.from_json_dict(json_dict["ext"])
+        return cls(
+            liquidity_pool_use_count=liquidity_pool_use_count,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

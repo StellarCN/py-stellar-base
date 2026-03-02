@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
 from .asset_code12 import AssetCode12
+from .base import DEFAULT_XDR_MAX_DEPTH
 
 __all__ = ["AlphaNum12"]
 
@@ -36,9 +38,13 @@ class AlphaNum12:
         self.issuer.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> AlphaNum12:
-        asset_code = AssetCode12.unpack(unpacker)
-        issuer = AccountID.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> AlphaNum12:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        asset_code = AssetCode12.unpack(unpacker, depth_limit - 1)
+        issuer = AccountID.unpack(unpacker, depth_limit - 1)
         return cls(
             asset_code=asset_code,
             issuer=issuer,
@@ -52,7 +58,11 @@ class AlphaNum12:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> AlphaNum12:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -62,6 +72,28 @@ class AlphaNum12:
     def from_xdr(cls, xdr: str) -> AlphaNum12:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> AlphaNum12:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "asset_code": self.asset_code.to_json_dict(),
+            "issuer": self.issuer.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> AlphaNum12:
+        asset_code = AssetCode12.from_json_dict(json_dict["asset_code"])
+        issuer = AccountID.from_json_dict(json_dict["issuer"])
+        return cls(
+            asset_code=asset_code,
+            issuer=issuer,
+        )
 
     def __hash__(self):
         return hash(

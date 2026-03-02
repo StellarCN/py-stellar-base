@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_OFFER_ENTRY_FLAGS_MAP = {1: "passive_flag"}
+_OFFER_ENTRY_FLAGS_REVERSE_MAP = {"passive_flag": 1}
 __all__ = ["OfferEntryFlags"]
 
 
@@ -40,7 +43,11 @@ class OfferEntryFlags(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> OfferEntryFlags:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -50,3 +57,17 @@ class OfferEntryFlags(IntEnum):
     def from_xdr(cls, xdr: str) -> OfferEntryFlags:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> OfferEntryFlags:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _OFFER_ENTRY_FLAGS_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> OfferEntryFlags:
+        return cls(_OFFER_ENTRY_FLAGS_REVERSE_MAP[json_value])

@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Hyper
+from .base import DEFAULT_XDR_MAX_DEPTH, Hyper
 
 __all__ = ["Int64"]
 
@@ -25,7 +26,11 @@ class Int64:
         Hyper(self.int64).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> Int64:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> Int64:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         int64 = Hyper.unpack(unpacker)
         return cls(int64)
 
@@ -37,7 +42,11 @@ class Int64:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> Int64:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -48,8 +57,22 @@ class Int64:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> Int64:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        return Hyper.to_json_dict(self.int64)
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> Int64:
+        return cls(Hyper.from_json_dict(json_value))
+
     def __hash__(self):
-        return hash(self.int64)
+        return hash((self.int64,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

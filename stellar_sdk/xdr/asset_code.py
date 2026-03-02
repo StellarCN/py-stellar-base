@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
@@ -10,6 +11,7 @@ from xdrlib3 import Packer, Unpacker
 from .asset_code4 import AssetCode4
 from .asset_code12 import AssetCode12
 from .asset_type import AssetType
+from .base import DEFAULT_XDR_MAX_DEPTH
 
 __all__ = ["AssetCode"]
 
@@ -52,17 +54,22 @@ class AssetCode:
                 raise ValueError("asset_code12 should not be None.")
             self.asset_code12.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> AssetCode:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> AssetCode:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         type = AssetType.unpack(unpacker)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
-            asset_code4 = AssetCode4.unpack(unpacker)
+            asset_code4 = AssetCode4.unpack(unpacker, depth_limit - 1)
             return cls(type=type, asset_code4=asset_code4)
         if type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
-            asset_code12 = AssetCode12.unpack(unpacker)
+            asset_code12 = AssetCode12.unpack(unpacker, depth_limit - 1)
             return cls(type=type, asset_code12=asset_code12)
-        return cls(type=type)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -72,7 +79,11 @@ class AssetCode:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> AssetCode:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -82,6 +93,38 @@ class AssetCode:
     def from_xdr(cls, xdr: str) -> AssetCode:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> AssetCode:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
+            assert self.asset_code4 is not None
+            return {"credit_alphanum4": self.asset_code4.to_json_dict()}
+        if self.type == AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
+            assert self.asset_code12 is not None
+            return {"credit_alphanum12": self.asset_code12.to_json_dict()}
+        raise ValueError(f"Unknown type in AssetCode: {self.type}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: dict) -> AssetCode:
+        if len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for AssetCode, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        type = AssetType.from_json_dict(key)
+        if key == "credit_alphanum4":
+            asset_code4 = AssetCode4.from_json_dict(json_value["credit_alphanum4"])
+            return cls(type=type, asset_code4=asset_code4)
+        if key == "credit_alphanum12":
+            asset_code12 = AssetCode12.from_json_dict(json_value["credit_alphanum12"])
+            return cls(type=type, asset_code12=asset_code12)
+        raise ValueError(f"Unknown key '{key}' for AssetCode")
 
     def __hash__(self):
         return hash(
@@ -104,14 +147,8 @@ class AssetCode:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        (
+        if self.asset_code4 is not None:
             out.append(f"asset_code4={self.asset_code4}")
-            if self.asset_code4 is not None
-            else None
-        )
-        (
+        if self.asset_code12 is not None:
             out.append(f"asset_code12={self.asset_code12}")
-            if self.asset_code12 is not None
-            else None
-        )
         return f"<AssetCode [{', '.join(out)}]>"

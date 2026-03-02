@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .extension_point import ExtensionPoint
 from .uint32 import Uint32
 
@@ -71,18 +73,22 @@ class ContractCodeCostInputs:
         self.n_data_segment_bytes.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ContractCodeCostInputs:
-        ext = ExtensionPoint.unpack(unpacker)
-        n_instructions = Uint32.unpack(unpacker)
-        n_functions = Uint32.unpack(unpacker)
-        n_globals = Uint32.unpack(unpacker)
-        n_table_entries = Uint32.unpack(unpacker)
-        n_types = Uint32.unpack(unpacker)
-        n_data_segments = Uint32.unpack(unpacker)
-        n_elem_segments = Uint32.unpack(unpacker)
-        n_imports = Uint32.unpack(unpacker)
-        n_exports = Uint32.unpack(unpacker)
-        n_data_segment_bytes = Uint32.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ContractCodeCostInputs:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ext = ExtensionPoint.unpack(unpacker, depth_limit - 1)
+        n_instructions = Uint32.unpack(unpacker, depth_limit - 1)
+        n_functions = Uint32.unpack(unpacker, depth_limit - 1)
+        n_globals = Uint32.unpack(unpacker, depth_limit - 1)
+        n_table_entries = Uint32.unpack(unpacker, depth_limit - 1)
+        n_types = Uint32.unpack(unpacker, depth_limit - 1)
+        n_data_segments = Uint32.unpack(unpacker, depth_limit - 1)
+        n_elem_segments = Uint32.unpack(unpacker, depth_limit - 1)
+        n_imports = Uint32.unpack(unpacker, depth_limit - 1)
+        n_exports = Uint32.unpack(unpacker, depth_limit - 1)
+        n_data_segment_bytes = Uint32.unpack(unpacker, depth_limit - 1)
         return cls(
             ext=ext,
             n_instructions=n_instructions,
@@ -105,7 +111,11 @@ class ContractCodeCostInputs:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ContractCodeCostInputs:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -115,6 +125,55 @@ class ContractCodeCostInputs:
     def from_xdr(cls, xdr: str) -> ContractCodeCostInputs:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ContractCodeCostInputs:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ext": self.ext.to_json_dict(),
+            "n_instructions": self.n_instructions.to_json_dict(),
+            "n_functions": self.n_functions.to_json_dict(),
+            "n_globals": self.n_globals.to_json_dict(),
+            "n_table_entries": self.n_table_entries.to_json_dict(),
+            "n_types": self.n_types.to_json_dict(),
+            "n_data_segments": self.n_data_segments.to_json_dict(),
+            "n_elem_segments": self.n_elem_segments.to_json_dict(),
+            "n_imports": self.n_imports.to_json_dict(),
+            "n_exports": self.n_exports.to_json_dict(),
+            "n_data_segment_bytes": self.n_data_segment_bytes.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> ContractCodeCostInputs:
+        ext = ExtensionPoint.from_json_dict(json_dict["ext"])
+        n_instructions = Uint32.from_json_dict(json_dict["n_instructions"])
+        n_functions = Uint32.from_json_dict(json_dict["n_functions"])
+        n_globals = Uint32.from_json_dict(json_dict["n_globals"])
+        n_table_entries = Uint32.from_json_dict(json_dict["n_table_entries"])
+        n_types = Uint32.from_json_dict(json_dict["n_types"])
+        n_data_segments = Uint32.from_json_dict(json_dict["n_data_segments"])
+        n_elem_segments = Uint32.from_json_dict(json_dict["n_elem_segments"])
+        n_imports = Uint32.from_json_dict(json_dict["n_imports"])
+        n_exports = Uint32.from_json_dict(json_dict["n_exports"])
+        n_data_segment_bytes = Uint32.from_json_dict(json_dict["n_data_segment_bytes"])
+        return cls(
+            ext=ext,
+            n_instructions=n_instructions,
+            n_functions=n_functions,
+            n_globals=n_globals,
+            n_table_entries=n_table_entries,
+            n_types=n_types,
+            n_data_segments=n_data_segments,
+            n_elem_segments=n_elem_segments,
+            n_imports=n_imports,
+            n_exports=n_exports,
+            n_data_segment_bytes=n_data_segment_bytes,
+        )
 
     def __hash__(self):
         return hash(

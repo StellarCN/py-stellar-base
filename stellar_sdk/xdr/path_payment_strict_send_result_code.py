@@ -3,10 +3,41 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_PATH_PAYMENT_STRICT_SEND_RESULT_CODE_MAP = {
+    0: "success",
+    -1: "malformed",
+    -2: "underfunded",
+    -3: "src_no_trust",
+    -4: "src_not_authorized",
+    -5: "no_destination",
+    -6: "no_trust",
+    -7: "not_authorized",
+    -8: "line_full",
+    -9: "no_issuer",
+    -10: "too_few_offers",
+    -11: "offer_cross_self",
+    -12: "under_destmin",
+}
+_PATH_PAYMENT_STRICT_SEND_RESULT_CODE_REVERSE_MAP = {
+    "success": 0,
+    "malformed": -1,
+    "underfunded": -2,
+    "src_no_trust": -3,
+    "src_not_authorized": -4,
+    "no_destination": -5,
+    "no_trust": -6,
+    "not_authorized": -7,
+    "line_full": -8,
+    "no_issuer": -9,
+    "too_few_offers": -10,
+    "offer_cross_self": -11,
+    "under_destmin": -12,
+}
 __all__ = ["PathPaymentStrictSendResultCode"]
 
 
@@ -73,7 +104,11 @@ class PathPaymentStrictSendResultCode(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> PathPaymentStrictSendResultCode:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -83,3 +118,17 @@ class PathPaymentStrictSendResultCode(IntEnum):
     def from_xdr(cls, xdr: str) -> PathPaymentStrictSendResultCode:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> PathPaymentStrictSendResultCode:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _PATH_PAYMENT_STRICT_SEND_RESULT_CODE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> PathPaymentStrictSendResultCode:
+        return cls(_PATH_PAYMENT_STRICT_SEND_RESULT_CODE_REVERSE_MAP[json_value])

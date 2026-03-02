@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Opaque
 
 __all__ = ["Curve25519Public"]
 
@@ -25,13 +26,22 @@ class Curve25519Public:
         self,
         key: bytes,
     ) -> None:
+        _expect_length = 32
+        if key and len(key) != _expect_length:
+            raise ValueError(
+                f"The length of `key` should be {_expect_length}, but got {len(key)}."
+            )
         self.key = key
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.key, 32, True).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> Curve25519Public:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> Curve25519Public:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         key = Opaque.unpack(unpacker, 32, True)
         return cls(
             key=key,
@@ -45,7 +55,11 @@ class Curve25519Public:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> Curve25519Public:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -55,6 +69,25 @@ class Curve25519Public:
     def from_xdr(cls, xdr: str) -> Curve25519Public:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> Curve25519Public:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "key": Opaque.to_json_dict(self.key),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> Curve25519Public:
+        key = Opaque.from_json_dict(json_dict["key"])
+        return cls(
+            key=key,
+        )
 
     def __hash__(self):
         return hash((self.key,))

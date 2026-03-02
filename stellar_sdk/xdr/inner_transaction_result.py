@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .inner_transaction_result_ext import InnerTransactionResultExt
 from .inner_transaction_result_result import InnerTransactionResultResult
 from .int64 import Int64
@@ -74,10 +76,14 @@ class InnerTransactionResult:
         self.ext.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> InnerTransactionResult:
-        fee_charged = Int64.unpack(unpacker)
-        result = InnerTransactionResultResult.unpack(unpacker)
-        ext = InnerTransactionResultExt.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> InnerTransactionResult:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        fee_charged = Int64.unpack(unpacker, depth_limit - 1)
+        result = InnerTransactionResultResult.unpack(unpacker, depth_limit - 1)
+        ext = InnerTransactionResultExt.unpack(unpacker, depth_limit - 1)
         return cls(
             fee_charged=fee_charged,
             result=result,
@@ -92,7 +98,11 @@ class InnerTransactionResult:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> InnerTransactionResult:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -102,6 +112,31 @@ class InnerTransactionResult:
     def from_xdr(cls, xdr: str) -> InnerTransactionResult:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> InnerTransactionResult:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "fee_charged": self.fee_charged.to_json_dict(),
+            "result": self.result.to_json_dict(),
+            "ext": self.ext.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> InnerTransactionResult:
+        fee_charged = Int64.from_json_dict(json_dict["fee_charged"])
+        result = InnerTransactionResultResult.from_json_dict(json_dict["result"])
+        ext = InnerTransactionResultExt.from_json_dict(json_dict["ext"])
+        return cls(
+            fee_charged=fee_charged,
+            result=result,
+            ext=ext,
+        )
 
     def __hash__(self):
         return hash(

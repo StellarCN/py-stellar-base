@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .sc_address import SCAddress
 from .uint256 import Uint256
 
@@ -36,9 +38,13 @@ class ContractIDPreimageFromAddress:
         self.salt.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ContractIDPreimageFromAddress:
-        address = SCAddress.unpack(unpacker)
-        salt = Uint256.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ContractIDPreimageFromAddress:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        address = SCAddress.unpack(unpacker, depth_limit - 1)
+        salt = Uint256.unpack(unpacker, depth_limit - 1)
         return cls(
             address=address,
             salt=salt,
@@ -52,7 +58,11 @@ class ContractIDPreimageFromAddress:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ContractIDPreimageFromAddress:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -62,6 +72,28 @@ class ContractIDPreimageFromAddress:
     def from_xdr(cls, xdr: str) -> ContractIDPreimageFromAddress:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ContractIDPreimageFromAddress:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "address": self.address.to_json_dict(),
+            "salt": self.salt.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> ContractIDPreimageFromAddress:
+        address = SCAddress.from_json_dict(json_dict["address"])
+        salt = Uint256.from_json_dict(json_dict["salt"])
+        return cls(
+            address=address,
+            salt=salt,
+        )
 
     def __hash__(self):
         return hash(

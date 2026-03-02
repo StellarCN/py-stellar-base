@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .signer import Signer
 from .string32 import String32
 from .uint32 import Uint32
@@ -110,16 +112,42 @@ class SetOptionsOp:
             self.signer.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SetOptionsOp:
-        inflation_dest = AccountID.unpack(unpacker) if unpacker.unpack_uint() else None
-        clear_flags = Uint32.unpack(unpacker) if unpacker.unpack_uint() else None
-        set_flags = Uint32.unpack(unpacker) if unpacker.unpack_uint() else None
-        master_weight = Uint32.unpack(unpacker) if unpacker.unpack_uint() else None
-        low_threshold = Uint32.unpack(unpacker) if unpacker.unpack_uint() else None
-        med_threshold = Uint32.unpack(unpacker) if unpacker.unpack_uint() else None
-        high_threshold = Uint32.unpack(unpacker) if unpacker.unpack_uint() else None
-        home_domain = String32.unpack(unpacker) if unpacker.unpack_uint() else None
-        signer = Signer.unpack(unpacker) if unpacker.unpack_uint() else None
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SetOptionsOp:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        inflation_dest = (
+            AccountID.unpack(unpacker, depth_limit - 1)
+            if unpacker.unpack_uint()
+            else None
+        )
+        clear_flags = (
+            Uint32.unpack(unpacker, depth_limit - 1) if unpacker.unpack_uint() else None
+        )
+        set_flags = (
+            Uint32.unpack(unpacker, depth_limit - 1) if unpacker.unpack_uint() else None
+        )
+        master_weight = (
+            Uint32.unpack(unpacker, depth_limit - 1) if unpacker.unpack_uint() else None
+        )
+        low_threshold = (
+            Uint32.unpack(unpacker, depth_limit - 1) if unpacker.unpack_uint() else None
+        )
+        med_threshold = (
+            Uint32.unpack(unpacker, depth_limit - 1) if unpacker.unpack_uint() else None
+        )
+        high_threshold = (
+            Uint32.unpack(unpacker, depth_limit - 1) if unpacker.unpack_uint() else None
+        )
+        home_domain = (
+            String32.unpack(unpacker, depth_limit - 1)
+            if unpacker.unpack_uint()
+            else None
+        )
+        signer = (
+            Signer.unpack(unpacker, depth_limit - 1) if unpacker.unpack_uint() else None
+        )
         return cls(
             inflation_dest=inflation_dest,
             clear_flags=clear_flags,
@@ -140,7 +168,11 @@ class SetOptionsOp:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SetOptionsOp:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -150,6 +182,115 @@ class SetOptionsOp:
     def from_xdr(cls, xdr: str) -> SetOptionsOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SetOptionsOp:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "inflation_dest": (
+                self.inflation_dest.to_json_dict()
+                if self.inflation_dest is not None
+                else None
+            ),
+            "clear_flags": (
+                self.clear_flags.to_json_dict()
+                if self.clear_flags is not None
+                else None
+            ),
+            "set_flags": (
+                self.set_flags.to_json_dict() if self.set_flags is not None else None
+            ),
+            "master_weight": (
+                self.master_weight.to_json_dict()
+                if self.master_weight is not None
+                else None
+            ),
+            "low_threshold": (
+                self.low_threshold.to_json_dict()
+                if self.low_threshold is not None
+                else None
+            ),
+            "med_threshold": (
+                self.med_threshold.to_json_dict()
+                if self.med_threshold is not None
+                else None
+            ),
+            "high_threshold": (
+                self.high_threshold.to_json_dict()
+                if self.high_threshold is not None
+                else None
+            ),
+            "home_domain": (
+                self.home_domain.to_json_dict()
+                if self.home_domain is not None
+                else None
+            ),
+            "signer": self.signer.to_json_dict() if self.signer is not None else None,
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SetOptionsOp:
+        inflation_dest = (
+            AccountID.from_json_dict(json_dict["inflation_dest"])
+            if json_dict["inflation_dest"] is not None
+            else None
+        )
+        clear_flags = (
+            Uint32.from_json_dict(json_dict["clear_flags"])
+            if json_dict["clear_flags"] is not None
+            else None
+        )
+        set_flags = (
+            Uint32.from_json_dict(json_dict["set_flags"])
+            if json_dict["set_flags"] is not None
+            else None
+        )
+        master_weight = (
+            Uint32.from_json_dict(json_dict["master_weight"])
+            if json_dict["master_weight"] is not None
+            else None
+        )
+        low_threshold = (
+            Uint32.from_json_dict(json_dict["low_threshold"])
+            if json_dict["low_threshold"] is not None
+            else None
+        )
+        med_threshold = (
+            Uint32.from_json_dict(json_dict["med_threshold"])
+            if json_dict["med_threshold"] is not None
+            else None
+        )
+        high_threshold = (
+            Uint32.from_json_dict(json_dict["high_threshold"])
+            if json_dict["high_threshold"] is not None
+            else None
+        )
+        home_domain = (
+            String32.from_json_dict(json_dict["home_domain"])
+            if json_dict["home_domain"] is not None
+            else None
+        )
+        signer = (
+            Signer.from_json_dict(json_dict["signer"])
+            if json_dict["signer"] is not None
+            else None
+        )
+        return cls(
+            inflation_dest=inflation_dest,
+            clear_flags=clear_flags,
+            set_flags=set_flags,
+            master_weight=master_weight,
+            low_threshold=low_threshold,
+            med_threshold=med_threshold,
+            high_threshold=high_threshold,
+            home_domain=home_domain,
+            signer=signer,
+        )
 
     def __hash__(self):
         return hash(

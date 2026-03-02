@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .contract_event_body import ContractEventBody
 from .contract_event_type import ContractEventType
 from .contract_id import ContractID
@@ -64,11 +66,19 @@ class ContractEvent:
         self.body.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ContractEvent:
-        ext = ExtensionPoint.unpack(unpacker)
-        contract_id = ContractID.unpack(unpacker) if unpacker.unpack_uint() else None
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ContractEvent:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ext = ExtensionPoint.unpack(unpacker, depth_limit - 1)
+        contract_id = (
+            ContractID.unpack(unpacker, depth_limit - 1)
+            if unpacker.unpack_uint()
+            else None
+        )
         type = ContractEventType.unpack(unpacker)
-        body = ContractEventBody.unpack(unpacker)
+        body = ContractEventBody.unpack(unpacker, depth_limit - 1)
         return cls(
             ext=ext,
             contract_id=contract_id,
@@ -84,7 +94,11 @@ class ContractEvent:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ContractEvent:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -94,6 +108,42 @@ class ContractEvent:
     def from_xdr(cls, xdr: str) -> ContractEvent:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ContractEvent:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ext": self.ext.to_json_dict(),
+            "contract_id": (
+                self.contract_id.to_json_dict()
+                if self.contract_id is not None
+                else None
+            ),
+            "type": self.type.to_json_dict(),
+            "body": self.body.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> ContractEvent:
+        ext = ExtensionPoint.from_json_dict(json_dict["ext"])
+        contract_id = (
+            ContractID.from_json_dict(json_dict["contract_id"])
+            if json_dict["contract_id"] is not None
+            else None
+        )
+        type = ContractEventType.from_json_dict(json_dict["type"])
+        body = ContractEventBody.from_json_dict(json_dict["body"])
+        return cls(
+            ext=ext,
+            contract_id=contract_id,
+            type=type,
+            body=body,
+        )
 
     def __hash__(self):
         return hash(

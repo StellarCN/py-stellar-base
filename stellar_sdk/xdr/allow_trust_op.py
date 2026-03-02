@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
 from .asset_code import AssetCode
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .uint32 import Uint32
 
 __all__ = ["AllowTrustOp"]
@@ -43,10 +45,14 @@ class AllowTrustOp:
         self.authorize.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> AllowTrustOp:
-        trustor = AccountID.unpack(unpacker)
-        asset = AssetCode.unpack(unpacker)
-        authorize = Uint32.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> AllowTrustOp:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        trustor = AccountID.unpack(unpacker, depth_limit - 1)
+        asset = AssetCode.unpack(unpacker, depth_limit - 1)
+        authorize = Uint32.unpack(unpacker, depth_limit - 1)
         return cls(
             trustor=trustor,
             asset=asset,
@@ -61,7 +67,11 @@ class AllowTrustOp:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> AllowTrustOp:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -71,6 +81,31 @@ class AllowTrustOp:
     def from_xdr(cls, xdr: str) -> AllowTrustOp:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> AllowTrustOp:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "trustor": self.trustor.to_json_dict(),
+            "asset": self.asset.to_json_dict(),
+            "authorize": self.authorize.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> AllowTrustOp:
+        trustor = AccountID.from_json_dict(json_dict["trustor"])
+        asset = AssetCode.from_json_dict(json_dict["asset"])
+        authorize = Uint32.from_json_dict(json_dict["authorize"])
+        return cls(
+            trustor=trustor,
+            asset=asset,
+            authorize=authorize,
+        )
 
     def __hash__(self):
         return hash(

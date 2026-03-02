@@ -3,10 +3,31 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_LIQUIDITY_POOL_DEPOSIT_RESULT_CODE_MAP = {
+    0: "success",
+    -1: "malformed",
+    -2: "no_trust",
+    -3: "not_authorized",
+    -4: "underfunded",
+    -5: "line_full",
+    -6: "bad_price",
+    -7: "pool_full",
+}
+_LIQUIDITY_POOL_DEPOSIT_RESULT_CODE_REVERSE_MAP = {
+    "success": 0,
+    "malformed": -1,
+    "no_trust": -2,
+    "not_authorized": -3,
+    "underfunded": -4,
+    "line_full": -5,
+    "bad_price": -6,
+    "pool_full": -7,
+}
 __all__ = ["LiquidityPoolDepositResultCode"]
 
 
@@ -59,7 +80,11 @@ class LiquidityPoolDepositResultCode(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> LiquidityPoolDepositResultCode:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -69,3 +94,17 @@ class LiquidityPoolDepositResultCode(IntEnum):
     def from_xdr(cls, xdr: str) -> LiquidityPoolDepositResultCode:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> LiquidityPoolDepositResultCode:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _LIQUIDITY_POOL_DEPOSIT_RESULT_CODE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> LiquidityPoolDepositResultCode:
+        return cls(_LIQUIDITY_POOL_DEPOSIT_RESULT_CODE_REVERSE_MAP[json_value])

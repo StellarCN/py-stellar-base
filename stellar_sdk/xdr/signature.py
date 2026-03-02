@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Opaque
 
 __all__ = ["Signature"]
 
@@ -19,13 +20,22 @@ class Signature:
     """
 
     def __init__(self, signature: bytes) -> None:
+        _expect_max_length = 64
+        if signature and len(signature) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `signature` should be {_expect_max_length}, but got {len(signature)}."
+            )
         self.signature = signature
 
     def pack(self, packer: Packer) -> None:
         Opaque(self.signature, 64, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> Signature:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> Signature:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         signature = Opaque.unpack(unpacker, 64, False)
         return cls(signature)
 
@@ -37,7 +47,11 @@ class Signature:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> Signature:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -48,8 +62,22 @@ class Signature:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
 
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> Signature:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        return Opaque.to_json_dict(self.signature)
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> Signature:
+        return cls(Opaque.from_json_dict(json_value))
+
     def __hash__(self):
-        return hash(self.signature)
+        return hash((self.signature,))
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):

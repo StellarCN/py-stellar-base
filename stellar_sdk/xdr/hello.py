@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .auth_cert import AuthCert
-from .base import Integer, String
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, String
 from .hash import Hash
 from .node_id import NodeID
 from .uint32 import Uint32
@@ -46,6 +47,11 @@ class Hello:
         cert: AuthCert,
         nonce: Uint256,
     ) -> None:
+        _expect_max_length = 100
+        if version_str and len(version_str) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `version_str` should be {_expect_max_length}, but got {len(version_str)}."
+            )
         self.ledger_version = ledger_version
         self.overlay_version = overlay_version
         self.overlay_min_version = overlay_min_version
@@ -68,16 +74,20 @@ class Hello:
         self.nonce.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> Hello:
-        ledger_version = Uint32.unpack(unpacker)
-        overlay_version = Uint32.unpack(unpacker)
-        overlay_min_version = Uint32.unpack(unpacker)
-        network_id = Hash.unpack(unpacker)
-        version_str = String.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> Hello:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ledger_version = Uint32.unpack(unpacker, depth_limit - 1)
+        overlay_version = Uint32.unpack(unpacker, depth_limit - 1)
+        overlay_min_version = Uint32.unpack(unpacker, depth_limit - 1)
+        network_id = Hash.unpack(unpacker, depth_limit - 1)
+        version_str = String.unpack(unpacker, 100)
         listening_port = Integer.unpack(unpacker)
-        peer_id = NodeID.unpack(unpacker)
-        cert = AuthCert.unpack(unpacker)
-        nonce = Uint256.unpack(unpacker)
+        peer_id = NodeID.unpack(unpacker, depth_limit - 1)
+        cert = AuthCert.unpack(unpacker, depth_limit - 1)
+        nonce = Uint256.unpack(unpacker, depth_limit - 1)
         return cls(
             ledger_version=ledger_version,
             overlay_version=overlay_version,
@@ -98,7 +108,11 @@ class Hello:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> Hello:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -108,6 +122,49 @@ class Hello:
     def from_xdr(cls, xdr: str) -> Hello:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> Hello:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ledger_version": self.ledger_version.to_json_dict(),
+            "overlay_version": self.overlay_version.to_json_dict(),
+            "overlay_min_version": self.overlay_min_version.to_json_dict(),
+            "network_id": self.network_id.to_json_dict(),
+            "version_str": String.to_json_dict(self.version_str),
+            "listening_port": Integer.to_json_dict(self.listening_port),
+            "peer_id": self.peer_id.to_json_dict(),
+            "cert": self.cert.to_json_dict(),
+            "nonce": self.nonce.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> Hello:
+        ledger_version = Uint32.from_json_dict(json_dict["ledger_version"])
+        overlay_version = Uint32.from_json_dict(json_dict["overlay_version"])
+        overlay_min_version = Uint32.from_json_dict(json_dict["overlay_min_version"])
+        network_id = Hash.from_json_dict(json_dict["network_id"])
+        version_str = String.from_json_dict(json_dict["version_str"])
+        listening_port = Integer.from_json_dict(json_dict["listening_port"])
+        peer_id = NodeID.from_json_dict(json_dict["peer_id"])
+        cert = AuthCert.from_json_dict(json_dict["cert"])
+        nonce = Uint256.from_json_dict(json_dict["nonce"])
+        return cls(
+            ledger_version=ledger_version,
+            overlay_version=overlay_version,
+            overlay_min_version=overlay_min_version,
+            network_id=network_id,
+            version_str=version_str,
+            listening_port=listening_port,
+            peer_id=peer_id,
+            cert=cert,
+            nonce=nonce,
+        )
 
     def __hash__(self):
         return hash(

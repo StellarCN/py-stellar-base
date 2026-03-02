@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
 from .transaction_signature_payload_tagged_transaction import (
     TransactionSignaturePayloadTaggedTransaction,
@@ -46,10 +48,14 @@ class TransactionSignaturePayload:
         self.tagged_transaction.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> TransactionSignaturePayload:
-        network_id = Hash.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TransactionSignaturePayload:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        network_id = Hash.unpack(unpacker, depth_limit - 1)
         tagged_transaction = TransactionSignaturePayloadTaggedTransaction.unpack(
-            unpacker
+            unpacker, depth_limit - 1
         )
         return cls(
             network_id=network_id,
@@ -64,7 +70,11 @@ class TransactionSignaturePayload:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TransactionSignaturePayload:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -74,6 +84,32 @@ class TransactionSignaturePayload:
     def from_xdr(cls, xdr: str) -> TransactionSignaturePayload:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TransactionSignaturePayload:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "network_id": self.network_id.to_json_dict(),
+            "tagged_transaction": self.tagged_transaction.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> TransactionSignaturePayload:
+        network_id = Hash.from_json_dict(json_dict["network_id"])
+        tagged_transaction = (
+            TransactionSignaturePayloadTaggedTransaction.from_json_dict(
+                json_dict["tagged_transaction"]
+            )
+        )
+        return cls(
+            network_id=network_id,
+            tagged_transaction=tagged_transaction,
+        )
 
     def __hash__(self):
         return hash(

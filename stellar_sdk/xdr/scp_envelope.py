@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .scp_statement import SCPStatement
 from .signature import Signature
 
@@ -36,9 +38,13 @@ class SCPEnvelope:
         self.signature.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SCPEnvelope:
-        statement = SCPStatement.unpack(unpacker)
-        signature = Signature.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SCPEnvelope:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        statement = SCPStatement.unpack(unpacker, depth_limit - 1)
+        signature = Signature.unpack(unpacker, depth_limit - 1)
         return cls(
             statement=statement,
             signature=signature,
@@ -52,7 +58,11 @@ class SCPEnvelope:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCPEnvelope:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -62,6 +72,28 @@ class SCPEnvelope:
     def from_xdr(cls, xdr: str) -> SCPEnvelope:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCPEnvelope:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "statement": self.statement.to_json_dict(),
+            "signature": self.signature.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SCPEnvelope:
+        statement = SCPStatement.from_json_dict(json_dict["statement"])
+        signature = Signature.from_json_dict(json_dict["signature"])
+        return cls(
+            statement=statement,
+            signature=signature,
+        )
 
     def __hash__(self):
         return hash(

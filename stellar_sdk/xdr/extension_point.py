@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Integer
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 
 __all__ = ["ExtensionPoint"]
 
@@ -32,13 +33,18 @@ class ExtensionPoint:
         Integer(self.v).pack(packer)
         if self.v == 0:
             return
+        raise ValueError("Invalid v.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ExtensionPoint:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ExtensionPoint:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         v = Integer.unpack(unpacker)
         if v == 0:
             return cls(v=v)
-        return cls(v=v)
+        raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -48,7 +54,11 @@ class ExtensionPoint:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ExtensionPoint:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -58,6 +68,27 @@ class ExtensionPoint:
     def from_xdr(cls, xdr: str) -> ExtensionPoint:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ExtensionPoint:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.v == 0:
+            return "v0"
+        raise ValueError(f"Unknown v in ExtensionPoint: {self.v}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> ExtensionPoint:
+        if json_value not in ("v0",):
+            raise ValueError(
+                f"Unexpected string '{json_value}' for ExtensionPoint, must be one of: v0"
+            )
+        v = int(json_value[1:])
+        return cls(v=v)
 
     def __hash__(self):
         return hash((self.v,))

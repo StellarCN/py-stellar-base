@@ -3,10 +3,23 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_SIGNER_KEY_TYPE_MAP = {
+    0: "ed25519",
+    1: "pre_auth_tx",
+    2: "hash_x",
+    3: "ed25519_signed_payload",
+}
+_SIGNER_KEY_TYPE_REVERSE_MAP = {
+    "ed25519": 0,
+    "pre_auth_tx": 1,
+    "hash_x": 2,
+    "ed25519_signed_payload": 3,
+}
 __all__ = ["SignerKeyType"]
 
 
@@ -44,7 +57,11 @@ class SignerKeyType(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SignerKeyType:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -54,3 +71,17 @@ class SignerKeyType(IntEnum):
     def from_xdr(cls, xdr: str) -> SignerKeyType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SignerKeyType:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _SIGNER_KEY_TYPE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> SignerKeyType:
+        return cls(_SIGNER_KEY_TYPE_REVERSE_MAP[json_value])

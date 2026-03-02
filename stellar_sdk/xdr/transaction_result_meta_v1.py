@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .extension_point import ExtensionPoint
 from .ledger_entry_changes import LedgerEntryChanges
 from .transaction_meta import TransactionMeta
@@ -52,12 +54,18 @@ class TransactionResultMetaV1:
         self.post_tx_apply_fee_processing.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> TransactionResultMetaV1:
-        ext = ExtensionPoint.unpack(unpacker)
-        result = TransactionResultPair.unpack(unpacker)
-        fee_processing = LedgerEntryChanges.unpack(unpacker)
-        tx_apply_processing = TransactionMeta.unpack(unpacker)
-        post_tx_apply_fee_processing = LedgerEntryChanges.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TransactionResultMetaV1:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ext = ExtensionPoint.unpack(unpacker, depth_limit - 1)
+        result = TransactionResultPair.unpack(unpacker, depth_limit - 1)
+        fee_processing = LedgerEntryChanges.unpack(unpacker, depth_limit - 1)
+        tx_apply_processing = TransactionMeta.unpack(unpacker, depth_limit - 1)
+        post_tx_apply_fee_processing = LedgerEntryChanges.unpack(
+            unpacker, depth_limit - 1
+        )
         return cls(
             ext=ext,
             result=result,
@@ -74,7 +82,11 @@ class TransactionResultMetaV1:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> TransactionResultMetaV1:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -84,6 +96,41 @@ class TransactionResultMetaV1:
     def from_xdr(cls, xdr: str) -> TransactionResultMetaV1:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> TransactionResultMetaV1:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ext": self.ext.to_json_dict(),
+            "result": self.result.to_json_dict(),
+            "fee_processing": self.fee_processing.to_json_dict(),
+            "tx_apply_processing": self.tx_apply_processing.to_json_dict(),
+            "post_tx_apply_fee_processing": self.post_tx_apply_fee_processing.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> TransactionResultMetaV1:
+        ext = ExtensionPoint.from_json_dict(json_dict["ext"])
+        result = TransactionResultPair.from_json_dict(json_dict["result"])
+        fee_processing = LedgerEntryChanges.from_json_dict(json_dict["fee_processing"])
+        tx_apply_processing = TransactionMeta.from_json_dict(
+            json_dict["tx_apply_processing"]
+        )
+        post_tx_apply_fee_processing = LedgerEntryChanges.from_json_dict(
+            json_dict["post_tx_apply_fee_processing"]
+        )
+        return cls(
+            ext=ext,
+            result=result,
+            fee_processing=fee_processing,
+            tx_apply_processing=tx_apply_processing,
+            post_tx_apply_fee_processing=post_tx_apply_fee_processing,
+        )
 
     def __hash__(self):
         return hash(

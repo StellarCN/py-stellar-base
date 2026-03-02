@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .int64 import Int64
 from .uint32 import Uint32
 
@@ -105,22 +107,26 @@ class ConfigSettingContractLedgerCostV0:
         self.soroban_state_rent_fee_growth_factor.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ConfigSettingContractLedgerCostV0:
-        ledger_max_disk_read_entries = Uint32.unpack(unpacker)
-        ledger_max_disk_read_bytes = Uint32.unpack(unpacker)
-        ledger_max_write_ledger_entries = Uint32.unpack(unpacker)
-        ledger_max_write_bytes = Uint32.unpack(unpacker)
-        tx_max_disk_read_entries = Uint32.unpack(unpacker)
-        tx_max_disk_read_bytes = Uint32.unpack(unpacker)
-        tx_max_write_ledger_entries = Uint32.unpack(unpacker)
-        tx_max_write_bytes = Uint32.unpack(unpacker)
-        fee_disk_read_ledger_entry = Int64.unpack(unpacker)
-        fee_write_ledger_entry = Int64.unpack(unpacker)
-        fee_disk_read1_kb = Int64.unpack(unpacker)
-        soroban_state_target_size_bytes = Int64.unpack(unpacker)
-        rent_fee1_kb_soroban_state_size_low = Int64.unpack(unpacker)
-        rent_fee1_kb_soroban_state_size_high = Int64.unpack(unpacker)
-        soroban_state_rent_fee_growth_factor = Uint32.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ConfigSettingContractLedgerCostV0:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ledger_max_disk_read_entries = Uint32.unpack(unpacker, depth_limit - 1)
+        ledger_max_disk_read_bytes = Uint32.unpack(unpacker, depth_limit - 1)
+        ledger_max_write_ledger_entries = Uint32.unpack(unpacker, depth_limit - 1)
+        ledger_max_write_bytes = Uint32.unpack(unpacker, depth_limit - 1)
+        tx_max_disk_read_entries = Uint32.unpack(unpacker, depth_limit - 1)
+        tx_max_disk_read_bytes = Uint32.unpack(unpacker, depth_limit - 1)
+        tx_max_write_ledger_entries = Uint32.unpack(unpacker, depth_limit - 1)
+        tx_max_write_bytes = Uint32.unpack(unpacker, depth_limit - 1)
+        fee_disk_read_ledger_entry = Int64.unpack(unpacker, depth_limit - 1)
+        fee_write_ledger_entry = Int64.unpack(unpacker, depth_limit - 1)
+        fee_disk_read1_kb = Int64.unpack(unpacker, depth_limit - 1)
+        soroban_state_target_size_bytes = Int64.unpack(unpacker, depth_limit - 1)
+        rent_fee1_kb_soroban_state_size_low = Int64.unpack(unpacker, depth_limit - 1)
+        rent_fee1_kb_soroban_state_size_high = Int64.unpack(unpacker, depth_limit - 1)
+        soroban_state_rent_fee_growth_factor = Uint32.unpack(unpacker, depth_limit - 1)
         return cls(
             ledger_max_disk_read_entries=ledger_max_disk_read_entries,
             ledger_max_disk_read_bytes=ledger_max_disk_read_bytes,
@@ -147,7 +153,11 @@ class ConfigSettingContractLedgerCostV0:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ConfigSettingContractLedgerCostV0:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -157,6 +167,93 @@ class ConfigSettingContractLedgerCostV0:
     def from_xdr(cls, xdr: str) -> ConfigSettingContractLedgerCostV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ConfigSettingContractLedgerCostV0:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ledger_max_disk_read_entries": self.ledger_max_disk_read_entries.to_json_dict(),
+            "ledger_max_disk_read_bytes": self.ledger_max_disk_read_bytes.to_json_dict(),
+            "ledger_max_write_ledger_entries": self.ledger_max_write_ledger_entries.to_json_dict(),
+            "ledger_max_write_bytes": self.ledger_max_write_bytes.to_json_dict(),
+            "tx_max_disk_read_entries": self.tx_max_disk_read_entries.to_json_dict(),
+            "tx_max_disk_read_bytes": self.tx_max_disk_read_bytes.to_json_dict(),
+            "tx_max_write_ledger_entries": self.tx_max_write_ledger_entries.to_json_dict(),
+            "tx_max_write_bytes": self.tx_max_write_bytes.to_json_dict(),
+            "fee_disk_read_ledger_entry": self.fee_disk_read_ledger_entry.to_json_dict(),
+            "fee_write_ledger_entry": self.fee_write_ledger_entry.to_json_dict(),
+            "fee_disk_read1_kb": self.fee_disk_read1_kb.to_json_dict(),
+            "soroban_state_target_size_bytes": self.soroban_state_target_size_bytes.to_json_dict(),
+            "rent_fee1_kb_soroban_state_size_low": self.rent_fee1_kb_soroban_state_size_low.to_json_dict(),
+            "rent_fee1_kb_soroban_state_size_high": self.rent_fee1_kb_soroban_state_size_high.to_json_dict(),
+            "soroban_state_rent_fee_growth_factor": self.soroban_state_rent_fee_growth_factor.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> ConfigSettingContractLedgerCostV0:
+        ledger_max_disk_read_entries = Uint32.from_json_dict(
+            json_dict["ledger_max_disk_read_entries"]
+        )
+        ledger_max_disk_read_bytes = Uint32.from_json_dict(
+            json_dict["ledger_max_disk_read_bytes"]
+        )
+        ledger_max_write_ledger_entries = Uint32.from_json_dict(
+            json_dict["ledger_max_write_ledger_entries"]
+        )
+        ledger_max_write_bytes = Uint32.from_json_dict(
+            json_dict["ledger_max_write_bytes"]
+        )
+        tx_max_disk_read_entries = Uint32.from_json_dict(
+            json_dict["tx_max_disk_read_entries"]
+        )
+        tx_max_disk_read_bytes = Uint32.from_json_dict(
+            json_dict["tx_max_disk_read_bytes"]
+        )
+        tx_max_write_ledger_entries = Uint32.from_json_dict(
+            json_dict["tx_max_write_ledger_entries"]
+        )
+        tx_max_write_bytes = Uint32.from_json_dict(json_dict["tx_max_write_bytes"])
+        fee_disk_read_ledger_entry = Int64.from_json_dict(
+            json_dict["fee_disk_read_ledger_entry"]
+        )
+        fee_write_ledger_entry = Int64.from_json_dict(
+            json_dict["fee_write_ledger_entry"]
+        )
+        fee_disk_read1_kb = Int64.from_json_dict(json_dict["fee_disk_read1_kb"])
+        soroban_state_target_size_bytes = Int64.from_json_dict(
+            json_dict["soroban_state_target_size_bytes"]
+        )
+        rent_fee1_kb_soroban_state_size_low = Int64.from_json_dict(
+            json_dict["rent_fee1_kb_soroban_state_size_low"]
+        )
+        rent_fee1_kb_soroban_state_size_high = Int64.from_json_dict(
+            json_dict["rent_fee1_kb_soroban_state_size_high"]
+        )
+        soroban_state_rent_fee_growth_factor = Uint32.from_json_dict(
+            json_dict["soroban_state_rent_fee_growth_factor"]
+        )
+        return cls(
+            ledger_max_disk_read_entries=ledger_max_disk_read_entries,
+            ledger_max_disk_read_bytes=ledger_max_disk_read_bytes,
+            ledger_max_write_ledger_entries=ledger_max_write_ledger_entries,
+            ledger_max_write_bytes=ledger_max_write_bytes,
+            tx_max_disk_read_entries=tx_max_disk_read_entries,
+            tx_max_disk_read_bytes=tx_max_disk_read_bytes,
+            tx_max_write_ledger_entries=tx_max_write_ledger_entries,
+            tx_max_write_bytes=tx_max_write_bytes,
+            fee_disk_read_ledger_entry=fee_disk_read_ledger_entry,
+            fee_write_ledger_entry=fee_write_ledger_entry,
+            fee_disk_read1_kb=fee_disk_read1_kb,
+            soroban_state_target_size_bytes=soroban_state_target_size_bytes,
+            rent_fee1_kb_soroban_state_size_low=rent_fee1_kb_soroban_state_size_low,
+            rent_fee1_kb_soroban_state_size_high=rent_fee1_kb_soroban_state_size_high,
+            soroban_state_rent_fee_growth_factor=soroban_state_rent_fee_growth_factor,
+        )
 
     def __hash__(self):
         return hash(

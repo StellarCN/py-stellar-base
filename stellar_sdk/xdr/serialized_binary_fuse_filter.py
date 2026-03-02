@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, Opaque
 from .binary_fuse_filter_type import BinaryFuseFilterType
 from .short_hash_seed import ShortHashSeed
 from .uint32 import Uint32
@@ -50,6 +51,11 @@ class SerializedBinaryFuseFilter:
         fingerprint_length: Uint32,
         fingerprints: bytes,
     ) -> None:
+        _expect_max_length = 4294967295
+        if fingerprints and len(fingerprints) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `fingerprints` should be {_expect_max_length}, but got {len(fingerprints)}."
+            )
         self.type = type
         self.input_hash_seed = input_hash_seed
         self.filter_seed = filter_seed
@@ -72,15 +78,19 @@ class SerializedBinaryFuseFilter:
         Opaque(self.fingerprints, 4294967295, False).pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SerializedBinaryFuseFilter:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SerializedBinaryFuseFilter:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         type = BinaryFuseFilterType.unpack(unpacker)
-        input_hash_seed = ShortHashSeed.unpack(unpacker)
-        filter_seed = ShortHashSeed.unpack(unpacker)
-        segment_length = Uint32.unpack(unpacker)
-        segement_length_mask = Uint32.unpack(unpacker)
-        segment_count = Uint32.unpack(unpacker)
-        segment_count_length = Uint32.unpack(unpacker)
-        fingerprint_length = Uint32.unpack(unpacker)
+        input_hash_seed = ShortHashSeed.unpack(unpacker, depth_limit - 1)
+        filter_seed = ShortHashSeed.unpack(unpacker, depth_limit - 1)
+        segment_length = Uint32.unpack(unpacker, depth_limit - 1)
+        segement_length_mask = Uint32.unpack(unpacker, depth_limit - 1)
+        segment_count = Uint32.unpack(unpacker, depth_limit - 1)
+        segment_count_length = Uint32.unpack(unpacker, depth_limit - 1)
+        fingerprint_length = Uint32.unpack(unpacker, depth_limit - 1)
         fingerprints = Opaque.unpack(unpacker, 4294967295, False)
         return cls(
             type=type,
@@ -102,7 +112,11 @@ class SerializedBinaryFuseFilter:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SerializedBinaryFuseFilter:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -112,6 +126,49 @@ class SerializedBinaryFuseFilter:
     def from_xdr(cls, xdr: str) -> SerializedBinaryFuseFilter:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SerializedBinaryFuseFilter:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "type": self.type.to_json_dict(),
+            "input_hash_seed": self.input_hash_seed.to_json_dict(),
+            "filter_seed": self.filter_seed.to_json_dict(),
+            "segment_length": self.segment_length.to_json_dict(),
+            "segement_length_mask": self.segement_length_mask.to_json_dict(),
+            "segment_count": self.segment_count.to_json_dict(),
+            "segment_count_length": self.segment_count_length.to_json_dict(),
+            "fingerprint_length": self.fingerprint_length.to_json_dict(),
+            "fingerprints": Opaque.to_json_dict(self.fingerprints),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> SerializedBinaryFuseFilter:
+        type = BinaryFuseFilterType.from_json_dict(json_dict["type"])
+        input_hash_seed = ShortHashSeed.from_json_dict(json_dict["input_hash_seed"])
+        filter_seed = ShortHashSeed.from_json_dict(json_dict["filter_seed"])
+        segment_length = Uint32.from_json_dict(json_dict["segment_length"])
+        segement_length_mask = Uint32.from_json_dict(json_dict["segement_length_mask"])
+        segment_count = Uint32.from_json_dict(json_dict["segment_count"])
+        segment_count_length = Uint32.from_json_dict(json_dict["segment_count_length"])
+        fingerprint_length = Uint32.from_json_dict(json_dict["fingerprint_length"])
+        fingerprints = Opaque.from_json_dict(json_dict["fingerprints"])
+        return cls(
+            type=type,
+            input_hash_seed=input_hash_seed,
+            filter_seed=filter_seed,
+            segment_length=segment_length,
+            segement_length_mask=segement_length_mask,
+            segment_count=segment_count,
+            segment_count_length=segment_count_length,
+            fingerprint_length=fingerprint_length,
+            fingerprints=fingerprints,
+        )
 
     def __hash__(self):
         return hash(

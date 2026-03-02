@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
 from .signer_key_type import SignerKeyType
 from .uint256 import Uint256
@@ -75,23 +77,30 @@ class SignerKey:
                 raise ValueError("ed25519_signed_payload should not be None.")
             self.ed25519_signed_payload.pack(packer)
             return
+        raise ValueError("Invalid type.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SignerKey:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SignerKey:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         type = SignerKeyType.unpack(unpacker)
         if type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
-            ed25519 = Uint256.unpack(unpacker)
+            ed25519 = Uint256.unpack(unpacker, depth_limit - 1)
             return cls(type=type, ed25519=ed25519)
         if type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
-            pre_auth_tx = Uint256.unpack(unpacker)
+            pre_auth_tx = Uint256.unpack(unpacker, depth_limit - 1)
             return cls(type=type, pre_auth_tx=pre_auth_tx)
         if type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
-            hash_x = Uint256.unpack(unpacker)
+            hash_x = Uint256.unpack(unpacker, depth_limit - 1)
             return cls(type=type, hash_x=hash_x)
         if type == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD:
-            ed25519_signed_payload = SignerKeyEd25519SignedPayload.unpack(unpacker)
+            ed25519_signed_payload = SignerKeyEd25519SignedPayload.unpack(
+                unpacker, depth_limit - 1
+            )
             return cls(type=type, ed25519_signed_payload=ed25519_signed_payload)
-        return cls(type=type)
+        raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -101,7 +110,11 @@ class SignerKey:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SignerKey:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -111,6 +124,66 @@ class SignerKey:
     def from_xdr(cls, xdr: str) -> SignerKey:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SignerKey:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        from ..strkey import StrKey
+        from .signer_key_type import SignerKeyType
+
+        if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
+            assert self.ed25519 is not None
+            return StrKey.encode_ed25519_public_key(self.ed25519.uint256)
+        if self.type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
+            assert self.pre_auth_tx is not None
+            return StrKey.encode_pre_auth_tx(self.pre_auth_tx.uint256)
+        if self.type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
+            assert self.hash_x is not None
+            return StrKey.encode_sha256_hash(self.hash_x.uint256)
+        if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD:
+            assert self.ed25519_signed_payload is not None
+            from xdrlib3 import Packer as _Packer
+
+            packer = _Packer()
+            self.ed25519_signed_payload.pack(packer)
+            return StrKey.encode_ed25519_signed_payload(packer.get_buffer())
+        raise ValueError(f"Unknown SignerKey type: {self.type}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> SignerKey:
+        from ..strkey import StrKey
+        from .signer_key_type import SignerKeyType
+        from .uint256 import Uint256
+
+        if json_value.startswith("G"):
+            raw = StrKey.decode_ed25519_public_key(json_value)
+            return cls(type=SignerKeyType.SIGNER_KEY_TYPE_ED25519, ed25519=Uint256(raw))
+        if json_value.startswith("T"):
+            raw = StrKey.decode_pre_auth_tx(json_value)
+            return cls(
+                type=SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX, pre_auth_tx=Uint256(raw)
+            )
+        if json_value.startswith("X"):
+            raw = StrKey.decode_sha256_hash(json_value)
+            return cls(type=SignerKeyType.SIGNER_KEY_TYPE_HASH_X, hash_x=Uint256(raw))
+        if json_value.startswith("P"):
+            from xdrlib3 import Unpacker as _Unpacker
+
+            from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
+
+            raw = StrKey.decode_ed25519_signed_payload(json_value)
+            unpacker = _Unpacker(raw)
+            payload = SignerKeyEd25519SignedPayload.unpack(unpacker)
+            return cls(
+                type=SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD,
+                ed25519_signed_payload=payload,
+            )
+        raise ValueError(f"Invalid SignerKey strkey: {json_value}")
 
     def __hash__(self):
         return hash(
@@ -137,16 +210,12 @@ class SignerKey:
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
-        out.append(f"ed25519={self.ed25519}") if self.ed25519 is not None else None
-        (
+        if self.ed25519 is not None:
+            out.append(f"ed25519={self.ed25519}")
+        if self.pre_auth_tx is not None:
             out.append(f"pre_auth_tx={self.pre_auth_tx}")
-            if self.pre_auth_tx is not None
-            else None
-        )
-        out.append(f"hash_x={self.hash_x}") if self.hash_x is not None else None
-        (
+        if self.hash_x is not None:
+            out.append(f"hash_x={self.hash_x}")
+        if self.ed25519_signed_payload is not None:
             out.append(f"ed25519_signed_payload={self.ed25519_signed_payload}")
-            if self.ed25519_signed_payload is not None
-            else None
-        )
         return f"<SignerKey [{', '.join(out)}]>"

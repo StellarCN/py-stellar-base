@@ -3,10 +3,35 @@
 from __future__ import annotations
 
 import base64
+import json
 from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+_ENVELOPE_TYPE_MAP = {
+    0: "tx_v0",
+    1: "scp",
+    2: "tx",
+    3: "auth",
+    4: "scpvalue",
+    5: "tx_fee_bump",
+    6: "op_id",
+    7: "pool_revoke_op_id",
+    8: "contract_id",
+    9: "soroban_authorization",
+}
+_ENVELOPE_TYPE_REVERSE_MAP = {
+    "tx_v0": 0,
+    "scp": 1,
+    "tx": 2,
+    "auth": 3,
+    "scpvalue": 4,
+    "tx_fee_bump": 5,
+    "op_id": 6,
+    "pool_revoke_op_id": 7,
+    "contract_id": 8,
+    "soroban_authorization": 9,
+}
 __all__ = ["EnvelopeType"]
 
 
@@ -56,7 +81,11 @@ class EnvelopeType(IntEnum):
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> EnvelopeType:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -66,3 +95,17 @@ class EnvelopeType(IntEnum):
     def from_xdr(cls, xdr: str) -> EnvelopeType:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> EnvelopeType:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> str:
+        return _ENVELOPE_TYPE_MAP[self.value]
+
+    @classmethod
+    def from_json_dict(cls, json_value: str) -> EnvelopeType:
+        return cls(_ENVELOPE_TYPE_REVERSE_MAP[json_value])

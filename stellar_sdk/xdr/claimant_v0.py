@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .claim_predicate import ClaimPredicate
 
 __all__ = ["ClaimantV0"]
@@ -36,9 +38,13 @@ class ClaimantV0:
         self.predicate.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> ClaimantV0:
-        destination = AccountID.unpack(unpacker)
-        predicate = ClaimPredicate.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ClaimantV0:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        destination = AccountID.unpack(unpacker, depth_limit - 1)
+        predicate = ClaimPredicate.unpack(unpacker, depth_limit - 1)
         return cls(
             destination=destination,
             predicate=predicate,
@@ -52,7 +58,11 @@ class ClaimantV0:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> ClaimantV0:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -62,6 +72,28 @@ class ClaimantV0:
     def from_xdr(cls, xdr: str) -> ClaimantV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> ClaimantV0:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "destination": self.destination.to_json_dict(),
+            "predicate": self.predicate.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> ClaimantV0:
+        destination = AccountID.from_json_dict(json_dict["destination"])
+        predicate = ClaimPredicate.from_json_dict(json_dict["predicate"])
+        return cls(
+            destination=destination,
+            predicate=predicate,
+        )
 
     def __hash__(self):
         return hash(

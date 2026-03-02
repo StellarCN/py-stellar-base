@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import base64
+import json
 from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .sc_spec_udt_union_case_tuple_v0 import SCSpecUDTUnionCaseTupleV0
 from .sc_spec_udt_union_case_v0_kind import SCSpecUDTUnionCaseV0Kind
 from .sc_spec_udt_union_case_void_v0 import SCSpecUDTUnionCaseVoidV0
@@ -49,17 +51,22 @@ class SCSpecUDTUnionCaseV0:
                 raise ValueError("tuple_case should not be None.")
             self.tuple_case.pack(packer)
             return
+        raise ValueError("Invalid kind.")
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> SCSpecUDTUnionCaseV0:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> SCSpecUDTUnionCaseV0:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
         kind = SCSpecUDTUnionCaseV0Kind.unpack(unpacker)
         if kind == SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_VOID_V0:
-            void_case = SCSpecUDTUnionCaseVoidV0.unpack(unpacker)
+            void_case = SCSpecUDTUnionCaseVoidV0.unpack(unpacker, depth_limit - 1)
             return cls(kind=kind, void_case=void_case)
         if kind == SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_TUPLE_V0:
-            tuple_case = SCSpecUDTUnionCaseTupleV0.unpack(unpacker)
+            tuple_case = SCSpecUDTUnionCaseTupleV0.unpack(unpacker, depth_limit - 1)
             return cls(kind=kind, tuple_case=tuple_case)
-        return cls(kind=kind)
+        raise ValueError("Invalid kind.")
 
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
@@ -69,7 +76,11 @@ class SCSpecUDTUnionCaseV0:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> SCSpecUDTUnionCaseV0:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -79,6 +90,40 @@ class SCSpecUDTUnionCaseV0:
     def from_xdr(cls, xdr: str) -> SCSpecUDTUnionCaseV0:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> SCSpecUDTUnionCaseV0:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self):
+        if self.kind == SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_VOID_V0:
+            assert self.void_case is not None
+            return {"void_v0": self.void_case.to_json_dict()}
+        if self.kind == SCSpecUDTUnionCaseV0Kind.SC_SPEC_UDT_UNION_CASE_TUPLE_V0:
+            assert self.tuple_case is not None
+            return {"tuple_v0": self.tuple_case.to_json_dict()}
+        raise ValueError(f"Unknown kind in SCSpecUDTUnionCaseV0: {self.kind}")
+
+    @classmethod
+    def from_json_dict(cls, json_value: dict) -> SCSpecUDTUnionCaseV0:
+        if len(json_value) != 1:
+            raise ValueError(
+                f"Expected a single-key object for SCSpecUDTUnionCaseV0, got: {json_value}"
+            )
+        key = next(iter(json_value))
+        kind = SCSpecUDTUnionCaseV0Kind.from_json_dict(key)
+        if key == "void_v0":
+            void_case = SCSpecUDTUnionCaseVoidV0.from_json_dict(json_value["void_v0"])
+            return cls(kind=kind, void_case=void_case)
+        if key == "tuple_v0":
+            tuple_case = SCSpecUDTUnionCaseTupleV0.from_json_dict(
+                json_value["tuple_v0"]
+            )
+            return cls(kind=kind, tuple_case=tuple_case)
+        raise ValueError(f"Unknown key '{key}' for SCSpecUDTUnionCaseV0")
 
     def __hash__(self):
         return hash(
@@ -101,14 +146,8 @@ class SCSpecUDTUnionCaseV0:
     def __repr__(self):
         out = []
         out.append(f"kind={self.kind}")
-        (
+        if self.void_case is not None:
             out.append(f"void_case={self.void_case}")
-            if self.void_case is not None
-            else None
-        )
-        (
+        if self.tuple_case is not None:
             out.append(f"tuple_case={self.tuple_case}")
-            if self.tuple_case is not None
-            else None
-        )
         return f"<SCSpecUDTUnionCaseV0 [{', '.join(out)}]>"

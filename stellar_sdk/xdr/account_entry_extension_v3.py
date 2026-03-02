@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import base64
+import json
 
 from xdrlib3 import Packer, Unpacker
 
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .extension_point import ExtensionPoint
 from .time_point import TimePoint
 from .uint32 import Uint32
@@ -47,10 +49,14 @@ class AccountEntryExtensionV3:
         self.seq_time.pack(packer)
 
     @classmethod
-    def unpack(cls, unpacker: Unpacker) -> AccountEntryExtensionV3:
-        ext = ExtensionPoint.unpack(unpacker)
-        seq_ledger = Uint32.unpack(unpacker)
-        seq_time = TimePoint.unpack(unpacker)
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> AccountEntryExtensionV3:
+        if depth_limit <= 0:
+            raise ValueError("Maximum decoding depth reached")
+        ext = ExtensionPoint.unpack(unpacker, depth_limit - 1)
+        seq_ledger = Uint32.unpack(unpacker, depth_limit - 1)
+        seq_time = TimePoint.unpack(unpacker, depth_limit - 1)
         return cls(
             ext=ext,
             seq_ledger=seq_ledger,
@@ -65,7 +71,11 @@ class AccountEntryExtensionV3:
     @classmethod
     def from_xdr_bytes(cls, xdr: bytes) -> AccountEntryExtensionV3:
         unpacker = Unpacker(xdr)
-        return cls.unpack(unpacker)
+        result = cls.unpack(unpacker)
+        remaining = len(xdr) - unpacker.get_position()
+        if remaining != 0:
+            raise ValueError(f"Unexpected trailing {remaining} bytes in XDR data")
+        return result
 
     def to_xdr(self) -> str:
         xdr_bytes = self.to_xdr_bytes()
@@ -75,6 +85,31 @@ class AccountEntryExtensionV3:
     def from_xdr(cls, xdr: str) -> AccountEntryExtensionV3:
         xdr_bytes = base64.b64decode(xdr.encode())
         return cls.from_xdr_bytes(xdr_bytes)
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_json_dict())
+
+    @classmethod
+    def from_json(cls, json_str: str) -> AccountEntryExtensionV3:
+        return cls.from_json_dict(json.loads(json_str))
+
+    def to_json_dict(self) -> dict:
+        return {
+            "ext": self.ext.to_json_dict(),
+            "seq_ledger": self.seq_ledger.to_json_dict(),
+            "seq_time": self.seq_time.to_json_dict(),
+        }
+
+    @classmethod
+    def from_json_dict(cls, json_dict: dict) -> AccountEntryExtensionV3:
+        ext = ExtensionPoint.from_json_dict(json_dict["ext"])
+        seq_ledger = Uint32.from_json_dict(json_dict["seq_ledger"])
+        seq_time = TimePoint.from_json_dict(json_dict["seq_time"])
+        return cls(
+            ext=ext,
+            seq_ledger=seq_ledger,
+            seq_time=seq_time,
+        )
 
     def __hash__(self):
         return hash(
