@@ -79,6 +79,21 @@ _CONTRACT_COST_TYPE_MAP = {
     67: "bls12381frmul",
     68: "bls12381frpow",
     69: "bls12381frinv",
+    70: "bn254encodefp",
+    71: "bn254decodefp",
+    72: "bn254g1checkpointoncurve",
+    73: "bn254g2checkpointoncurve",
+    74: "bn254g2checkpointinsubgroup",
+    75: "bn254g1projectivetoaffine",
+    76: "bn254g1add",
+    77: "bn254g1mul",
+    78: "bn254pairing",
+    79: "bn254frfromu256",
+    80: "bn254frtou256",
+    81: "bn254fraddsub",
+    82: "bn254frmul",
+    83: "bn254frpow",
+    84: "bn254frinv",
 }
 _CONTRACT_COST_TYPE_REVERSE_MAP = {
     "wasminsnexec": 0,
@@ -151,6 +166,21 @@ _CONTRACT_COST_TYPE_REVERSE_MAP = {
     "bls12381frmul": 67,
     "bls12381frpow": 68,
     "bls12381frinv": 69,
+    "bn254encodefp": 70,
+    "bn254decodefp": 71,
+    "bn254g1checkpointoncurve": 72,
+    "bn254g2checkpointoncurve": 73,
+    "bn254g2checkpointinsubgroup": 74,
+    "bn254g1projectivetoaffine": 75,
+    "bn254g1add": 76,
+    "bn254g1mul": 77,
+    "bn254pairing": 78,
+    "bn254frfromu256": 79,
+    "bn254frtou256": 80,
+    "bn254fraddsub": 81,
+    "bn254frmul": 82,
+    "bn254frpow": 83,
+    "bn254frinv": 84,
 }
 __all__ = ["ContractCostType"]
 
@@ -309,7 +339,38 @@ class ContractCostType(IntEnum):
             // Cost of performing BLS12-381 scalar element exponentiation
             Bls12381FrPow = 68,
             // Cost of performing BLS12-381 scalar element inversion
-            Bls12381FrInv = 69
+            Bls12381FrInv = 69,
+
+            // Cost of encoding a BN254 Fp (base field element)
+            Bn254EncodeFp = 70,
+            // Cost of decoding a BN254 Fp (base field element)
+            Bn254DecodeFp = 71,
+            // Cost of checking a G1 point lies on the curve
+            Bn254G1CheckPointOnCurve = 72,
+            // Cost of checking a G2 point lies on the curve
+            Bn254G2CheckPointOnCurve = 73,
+            // Cost of checking a G2 point belongs to the correct subgroup
+            Bn254G2CheckPointInSubgroup = 74,
+            // Cost of converting a BN254 G1 point from projective to affine coordinates
+            Bn254G1ProjectiveToAffine = 75,
+            // Cost of performing BN254 G1 point addition
+            Bn254G1Add = 76,
+            // Cost of performing BN254 G1 scalar multiplication
+            Bn254G1Mul = 77,
+            // Cost of performing BN254 pairing operation
+            Bn254Pairing = 78,
+            // Cost of converting a BN254 scalar element from U256
+            Bn254FrFromU256 = 79,
+            // Cost of converting a BN254 scalar element to U256
+            Bn254FrToU256 = 80,
+            // // Cost of performing BN254 scalar element addition/subtraction
+            Bn254FrAddSub = 81,
+            // Cost of performing BN254 scalar element multiplication
+            Bn254FrMul = 82,
+            // Cost of performing BN254 scalar element exponentiation
+            Bn254FrPow = 83,
+             // Cost of performing BN254 scalar element inversion
+            Bn254FrInv = 84
         };
     """
 
@@ -383,6 +444,21 @@ class ContractCostType(IntEnum):
     Bls12381FrMul = 67
     Bls12381FrPow = 68
     Bls12381FrInv = 69
+    Bn254EncodeFp = 70
+    Bn254DecodeFp = 71
+    Bn254G1CheckPointOnCurve = 72
+    Bn254G2CheckPointOnCurve = 73
+    Bn254G2CheckPointInSubgroup = 74
+    Bn254G1ProjectiveToAffine = 75
+    Bn254G1Add = 76
+    Bn254G1Mul = 77
+    Bn254Pairing = 78
+    Bn254FrFromU256 = 79
+    Bn254FrToU256 = 80
+    Bn254FrAddSub = 81
+    Bn254FrMul = 82
+    Bn254FrPow = 83
+    Bn254FrInv = 84
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

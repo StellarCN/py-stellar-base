@@ -27,7 +27,7 @@ class SCSpecEventV0:
             string lib<80>;
             SCSymbol name;
             SCSymbol prefixTopics<2>;
-            SCSpecEventParamV0 params<50>;
+            SCSpecEventParamV0 params<>;
             SCSpecEventDataFormat dataFormat;
         };
     """
@@ -56,7 +56,7 @@ class SCSpecEventV0:
             raise ValueError(
                 f"The maximum length of `prefix_topics` should be {_expect_max_length}, but got {len(prefix_topics)}."
             )
-        _expect_max_length = 50
+        _expect_max_length = 4294967295
         if params and len(params) > _expect_max_length:
             raise ValueError(
                 f"The maximum length of `params` should be {_expect_max_length}, but got {len(params)}."

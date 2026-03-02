@@ -24,7 +24,7 @@ class SCSpecUDTEnumV0:
             string doc<SC_SPEC_DOC_LIMIT>;
             string lib<80>;
             string name<60>;
-            SCSpecUDTEnumCaseV0 cases<50>;
+            SCSpecUDTEnumCaseV0 cases<>;
         };
     """
 
@@ -50,7 +50,7 @@ class SCSpecUDTEnumV0:
             raise ValueError(
                 f"The maximum length of `name` should be {_expect_max_length}, but got {len(name)}."
             )
-        _expect_max_length = 50
+        _expect_max_length = 4294967295
         if cases and len(cases) > _expect_max_length:
             raise ValueError(
                 f"The maximum length of `cases` should be {_expect_max_length}, but got {len(cases)}."

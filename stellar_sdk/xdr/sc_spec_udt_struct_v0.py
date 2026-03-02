@@ -24,7 +24,7 @@ class SCSpecUDTStructV0:
             string doc<SC_SPEC_DOC_LIMIT>;
             string lib<80>;
             string name<60>;
-            SCSpecUDTStructFieldV0 fields<40>;
+            SCSpecUDTStructFieldV0 fields<>;
         };
     """
 
@@ -50,7 +50,7 @@ class SCSpecUDTStructV0:
             raise ValueError(
                 f"The maximum length of `name` should be {_expect_max_length}, but got {len(name)}."
             )
-        _expect_max_length = 40
+        _expect_max_length = 4294967295
         if fields and len(fields) > _expect_max_length:
             raise ValueError(
                 f"The maximum length of `fields` should be {_expect_max_length}, but got {len(fields)}."
