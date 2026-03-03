@@ -1,3 +1,4 @@
+import functools
 from collections.abc import Sequence
 from typing import Any
 
@@ -405,19 +406,21 @@ def from_int256(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
 
 
 def to_map(data: dict[stellar_xdr.SCVal, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
-    """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an OrderedDict value.
+    """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a dict value.
+
+    The entries are sorted by key following Soroban runtime ordering rules,
+    as the network requires ScMap keys to be in ascending order.
 
     :param data: The dict value to convert.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_MAP`.
     """
+    entries = [
+        stellar_xdr.SCMapEntry(key=key, val=value) for key, value in data.items()
+    ]
+    entries.sort(key=functools.cmp_to_key(lambda a, b: _compare_sc_val(a.key, b.key)))
     return stellar_xdr.SCVal(
         stellar_xdr.SCValType.SCV_MAP,
-        map=stellar_xdr.SCMap(
-            sc_map=[
-                stellar_xdr.SCMapEntry(key=key, val=value)
-                for key, value in data.items()
-            ]
-        ),
+        map=stellar_xdr.SCMap(sc_map=entries),
     )
 
 
@@ -806,6 +809,274 @@ def from_struct(
     """
     v = from_map(sc_val)
     return dict([(from_symbol(key), val) for key, val in v.items()])
+
+
+def _compare_sc_address(a: stellar_xdr.SCAddress, b: stellar_xdr.SCAddress) -> int:
+    c = (a.type.value > b.type.value) - (a.type.value < b.type.value)
+    if c != 0:
+        return c
+    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
+        assert a.account_id is not None and b.account_id is not None
+        ax, bx = a.account_id.to_xdr_bytes(), b.account_id.to_xdr_bytes()
+        return (ax > bx) - (ax < bx)
+    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CONTRACT:
+        assert a.contract_id is not None and b.contract_id is not None
+        ax, bx = a.contract_id.to_xdr_bytes(), b.contract_id.to_xdr_bytes()
+        return (ax > bx) - (ax < bx)
+    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT:
+        assert a.muxed_account is not None and b.muxed_account is not None
+        at = (a.muxed_account.id.uint64, a.muxed_account.ed25519.uint256)
+        bt = (b.muxed_account.id.uint64, b.muxed_account.ed25519.uint256)
+        return (at > bt) - (at < bt)
+    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE:
+        assert a.claimable_balance_id is not None
+        assert b.claimable_balance_id is not None
+        ax, bx = (
+            a.claimable_balance_id.to_xdr_bytes(),
+            b.claimable_balance_id.to_xdr_bytes(),
+        )
+        return (ax > bx) - (ax < bx)
+    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL:
+        assert a.liquidity_pool_id is not None and b.liquidity_pool_id is not None
+        ax, bx = (
+            a.liquidity_pool_id.to_xdr_bytes(),
+            b.liquidity_pool_id.to_xdr_bytes(),
+        )
+        return (ax > bx) - (ax < bx)
+    raise ValueError(f"Unsupported SCAddress type: {a.type}")
+
+
+def _compare_contract_executable(
+    a: stellar_xdr.ContractExecutable, b: stellar_xdr.ContractExecutable
+) -> int:
+    c = (a.type.value > b.type.value) - (a.type.value < b.type.value)
+    if c != 0:
+        return c
+    if a.type == stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM:
+        assert a.wasm_hash is not None and b.wasm_hash is not None
+        ah, bh = a.wasm_hash.hash, b.wasm_hash.hash
+        return (ah > bh) - (ah < bh)
+    return 0
+
+
+def _compare_optional_sc_map(
+    a: stellar_xdr.SCMap | None, b: stellar_xdr.SCMap | None
+) -> int:
+    if a is None and b is None:
+        return 0
+    if a is None:
+        return -1
+    if b is None:
+        return 1
+    for ae, be in zip(a.sc_map, b.sc_map):
+        c = _compare_sc_val(ae.key, be.key)
+        if c != 0:
+            return c
+        c = _compare_sc_val(ae.val, be.val)
+        if c != 0:
+            return c
+    return (len(a.sc_map) > len(b.sc_map)) - (len(a.sc_map) < len(b.sc_map))
+
+
+def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
+    """Compare two SCVal values following Soroban runtime ordering rules.
+
+    This mirrors Rust's ``#[derive(Ord)]`` on the ``ScVal`` enum in
+    ``rs-soroban-env``.  Returns a negative int, 0, or positive int like a
+    standard three-way comparator.
+
+    Comparison rules:
+
+    1. **Cross-type**: compare by ``SCValType`` discriminant value
+       (``SCV_BOOL=0 < SCV_VOID=1 < … < SCV_LEDGER_KEY_NONCE=21``).
+    2. **Same-type** (by variant):
+
+       - ``SCV_BOOL``: ``False (0) < True (1)``
+       - ``SCV_VOID``, ``SCV_LEDGER_KEY_CONTRACT_INSTANCE``: always equal
+       - ``SCV_U32 / I32 / U64 / I64``: numeric comparison
+       - ``SCV_TIMEPOINT / DURATION``: numeric comparison of the underlying uint64
+       - ``SCV_U128``: tuple comparison ``(hi, lo)`` (both unsigned)
+       - ``SCV_I128``: tuple comparison ``(hi, lo)`` (hi signed, lo unsigned)
+       - ``SCV_U256``: tuple comparison ``(hi_hi, hi_lo, lo_hi, lo_lo)`` (all unsigned)
+       - ``SCV_I256``: tuple comparison ``(hi_hi, hi_lo, lo_hi, lo_lo)`` (hi_hi signed)
+       - ``SCV_BYTES / STRING / SYMBOL``: lexicographic byte comparison
+       - ``SCV_VEC``: element-by-element, shorter < longer
+       - ``SCV_MAP``: entry-by-entry (key first, then val), shorter < longer
+       - ``SCV_ADDRESS``: by address type discriminant
+         (``ACCOUNT=0 < CONTRACT=1 < MUXED_ACCOUNT=2 < CLAIMABLE_BALANCE=3 < LIQUIDITY_POOL=4``),
+         then structurally per variant:
+         ``ACCOUNT``: by ed25519 public key bytes;
+         ``CONTRACT``: by contract hash bytes;
+         ``MUXED_ACCOUNT``: by ``(id, ed25519)`` tuple;
+         ``CLAIMABLE_BALANCE``: by claimable balance ID XDR bytes;
+         ``LIQUIDITY_POOL``: by pool hash bytes
+       - ``SCV_ERROR``: by error type discriminant, then contract_code or error code
+       - ``SCV_CONTRACT_INSTANCE``: by executable type, then wasm_hash, then storage
+       - ``SCV_LEDGER_KEY_NONCE``: signed numeric comparison of nonce
+    """
+    # Cross-type: compare by discriminant value
+    if a.type != b.type:
+        return (a.type.value > b.type.value) - (a.type.value < b.type.value)
+
+    t = a.type
+
+    if t == stellar_xdr.SCValType.SCV_BOOL:
+        assert a.b is not None and b.b is not None
+        ai, bi = int(a.b), int(b.b)
+        return (ai > bi) - (ai < bi)
+
+    if t in (
+        stellar_xdr.SCValType.SCV_VOID,
+        stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE,
+    ):
+        return 0
+
+    if t == stellar_xdr.SCValType.SCV_U32:
+        assert a.u32 is not None and b.u32 is not None
+        av, bv = a.u32.uint32, b.u32.uint32
+        return (av > bv) - (av < bv)
+
+    if t == stellar_xdr.SCValType.SCV_I32:
+        assert a.i32 is not None and b.i32 is not None
+        av, bv = a.i32.int32, b.i32.int32
+        return (av > bv) - (av < bv)
+
+    if t == stellar_xdr.SCValType.SCV_U64:
+        assert a.u64 is not None and b.u64 is not None
+        av, bv = a.u64.uint64, b.u64.uint64
+        return (av > bv) - (av < bv)
+
+    if t == stellar_xdr.SCValType.SCV_I64:
+        assert a.i64 is not None and b.i64 is not None
+        av, bv = a.i64.int64, b.i64.int64
+        return (av > bv) - (av < bv)
+
+    if t == stellar_xdr.SCValType.SCV_TIMEPOINT:
+        assert a.timepoint is not None and b.timepoint is not None
+        av, bv = a.timepoint.time_point.uint64, b.timepoint.time_point.uint64
+        return (av > bv) - (av < bv)
+
+    if t == stellar_xdr.SCValType.SCV_DURATION:
+        assert a.duration is not None and b.duration is not None
+        av, bv = a.duration.duration.uint64, b.duration.duration.uint64
+        return (av > bv) - (av < bv)
+
+    if t == stellar_xdr.SCValType.SCV_U128:
+        assert a.u128 is not None and b.u128 is not None
+        at = (a.u128.hi.uint64, a.u128.lo.uint64)
+        bt = (b.u128.hi.uint64, b.u128.lo.uint64)
+        return (at > bt) - (at < bt)
+
+    if t == stellar_xdr.SCValType.SCV_I128:
+        assert a.i128 is not None and b.i128 is not None
+        at = (a.i128.hi.int64, a.i128.lo.uint64)
+        bt = (b.i128.hi.int64, b.i128.lo.uint64)
+        return (at > bt) - (at < bt)
+
+    if t == stellar_xdr.SCValType.SCV_U256:
+        assert a.u256 is not None and b.u256 is not None
+        at256 = (
+            a.u256.hi_hi.uint64,
+            a.u256.hi_lo.uint64,
+            a.u256.lo_hi.uint64,
+            a.u256.lo_lo.uint64,
+        )
+        bt256 = (
+            b.u256.hi_hi.uint64,
+            b.u256.hi_lo.uint64,
+            b.u256.lo_hi.uint64,
+            b.u256.lo_lo.uint64,
+        )
+        return (at256 > bt256) - (at256 < bt256)
+
+    if t == stellar_xdr.SCValType.SCV_I256:
+        assert a.i256 is not None and b.i256 is not None
+        ai256 = (
+            a.i256.hi_hi.int64,
+            a.i256.hi_lo.uint64,
+            a.i256.lo_hi.uint64,
+            a.i256.lo_lo.uint64,
+        )
+        bi256 = (
+            b.i256.hi_hi.int64,
+            b.i256.hi_lo.uint64,
+            b.i256.lo_hi.uint64,
+            b.i256.lo_lo.uint64,
+        )
+        return (ai256 > bi256) - (ai256 < bi256)
+
+    if t == stellar_xdr.SCValType.SCV_BYTES:
+        assert a.bytes is not None and b.bytes is not None
+        ab, bb = a.bytes.sc_bytes, b.bytes.sc_bytes
+        return (ab > bb) - (ab < bb)
+
+    if t == stellar_xdr.SCValType.SCV_STRING:
+        assert a.str is not None and b.str is not None
+        ab, bb = a.str.sc_string, b.str.sc_string
+        return (ab > bb) - (ab < bb)
+
+    if t == stellar_xdr.SCValType.SCV_SYMBOL:
+        assert a.sym is not None and b.sym is not None
+        ab, bb = a.sym.sc_symbol, b.sym.sc_symbol
+        return (ab > bb) - (ab < bb)
+
+    if t == stellar_xdr.SCValType.SCV_VEC:
+        assert a.vec is not None and b.vec is not None
+        for ae, be in zip(a.vec.sc_vec, b.vec.sc_vec):
+            c = _compare_sc_val(ae, be)
+            if c != 0:
+                return c
+        return (len(a.vec.sc_vec) > len(b.vec.sc_vec)) - (
+            len(a.vec.sc_vec) < len(b.vec.sc_vec)
+        )
+
+    if t == stellar_xdr.SCValType.SCV_MAP:
+        assert a.map is not None and b.map is not None
+        for am, bm in zip(a.map.sc_map, b.map.sc_map):
+            c = _compare_sc_val(am.key, bm.key)
+            if c != 0:
+                return c
+            c = _compare_sc_val(am.val, bm.val)
+            if c != 0:
+                return c
+        return (len(a.map.sc_map) > len(b.map.sc_map)) - (
+            len(a.map.sc_map) < len(b.map.sc_map)
+        )
+
+    if t == stellar_xdr.SCValType.SCV_ADDRESS:
+        assert a.address is not None and b.address is not None
+        return _compare_sc_address(a.address, b.address)
+
+    if t == stellar_xdr.SCValType.SCV_ERROR:
+        assert a.error is not None and b.error is not None
+        c = (a.error.type.value > b.error.type.value) - (
+            a.error.type.value < b.error.type.value
+        )
+        if c != 0:
+            return c
+        if a.error.type == stellar_xdr.SCErrorType.SCE_CONTRACT:
+            assert a.error.contract_code is not None
+            assert b.error.contract_code is not None
+            av, bv = a.error.contract_code.uint32, b.error.contract_code.uint32
+            return (av > bv) - (av < bv)
+        assert a.error.code is not None and b.error.code is not None
+        return (a.error.code.value > b.error.code.value) - (
+            a.error.code.value < b.error.code.value
+        )
+
+    if t == stellar_xdr.SCValType.SCV_CONTRACT_INSTANCE:
+        assert a.instance is not None and b.instance is not None
+        c = _compare_contract_executable(a.instance.executable, b.instance.executable)
+        if c != 0:
+            return c
+        return _compare_optional_sc_map(a.instance.storage, b.instance.storage)
+
+    if t == stellar_xdr.SCValType.SCV_LEDGER_KEY_NONCE:
+        assert a.nonce_key is not None and b.nonce_key is not None
+        av, bv = a.nonce_key.nonce.int64, b.nonce_key.nonce.int64
+        return (av > bv) - (av < bv)
+
+    raise ValueError(f"Unsupported SCVal type: {t}")
 
 
 def _parse_sc_val(sc_val: stellar_xdr.SCVal | bytes | str) -> stellar_xdr.SCVal:
