@@ -1,0 +1,22 @@
+name: Submit SBOM to PG Atlas
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: sbom-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Fetch and submit SBOM
+        uses: SCF-Public-Goods-Maintenance/pg-atlas-sbom-action@main
