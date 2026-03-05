@@ -389,7 +389,7 @@ class GetLatestLedgerResponse(BaseModel):
     protocol_version: int = Field(alias="protocolVersion")
     sequence: int
     close_time: int = Field(alias="closeTime")
-    # LedgerHeaderHistoryEntry XDR in base64
+    # LedgerHeader XDR in base64
     header_xdr: str = Field(alias="headerXdr")
     # LedgerCloseMeta XDR in base64
     metadata_xdr: str = Field(alias="metadataXdr")
