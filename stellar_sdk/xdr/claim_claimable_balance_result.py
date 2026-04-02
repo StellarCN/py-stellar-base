@@ -26,6 +26,7 @@ class ClaimClaimableBalanceResult:
         case CLAIM_CLAIMABLE_BALANCE_LINE_FULL:
         case CLAIM_CLAIMABLE_BALANCE_NO_TRUST:
         case CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED:
+        case CLAIM_CLAIMABLE_BALANCE_TRUSTLINE_FROZEN:
             void;
         };
     """
@@ -65,6 +66,11 @@ class ClaimClaimableBalanceResult:
             == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED
         ):
             return
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_TRUSTLINE_FROZEN
+        ):
+            return
         raise ValueError("Invalid code.")
 
     @classmethod
@@ -90,6 +96,11 @@ class ClaimClaimableBalanceResult:
         if (
             code
             == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED
+        ):
+            return cls(code=code)
+        if (
+            code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_TRUSTLINE_FROZEN
         ):
             return cls(code=code)
         raise ValueError("Invalid code.")
@@ -152,6 +163,11 @@ class ClaimClaimableBalanceResult:
             == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED
         ):
             return "not_authorized"
+        if (
+            self.code
+            == ClaimClaimableBalanceResultCode.CLAIM_CLAIMABLE_BALANCE_TRUSTLINE_FROZEN
+        ):
+            return "trustline_frozen"
         raise ValueError(f"Unknown code in ClaimClaimableBalanceResult: {self.code}")
 
     @classmethod
@@ -163,9 +179,10 @@ class ClaimClaimableBalanceResult:
             "line_full",
             "no_trust",
             "not_authorized",
+            "trustline_frozen",
         ):
             raise ValueError(
-                f"Unexpected string '{json_value}' for ClaimClaimableBalanceResult, must be one of: success, does_not_exist, cannot_claim, line_full, no_trust, not_authorized"
+                f"Unexpected string '{json_value}' for ClaimClaimableBalanceResult, must be one of: success, does_not_exist, cannot_claim, line_full, no_trust, not_authorized, trustline_frozen"
             )
         code = ClaimClaimableBalanceResultCode.from_json_dict(json_value)
         return cls(code=code)

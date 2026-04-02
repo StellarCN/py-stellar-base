@@ -28,6 +28,7 @@ _TRANSACTION_RESULT_CODE_MAP = {
     -15: "txbad_min_seq_age_or_gap",
     -16: "txmalformed",
     -17: "txsoroban_invalid",
+    -18: "txfrozen_key_accessed",
 }
 _TRANSACTION_RESULT_CODE_REVERSE_MAP = {
     "txfee_bump_inner_success": 1,
@@ -49,6 +50,7 @@ _TRANSACTION_RESULT_CODE_REVERSE_MAP = {
     "txbad_min_seq_age_or_gap": -15,
     "txmalformed": -16,
     "txsoroban_invalid": -17,
+    "txfrozen_key_accessed": -18,
 }
 __all__ = ["TransactionResultCode"]
 
@@ -81,7 +83,8 @@ class TransactionResultCode(IntEnum):
             txBAD_SPONSORSHIP = -14,        // sponsorship not confirmed
             txBAD_MIN_SEQ_AGE_OR_GAP = -15, // minSeqAge or minSeqLedgerGap conditions not met
             txMALFORMED = -16,              // precondition is invalid
-            txSOROBAN_INVALID = -17         // soroban-specific preconditions were not met
+            txSOROBAN_INVALID = -17,        // soroban-specific preconditions were not met
+            txFROZEN_KEY_ACCESSED = -18     // a 'frozen' ledger key is accessed by any operation
         };
     """
 
@@ -104,6 +107,7 @@ class TransactionResultCode(IntEnum):
     txBAD_MIN_SEQ_AGE_OR_GAP = -15
     txMALFORMED = -16
     txSOROBAN_INVALID = -17
+    txFROZEN_KEY_ACCESSED = -18
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

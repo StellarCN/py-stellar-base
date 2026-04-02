@@ -121,6 +121,7 @@ from .dependent_tx_cluster import *
 from .diagnostic_event import *
 from .dont_have import *
 from .duration import *
+from .encoded_ledger_key import *
 from .encrypted_body import *
 from .end_sponsoring_future_reserves_result import *
 from .end_sponsoring_future_reserves_result_code import *
@@ -138,6 +139,10 @@ from .fee_bump_transaction_ext import *
 from .fee_bump_transaction_inner_tx import *
 from .flood_advert import *
 from .flood_demand import *
+from .freeze_bypass_txs import *
+from .freeze_bypass_txs_delta import *
+from .frozen_ledger_keys import *
+from .frozen_ledger_keys_delta import *
 from .generalized_transaction_set import *
 from .hash import *
 from .hash_id_preimage import *

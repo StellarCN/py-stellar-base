@@ -26,6 +26,7 @@ class LiquidityPoolWithdrawResult:
         case LIQUIDITY_POOL_WITHDRAW_UNDERFUNDED:
         case LIQUIDITY_POOL_WITHDRAW_LINE_FULL:
         case LIQUIDITY_POOL_WITHDRAW_UNDER_MINIMUM:
+        case LIQUIDITY_POOL_WITHDRAW_TRUSTLINE_FROZEN:
             void;
         };
     """
@@ -65,6 +66,11 @@ class LiquidityPoolWithdrawResult:
             == LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_UNDER_MINIMUM
         ):
             return
+        if (
+            self.code
+            == LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_TRUSTLINE_FROZEN
+        ):
+            return
         raise ValueError("Invalid code.")
 
     @classmethod
@@ -87,6 +93,11 @@ class LiquidityPoolWithdrawResult:
         if (
             code
             == LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_UNDER_MINIMUM
+        ):
+            return cls(code=code)
+        if (
+            code
+            == LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_TRUSTLINE_FROZEN
         ):
             return cls(code=code)
         raise ValueError("Invalid code.")
@@ -149,6 +160,11 @@ class LiquidityPoolWithdrawResult:
             == LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_UNDER_MINIMUM
         ):
             return "under_minimum"
+        if (
+            self.code
+            == LiquidityPoolWithdrawResultCode.LIQUIDITY_POOL_WITHDRAW_TRUSTLINE_FROZEN
+        ):
+            return "trustline_frozen"
         raise ValueError(f"Unknown code in LiquidityPoolWithdrawResult: {self.code}")
 
     @classmethod
@@ -160,9 +176,10 @@ class LiquidityPoolWithdrawResult:
             "underfunded",
             "line_full",
             "under_minimum",
+            "trustline_frozen",
         ):
             raise ValueError(
-                f"Unexpected string '{json_value}' for LiquidityPoolWithdrawResult, must be one of: success, malformed, no_trust, underfunded, line_full, under_minimum"
+                f"Unexpected string '{json_value}' for LiquidityPoolWithdrawResult, must be one of: success, malformed, no_trust, underfunded, line_full, under_minimum, trustline_frozen"
             )
         code = LiquidityPoolWithdrawResultCode.from_json_dict(json_value)
         return cls(code=code)

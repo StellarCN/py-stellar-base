@@ -1402,6 +1402,10 @@ Duration
 --------
 .. autoclass:: stellar_sdk.xdr.duration.Duration
 
+EncodedLedgerKey
+----------------
+.. autoclass:: stellar_sdk.xdr.encoded_ledger_key.EncodedLedgerKey
+
 EncryptedBody
 -------------
 .. autoclass:: stellar_sdk.xdr.encrypted_body.EncryptedBody
@@ -1473,6 +1477,22 @@ FloodAdvert
 FloodDemand
 -----------
 .. autoclass:: stellar_sdk.xdr.flood_demand.FloodDemand
+
+FreezeBypassTxs
+---------------
+.. autoclass:: stellar_sdk.xdr.freeze_bypass_txs.FreezeBypassTxs
+
+FreezeBypassTxsDelta
+--------------------
+.. autoclass:: stellar_sdk.xdr.freeze_bypass_txs_delta.FreezeBypassTxsDelta
+
+FrozenLedgerKeys
+----------------
+.. autoclass:: stellar_sdk.xdr.frozen_ledger_keys.FrozenLedgerKeys
+
+FrozenLedgerKeysDelta
+---------------------
+.. autoclass:: stellar_sdk.xdr.frozen_ledger_keys_delta.FrozenLedgerKeysDelta
 
 GeneralizedTransactionSet
 -------------------------

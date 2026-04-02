@@ -17,6 +17,7 @@ _LIQUIDITY_POOL_DEPOSIT_RESULT_CODE_MAP = {
     -5: "line_full",
     -6: "bad_price",
     -7: "pool_full",
+    -8: "trustline_frozen",
 }
 _LIQUIDITY_POOL_DEPOSIT_RESULT_CODE_REVERSE_MAP = {
     "success": 0,
@@ -27,6 +28,7 @@ _LIQUIDITY_POOL_DEPOSIT_RESULT_CODE_REVERSE_MAP = {
     "line_full": -5,
     "bad_price": -6,
     "pool_full": -7,
+    "trustline_frozen": -8,
 }
 __all__ = ["LiquidityPoolDepositResultCode"]
 
@@ -51,7 +53,9 @@ class LiquidityPoolDepositResultCode(IntEnum):
             LIQUIDITY_POOL_DEPOSIT_LINE_FULL = -5,      // pool share trust line doesn't
                                                         // have sufficient limit
             LIQUIDITY_POOL_DEPOSIT_BAD_PRICE = -6,      // deposit price outside bounds
-            LIQUIDITY_POOL_DEPOSIT_POOL_FULL = -7       // pool reserves are full
+            LIQUIDITY_POOL_DEPOSIT_POOL_FULL = -7,      // pool reserves are full
+            LIQUIDITY_POOL_DEPOSIT_TRUSTLINE_FROZEN = -8  // trustline for one of the
+                                                          // assets is frozen
         };
     """
 
@@ -63,6 +67,7 @@ class LiquidityPoolDepositResultCode(IntEnum):
     LIQUIDITY_POOL_DEPOSIT_LINE_FULL = -5
     LIQUIDITY_POOL_DEPOSIT_BAD_PRICE = -6
     LIQUIDITY_POOL_DEPOSIT_POOL_FULL = -7
+    LIQUIDITY_POOL_DEPOSIT_TRUSTLINE_FROZEN = -8
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

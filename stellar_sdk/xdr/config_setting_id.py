@@ -26,6 +26,10 @@ _CONFIG_SETTING_ID_MAP = {
     14: "contract_parallel_compute_v0",
     15: "contract_ledger_cost_ext_v0",
     16: "scp_timing",
+    17: "frozen_ledger_keys",
+    18: "frozen_ledger_keys_delta",
+    19: "freeze_bypass_txs",
+    20: "freeze_bypass_txs_delta",
 }
 _CONFIG_SETTING_ID_REVERSE_MAP = {
     "contract_max_size_bytes": 0,
@@ -45,6 +49,10 @@ _CONFIG_SETTING_ID_REVERSE_MAP = {
     "contract_parallel_compute_v0": 14,
     "contract_ledger_cost_ext_v0": 15,
     "scp_timing": 16,
+    "frozen_ledger_keys": 17,
+    "frozen_ledger_keys_delta": 18,
+    "freeze_bypass_txs": 19,
+    "freeze_bypass_txs_delta": 20,
 }
 __all__ = ["ConfigSettingID"]
 
@@ -71,7 +79,11 @@ class ConfigSettingID(IntEnum):
             CONFIG_SETTING_EVICTION_ITERATOR = 13,
             CONFIG_SETTING_CONTRACT_PARALLEL_COMPUTE_V0 = 14,
             CONFIG_SETTING_CONTRACT_LEDGER_COST_EXT_V0 = 15,
-            CONFIG_SETTING_SCP_TIMING = 16
+            CONFIG_SETTING_SCP_TIMING = 16,
+            CONFIG_SETTING_FROZEN_LEDGER_KEYS = 17,
+            CONFIG_SETTING_FROZEN_LEDGER_KEYS_DELTA = 18,
+            CONFIG_SETTING_FREEZE_BYPASS_TXS = 19,
+            CONFIG_SETTING_FREEZE_BYPASS_TXS_DELTA = 20
         };
     """
 
@@ -92,6 +104,10 @@ class ConfigSettingID(IntEnum):
     CONFIG_SETTING_CONTRACT_PARALLEL_COMPUTE_V0 = 14
     CONFIG_SETTING_CONTRACT_LEDGER_COST_EXT_V0 = 15
     CONFIG_SETTING_SCP_TIMING = 16
+    CONFIG_SETTING_FROZEN_LEDGER_KEYS = 17
+    CONFIG_SETTING_FROZEN_LEDGER_KEYS_DELTA = 18
+    CONFIG_SETTING_FREEZE_BYPASS_TXS = 19
+    CONFIG_SETTING_FREEZE_BYPASS_TXS_DELTA = 20
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

@@ -44,6 +44,7 @@ class TransactionResultResult:
             case txBAD_MIN_SEQ_AGE_OR_GAP:
             case txMALFORMED:
             case txSOROBAN_INVALID:
+            case txFROZEN_KEY_ACCESSED:
                 void;
             }
     """
@@ -119,6 +120,8 @@ class TransactionResultResult:
             return
         if self.code == TransactionResultCode.txSOROBAN_INVALID:
             return
+        if self.code == TransactionResultCode.txFROZEN_KEY_ACCESSED:
+            return
         raise ValueError("Invalid code.")
 
     @classmethod
@@ -189,6 +192,8 @@ class TransactionResultResult:
         if code == TransactionResultCode.txMALFORMED:
             return cls(code=code)
         if code == TransactionResultCode.txSOROBAN_INVALID:
+            return cls(code=code)
+        if code == TransactionResultCode.txFROZEN_KEY_ACCESSED:
             return cls(code=code)
         raise ValueError("Invalid code.")
 
@@ -265,6 +270,8 @@ class TransactionResultResult:
             return "txmalformed"
         if self.code == TransactionResultCode.txSOROBAN_INVALID:
             return "txsoroban_invalid"
+        if self.code == TransactionResultCode.txFROZEN_KEY_ACCESSED:
+            return "txfrozen_key_accessed"
         raise ValueError(f"Unknown code in TransactionResultResult: {self.code}")
 
     @classmethod
@@ -286,9 +293,10 @@ class TransactionResultResult:
                 "txbad_min_seq_age_or_gap",
                 "txmalformed",
                 "txsoroban_invalid",
+                "txfrozen_key_accessed",
             ):
                 raise ValueError(
-                    f"Unexpected string '{json_value}' for TransactionResultResult, must be one of: txtoo_early, txtoo_late, txmissing_operation, txbad_seq, txbad_auth, txinsufficient_balance, txno_account, txinsufficient_fee, txbad_auth_extra, txinternal_error, txnot_supported, txbad_sponsorship, txbad_min_seq_age_or_gap, txmalformed, txsoroban_invalid"
+                    f"Unexpected string '{json_value}' for TransactionResultResult, must be one of: txtoo_early, txtoo_late, txmissing_operation, txbad_seq, txbad_auth, txinsufficient_balance, txno_account, txinsufficient_fee, txbad_auth_extra, txinternal_error, txnot_supported, txbad_sponsorship, txbad_min_seq_age_or_gap, txmalformed, txsoroban_invalid, txfrozen_key_accessed"
                 )
             code = TransactionResultCode.from_json_dict(json_value)
             return cls(code=code)

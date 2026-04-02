@@ -35,7 +35,7 @@ XDRS = xdr/Stellar-SCP.x \
        xdr/Stellar-types.x
 
 # Stellar XDR definitions repository commit hash
-XDR_COMMIT = 0a621ec7811db000a60efae5b35f78dee3aa2533
+XDR_COMMIT = cff714a5ebaaaf2dac343b3546c2df73f0b7a36e
 
 # Command prefix for running Python tools with uv
 UV_RUN_CMD = uv run --frozen --all-extras

@@ -15,6 +15,7 @@ _LIQUIDITY_POOL_WITHDRAW_RESULT_CODE_MAP = {
     -3: "underfunded",
     -4: "line_full",
     -5: "under_minimum",
+    -6: "trustline_frozen",
 }
 _LIQUIDITY_POOL_WITHDRAW_RESULT_CODE_REVERSE_MAP = {
     "success": 0,
@@ -23,6 +24,7 @@ _LIQUIDITY_POOL_WITHDRAW_RESULT_CODE_REVERSE_MAP = {
     "underfunded": -3,
     "line_full": -4,
     "under_minimum": -5,
+    "trustline_frozen": -6,
 }
 __all__ = ["LiquidityPoolWithdrawResultCode"]
 
@@ -44,7 +46,9 @@ class LiquidityPoolWithdrawResultCode(IntEnum):
                                                        // pool share
             LIQUIDITY_POOL_WITHDRAW_LINE_FULL = -4,    // would go above limit for one
                                                        // of the assets
-            LIQUIDITY_POOL_WITHDRAW_UNDER_MINIMUM = -5 // didn't withdraw enough
+            LIQUIDITY_POOL_WITHDRAW_UNDER_MINIMUM = -5, // didn't withdraw enough
+            LIQUIDITY_POOL_WITHDRAW_TRUSTLINE_FROZEN = -6  // trustline for one of the
+                                                           // assets is frozen
         };
     """
 
@@ -54,6 +58,7 @@ class LiquidityPoolWithdrawResultCode(IntEnum):
     LIQUIDITY_POOL_WITHDRAW_UNDERFUNDED = -3
     LIQUIDITY_POOL_WITHDRAW_LINE_FULL = -4
     LIQUIDITY_POOL_WITHDRAW_UNDER_MINIMUM = -5
+    LIQUIDITY_POOL_WITHDRAW_TRUSTLINE_FROZEN = -6
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

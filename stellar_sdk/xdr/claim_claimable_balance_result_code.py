@@ -15,6 +15,7 @@ _CLAIM_CLAIMABLE_BALANCE_RESULT_CODE_MAP = {
     -3: "line_full",
     -4: "no_trust",
     -5: "not_authorized",
+    -6: "trustline_frozen",
 }
 _CLAIM_CLAIMABLE_BALANCE_RESULT_CODE_REVERSE_MAP = {
     "success": 0,
@@ -23,6 +24,7 @@ _CLAIM_CLAIMABLE_BALANCE_RESULT_CODE_REVERSE_MAP = {
     "line_full": -3,
     "no_trust": -4,
     "not_authorized": -5,
+    "trustline_frozen": -6,
 }
 __all__ = ["ClaimClaimableBalanceResultCode"]
 
@@ -38,7 +40,8 @@ class ClaimClaimableBalanceResultCode(IntEnum):
             CLAIM_CLAIMABLE_BALANCE_CANNOT_CLAIM = -2,
             CLAIM_CLAIMABLE_BALANCE_LINE_FULL = -3,
             CLAIM_CLAIMABLE_BALANCE_NO_TRUST = -4,
-            CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED = -5
+            CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED = -5,
+            CLAIM_CLAIMABLE_BALANCE_TRUSTLINE_FROZEN = -6
         };
     """
 
@@ -48,6 +51,7 @@ class ClaimClaimableBalanceResultCode(IntEnum):
     CLAIM_CLAIMABLE_BALANCE_LINE_FULL = -3
     CLAIM_CLAIMABLE_BALANCE_NO_TRUST = -4
     CLAIM_CLAIMABLE_BALANCE_NOT_AUTHORIZED = -5
+    CLAIM_CLAIMABLE_BALANCE_TRUSTLINE_FROZEN = -6
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
