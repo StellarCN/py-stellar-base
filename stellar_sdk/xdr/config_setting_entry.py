@@ -29,6 +29,10 @@ from .config_setting_id import ConfigSettingID
 from .config_setting_scp_timing import ConfigSettingSCPTiming
 from .contract_cost_params import ContractCostParams
 from .eviction_iterator import EvictionIterator
+from .freeze_bypass_txs import FreezeBypassTxs
+from .freeze_bypass_txs_delta import FreezeBypassTxsDelta
+from .frozen_ledger_keys import FrozenLedgerKeys
+from .frozen_ledger_keys_delta import FrozenLedgerKeysDelta
 from .state_archival_settings import StateArchivalSettings
 from .uint32 import Uint32
 from .uint64 import Uint64
@@ -76,6 +80,14 @@ class ConfigSettingEntry:
             ConfigSettingContractLedgerCostExtV0 contractLedgerCostExt;
         case CONFIG_SETTING_SCP_TIMING:
             ConfigSettingSCPTiming contractSCPTiming;
+        case CONFIG_SETTING_FROZEN_LEDGER_KEYS:
+            FrozenLedgerKeys frozenLedgerKeys;
+        case CONFIG_SETTING_FROZEN_LEDGER_KEYS_DELTA:
+            FrozenLedgerKeysDelta frozenLedgerKeysDelta;
+        case CONFIG_SETTING_FREEZE_BYPASS_TXS:
+            FreezeBypassTxs freezeBypassTxs;
+        case CONFIG_SETTING_FREEZE_BYPASS_TXS_DELTA:
+            FreezeBypassTxsDelta freezeBypassTxsDelta;
         };
     """
 
@@ -105,6 +117,10 @@ class ConfigSettingEntry:
         ] = None,
         contract_ledger_cost_ext: Optional[ConfigSettingContractLedgerCostExtV0] = None,
         contract_scp_timing: Optional[ConfigSettingSCPTiming] = None,
+        frozen_ledger_keys: Optional[FrozenLedgerKeys] = None,
+        frozen_ledger_keys_delta: Optional[FrozenLedgerKeysDelta] = None,
+        freeze_bypass_txs: Optional[FreezeBypassTxs] = None,
+        freeze_bypass_txs_delta: Optional[FreezeBypassTxsDelta] = None,
     ) -> None:
         _expect_max_length = 4294967295
         if (
@@ -132,6 +148,10 @@ class ConfigSettingEntry:
         self.contract_parallel_compute = contract_parallel_compute
         self.contract_ledger_cost_ext = contract_ledger_cost_ext
         self.contract_scp_timing = contract_scp_timing
+        self.frozen_ledger_keys = frozen_ledger_keys
+        self.frozen_ledger_keys_delta = frozen_ledger_keys_delta
+        self.freeze_bypass_txs = freeze_bypass_txs
+        self.freeze_bypass_txs_delta = freeze_bypass_txs_delta
 
     def pack(self, packer: Packer) -> None:
         self.config_setting_id.pack(packer)
@@ -259,6 +279,32 @@ class ConfigSettingEntry:
             if self.contract_scp_timing is None:
                 raise ValueError("contract_scp_timing should not be None.")
             self.contract_scp_timing.pack(packer)
+            return
+        if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_FROZEN_LEDGER_KEYS:
+            if self.frozen_ledger_keys is None:
+                raise ValueError("frozen_ledger_keys should not be None.")
+            self.frozen_ledger_keys.pack(packer)
+            return
+        if (
+            self.config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_FROZEN_LEDGER_KEYS_DELTA
+        ):
+            if self.frozen_ledger_keys_delta is None:
+                raise ValueError("frozen_ledger_keys_delta should not be None.")
+            self.frozen_ledger_keys_delta.pack(packer)
+            return
+        if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_FREEZE_BYPASS_TXS:
+            if self.freeze_bypass_txs is None:
+                raise ValueError("freeze_bypass_txs should not be None.")
+            self.freeze_bypass_txs.pack(packer)
+            return
+        if (
+            self.config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_FREEZE_BYPASS_TXS_DELTA
+        ):
+            if self.freeze_bypass_txs_delta is None:
+                raise ValueError("freeze_bypass_txs_delta should not be None.")
+            self.freeze_bypass_txs_delta.pack(packer)
             return
         raise ValueError("Invalid config_setting_id.")
 
@@ -426,6 +472,33 @@ class ConfigSettingEntry:
                 config_setting_id=config_setting_id,
                 contract_scp_timing=contract_scp_timing,
             )
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_FROZEN_LEDGER_KEYS:
+            frozen_ledger_keys = FrozenLedgerKeys.unpack(unpacker, depth_limit - 1)
+            return cls(
+                config_setting_id=config_setting_id,
+                frozen_ledger_keys=frozen_ledger_keys,
+            )
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_FROZEN_LEDGER_KEYS_DELTA:
+            frozen_ledger_keys_delta = FrozenLedgerKeysDelta.unpack(
+                unpacker, depth_limit - 1
+            )
+            return cls(
+                config_setting_id=config_setting_id,
+                frozen_ledger_keys_delta=frozen_ledger_keys_delta,
+            )
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_FREEZE_BYPASS_TXS:
+            freeze_bypass_txs = FreezeBypassTxs.unpack(unpacker, depth_limit - 1)
+            return cls(
+                config_setting_id=config_setting_id, freeze_bypass_txs=freeze_bypass_txs
+            )
+        if config_setting_id == ConfigSettingID.CONFIG_SETTING_FREEZE_BYPASS_TXS_DELTA:
+            freeze_bypass_txs_delta = FreezeBypassTxsDelta.unpack(
+                unpacker, depth_limit - 1
+            )
+            return cls(
+                config_setting_id=config_setting_id,
+                freeze_bypass_txs_delta=freeze_bypass_txs_delta,
+            )
         raise ValueError("Invalid config_setting_id.")
 
     def to_xdr_bytes(self) -> bytes:
@@ -568,6 +641,28 @@ class ConfigSettingEntry:
         if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_SCP_TIMING:
             assert self.contract_scp_timing is not None
             return {"scp_timing": self.contract_scp_timing.to_json_dict()}
+        if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_FROZEN_LEDGER_KEYS:
+            assert self.frozen_ledger_keys is not None
+            return {"frozen_ledger_keys": self.frozen_ledger_keys.to_json_dict()}
+        if (
+            self.config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_FROZEN_LEDGER_KEYS_DELTA
+        ):
+            assert self.frozen_ledger_keys_delta is not None
+            return {
+                "frozen_ledger_keys_delta": self.frozen_ledger_keys_delta.to_json_dict()
+            }
+        if self.config_setting_id == ConfigSettingID.CONFIG_SETTING_FREEZE_BYPASS_TXS:
+            assert self.freeze_bypass_txs is not None
+            return {"freeze_bypass_txs": self.freeze_bypass_txs.to_json_dict()}
+        if (
+            self.config_setting_id
+            == ConfigSettingID.CONFIG_SETTING_FREEZE_BYPASS_TXS_DELTA
+        ):
+            assert self.freeze_bypass_txs_delta is not None
+            return {
+                "freeze_bypass_txs_delta": self.freeze_bypass_txs_delta.to_json_dict()
+            }
         raise ValueError(
             f"Unknown config_setting_id in ConfigSettingEntry: {self.config_setting_id}"
         )
@@ -722,6 +817,37 @@ class ConfigSettingEntry:
                 config_setting_id=config_setting_id,
                 contract_scp_timing=contract_scp_timing,
             )
+        if key == "frozen_ledger_keys":
+            frozen_ledger_keys = FrozenLedgerKeys.from_json_dict(
+                json_value["frozen_ledger_keys"]
+            )
+            return cls(
+                config_setting_id=config_setting_id,
+                frozen_ledger_keys=frozen_ledger_keys,
+            )
+        if key == "frozen_ledger_keys_delta":
+            frozen_ledger_keys_delta = FrozenLedgerKeysDelta.from_json_dict(
+                json_value["frozen_ledger_keys_delta"]
+            )
+            return cls(
+                config_setting_id=config_setting_id,
+                frozen_ledger_keys_delta=frozen_ledger_keys_delta,
+            )
+        if key == "freeze_bypass_txs":
+            freeze_bypass_txs = FreezeBypassTxs.from_json_dict(
+                json_value["freeze_bypass_txs"]
+            )
+            return cls(
+                config_setting_id=config_setting_id, freeze_bypass_txs=freeze_bypass_txs
+            )
+        if key == "freeze_bypass_txs_delta":
+            freeze_bypass_txs_delta = FreezeBypassTxsDelta.from_json_dict(
+                json_value["freeze_bypass_txs_delta"]
+            )
+            return cls(
+                config_setting_id=config_setting_id,
+                freeze_bypass_txs_delta=freeze_bypass_txs_delta,
+            )
         raise ValueError(f"Unknown key '{key}' for ConfigSettingEntry")
 
     def __hash__(self):
@@ -745,6 +871,10 @@ class ConfigSettingEntry:
                 self.contract_parallel_compute,
                 self.contract_ledger_cost_ext,
                 self.contract_scp_timing,
+                self.frozen_ledger_keys,
+                self.frozen_ledger_keys_delta,
+                self.freeze_bypass_txs,
+                self.freeze_bypass_txs_delta,
             )
         )
 
@@ -774,6 +904,10 @@ class ConfigSettingEntry:
             and self.contract_parallel_compute == other.contract_parallel_compute
             and self.contract_ledger_cost_ext == other.contract_ledger_cost_ext
             and self.contract_scp_timing == other.contract_scp_timing
+            and self.frozen_ledger_keys == other.frozen_ledger_keys
+            and self.frozen_ledger_keys_delta == other.frozen_ledger_keys_delta
+            and self.freeze_bypass_txs == other.freeze_bypass_txs
+            and self.freeze_bypass_txs_delta == other.freeze_bypass_txs_delta
         )
 
     def __repr__(self):
@@ -823,4 +957,12 @@ class ConfigSettingEntry:
             out.append(f"contract_ledger_cost_ext={self.contract_ledger_cost_ext}")
         if self.contract_scp_timing is not None:
             out.append(f"contract_scp_timing={self.contract_scp_timing}")
+        if self.frozen_ledger_keys is not None:
+            out.append(f"frozen_ledger_keys={self.frozen_ledger_keys}")
+        if self.frozen_ledger_keys_delta is not None:
+            out.append(f"frozen_ledger_keys_delta={self.frozen_ledger_keys_delta}")
+        if self.freeze_bypass_txs is not None:
+            out.append(f"freeze_bypass_txs={self.freeze_bypass_txs}")
+        if self.freeze_bypass_txs_delta is not None:
+            out.append(f"freeze_bypass_txs_delta={self.freeze_bypass_txs_delta}")
         return f"<ConfigSettingEntry [{', '.join(out)}]>"

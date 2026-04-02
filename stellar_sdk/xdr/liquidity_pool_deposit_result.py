@@ -28,6 +28,7 @@ class LiquidityPoolDepositResult:
         case LIQUIDITY_POOL_DEPOSIT_LINE_FULL:
         case LIQUIDITY_POOL_DEPOSIT_BAD_PRICE:
         case LIQUIDITY_POOL_DEPOSIT_POOL_FULL:
+        case LIQUIDITY_POOL_DEPOSIT_TRUSTLINE_FROZEN:
             void;
         };
     """
@@ -62,6 +63,11 @@ class LiquidityPoolDepositResult:
             return
         if self.code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_POOL_FULL:
             return
+        if (
+            self.code
+            == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_TRUSTLINE_FROZEN
+        ):
+            return
         raise ValueError("Invalid code.")
 
     @classmethod
@@ -86,6 +92,11 @@ class LiquidityPoolDepositResult:
         if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_BAD_PRICE:
             return cls(code=code)
         if code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_POOL_FULL:
+            return cls(code=code)
+        if (
+            code
+            == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_TRUSTLINE_FROZEN
+        ):
             return cls(code=code)
         raise ValueError("Invalid code.")
 
@@ -142,6 +153,11 @@ class LiquidityPoolDepositResult:
             return "bad_price"
         if self.code == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_POOL_FULL:
             return "pool_full"
+        if (
+            self.code
+            == LiquidityPoolDepositResultCode.LIQUIDITY_POOL_DEPOSIT_TRUSTLINE_FROZEN
+        ):
+            return "trustline_frozen"
         raise ValueError(f"Unknown code in LiquidityPoolDepositResult: {self.code}")
 
     @classmethod
@@ -155,9 +171,10 @@ class LiquidityPoolDepositResult:
             "line_full",
             "bad_price",
             "pool_full",
+            "trustline_frozen",
         ):
             raise ValueError(
-                f"Unexpected string '{json_value}' for LiquidityPoolDepositResult, must be one of: success, malformed, no_trust, not_authorized, underfunded, line_full, bad_price, pool_full"
+                f"Unexpected string '{json_value}' for LiquidityPoolDepositResult, must be one of: success, malformed, no_trust, not_authorized, underfunded, line_full, bad_price, pool_full, trustline_frozen"
             )
         code = LiquidityPoolDepositResultCode.from_json_dict(json_value)
         return cls(code=code)

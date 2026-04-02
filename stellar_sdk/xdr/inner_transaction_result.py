@@ -46,6 +46,7 @@ class InnerTransactionResult:
             case txBAD_MIN_SEQ_AGE_OR_GAP:
             case txMALFORMED:
             case txSOROBAN_INVALID:
+            case txFROZEN_KEY_ACCESSED:
                 void;
             }
             result;

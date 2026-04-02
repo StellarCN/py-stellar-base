@@ -94,6 +94,7 @@ _CONTRACT_COST_TYPE_MAP = {
     82: "bn254frmul",
     83: "bn254frpow",
     84: "bn254frinv",
+    85: "bn254g1msm",
 }
 _CONTRACT_COST_TYPE_REVERSE_MAP = {
     "wasminsnexec": 0,
@@ -181,6 +182,7 @@ _CONTRACT_COST_TYPE_REVERSE_MAP = {
     "bn254frmul": 82,
     "bn254frpow": 83,
     "bn254frinv": 84,
+    "bn254g1msm": 85,
 }
 __all__ = ["ContractCostType"]
 
@@ -370,7 +372,9 @@ class ContractCostType(IntEnum):
             // Cost of performing BN254 scalar element exponentiation
             Bn254FrPow = 83,
              // Cost of performing BN254 scalar element inversion
-            Bn254FrInv = 84
+            Bn254FrInv = 84,
+            // Cost of performing BN254 G1 multi-scalar multiplication (MSM)
+            Bn254G1Msm = 85
         };
     """
 
@@ -459,6 +463,7 @@ class ContractCostType(IntEnum):
     Bn254FrMul = 82
     Bn254FrPow = 83
     Bn254FrInv = 84
+    Bn254G1Msm = 85
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
