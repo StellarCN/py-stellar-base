@@ -182,6 +182,15 @@ class TestSignerKey:
         assert SignerKey.ed25519_signed_payload(ed25519_signed_payload) == signer_key
         assert SignerKey.ed25519_signed_payload(signer_key_data) == signer_key
 
+    def test_eq_compares_signer_key_type(self):
+        signer_key_data = b"\x85\xba{e\xeb\x92\x83r\xb2\xf5\xc4Z$\xc2\x84b\xc6\x8a\xa6\x04\x86dg$x6\x0c\xeb\x9aW\x13W"
+        ed25519_signer = SignerKey(
+            signer_key_data, SignerKeyType.SIGNER_KEY_TYPE_ED25519
+        )
+        hash_x_signer = SignerKey(signer_key_data, SignerKeyType.SIGNER_KEY_TYPE_HASH_X)
+
+        assert ed25519_signer != hash_x_signer
+
 
 class TestSignedPayloadSigner:
     @pytest.mark.parametrize(
@@ -253,3 +262,10 @@ class TestSignedPayloadSigner:
             "<SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD: 3>",
         ):
             signer_key.to_signed_payload_signer()
+
+    def test_eq_compares_payload(self):
+        account_id = "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"
+        signer1 = SignedPayloadSigner(account_id, b"cat")
+        signer2 = SignedPayloadSigner(account_id, b"dog")
+
+        assert signer1 != signer2

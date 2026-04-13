@@ -31,7 +31,7 @@ class SignedPayloadSigner:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.account_id == other.account_id and self.payload == self.payload
+        return self.account_id == other.account_id and self.payload == other.payload
 
     def __repr__(self):
         return f"<SignedPayloadSigner [account_id={self.account_id}, payload={self.payload}]>"
@@ -249,7 +249,7 @@ class SignerKey:
             return NotImplemented
         return (
             self.signer_key == other.signer_key
-            and self.signer_key_type == self.signer_key_type
+            and self.signer_key_type == other.signer_key_type
         )
 
     def __repr__(self):
