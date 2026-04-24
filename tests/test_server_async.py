@@ -16,7 +16,7 @@ from stellar_sdk.account import Thresholds
 from stellar_sdk.call_builder.call_builder_async import *
 
 
-# @pytest.mark.slow
+@pytest.mark.slow
 @pytest.mark.asyncio
 class TestServerAsync:
     async def test_load_acount(self):
