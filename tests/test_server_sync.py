@@ -5,6 +5,7 @@ import requests_mock
 
 from stellar_sdk import (
     Asset,
+    FeeBumpTransactionEnvelope,
     MuxedAccount,
     Network,
     RequestsClient,
@@ -167,10 +168,16 @@ class TestServerSync:
             xdr = (
                 server.transactions()
                 .limit(1)
-                .order(True)
                 .call()["_embedded"]["records"][0]["envelope_xdr"]
             )
-            te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+            try:
+                te = TransactionEnvelope.from_xdr(
+                    xdr, Network.PUBLIC_NETWORK_PASSPHRASE
+                )
+            except ValueError:
+                te = FeeBumpTransactionEnvelope.from_xdr(
+                    xdr, Network.PUBLIC_NETWORK_PASSPHRASE
+                )
             resp = server.submit_transaction(te, True)
             assert resp["envelope_xdr"] == xdr
 

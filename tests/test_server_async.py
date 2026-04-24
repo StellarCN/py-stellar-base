@@ -6,6 +6,7 @@ from aioresponses import aioresponses
 from stellar_sdk import (
     AiohttpClient,
     Asset,
+    FeeBumpTransactionEnvelope,
     MuxedAccount,
     Network,
     ServerAsync,
@@ -163,10 +164,17 @@ class TestServerAsync:
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
         async with ServerAsync(horizon_url, client) as server:
-            xdr = (await server.transactions().limit(1).order(True).call())[
-                "_embedded"
-            ]["records"][0]["envelope_xdr"]
-            te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+            xdr = (await server.transactions().limit(1).call())["_embedded"]["records"][
+                0
+            ]["envelope_xdr"]
+            try:
+                te = TransactionEnvelope.from_xdr(
+                    xdr, Network.PUBLIC_NETWORK_PASSPHRASE
+                )
+            except ValueError:
+                te = FeeBumpTransactionEnvelope.from_xdr(
+                    xdr, Network.PUBLIC_NETWORK_PASSPHRASE
+                )
             resp = await server.submit_transaction(te, True)
             assert resp["envelope_xdr"] == xdr
 
