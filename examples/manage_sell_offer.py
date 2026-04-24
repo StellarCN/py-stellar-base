@@ -67,10 +67,8 @@ print("\nCreate new Asset\n")
 awesome_asset_coin = Asset("AAC", issuer_public_key)
 
 ## The Seller Account (the account that the custom asset receivs) must trust the asset.
-print(
-    "The Seller Account must trust the new asset. \
-      \nCreate Trust."
-)
+print("The Seller Account must trust the new asset. \
+      \nCreate Trust.")
 trust_transaction = (
     TransactionBuilder(
         source_account=seller_account,
@@ -137,11 +135,9 @@ print("Get Offer:")
 offers = server.offers().for_seller(seller_public_key).call()
 offer_id = None
 for offer in offers["_embedded"]["records"]:
-    print(
-        f"ID: {offer['id']}\nSeller: {offer['seller']} \
+    print(f"ID: {offer['id']}\nSeller: {offer['seller']} \
           \nSelling: {offer['selling']['asset_code']} \
-          \nAmount: {offer['amount']}\nPrice: {offer['price']}"
-    )
+          \nAmount: {offer['amount']}\nPrice: {offer['price']}")
     offer_id = offer["id"]
 
 print("#" * 30)
@@ -174,11 +170,9 @@ print("Offer updated")
 print("Get updated offer:")
 offers = server.offers().for_seller(seller_public_key).call()
 for offer in offers["_embedded"]["records"]:
-    print(
-        f"ID: {offer['id']}\nSeller: {offer['seller']} \
+    print(f"ID: {offer['id']}\nSeller: {offer['seller']} \
           \nSelling: {offer['selling']['asset_code']} \
-          \nAmount: {offer['amount']}\nPrice: {offer['price']}"
-    )
+          \nAmount: {offer['amount']}\nPrice: {offer['price']}")
 
 print("#" * 30)
 
@@ -210,11 +204,9 @@ print("check if offer is deleted:\n")
 offers = server.offers().for_seller(seller_public_key).call()
 if offers["_embedded"]["records"]:
     for offer in offers["_embedded"]["records"]:
-        print(
-            f"ID: {offer['id']}\nSeller: {offer['seller']} \
+        print(f"ID: {offer['id']}\nSeller: {offer['seller']} \
             \nSelling: {offer['selling']['asset_code']} \
-            \nAmount: {offer['amount']}\nPrice: {offer['price']}"
-        )
+            \nAmount: {offer['amount']}\nPrice: {offer['price']}")
 else:
     print("There is no offer")
 
