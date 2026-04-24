@@ -66,6 +66,7 @@ jobs:
         run: uv tree
 
       - name: Run type check
+        if: "!startsWith(matrix.platform.python-version, 'pypy')"
         run: make type-check
 
       - name: Test with pytest
