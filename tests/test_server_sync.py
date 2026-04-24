@@ -167,6 +167,7 @@ class TestServerSync:
             xdr = (
                 server.transactions()
                 .limit(1)
+                .order(True)
                 .call()["_embedded"]["records"][0]["envelope_xdr"]
             )
             te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)

@@ -15,7 +15,7 @@ from stellar_sdk.account import Thresholds
 from stellar_sdk.call_builder.call_builder_async import *
 
 
-@pytest.mark.slow
+# @pytest.mark.slow
 @pytest.mark.asyncio
 class TestServerAsync:
     async def test_load_acount(self):
@@ -163,9 +163,9 @@ class TestServerAsync:
         horizon_url = "https://horizon.stellar.org"
         client = AiohttpClient()
         async with ServerAsync(horizon_url, client) as server:
-            xdr = (await server.transactions().limit(1).call())["_embedded"]["records"][
-                0
-            ]["envelope_xdr"]
+            xdr = (await server.transactions().limit(1).order(True).call())[
+                "_embedded"
+            ]["records"][0]["envelope_xdr"]
             te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
             resp = await server.submit_transaction(te, True)
             assert resp["envelope_xdr"] == xdr
