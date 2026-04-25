@@ -6,6 +6,7 @@ from aioresponses import aioresponses
 from stellar_sdk import (
     AiohttpClient,
     Asset,
+    FeeBumpTransactionEnvelope,
     MuxedAccount,
     Network,
     ServerAsync,
@@ -166,7 +167,14 @@ class TestServerAsync:
             xdr = (await server.transactions().limit(1).call())["_embedded"]["records"][
                 0
             ]["envelope_xdr"]
-            te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
+            try:
+                te = TransactionEnvelope.from_xdr(
+                    xdr, Network.PUBLIC_NETWORK_PASSPHRASE
+                )
+            except ValueError:
+                te = FeeBumpTransactionEnvelope.from_xdr(
+                    xdr, Network.PUBLIC_NETWORK_PASSPHRASE
+                )
             resp = await server.submit_transaction(te, True)
             assert resp["envelope_xdr"] == xdr
 
