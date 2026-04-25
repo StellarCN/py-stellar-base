@@ -18,6 +18,7 @@ Release History
 - feat(xdr-generator): add SEP-0051 XDR-JSON support.
 - feat: add `close_time`, `header_xdr`, and `metadata_xdr` to `GetLatestLedgerResponse`.
 - chore: bump [stellar-xdr](https://github.com/stellar/stellar-xdr) to v25.0.
+- chore!: drop support for PyPy 3.10.
 
 ### Version 13.2.1
 
