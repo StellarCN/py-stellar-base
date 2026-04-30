@@ -841,6 +841,9 @@ Auth
 ^^^^
 .. autofunction:: stellar_sdk.auth.authorize_entry
 .. autofunction:: stellar_sdk.auth.authorize_invocation
+.. autofunction:: stellar_sdk.auth.authorization_payload_hash
+.. autofunction:: stellar_sdk.auth.build_authorization_preimage
+.. autodata:: stellar_sdk.auth.AuthorizationSigner
 
 Helpers
 ^^^^^^^

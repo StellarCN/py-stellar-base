@@ -3,7 +3,7 @@ import time
 from typing import Callable, Generic, TypeVar
 
 from .. import Address, Keypair, SorobanDataBuilder, xdr
-from ..auth import authorize_entry
+from ..auth import AuthorizationSigner, authorize_entry
 from ..base_soroban_server import _assemble_transaction
 from ..operation import InvokeHostFunction
 from ..soroban_rpc import (
@@ -172,12 +172,14 @@ class AssembledTransaction(Generic[T]):
 
     def sign_auth_entries(
         self,
-        auth_entries_signer: Keypair,
+        auth_entries_signer: Keypair | AuthorizationSigner,
+        address: Address | str | None = None,
         valid_until_ledger_sequence: int | None = None,
     ) -> "AssembledTransaction":
         """Signs the transaction's authorization entries.
 
-        :param auth_entries_signer: The keypair to sign the authorization entries.
+        :param auth_entries_signer: A :class:`Keypair`, or any custom :data:`AuthorizationSigner <stellar_sdk.auth.AuthorizationSigner>` for non-default account contracts (BLS, WebAuthn, ...).
+        :param address: Address whose authorization entries should be signed. Required when ``auth_entries_signer`` is not a :class:`Keypair`; otherwise inferred from the keypair's public key.
         :param valid_until_ledger_sequence: Optional ledger sequence until which the authorization is valid, if not set, defaults to 100 ledgers from the current ledger.
         :return: Self for chaining
         :raises: :exc:`NotYetSimulatedError <stellar_sdk.contract.exceptions.NotYetSimulatedError>`: If the transaction has not been simulated
@@ -188,6 +190,17 @@ class AssembledTransaction(Generic[T]):
         if not self.built_transaction:
             raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
 
+        if address is None:
+            if isinstance(auth_entries_signer, Keypair):
+                address = auth_entries_signer.public_key
+            else:
+                raise ValueError(
+                    "`address` is required when `auth_entries_signer` is not a Keypair."
+                )
+        target_address = (
+            address if isinstance(address, Address) else Address(address)
+        ).address
+
         op = self.built_transaction.transaction.operations[0]
         assert isinstance(op, InvokeHostFunction)
         for i, e in enumerate(op.auth):
@@ -197,10 +210,10 @@ class AssembledTransaction(Generic[T]):
             ):
                 continue
             assert e.credentials.address is not None
-            if (
-                Address.from_xdr_sc_address(e.credentials.address.address).address
-                != auth_entries_signer.public_key
-            ):
+            entry_address = Address.from_xdr_sc_address(
+                e.credentials.address.address
+            ).address
+            if entry_address != target_address:
                 continue
             op.auth[i] = authorize_entry(
                 e,
