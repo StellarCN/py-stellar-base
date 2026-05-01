@@ -1,6 +1,6 @@
 import copy
 import random
-from typing import Callable
+from typing import Callable, TypeAlias
 
 from . import scval
 from . import xdr as stellar_xdr
@@ -9,7 +9,9 @@ from .keypair import Keypair
 from .network import Network
 from .utils import sha256
 
-AuthorizationSigner = Callable[[stellar_xdr.HashIDPreimage], stellar_xdr.SCVal]
+AuthorizationSigner: TypeAlias = Callable[
+    [stellar_xdr.HashIDPreimage], stellar_xdr.SCVal
+]
 """Type alias for a custom Soroban authorization signer.
 
 Receives the authorization preimage and returns the signature ``SCVal`` accepted
