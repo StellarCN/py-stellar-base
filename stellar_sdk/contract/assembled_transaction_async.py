@@ -159,7 +159,7 @@ class AssembledTransactionAsync(Generic[T]):
         transaction_signer = transaction_signer or self.transaction_signer
         if not transaction_signer:
             raise ValueError(
-                "You must provide a sign_transaction_func to sign the transaction, either here or in the constructor."
+                "You must provide a transaction_signer to sign the transaction, either here or in the constructor."
             )
 
         sigs_needed = list(self.needs_non_invoker_signing_by())
