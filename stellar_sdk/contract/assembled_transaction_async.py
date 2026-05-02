@@ -4,7 +4,11 @@ import time
 from typing import Callable, Generic, TypeVar
 
 from .. import Address, Keypair, SorobanDataBuilder, SorobanServerAsync, xdr
-from ..auth import authorize_entry
+from ..auth import (
+    AuthorizationSigner,
+    _resolve_account_or_contract_address,
+    authorize_entry,
+)
 from ..base_soroban_server import _assemble_transaction
 from ..operation import InvokeHostFunction
 from ..soroban_rpc import (
@@ -155,12 +159,10 @@ class AssembledTransactionAsync(Generic[T]):
         transaction_signer = transaction_signer or self.transaction_signer
         if not transaction_signer:
             raise ValueError(
-                "You must provide a sign_transaction_func to sign the transaction, either here or in the constructor."
+                "You must provide a transaction_signer to sign the transaction, either here or in the constructor."
             )
 
-        sigs_needed = [
-            s for s in self.needs_non_invoker_signing_by() if not s.startswith("C")
-        ]
+        sigs_needed = list(self.needs_non_invoker_signing_by())
         if sigs_needed:
             raise NeedsMoreSignaturesError(
                 f"`Transaction requires signatures from {sigs_needed}`. See `needs_non_invoker_signing_by` for details.",
@@ -172,12 +174,14 @@ class AssembledTransactionAsync(Generic[T]):
 
     async def sign_auth_entries(
         self,
-        auth_entries_signer: Keypair,
+        auth_entries_signer: Keypair | AuthorizationSigner,
+        address: Address | str | None = None,
         valid_until_ledger_sequence: int | None = None,
     ) -> "AssembledTransactionAsync":
         """Signs the transaction's authorization entries.
 
-        :param auth_entries_signer: The keypair to sign the authorization entries.
+        :param auth_entries_signer: A :class:`Keypair`, or any custom :data:`AuthorizationSigner <stellar_sdk.auth.AuthorizationSigner>` for non-default account contracts (BLS, WebAuthn, ...).
+        :param address: Classic account (``G...``) or contract (``C...``) address whose authorization entries should be signed. Required when ``auth_entries_signer`` is not a :class:`Keypair`; otherwise inferred from the keypair's public key.
         :param valid_until_ledger_sequence: Optional ledger sequence until which the authorization is valid, if not set, defaults to 100 ledgers from the current ledger.
         :return: Self for chaining
         :raises: :exc:`NotYetSimulatedError <stellar_sdk.contract.exceptions.NotYetSimulatedError>`: If the transaction has not been simulated
@@ -190,6 +194,15 @@ class AssembledTransactionAsync(Generic[T]):
         if not self.built_transaction:
             raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
 
+        if address is None:
+            if isinstance(auth_entries_signer, Keypair):
+                address = auth_entries_signer.public_key
+            else:
+                raise ValueError(
+                    "`address` is required when `auth_entries_signer` is not a Keypair."
+                )
+        target_address = _resolve_account_or_contract_address(address).address
+
         op = self.built_transaction.transaction.operations[0]
         assert isinstance(op, InvokeHostFunction)
         for i, e in enumerate(op.auth):
@@ -199,10 +212,10 @@ class AssembledTransactionAsync(Generic[T]):
             ):
                 continue
             assert e.credentials.address is not None
-            if (
-                Address.from_xdr_sc_address(e.credentials.address.address).address
-                != auth_entries_signer.public_key
-            ):
+            entry_address = Address.from_xdr_sc_address(
+                e.credentials.address.address
+            ).address
+            if entry_address != target_address:
                 continue
             op.auth[i] = authorize_entry(
                 e,
