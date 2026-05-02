@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
@@ -9,6 +10,7 @@ from stellar_sdk.auth import (
     authorize_entry,
     authorize_invocation,
 )
+from stellar_sdk.contract import AssembledTransaction, AssembledTransactionAsync
 
 
 def _ed25519_auth_signer(signer: Keypair):
@@ -30,6 +32,31 @@ def _ed25519_auth_signer(signer: Keypair):
         )
 
     return _signer
+
+
+def _sample_invocation(
+    contract_id: str = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
+) -> stellar_xdr.SorobanAuthorizedInvocation:
+    return stellar_xdr.SorobanAuthorizedInvocation(
+        function=stellar_xdr.SorobanAuthorizedFunction(
+            type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
+            contract_fn=stellar_xdr.InvokeContractArgs(
+                contract_address=Address(contract_id).to_xdr_sc_address(),
+                function_name=stellar_xdr.SCSymbol(b"increment"),
+                args=[],
+            ),
+        ),
+        sub_invocations=[],
+    )
+
+
+_MUXED_ACCOUNT_ID = (
+    "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
+)
+_CLAIMABLE_BALANCE_ID = (
+    "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4TU"
+)
+_LIQUIDITY_POOL_ID = "LA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUPJN"
 
 
 class TestAuth:
@@ -840,4 +867,73 @@ class TestAuth:
                 654656,
                 invocation,
                 Network.TESTNET_NETWORK_PASSPHRASE,
+            )
+
+    @pytest.mark.parametrize(
+        "address",
+        [
+            _MUXED_ACCOUNT_ID,
+            Address(_CLAIMABLE_BALANCE_ID),
+            _LIQUIDITY_POOL_ID,
+        ],
+    )
+    def test_sign_authorize_invocation_rejects_non_account_contract_address(
+        self, address
+    ):
+        with pytest.raises(ValueError, match=r"classic account .* contract"):
+            authorize_invocation(
+                lambda _: scval.to_bytes(b"sig"),
+                address,
+                654656,
+                _sample_invocation(),
+                Network.TESTNET_NETWORK_PASSPHRASE,
+            )
+
+    def test_sign_authorize_entry_rejects_non_account_contract_credential_address(
+        self,
+    ):
+        credentials = stellar_xdr.SorobanCredentials(
+            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+            address=stellar_xdr.SorobanAddressCredentials(
+                address=Address(_MUXED_ACCOUNT_ID).to_xdr_sc_address(),
+                nonce=stellar_xdr.Int64(123456789),
+                signature_expiration_ledger=stellar_xdr.Uint32(0),
+                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
+            ),
+        )
+        entry = stellar_xdr.SorobanAuthorizationEntry(
+            credentials, _sample_invocation()
+        )
+
+        with pytest.raises(ValueError, match=r"classic account .* contract"):
+            authorize_entry(
+                entry,
+                Keypair.random(),
+                654656,
+                Network.TESTNET_NETWORK_PASSPHRASE,
+            )
+
+    def test_sign_auth_entries_rejects_non_account_contract_address(self):
+        fake_assembled_transaction = SimpleNamespace(built_transaction=object())
+
+        with pytest.raises(ValueError, match=r"classic account .* contract"):
+            AssembledTransaction.sign_auth_entries(
+                cast(Any, fake_assembled_transaction),
+                Keypair.random(),
+                _MUXED_ACCOUNT_ID,
+                654656,
+            )
+
+    @pytest.mark.asyncio
+    async def test_async_sign_auth_entries_rejects_non_account_contract_address(
+        self,
+    ):
+        fake_assembled_transaction = SimpleNamespace(built_transaction=object())
+
+        with pytest.raises(ValueError, match=r"classic account .* contract"):
+            await AssembledTransactionAsync.sign_auth_entries(
+                cast(Any, fake_assembled_transaction),
+                Keypair.random(),
+                Address(_CLAIMABLE_BALANCE_ID),
+                654656,
             )

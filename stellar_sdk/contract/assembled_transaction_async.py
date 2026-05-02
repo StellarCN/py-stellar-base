@@ -4,7 +4,11 @@ import time
 from typing import Callable, Generic, TypeVar
 
 from .. import Address, Keypair, SorobanDataBuilder, SorobanServerAsync, xdr
-from ..auth import AuthorizationSigner, authorize_entry
+from ..auth import (
+    AuthorizationSigner,
+    _resolve_account_or_contract_address,
+    authorize_entry,
+)
 from ..base_soroban_server import _assemble_transaction
 from ..operation import InvokeHostFunction
 from ..soroban_rpc import (
@@ -179,7 +183,7 @@ class AssembledTransactionAsync(Generic[T]):
         """Signs the transaction's authorization entries.
 
         :param auth_entries_signer: A :class:`Keypair`, or any custom :data:`AuthorizationSigner <stellar_sdk.auth.AuthorizationSigner>` for non-default account contracts (BLS, WebAuthn, ...).
-        :param address: Address whose authorization entries should be signed. Required when ``auth_entries_signer`` is not a :class:`Keypair`; otherwise inferred from the keypair's public key.
+        :param address: Classic account (``G...``) or contract (``C...``) address whose authorization entries should be signed. Required when ``auth_entries_signer`` is not a :class:`Keypair`; otherwise inferred from the keypair's public key.
         :param valid_until_ledger_sequence: Optional ledger sequence until which the authorization is valid, if not set, defaults to 100 ledgers from the current ledger.
         :return: Self for chaining
         :raises: :exc:`NotYetSimulatedError <stellar_sdk.contract.exceptions.NotYetSimulatedError>`: If the transaction has not been simulated
@@ -199,9 +203,7 @@ class AssembledTransactionAsync(Generic[T]):
                 raise ValueError(
                     "`address` is required when `auth_entries_signer` is not a Keypair."
                 )
-        target_address = (
-            address if isinstance(address, Address) else Address(address)
-        ).address
+        target_address = _resolve_account_or_contract_address(address).address
 
         op = self.built_transaction.transaction.operations[0]
         assert isinstance(op, InvokeHostFunction)

@@ -4,7 +4,7 @@ from typing import Callable, TypeAlias
 
 from . import scval
 from . import xdr as stellar_xdr
-from .address import Address
+from .address import Address, AddressType
 from .keypair import Keypair
 from .network import Network
 from .utils import sha256
@@ -55,7 +55,9 @@ def build_authorization_preimage(
     :param network_passphrase: Network passphrase incorporated into the signature.
     :return: A :class:`stellar_sdk.xdr.HashIDPreimage` for the authorization.
     :raises:
-        :exc:`ValueError`: if ``entry`` does not use address credentials.
+        :exc:`ValueError`: if ``entry`` does not use address credentials, or if
+        the credential address is not a classic account (``G...``) or contract
+        (``C...``) address.
     """
     if (
         entry.credentials.type
@@ -65,6 +67,7 @@ def build_authorization_preimage(
 
     assert entry.credentials.address is not None
     addr_auth = entry.credentials.address
+    _ensure_authorization_sc_address(addr_auth.address)
     network_id = Network(network_passphrase).network_id()
     return stellar_xdr.HashIDPreimage(
         type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION,
@@ -115,10 +118,30 @@ def _sign_authorization(
     return result
 
 
+_AUTHORIZED_ADDRESS_TYPES = (AddressType.ACCOUNT, AddressType.CONTRACT)
+_AUTHORIZED_SC_ADDRESS_TYPES = (
+    stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_ACCOUNT,
+    stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CONTRACT,
+)
+_AUTHORIZED_ADDRESS_ERROR = (
+    "Authorization address must be a classic account (G...) or contract (C...) address."
+)
+
+
+def _ensure_authorization_sc_address(address: stellar_xdr.SCAddress) -> None:
+    if address.type not in _AUTHORIZED_SC_ADDRESS_TYPES:
+        raise ValueError(_AUTHORIZED_ADDRESS_ERROR)
+
+
+def _resolve_account_or_contract_address(address: Address | str) -> Address:
+    resolved = address if isinstance(address, Address) else Address(address)
+    if resolved.type not in _AUTHORIZED_ADDRESS_TYPES:
+        raise ValueError(_AUTHORIZED_ADDRESS_ERROR)
+    return resolved
+
+
 def _resolve_address(address: Address | str) -> stellar_xdr.SCAddress:
-    return (
-        address if isinstance(address, Address) else Address(address)
-    ).to_xdr_sc_address()
+    return _resolve_account_or_contract_address(address).to_xdr_sc_address()
 
 
 def authorize_entry(
@@ -164,6 +187,9 @@ def authorize_entry(
     :param network_passphrase: Network passphrase incorporated into the signature
         (see :class:`stellar_sdk.Network` for options).
     :return: A signed Soroban authorization entry.
+    :raises:
+        :exc:`ValueError`: if the entry's credential address is not a classic
+        account (``G...``) or contract (``C...``) address.
     """
     if isinstance(entry, str):
         entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr(entry)
@@ -213,8 +239,9 @@ def authorize_invocation(
 
     :param signer: Either a :class:`Keypair` or an :data:`AuthorizationSigner`
         callable. See :func:`authorize_entry` for details.
-    :param address: The address being authorized. May be a classic ``G...``
-        account address or a ``C...`` contract address. When ``signer`` is a
+    :param address: The address being authorized. Must be a classic ``G...``
+        account address or a ``C...`` contract address, or an
+        :class:`Address` instance of one of those types. When ``signer`` is a
         :class:`Keypair`, may be omitted (defaults to the keypair's public key);
         otherwise required.
     :param valid_until_ledger_sequence: Ledger sequence through which this
@@ -224,7 +251,9 @@ def authorize_invocation(
     :param network_passphrase: Network passphrase incorporated into the signature.
     :return: A signed Soroban authorization entry.
     :raises:
-        :exc:`ValueError`: if ``address`` is omitted with a non-Keypair signer.
+        :exc:`ValueError`: if ``address`` is omitted with a non-Keypair signer,
+        or if ``address`` is not a classic account (``G...``) or contract
+        (``C...``) address.
     """
     if address is None:
         if isinstance(signer, Keypair):
