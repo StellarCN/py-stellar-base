@@ -162,9 +162,7 @@ class AssembledTransaction(Generic[T]):
                 "You must provide a sign_transaction_func to sign the transaction, either here or in the constructor."
             )
 
-        sigs_needed = [
-            s for s in self.needs_non_invoker_signing_by() if not s.startswith("C")
-        ]
+        sigs_needed = list(self.needs_non_invoker_signing_by())
         if sigs_needed:
             raise NeedsMoreSignaturesError(
                 f"`Transaction requires signatures from {sigs_needed}`. See `needs_non_invoker_signing_by` for details.",

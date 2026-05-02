@@ -11,6 +11,7 @@ from stellar_sdk.auth import (
     authorize_invocation,
 )
 from stellar_sdk.contract import AssembledTransaction, AssembledTransactionAsync
+from stellar_sdk.contract.exceptions import NeedsMoreSignaturesError
 
 
 def _ed25519_auth_signer(signer: Keypair):
@@ -936,4 +937,36 @@ class TestAuth:
                 Keypair.random(),
                 Address(_CLAIMABLE_BALANCE_ID),
                 654656,
+            )
+
+    def test_sign_requires_unsigned_contract_account_auth_entry(self):
+        contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+        fake_assembled_transaction = SimpleNamespace(
+            built_transaction=object(),
+            transaction_signer=None,
+            simulation=None,
+            needs_non_invoker_signing_by=lambda: {contract_id},
+        )
+
+        with pytest.raises(NeedsMoreSignaturesError, match=contract_id):
+            AssembledTransaction.sign(
+                cast(Any, fake_assembled_transaction),
+                transaction_signer=Keypair.random(),
+                force=True,
+            )
+
+    def test_async_sign_requires_unsigned_contract_account_auth_entry(self):
+        contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+        fake_assembled_transaction = SimpleNamespace(
+            built_transaction=object(),
+            transaction_signer=None,
+            simulation=None,
+            needs_non_invoker_signing_by=lambda: {contract_id},
+        )
+
+        with pytest.raises(NeedsMoreSignaturesError, match=contract_id):
+            AssembledTransactionAsync.sign(
+                cast(Any, fake_assembled_transaction),
+                transaction_signer=Keypair.random(),
+                force=True,
             )
