@@ -54,9 +54,7 @@ def _sample_invocation(
 _MUXED_ACCOUNT_ID = (
     "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
 )
-_CLAIMABLE_BALANCE_ID = (
-    "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4TU"
-)
+_CLAIMABLE_BALANCE_ID = "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4TU"
 _LIQUIDITY_POOL_ID = "LA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUPJN"
 
 
@@ -902,9 +900,7 @@ class TestAuth:
                 signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
             ),
         )
-        entry = stellar_xdr.SorobanAuthorizationEntry(
-            credentials, _sample_invocation()
-        )
+        entry = stellar_xdr.SorobanAuthorizationEntry(credentials, _sample_invocation())
 
         with pytest.raises(ValueError, match=r"classic account .* contract"):
             authorize_entry(
