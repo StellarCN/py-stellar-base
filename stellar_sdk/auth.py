@@ -50,8 +50,8 @@ def build_authorization_preimage(
     """Build the signature preimage for a Soroban address authorization entry.
 
     :param entry: Soroban authorization entry to be authorized.
-    :param valid_until_ledger_sequence: Exclusive future ledger sequence number
-        until which this authorization entry should be valid.
+    :param valid_until_ledger_sequence: Ledger sequence through which this
+        authorization entry should remain valid.
     :param network_passphrase: Network passphrase incorporated into the signature.
     :return: A :class:`stellar_sdk.xdr.HashIDPreimage` for the authorization.
     :raises:
@@ -158,9 +158,9 @@ def authorize_entry(
         signature shape) or an :data:`AuthorizationSigner` callable. The signer
         must produce a signature accepted by the account at
         ``entry.credentials.address``.
-    :param valid_until_ledger_sequence: Exclusive future ledger sequence number
-        until which this authorization entry should be valid (when
-        ``currentLedgerSeq == validUntil``, the entry is expired).
+    :param valid_until_ledger_sequence: Ledger sequence through which this
+        authorization entry should remain valid (the entry is invalid starting
+        at ``validUntil + 1``).
     :param network_passphrase: Network passphrase incorporated into the signature
         (see :class:`stellar_sdk.Network` for options).
     :return: A signed Soroban authorization entry.
@@ -217,8 +217,8 @@ def authorize_invocation(
         account address or a ``C...`` contract address. When ``signer`` is a
         :class:`Keypair`, may be omitted (defaults to the keypair's public key);
         otherwise required.
-    :param valid_until_ledger_sequence: Exclusive future ledger sequence number
-        until which this authorization entry should be valid.
+    :param valid_until_ledger_sequence: Ledger sequence through which this
+        authorization entry should remain valid.
     :param invocation: Invocation tree being authorized (typically from
         transaction simulation).
     :param network_passphrase: Network passphrase incorporated into the signature.
