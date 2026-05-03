@@ -13,6 +13,7 @@ __all__ = [
     "SimulationFailedError",
     "ExpiredStateError",
     "NoSignatureNeededError",
+    "NeedsPreparationError",
     "NeedsMoreSignaturesError",
     "SendTransactionFailedError",
     "TransactionFailedError",
@@ -50,6 +51,10 @@ class ExpiredStateError(AssembledTransactionError):
 
 class NoSignatureNeededError(AssembledTransactionError):
     """Raised when no signature is needed."""
+
+
+class NeedsPreparationError(AssembledTransactionError):
+    """Raised when the transaction needs to be prepared before continuing."""
 
 
 class NeedsMoreSignaturesError(AssembledTransactionError):
