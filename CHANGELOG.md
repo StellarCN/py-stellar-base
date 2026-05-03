@@ -11,6 +11,10 @@ Release History
     - `AuthorizationSigner`: `Callable[[HashIDPreimage], SCVal]` type alias.
     - `authorization_payload_hash(preimage) -> bytes`: returns the 32-byte payload that account contracts receive in `__check_auth`.
     - `build_authorization_preimage(entry, valid_until_ledger_sequence, network_passphrase) -> HashIDPreimage`: builds the signature preimage for an address-credential entry.
+- feat: improve `stellar_sdk.contract.AssembledTransaction` authorization lifecycle for contract account authorization.
+  - `AssembledTransaction.authorize(...)` / `AssembledTransactionAsync.authorize(...)` were added as clearer aliases for signing Soroban authorization entries. They support `valid_for_ledger_count` for relative authorization expiration.
+  - `AssembledTransaction.prepare()` / `AssembledTransactionAsync.prepare()` were added to re-simulate and prepare the current built transaction after authorization entries have changed. `sign_and_submit()` now automatically prepares when a `C...` contract account authorization was signed, while ordinary `G...` account authorizations keep the existing single-simulation flow.
+  - `NeedsPreparationError` is raised when exporting XDR, reading the result, checking read-call status, or signing the transaction envelope before required preparation has happened.
 - refactor!: remove deprecated `StrKey.encode_muxed_account` and `StrKey.decode_muxed_account`, use `stellar_sdk.MuxedAccount` instead.
 - refactor!: remove `TransactionBuilder.append_create_stellar_asset_contract_from_address_op`, use `TransactionBuilder.append_create_contract_op` instead.
 - feat!: add `max_content_size` parameter to `BaseSyncClient.get()` and `BaseAsyncClient.get()` to prevent DoS via memory exhaustion. `fetch_stellar_toml`, `fetch_stellar_toml_async` and federation resolve functions now enforce response size limits. Custom client implementations must update their `get()` signature to include `max_content_size: int | None = None`.
