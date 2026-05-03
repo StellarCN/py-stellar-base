@@ -17,9 +17,10 @@ from ..auth import (
     _resolve_account_or_contract_address,
     authorize_entry,
 )
-from ..base_soroban_server import _assemble_transaction
+from ..base_soroban_server import ResourceLeeway, _assemble_transaction
 from ..operation import InvokeHostFunction
 from ..soroban_rpc import (
+    AuthMode,
     GetTransactionResponse,
     GetTransactionStatus,
     RestorePreamble,
@@ -52,6 +53,13 @@ class AssembledTransactionAsync(Generic[T]):
     :param transaction_signer: Optional keypair for signing transactions, if you don't need to submit the transaction, you can set this to `None`.
     :param parse_result_xdr_fn: Optional function to parse XDR results, keep `None` for raw XDR
     :param submit_timeout: Timeout in seconds for transaction submission (default: 180s)
+    :param addl_resources: Additional resource leeway forwarded to every internal
+        simulation call (initial simulate, prepare, and the post-restore
+        re-simulation). Not applied to the inner ``RestoreFootprint`` transaction
+        created by automatic state restoration.
+    :param auth_mode: Authorization mode forwarded to every internal simulation
+        call. Use :class:`AuthMode.RECORD_ALL_NOROOT <stellar_sdk.soroban_rpc.AuthMode>`
+        to opt into non-root authorization in recording mode.
     """
 
     def __init__(
@@ -61,6 +69,8 @@ class AssembledTransactionAsync(Generic[T]):
         transaction_signer: Keypair | None = None,
         parse_result_xdr_fn: Callable[[xdr.SCVal], T] | None = None,
         submit_timeout: int = 180,
+        addl_resources: ResourceLeeway | None = None,
+        auth_mode: AuthMode | None = None,
     ):
         self.server = server
         self.submit_timeout = submit_timeout
@@ -70,6 +80,9 @@ class AssembledTransactionAsync(Generic[T]):
 
         self.transaction_builder: TransactionBuilder = transaction_builder
         self.built_transaction: TransactionEnvelope | None = None
+
+        self.addl_resources = addl_resources
+        self.auth_mode = auth_mode
 
         self.simulation: SimulateTransactionResponse | None = None
         self._simulation_result: SimulateHostFunctionResult | None = None
@@ -100,7 +113,11 @@ class AssembledTransactionAsync(Generic[T]):
         self.transaction_builder.source_account.sequence = source.sequence
 
         built_tx = self.transaction_builder.build()
-        self.simulation = await self.server.simulate_transaction(built_tx)
+        self.simulation = await self.server.simulate_transaction(
+            built_tx,
+            addl_resources=self.addl_resources,
+            auth_mode=self.auth_mode,
+        )
 
         if (
             restore
@@ -156,7 +173,11 @@ class AssembledTransactionAsync(Generic[T]):
             )
 
         simulation_tx = self._transaction_for_simulation()
-        self.simulation = await self.server.simulate_transaction(simulation_tx)
+        self.simulation = await self.server.simulate_transaction(
+            simulation_tx,
+            addl_resources=self.addl_resources,
+            auth_mode=self.auth_mode,
+        )
         self._simulation_result = None
         self._simulation_transaction_data = None
 
