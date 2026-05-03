@@ -401,12 +401,18 @@ class AssembledTransactionAsync(Generic[T]):
             )
             signed_any = True
 
-        if signed_any and target_address.type == AddressType.CONTRACT:
-            self._needs_preparation = True
-            self._preparation_reason = (
-                "Contract account authorization changed; call prepare() before "
-                "signing or exporting XDR."
+        if signed_any and self._authorization_requires_preparation(target_address):
+            self._mark_needs_preparation(
+                "Authorization entries changed in a way that may affect Soroban "
+                "resources; call prepare() before signing or exporting XDR."
             )
+
+    def _authorization_requires_preparation(self, address: Address) -> bool:
+        return address.type == AddressType.CONTRACT
+
+    def _mark_needs_preparation(self, reason: str) -> None:
+        self._needs_preparation = True
+        self._preparation_reason = reason
 
     def _transaction_for_simulation(self) -> TransactionEnvelope:
         if not self.built_transaction:

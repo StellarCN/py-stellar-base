@@ -170,9 +170,9 @@ def test_authorize_contract_address_requires_preparation():
         seen_preimages[0].soroban_authorization.signature_expiration_ledger.uint32
         == 120
     )
-    with pytest.raises(NeedsPreparationError, match="Contract account"):
+    with pytest.raises(NeedsPreparationError, match="Authorization entries"):
         assembled.sign(force=True)
-    with pytest.raises(NeedsPreparationError, match="Contract account"):
+    with pytest.raises(NeedsPreparationError, match="Authorization entries"):
         assembled.to_xdr()
 
 
