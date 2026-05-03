@@ -7,14 +7,14 @@ Stellar Python SDK
 ==================
 
 py-stellar-base is a Python library for communicating with
-a `Stellar Horizon server`_ and `Soroban-RPC server`_. It is used for building Stellar apps on Python. It supports **Python 3.10+** as
+a `Stellar Horizon server`_ and `Stellar RPC server`_. It is used for building Stellar apps on Python. It supports **Python 3.10+** as
 well as PyPy 3.11.
 
 It provides:
 
 - a networking layer API for Horizon endpoints.
-- a networking layer API for Soroban-RPC server methods.
-- facilities for building and signing transactions, for communicating with a Stellar Horizon and Soroban-RPC instance, and for submitting transactions or querying network history.
+- a networking layer API for Stellar RPC server methods.
+- facilities for building and signing transactions, for communicating with a Stellar Horizon and Stellar RPC instance, and for submitting transactions or querying network history.
 
 Quickstart
 ----------
@@ -76,4 +76,4 @@ Thank you to all the people who have already contributed to Stellar ecosystem!
 .. _Stellar Horizon server: https://github.com/stellar/go/tree/master/services/horizon
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
 .. _Stellar JavaScript SDK: https://github.com/stellar/js-stellar-sdk
-.. _Soroban-RPC server: https://soroban.stellar.org/docs/reference/rpc
+.. _Stellar RPC server: https://soroban.stellar.org/docs/reference/rpc

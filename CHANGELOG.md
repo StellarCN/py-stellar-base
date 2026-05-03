@@ -2,37 +2,54 @@ Release History
 ===============
 
 ### Pending
-- feat: expose `addl_resources` (`ResourceLeeway`) and `auth_mode` (`AuthMode`) parameters on `stellar_sdk.contract.AssembledTransaction`, `stellar_sdk.contract.AssembledTransactionAsync`, and `ContractClient.invoke` / `ContractClientAsync.invoke`. These values are stored on the assembled transaction and forwarded to every internal simulation call (initial `simulate()`, `prepare()`, and the post-restore re-simulation). The inner `RestoreFootprint` transaction created by automatic state restoration intentionally does not receive them.
-- feat!: redesign `stellar_sdk.auth` so any account contract (default Stellar Account, BLS, WebAuthn, threshold, ...) can authorize Soroban entries. The signer no longer hardcodes the default Stellar Account `Vec<Map{public_key, signature}>` signature shape. API changes:
-  - `stellar_sdk.auth.authorize_entry(entry, signer, valid_until_ledger_sequence, network_passphrase)`: the `signer` callable is now `Callable[[HashIDPreimage], SCVal]` (alias `stellar_sdk.auth.AuthorizationSigner`) and returns the signature `SCVal` accepted by the account contract — previously it was `Callable[[HashIDPreimage], tuple[str, bytes]]` returning `(public_key, signature)`. Passing a `Keypair` continues to work and still produces the default Stellar Account signature shape. The client-side `kp.verify(payload, signature)` self-check on callable signers has been removed (it cannot work for non-ed25519 accounts); custom signers are responsible for producing valid signatures.
-  - `stellar_sdk.auth.authorize_invocation(signer, address, valid_until_ledger_sequence, invocation, network_passphrase)`: the second positional parameter has been renamed `public_key` → `address`. It accepts only classic account (`G...`) or contract (`C...`) addresses, including matching `Address` instances. It remains optional when `signer` is a `Keypair`.
-  - `stellar_sdk.contract.AssembledTransaction.sign_auth_entries(auth_entries_signer, address=None, valid_until_ledger_sequence=None)` and the async counterpart `AssembledTransactionAsync.sign_auth_entries(...)`: `auth_entries_signer` now also accepts an `AuthorizationSigner` callable; the new `address` parameter selects which `G...` or `C...` entries to sign. It is required for non-`Keypair` signers and inferred from the keypair otherwise. Parameter order is `(signer, address, valid_until_ledger_sequence)` — `valid_until_ledger_sequence` has moved one position back.
-  - `AssembledTransaction.sign()` and the async counterpart now refuse to sign the transaction envelope while any non-invoker authorization entry is still unsigned, including `C...` contract account entries. Previously this check ignored `C...` entries.
-  - New public helpers in `stellar_sdk.auth`:
-    - `AuthorizationSigner`: `Callable[[HashIDPreimage], SCVal]` type alias.
-    - `authorization_payload_hash(preimage) -> bytes`: returns the 32-byte payload that account contracts receive in `__check_auth`.
-    - `build_authorization_preimage(entry, valid_until_ledger_sequence, network_passphrase) -> HashIDPreimage`: builds the signature preimage for an address-credential entry.
-- feat: improve `stellar_sdk.contract.AssembledTransaction` authorization lifecycle for contract account authorization.
-  - `AssembledTransaction.authorize(...)` / `AssembledTransactionAsync.authorize(...)` were added as clearer aliases for signing Soroban authorization entries. They support `valid_for_ledger_count` for relative authorization expiration.
-  - `AssembledTransaction.prepare()` / `AssembledTransactionAsync.prepare()` were added to re-simulate and prepare the current built transaction after authorization entries have changed. `sign_and_submit()` now automatically prepares when a `C...` contract account authorization was signed, while ordinary `G...` account authorizations keep the existing single-simulation flow.
-  - `NeedsPreparationError` is raised when exporting XDR, reading the result, checking read-call status, or signing the transaction envelope before required preparation has happened.
-- refactor!: remove deprecated `StrKey.encode_muxed_account` and `StrKey.decode_muxed_account`, use `stellar_sdk.MuxedAccount` instead.
-- refactor!: remove `TransactionBuilder.append_create_stellar_asset_contract_from_address_op`, use `TransactionBuilder.append_create_contract_op` instead.
-- feat!: add `max_content_size` parameter to `BaseSyncClient.get()` and `BaseAsyncClient.get()` to prevent DoS via memory exhaustion. `fetch_stellar_toml`, `fetch_stellar_toml_async` and federation resolve functions now enforce response size limits. Custom client implementations must update their `get()` signature to include `max_content_size: int | None = None`.
-- fix: correct equality checks for `SignedPayloadSigner` and `SignerKey`.
-- fix: xdr-generator security hardening:
-  - validate `Opaque`/`String` max sizes on unpack.
+
+### Version 14.0.0
+
+Released on May 03, 2026
+
+#### Breaking changes
+- Redesign `stellar_sdk.auth` so any account contract (default Stellar Account, BLS, WebAuthn, threshold, etc.) can authorize Soroban entries. ([#1160](https://github.com/StellarCN/py-stellar-base/pull/1160))
+  - `stellar_sdk.auth.authorize_entry(entry, signer, valid_until_ledger_sequence, network_passphrase)`: the `signer` callable is now `Callable[[HashIDPreimage], SCVal]` (alias `stellar_sdk.auth.AuthorizationSigner`) and returns the signature `SCVal` accepted by the account contract. It was previously `Callable[[HashIDPreimage], tuple[str, bytes]]` returning `(public_key, signature)`. Passing a `Keypair` continues to produce the default Stellar Account signature shape.
+  - `stellar_sdk.auth.authorize_invocation(signer, address, valid_until_ledger_sequence, invocation, network_passphrase)`: the second positional parameter was renamed from `public_key` to `address`. It accepts only classic account (`G...`) or contract (`C...`) addresses, including matching `Address` instances. It remains optional when `signer` is a `Keypair`.
+  - `AssembledTransaction.sign_auth_entries(auth_entries_signer, address=None, valid_until_ledger_sequence=None)` and `AssembledTransactionAsync.sign_auth_entries(...)`: `auth_entries_signer` now also accepts an `AuthorizationSigner` callable. The new `address` parameter selects which `G...` or `C...` entries to sign, is required for non-`Keypair` signers, and is inferred from the keypair otherwise. The parameter order is now `(signer, address, valid_until_ledger_sequence)`.
+  - `AssembledTransaction.sign()` and `AssembledTransactionAsync.sign()` now refuse to sign the transaction envelope while any non-invoker authorization entry is still unsigned, including `C...` contract account entries.
+  - New public helpers: `AuthorizationSigner`, `authorization_payload_hash(preimage)`, and `build_authorization_preimage(entry, valid_until_ledger_sequence, network_passphrase)`.
+- Add `max_content_size` to `BaseSyncClient.get()` and `BaseAsyncClient.get()` to prevent memory exhaustion from oversized responses. Custom client implementations must update their `get()` signature to include `max_content_size: int | None = None`. `fetch_stellar_toml`, `fetch_stellar_toml_async`, and federation resolve functions now enforce response size limits. ([#1131](https://github.com/StellarCN/py-stellar-base/pull/1131))
+- Remove deprecated `StrKey.encode_muxed_account` and `StrKey.decode_muxed_account`; use `stellar_sdk.MuxedAccount` instead. ([#1135](https://github.com/StellarCN/py-stellar-base/pull/1135))
+- Remove `TransactionBuilder.append_create_stellar_asset_contract_from_address_op`; use `TransactionBuilder.append_create_contract_op` instead. ([#1127](https://github.com/StellarCN/py-stellar-base/pull/1127))
+- Drop support for PyPy 3.10. ([#1159](https://github.com/StellarCN/py-stellar-base/pull/1159))
+
+#### Update
+- Upgrade generated Stellar XDR definitions to Protocol 26 through `stellar-xdr` v26.0. ([#1149](https://github.com/StellarCN/py-stellar-base/pull/1149))
+- Improve the `stellar_sdk.contract.AssembledTransaction` authorization lifecycle for contract account authorization. ([#1162](https://github.com/StellarCN/py-stellar-base/pull/1162))
+  - Add `AssembledTransaction.authorize(...)` and `AssembledTransactionAsync.authorize(...)` as clearer aliases for signing Soroban authorization entries. They support `valid_for_ledger_count` for relative authorization expiration.
+  - Add `AssembledTransaction.prepare()` and `AssembledTransactionAsync.prepare()` to re-simulate and prepare the current built transaction after authorization entries have changed.
+  - `sign_and_submit()` now automatically prepares when a `C...` contract account authorization was signed, while ordinary `G...` account authorizations keep the existing single-simulation flow.
+  - Raise `NeedsPreparationError` when exporting XDR, reading the result, checking read-call status, or signing the transaction envelope before required preparation has happened.
+- Expose `addl_resources` (`ResourceLeeway`) and `auth_mode` (`AuthMode`) parameters on `AssembledTransaction`, `AssembledTransactionAsync`, `ContractClient.invoke`, and `ContractClientAsync.invoke`. They are forwarded to the assembled transaction's internal simulation calls, including `simulate()`, `prepare()`, and post-restore re-simulation. The inner `RestoreFootprint` transaction created by automatic state restoration intentionally does not receive them. ([#1164](https://github.com/StellarCN/py-stellar-base/pull/1164))
+- Add `close_time`, `header_xdr`, and `metadata_xdr` to `GetLatestLedgerResponse`. ([#1136](https://github.com/StellarCN/py-stellar-base/pull/1136))
+- Add SEP-0051 XDR-JSON support to the XDR generator. ([#1134](https://github.com/StellarCN/py-stellar-base/pull/1134))
+- Sort `SCMap` entries by key in `scval.to_map` following Soroban runtime ordering. ([#1141](https://github.com/StellarCN/py-stellar-base/pull/1141))
+
+#### Fixes
+- Correct method call for simulation result output. ([#1163](https://github.com/StellarCN/py-stellar-base/pull/1163))
+- Correct equality checks for `SignedPayloadSigner` and `SignerKey`. ([#1153](https://github.com/StellarCN/py-stellar-base/pull/1153))
+- Harden XDR parsing and generation:
+  - validate `Opaque` and `String` max sizes on unpack.
   - add remaining-input-length checks for variable-length arrays.
   - raise on unmatched union discriminants in `pack()`.
   - raise on unknown union discriminants in `unpack()`.
   - check for trailing data in `from_xdr_bytes()`.
-  - add length validation for opaque/string in typedef and struct constructors.
+  - add length validation for opaque/string typedef and struct constructors.
   - fix `CIRCLE_IMPORT_UNION` lazy import tracking.
-  - add decoding depth limit (`DEFAULT_XDR_MAX_DEPTH = 512`) to prevent stack overflow via deeply nested XDR structures.
-- feat(xdr-generator): add SEP-0051 XDR-JSON support.
-- feat: add `close_time`, `header_xdr`, and `metadata_xdr` to `GetLatestLedgerResponse`.
-- chore: bump [stellar-xdr](https://github.com/stellar/stellar-xdr) to v25.0.
-- chore!: drop support for PyPy 3.10.
+  - add decoding depth limit (`DEFAULT_XDR_MAX_DEPTH = 512`) to prevent stack overflow from deeply nested XDR.
+
+#### Maintenance
+- Migrate the Python XDR generator from `xdrgen` into this SDK. ([#1113](https://github.com/StellarCN/py-stellar-base/pull/1113))
+- Regenerate XDR classes using the latest generator. ([#1137](https://github.com/StellarCN/py-stellar-base/pull/1137))
+- Add XDR-JSON tests and a script to compare Python XDR-JSON output against the Rust Stellar CLI. ([#1139](https://github.com/StellarCN/py-stellar-base/pull/1139), [#1140](https://github.com/StellarCN/py-stellar-base/pull/1140))
+- Add SBOM submission workflow for PG Atlas. ([#1143](https://github.com/StellarCN/py-stellar-base/pull/1143))
+- Update dependencies and test tooling, including Python 3.14 updates.
 
 ### Version 13.2.1
 
