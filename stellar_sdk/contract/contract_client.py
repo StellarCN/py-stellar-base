@@ -3,7 +3,9 @@ from typing import Callable, TypeVar
 
 from .. import Account, Asset, Keypair, MuxedAccount, scval
 from .. import xdr as stellar_xdr
+from ..base_soroban_server import ResourceLeeway
 from ..client.base_sync_client import BaseSyncClient
+from ..soroban_rpc import AuthMode
 from ..soroban_server import SorobanServer
 from ..transaction_builder import TransactionBuilder
 from .assembled_transaction import AssembledTransaction
@@ -54,6 +56,8 @@ class ContractClient:
         submit_timeout: int = 30,
         simulate: bool = True,
         restore: bool = True,
+        addl_resources: ResourceLeeway | None = None,
+        auth_mode: AuthMode | None = None,
     ) -> AssembledTransaction[T]:
         """Build an :py:class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>` to invoke a contract function.
 
@@ -67,6 +71,8 @@ class ContractClient:
         :param submit_timeout: The timeout for submitting the transaction.
         :param simulate: Whether to simulate the transaction.
         :param restore: Whether to restore the transaction, only valid when simulate is True, and the signer is provided.
+        :param addl_resources: Additional resource leeway forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>`.
+        :param auth_mode: Authorization mode forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>`.
         :return:
         """
         builder = (
@@ -79,7 +85,13 @@ class ContractClient:
             .set_timeout(transaction_timeout)
         )
         assembled = AssembledTransaction(
-            builder, self.server, signer, parse_result_xdr_fn, submit_timeout
+            builder,
+            self.server,
+            signer,
+            parse_result_xdr_fn,
+            submit_timeout,
+            addl_resources=addl_resources,
+            auth_mode=auth_mode,
         )
         if simulate:
             assembled = assembled.simulate(restore)

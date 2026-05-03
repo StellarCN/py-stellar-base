@@ -3,7 +3,9 @@ from typing import Callable, TypeVar
 
 from .. import Account, Asset, Keypair, MuxedAccount, SorobanServerAsync, scval
 from .. import xdr as stellar_xdr
+from ..base_soroban_server import ResourceLeeway
 from ..client.base_async_client import BaseAsyncClient
+from ..soroban_rpc import AuthMode
 from ..transaction_builder import TransactionBuilder
 from .assembled_transaction_async import AssembledTransactionAsync
 
@@ -53,6 +55,8 @@ class ContractClientAsync:
         submit_timeout: int = 30,
         simulate: bool = True,
         restore: bool = True,
+        addl_resources: ResourceLeeway | None = None,
+        auth_mode: AuthMode | None = None,
     ) -> AssembledTransactionAsync[T]:
         """Build an :py:class:`AssembledTransactionAsync <stellar_sdk.contract.AssembledTransactionAsync>` to invoke a contract function.
 
@@ -66,6 +70,8 @@ class ContractClientAsync:
         :param submit_timeout: The timeout for submitting the transaction.
         :param simulate: Whether to simulate the transaction.
         :param restore: Whether to restore the transaction, only valid when simulate is True, and the signer is provided.
+        :param addl_resources: Additional resource leeway forwarded to every simulation performed by the returned :class:`AssembledTransactionAsync <stellar_sdk.contract.AssembledTransactionAsync>`.
+        :param auth_mode: Authorization mode forwarded to every simulation performed by the returned :class:`AssembledTransactionAsync <stellar_sdk.contract.AssembledTransactionAsync>`.
         :return:
         """
         builder = (
@@ -78,7 +84,13 @@ class ContractClientAsync:
             .set_timeout(transaction_timeout)
         )
         assembled = AssembledTransactionAsync(
-            builder, self.server, signer, parse_result_xdr_fn, submit_timeout
+            builder,
+            self.server,
+            signer,
+            parse_result_xdr_fn,
+            submit_timeout,
+            addl_resources=addl_resources,
+            auth_mode=auth_mode,
         )
         if simulate:
             assembled = await assembled.simulate(restore)

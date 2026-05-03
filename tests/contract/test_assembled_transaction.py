@@ -71,7 +71,9 @@ class _FakeSorobanServer:
     def get_latest_ledger(self) -> SimpleNamespace:
         return SimpleNamespace(sequence=100)
 
-    def simulate_transaction(self, transaction) -> SimpleNamespace:
+    def simulate_transaction(
+        self, transaction, addl_resources=None, auth_mode=None
+    ) -> SimpleNamespace:
         self.simulated_transactions.append(transaction)
         restore_preamble = (
             self.restore_preambles.pop(0) if self.restore_preambles else None
@@ -89,7 +91,9 @@ class _FakeSorobanServerAsync:
     async def get_latest_ledger(self) -> SimpleNamespace:
         return SimpleNamespace(sequence=100)
 
-    async def simulate_transaction(self, transaction) -> SimpleNamespace:
+    async def simulate_transaction(
+        self, transaction, addl_resources=None, auth_mode=None
+    ) -> SimpleNamespace:
         self.simulated_transactions.append(transaction)
         restore_preamble = (
             self.restore_preambles.pop(0) if self.restore_preambles else None
