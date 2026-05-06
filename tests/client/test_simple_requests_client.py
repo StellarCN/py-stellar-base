@@ -1,14 +1,13 @@
 import pytest
 
 from stellar_sdk.client.simple_requests_client import USER_AGENT, SimpleRequestsClient
-from tests import HTTPBIN_URL
 
 
 @pytest.mark.slow
 class TestSimpleRequestsClient:
-    def test_get(self):
+    def test_get(self, httpbin_url):
         client = SimpleRequestsClient()
-        url = HTTPBIN_URL + "get"
+        url = httpbin_url + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = client.get(url, params=params)
         assert resp.status_code == 200
@@ -16,9 +15,9 @@ class TestSimpleRequestsClient:
         assert json["args"] == params
         assert json["headers"]["User-Agent"] == USER_AGENT
 
-    def test_post(self):
+    def test_post(self, httpbin_url):
         client = SimpleRequestsClient()
-        url = HTTPBIN_URL + "post"
+        url = httpbin_url + "post"
         data = {
             "tx": "AAAAABa3N0+hJk17vP/AnYK5xV4o/PhOnEfgi36HlYo4g+3nAAAAZQFDfjoAAaTSAAAAAA"
             "AAAAEAAAAJX3VwZGF0ZWRfAAAAAAAAAQAAAAEAAAAAFrc3T6EmTXu8/8CdgrnFXij8+E6cR+"

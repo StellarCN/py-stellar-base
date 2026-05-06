@@ -4,13 +4,12 @@ from stellar_sdk.__version__ import __version__
 from stellar_sdk.call_builder.call_builder_sync import BaseCallBuilder
 from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.exceptions import BadRequestError, NotFoundError, NotPageableError
-from tests import HTTPBIN_URL
 
 
 @pytest.mark.slow
 class TestBaseCallBuilder:
-    def test_get_data(self):
-        url = HTTPBIN_URL + "get"
+    def test_get_data(self, httpbin_url):
+        url = httpbin_url + "get"
         client = RequestsClient()
         resp = (
             BaseCallBuilder(horizon_url=url, client=client)
@@ -25,7 +24,7 @@ class TestBaseCallBuilder:
         ] == "py-stellar-base/{}/RequestsClient".format(__version__)
         assert resp["headers"]["X-Client-Name"] == "py-stellar-base"
         assert resp["headers"]["X-Client-Version"] == __version__
-        assert resp["url"] == HTTPBIN_URL + "get?limit=10&cursor=10086&order=desc"
+        assert resp["url"] == httpbin_url + "get?limit=10&cursor=10086&order=desc"
 
     @pytest.mark.timeout(30)
     def test_stream_data(self):
@@ -73,8 +72,8 @@ class TestBaseCallBuilder:
         )
         assert exception.extras is None
 
-    def test_get_data_no_link(self):
-        url = HTTPBIN_URL + "get"
+    def test_get_data_no_link(self, httpbin_url):
+        url = httpbin_url + "get"
         client = RequestsClient()
         call_builder = (
             BaseCallBuilder(horizon_url=url, client=client)
@@ -86,8 +85,8 @@ class TestBaseCallBuilder:
         assert call_builder.next_href is None
         assert call_builder.prev_href is None
 
-    def test_get_data_not_pageable_raise(self):
-        url = HTTPBIN_URL + "get"
+    def test_get_data_not_pageable_raise(self, httpbin_url):
+        url = httpbin_url + "get"
         client = RequestsClient()
         call_builder = (
             BaseCallBuilder(horizon_url=url, client=client)
@@ -134,8 +133,8 @@ class TestBaseCallBuilder:
         )
         client.close()
 
-    def test_horizon_url_params(self):
-        url = HTTPBIN_URL + "get?version=1.2&auth=myPassw0wd"
+    def test_horizon_url_params(self, httpbin_url):
+        url = httpbin_url + "get?version=1.2&auth=myPassw0wd"
         client = RequestsClient()
         resp = (
             BaseCallBuilder(horizon_url=url, client=client)
@@ -158,6 +157,6 @@ class TestBaseCallBuilder:
         assert resp["headers"]["X-Client-Version"] == __version__
         assert (
             resp["url"]
-            == HTTPBIN_URL
+            == httpbin_url
             + "get?version=1.2&auth=myPassw0wd&limit=10&cursor=10086&order=desc"
         )
