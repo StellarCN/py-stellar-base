@@ -6,14 +6,13 @@ from requests import RequestException
 
 from stellar_sdk.client.requests_client import USER_AGENT, RequestsClient
 from stellar_sdk.exceptions import ConnectionError, ContentSizeLimitExceededError
-from tests import HTTPBIN_URL
 
 
 @pytest.mark.slow
 class TestRequestsClient:
-    def test_get(self):
+    def test_get(self, httpbin_url):
         client = RequestsClient()
-        url = HTTPBIN_URL + "get"
+        url = httpbin_url + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = client.get(url, params=params)
         assert resp.status_code == 200
@@ -21,9 +20,9 @@ class TestRequestsClient:
         assert json["args"] == params
         assert json["headers"]["User-Agent"] == USER_AGENT
 
-    def test_post(self):
+    def test_post(self, httpbin_url):
         client = RequestsClient()
-        url = HTTPBIN_URL + "post"
+        url = httpbin_url + "post"
         data = {
             "tx": "AAAAABa3N0+hJk17vP/AnYK5xV4o/PhOnEfgi36HlYo4g+3nAAAAZQFDfjoAAaTSAAAAAA"
             "AAAAEAAAAJX3VwZGF0ZWRfAAAAAAAAAQAAAAEAAAAAFrc3T6EmTXu8/8CdgrnFXij8+E6cR+"
@@ -49,9 +48,9 @@ class TestRequestsClient:
             if len(resp) == 2:
                 break
 
-    def test_with(self):
+    def test_with(self, httpbin_url):
         with RequestsClient() as client:
-            url = HTTPBIN_URL + "get"
+            url = httpbin_url + "get"
             params = {"hello": "world", "stellar": "sdk"}
             resp = client.get(url, params=params)
             assert resp.status_code == 200
@@ -59,10 +58,10 @@ class TestRequestsClient:
             assert json["args"] == params
             assert json["headers"]["User-Agent"] == USER_AGENT
 
-    def test_custom_headers(self):
+    def test_custom_headers(self, httpbin_url):
         custom_headers = {"a": "b", "c": "d"}
         client = RequestsClient(custom_headers=custom_headers)
-        url = HTTPBIN_URL + "get"
+        url = httpbin_url + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = client.get(url, params=params)
         assert resp.status_code == 200

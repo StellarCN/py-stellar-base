@@ -3,16 +3,15 @@ from aioresponses import aioresponses
 
 from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
 from stellar_sdk.exceptions import ConnectionError, ContentSizeLimitExceededError
-from tests import HTTPBIN_URL
 
 
 @pytest.mark.slow
 class TestAiohttpClient:
     @pytest.mark.asyncio
-    async def test_get(self):
+    async def test_get(self, httpbin_url):
         user_agent = "Hello/Stellar/overcat"
         client = AiohttpClient(pool_size=10, user_agent=user_agent)
-        url = HTTPBIN_URL + "get"
+        url = httpbin_url + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = await client.get(url, params=params)
         assert resp.status_code == 200
@@ -22,9 +21,9 @@ class TestAiohttpClient:
         await client.close()
 
     @pytest.mark.asyncio
-    async def test_post(self):
+    async def test_post(self, httpbin_url):
         client = AiohttpClient()
-        url = HTTPBIN_URL + "post"
+        url = httpbin_url + "post"
         data = {
             "tx": "AAAAABa3N0+hJk17vP/AnYK5xV4o/PhOnEfgi36HlYo4g+3nAAAAZQFDfjoAAaTSAAAAAA"
             "AAAAEAAAAJX3VwZGF0ZWRfAAAAAAAAAQAAAAEAAAAAFrc3T6EmTXu8/8CdgrnFXij8+E6cR+"
@@ -53,9 +52,9 @@ class TestAiohttpClient:
                     break
 
     @pytest.mark.asyncio
-    async def test_with(self):
+    async def test_with(self, httpbin_url):
         async with AiohttpClient() as client:
-            url = HTTPBIN_URL + "get"
+            url = httpbin_url + "get"
             params = {"hello": "world", "stellar": "sdk"}
             resp = await client.get(url, params=params)
             assert resp.status_code == 200
@@ -64,13 +63,13 @@ class TestAiohttpClient:
             assert json["headers"]["User-Agent"] == USER_AGENT
 
     @pytest.mark.asyncio
-    async def test_custom_headers(self):
+    async def test_custom_headers(self, httpbin_url):
         user_agent = "Hello/Stellar/overcat"
         custom_headers = {"a": "b", "c": "d"}
         client = AiohttpClient(
             pool_size=10, user_agent=user_agent, custom_headers=custom_headers
         )
-        url = HTTPBIN_URL + "get"
+        url = httpbin_url + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = await client.get(url, params=params)
         assert resp.status_code == 200

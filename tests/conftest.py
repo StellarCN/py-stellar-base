@@ -1,4 +1,44 @@
+import json
+
 import pytest
+from werkzeug.wrappers import Response
+
+
+def _httpbin_headers(request):
+    return {key: value for key, value in request.headers.items()}
+
+
+def _json_response(payload):
+    return Response(json.dumps(payload), content_type="application/json")
+
+
+def _httpbin_get(request):
+    return _json_response(
+        {
+            "args": request.args.to_dict(flat=True),
+            "headers": _httpbin_headers(request),
+            "url": request.url,
+        }
+    )
+
+
+def _httpbin_post(request):
+    return _json_response(
+        {
+            "form": request.form.to_dict(flat=True),
+            "headers": _httpbin_headers(request),
+            "url": request.url,
+        }
+    )
+
+
+@pytest.fixture
+def httpbin_url(httpserver):
+    httpserver.expect_request("/get", method="GET").respond_with_handler(_httpbin_get)
+    httpserver.expect_request("/post", method="POST").respond_with_handler(
+        _httpbin_post
+    )
+    return httpserver.url_for("/")
 
 
 def pytest_addoption(parser):
