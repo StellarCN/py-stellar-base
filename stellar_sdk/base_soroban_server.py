@@ -7,6 +7,7 @@ from enum import Enum
 from typing import TYPE_CHECKING
 
 from . import xdr as stellar_xdr
+from .address import Address
 from .operation import InvokeHostFunction
 from .soroban_rpc import *
 
@@ -31,6 +32,28 @@ class Durability(Enum):
 
 def _generate_unique_request_id() -> str:
     return uuid.uuid4().hex
+
+
+def _build_contract_instance_key(contract_id: str) -> stellar_xdr.LedgerKey:
+    return stellar_xdr.LedgerKey(
+        stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+        contract_data=stellar_xdr.LedgerKeyContractData(
+            contract=Address(contract_id).to_xdr_sc_address(),
+            key=stellar_xdr.SCVal(
+                stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
+            ),
+            durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+        ),
+    )
+
+
+def _validate_wasm_hash(wasm_hash: bytes) -> None:
+    if not isinstance(wasm_hash, bytes):
+        raise TypeError("wasm_hash must be bytes")
+    if len(wasm_hash) != 32:
+        raise ValueError(f"wasm_hash must be 32 bytes, got {len(wasm_hash)}.")
+    if wasm_hash == b"\x00" * 32:
+        raise ValueError("wasm_hash must not be all zero bytes.")
 
 
 def _assemble_transaction(

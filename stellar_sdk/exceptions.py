@@ -26,6 +26,10 @@ __all__ = [
     "SorobanRpcErrorResponse",
     "AccountNotFoundException",
     "PrepareTransactionException",
+    "ContractWasmRetrievalError",
+    "ContractInstanceNotFoundError",
+    "SACHasNoWasmError",
+    "ContractCodeNotFoundError",
     "ContentSizeLimitExceededError",
 ]
 
@@ -189,6 +193,22 @@ class PrepareTransactionException(SdkError):
         super().__init__(message)
         self.message = message
         self.simulate_transaction_response = simulate_transaction_response
+
+
+class ContractWasmRetrievalError(SdkError):
+    """Raised when contract Wasm code cannot be retrieved from Stellar RPC."""
+
+
+class ContractInstanceNotFoundError(ContractWasmRetrievalError):
+    """Raised when a contract instance ledger entry cannot be found."""
+
+
+class SACHasNoWasmError(ContractWasmRetrievalError):
+    """Raised when a Stellar Asset Contract has no Wasm code."""
+
+
+class ContractCodeNotFoundError(ContractWasmRetrievalError):
+    """Raised when a contract code ledger entry cannot be found."""
 
 
 class ContentSizeLimitExceededError(BaseRequestError):

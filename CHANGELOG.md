@@ -2,6 +2,7 @@ Release History
 ===============
 
 ### Pending
+- Add SEP-46 contract metadata, SEP-47 contract interface discovery, and SEP-48 contract interface specification introspection APIs for Soroban contract Wasm, including `ContractMeta`, `ContractSpec`, `ContractInfo`, and `SorobanServer[Async].get_contract_*` helpers.
 
 ### Version 14.0.0
 
