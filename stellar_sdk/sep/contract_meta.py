@@ -16,15 +16,20 @@ class ContractMeta:
     """The :class:`ContractMeta` object, which represents SEP-46 contract
     metadata.
 
-    ``entries`` are normalized to a tuple in entry order.
+    ``entries`` are normalized to a read-only tuple in entry order.
 
     :param entries: The raw SEP-46 metadata XDR entries.
     """
 
-    __slots__ = ("entries",)
+    __slots__ = ("_entries",)
 
     def __init__(self, entries: tuple[stellar_xdr.SCMetaEntry, ...] = ()) -> None:
-        self.entries = tuple(entries)
+        self._entries = tuple(entries)
+
+    @property
+    def entries(self) -> tuple[stellar_xdr.SCMetaEntry, ...]:
+        """Returns the raw SEP-46 metadata XDR entries."""
+        return self._entries
 
     @classmethod
     def from_wasm(cls, wasm: bytes) -> "ContractMeta":

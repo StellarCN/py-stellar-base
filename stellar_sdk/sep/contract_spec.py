@@ -16,15 +16,20 @@ class ContractSpec:
     """The :class:`ContractSpec` object, which represents a SEP-48 contract
     interface specification.
 
-    ``entries`` are normalized to a tuple in entry order.
+    ``entries`` are normalized to a read-only tuple in entry order.
 
     :param entries: The raw SEP-48 specification XDR entries.
     """
 
-    __slots__ = ("entries",)
+    __slots__ = ("_entries",)
 
     def __init__(self, entries: tuple[stellar_xdr.SCSpecEntry, ...] = ()) -> None:
-        self.entries = tuple(entries)
+        self._entries = tuple(entries)
+
+    @property
+    def entries(self) -> tuple[stellar_xdr.SCSpecEntry, ...]:
+        """Returns the raw SEP-48 specification XDR entries."""
+        return self._entries
 
     @classmethod
     def from_wasm(cls, wasm: bytes) -> "ContractSpec":

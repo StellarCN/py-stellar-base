@@ -26,14 +26,15 @@ class ContractInfo:
     """The :class:`ContractInfo` object, which aggregates Soroban contract
     metadata and interface information.
 
-    ``env_meta`` is normalized to a tuple in entry order.
+    ``meta``, ``spec``, and ``env_meta`` are read-only. ``env_meta`` is
+    normalized to a tuple in entry order.
 
     :param meta: The contract metadata.
     :param spec: The contract interface specification.
     :param env_meta: The contract environment metadata entries.
     """
 
-    __slots__ = ("meta", "spec", "env_meta")
+    __slots__ = ("_meta", "_spec", "_env_meta")
 
     def __init__(
         self,
@@ -41,9 +42,24 @@ class ContractInfo:
         spec: ContractSpec,
         env_meta: tuple[stellar_xdr.SCEnvMetaEntry, ...] = (),
     ) -> None:
-        self.meta = meta
-        self.spec = spec
-        self.env_meta = tuple(env_meta)
+        self._meta = meta
+        self._spec = spec
+        self._env_meta = tuple(env_meta)
+
+    @property
+    def meta(self) -> ContractMeta:
+        """Returns the contract metadata."""
+        return self._meta
+
+    @property
+    def spec(self) -> ContractSpec:
+        """Returns the contract interface specification."""
+        return self._spec
+
+    @property
+    def env_meta(self) -> tuple[stellar_xdr.SCEnvMetaEntry, ...]:
+        """Returns the contract environment metadata entries."""
+        return self._env_meta
 
     @classmethod
     def from_wasm(cls, wasm: bytes) -> "ContractInfo":

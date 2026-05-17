@@ -14,9 +14,6 @@ from .soroban_rpc import *
 if TYPE_CHECKING:
     from .transaction_envelope import TransactionEnvelope
 
-if TYPE_CHECKING:
-    from .transaction_envelope import TransactionEnvelope
-
 
 @dataclasses.dataclass
 class ResourceLeeway:

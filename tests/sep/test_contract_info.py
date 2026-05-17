@@ -62,8 +62,12 @@ def test_contract_info_without_env_meta_uses_empty_tuple():
     assert repr(info).startswith("<ContractInfo [meta=")
     with pytest.raises(TypeError, match="unhashable"):
         hash(info)
-    info.spec = ContractSpec()
-    assert len(info.spec) == 0
+    with pytest.raises(AttributeError):
+        setattr(info, "meta", info.meta)
+    with pytest.raises(AttributeError):
+        setattr(info, "spec", ContractSpec())
+    with pytest.raises(AttributeError):
+        setattr(info, "env_meta", ())
 
 
 def test_contract_info_from_wasm_file(tmp_path):

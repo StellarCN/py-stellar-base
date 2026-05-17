@@ -78,8 +78,8 @@ def test_contract_meta_value_semantics_and_decode_errors():
     assert 123 not in meta
     with pytest.raises(TypeError, match="unhashable"):
         hash(meta)
-    meta.entries = ()
-    assert meta.entries == ()
+    with pytest.raises(AttributeError):
+        setattr(meta, "entries", ())
 
     invalid = ContractMeta(
         (
