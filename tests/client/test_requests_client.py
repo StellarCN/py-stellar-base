@@ -6,9 +6,9 @@ from requests import RequestException
 
 from stellar_sdk.client.requests_client import USER_AGENT, RequestsClient
 from stellar_sdk.exceptions import ConnectionError, ContentSizeLimitExceededError
+from tests import _horizon_fixtures as hf
 
 
-@pytest.mark.slow
 class TestRequestsClient:
     def test_get(self, httpbin_url):
         client = RequestsClient()
@@ -36,17 +36,17 @@ class TestRequestsClient:
         assert json["headers"]["Content-Type"] == "application/x-www-form-urlencoded"
         assert json["form"] == data
 
-    @pytest.mark.timeout(30)
-    def test_stream(self):
+    def test_stream(self, horizon_mock):
         client = RequestsClient()
-        resp = []
-        for msg in client.stream(
-            "https://horizon.stellar.org/ledgers", {"cursor": "now"}
-        ):
-            assert isinstance(msg, dict)
-            resp.append(msg)
-            if len(resp) == 2:
-                break
+        horizon_mock.expect(
+            "/ledgers", body=hf.stream_body(), content_type="text/event-stream"
+        )
+        stream = client.stream(horizon_mock.url + "ledgers", {"cursor": "now"})
+        try:
+            assert next(stream) == {"id": "1"}
+            assert next(stream) == {"id": "2"}
+        finally:
+            stream.close()
 
     def test_with(self, httpbin_url):
         with RequestsClient() as client:

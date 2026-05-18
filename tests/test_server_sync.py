@@ -1,8 +1,5 @@
 from decimal import Decimal
 
-import pytest
-import requests_mock
-
 from stellar_sdk import (
     Asset,
     FeeBumpTransactionEnvelope,
@@ -14,51 +11,54 @@ from stellar_sdk import (
 )
 from stellar_sdk.account import Thresholds
 from stellar_sdk.call_builder.call_builder_sync import *
+from tests import _horizon_fixtures as hf
 
 
-@pytest.mark.slow
 class TestServerSync:
-    def test_load_acount(self):
+    def test_load_acount(self, horizon_mock):
         account_id = "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"
-        horizon_url = "https://horizon.stellar.org"
-        with Server(horizon_url) as server:
+        horizon_mock.expect(f"/accounts/{account_id}", json=hf.account(account_id))
+        with Server(horizon_mock.url) as server:
             account = server.load_account(account_id)
             assert account.account == MuxedAccount.from_account(account_id)
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
 
-    def test_load_acount_muxed_account_str(self):
+    def test_load_acount_muxed_account_str(self, horizon_mock):
         account_id = (
             "MDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQAAAAAAAAAAE2KS7Y"
         )
-        horizon_url = "https://horizon.stellar.org"
-        with Server(horizon_url) as server:
+        base_account_id = "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"
+        horizon_mock.expect(
+            f"/accounts/{base_account_id}", json=hf.account(base_account_id)
+        )
+        with Server(horizon_mock.url) as server:
             account = server.load_account(account_id)
-            assert account.account == MuxedAccount.from_account(
-                "MDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQAAAAAAAAAAE2KS7Y"
-            )
+            assert account.account == MuxedAccount.from_account(account_id)
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
 
-    def test_load_acount_muxed_account(self):
+    def test_load_acount_muxed_account(self, horizon_mock):
         account_id = MuxedAccount(
             "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D", 1234
         )
-        horizon_url = "https://horizon.stellar.org"
-        with Server(horizon_url) as server:
+        horizon_mock.expect(
+            f"/accounts/{account_id.account_id}", json=hf.account(account_id.account_id)
+        )
+        with Server(horizon_mock.url) as server:
             account = server.load_account(account_id)
             assert account.account == account_id
             assert isinstance(account.sequence, int)
             assert account.thresholds == Thresholds(1, 2, 3)
 
-    def test_fetch_base_fee(self):
-        horizon_url = "https://horizon.stellar.org"
-        with Server(horizon_url) as server:
+    def test_fetch_base_fee(self, horizon_mock):
+        horizon_mock.expect("/ledgers", json=hf.ledger())
+        with Server(horizon_mock.url) as server:
             base_fee = server.fetch_base_fee()
             assert base_fee == 100
 
-    def test_endpoint(self):
-        horizon_url = "https://horizon.stellar.org"
+    def test_endpoint(self, horizon_mock):
+        horizon_url = horizon_mock.url
         client = RequestsClient()
         with Server(horizon_url, client) as server:
             assert server.accounts() == AccountsCallBuilder(horizon_url, client)
@@ -148,83 +148,60 @@ class TestServerSync:
             assert server.trades() == TradesCallBuilder(horizon_url, client)
             assert server.transactions() == TransactionsCallBuilder(horizon_url, client)
 
-    def test_submit_transaction_with_xdr(self):
-        # TODO: mock test
-        horizon_url = "https://horizon.stellar.org"
+    def test_submit_transaction_with_xdr(self, horizon_mock):
         client = RequestsClient()
-        with Server(horizon_url, client) as server:
-            xdr = (
-                server.transactions()
-                .limit(1)
-                .call()["_embedded"]["records"][0]["envelope_xdr"]
-            )
-            resp = server.submit_transaction(xdr, True)
-            assert resp["envelope_xdr"] == xdr
+        horizon_mock.expect(
+            "/transactions", method="POST", json=hf.submit_transaction()
+        )
+        with Server(horizon_mock.url, client) as server:
+            resp = server.submit_transaction(hf.TRANSACTION_XDR, True)
+            assert resp["envelope_xdr"] == hf.TRANSACTION_XDR
 
-    def test_submit_transaction_with_te(self):
-        horizon_url = "https://horizon.stellar.org"
+    def test_submit_transaction_with_te(self, horizon_mock):
         client = RequestsClient()
-        with Server(horizon_url, client) as server:
-            xdr = (
-                server.transactions()
-                .limit(1)
-                .call()["_embedded"]["records"][0]["envelope_xdr"]
+        horizon_mock.expect(
+            "/transactions", method="POST", json=hf.submit_transaction()
+        )
+        try:
+            te = TransactionEnvelope.from_xdr(
+                hf.TRANSACTION_XDR, Network.PUBLIC_NETWORK_PASSPHRASE
             )
-            try:
-                te = TransactionEnvelope.from_xdr(
-                    xdr, Network.PUBLIC_NETWORK_PASSPHRASE
-                )
-            except ValueError:
-                te = FeeBumpTransactionEnvelope.from_xdr(
-                    xdr, Network.PUBLIC_NETWORK_PASSPHRASE
-                )
+        except ValueError:
+            te = FeeBumpTransactionEnvelope.from_xdr(
+                hf.TRANSACTION_XDR, Network.PUBLIC_NETWORK_PASSPHRASE
+            )
+        with Server(horizon_mock.url, client) as server:
             resp = server.submit_transaction(te, True)
-            assert resp["envelope_xdr"] == xdr
+            assert resp["envelope_xdr"] == hf.TRANSACTION_XDR
 
-    def test_submit_transaction_async_with_xdr(self):
-        xdr = "AAAAAHI7fpgo+b7tgpiFyYWimjV7L7IOYLwmQS7k7F8SronXAAAAZAE+QT4AAAAJAAAAAQAAAAAAAAAAAAAAAF1MG8cAAAAAAAAAAQAAAAAAAAAAAAAAAOvi1O/HEn+QgZJw+EMZBtwvTVNmpgvE9p8IRfwp0GY4AAAAAAExLQAAAAAAAAAAARKuidcAAABAJVc1ASGp35hUquGNbzzSqWPoTG0zgc89zc4p+19QkgbPqsdyEfHs7+ng9VJA49YneEXRa6Fv7pfKpEigb3VTCg=="
-        horizon_url = "https://horizon.stellar.org"
+    def test_submit_transaction_async_with_xdr(self, horizon_mock):
         client = RequestsClient()
-        te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
-        assert (
-            te.hash_hex()
-            == "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084"
+        te = TransactionEnvelope.from_xdr(
+            hf.TRANSACTION_XDR, Network.PUBLIC_NETWORK_PASSPHRASE
         )
-        data = {
-            "tx_status": "PENDING",
-            "hash": "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084",
-        }
+        assert te.hash_hex() == hf.TRANSACTION_HASH
+        horizon_mock.expect(
+            "/transactions_async",
+            method="POST",
+            json=hf.submit_transaction_async(hf.TRANSACTION_HASH),
+        )
+        with Server(horizon_mock.url, client) as server:
+            resp = server.submit_transaction_async(hf.TRANSACTION_XDR, True)
+            assert resp["hash"] == hf.TRANSACTION_HASH
+            assert resp["tx_status"] == "PENDING"
 
-        with requests_mock.Mocker() as m:
-            m.post(f"{horizon_url}/transactions_async", json=data)
-            with Server(horizon_url, client) as server:
-                resp = server.submit_transaction_async(xdr, True)
-                assert (
-                    resp["hash"]
-                    == "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084"
-                )
-                assert resp["tx_status"] == "PENDING"
-
-    def test_submit_transaction_async_with_te(self):
-        xdr = "AAAAAHI7fpgo+b7tgpiFyYWimjV7L7IOYLwmQS7k7F8SronXAAAAZAE+QT4AAAAJAAAAAQAAAAAAAAAAAAAAAF1MG8cAAAAAAAAAAQAAAAAAAAAAAAAAAOvi1O/HEn+QgZJw+EMZBtwvTVNmpgvE9p8IRfwp0GY4AAAAAAExLQAAAAAAAAAAARKuidcAAABAJVc1ASGp35hUquGNbzzSqWPoTG0zgc89zc4p+19QkgbPqsdyEfHs7+ng9VJA49YneEXRa6Fv7pfKpEigb3VTCg=="
-        te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
-        horizon_url = "https://horizon.stellar.org"
+    def test_submit_transaction_async_with_te(self, horizon_mock):
         client = RequestsClient()
-        assert (
-            te.hash_hex()
-            == "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084"
+        te = TransactionEnvelope.from_xdr(
+            hf.TRANSACTION_XDR, Network.PUBLIC_NETWORK_PASSPHRASE
         )
-        data = {
-            "tx_status": "PENDING",
-            "hash": "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084",
-        }
-
-        with requests_mock.Mocker() as m:
-            m.post(f"{horizon_url}/transactions_async", json=data)
-            with Server(horizon_url, client) as server:
-                resp = server.submit_transaction_async(te, True)
-                assert (
-                    resp["hash"]
-                    == "c1d2d2b16afb3313cea19f9854ffc095a18baf2d04508ef6d367a72928231084"
-                )
-                assert resp["tx_status"] == "PENDING"
+        assert te.hash_hex() == hf.TRANSACTION_HASH
+        horizon_mock.expect(
+            "/transactions_async",
+            method="POST",
+            json=hf.submit_transaction_async(hf.TRANSACTION_HASH),
+        )
+        with Server(horizon_mock.url, client) as server:
+            resp = server.submit_transaction_async(te, True)
+            assert resp["hash"] == hf.TRANSACTION_HASH
+            assert resp["tx_status"] == "PENDING"

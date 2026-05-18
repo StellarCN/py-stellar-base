@@ -3,7 +3,6 @@ import pytest
 from stellar_sdk.client.simple_requests_client import USER_AGENT, SimpleRequestsClient
 
 
-@pytest.mark.slow
 class TestSimpleRequestsClient:
     def test_get(self, httpbin_url):
         client = SimpleRequestsClient()
