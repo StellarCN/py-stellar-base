@@ -295,6 +295,27 @@ Response
 Contract
 ^^^^^^^^
 
+ContractMeta
+------------
+
+.. autoclass:: stellar_sdk.sep.contract_meta.ContractMeta
+   :members:
+   :undoc-members:
+
+ContractSpec
+------------
+
+.. autoclass:: stellar_sdk.sep.contract_spec.ContractSpec
+   :members:
+   :undoc-members:
+
+ContractInfo
+------------
+
+.. autoclass:: stellar_sdk.sep.contract_info.ContractInfo
+   :members:
+   :undoc-members:
+
 ContractClient
 ---------------
 

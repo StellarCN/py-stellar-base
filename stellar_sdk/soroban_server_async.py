@@ -15,16 +15,25 @@ from .base_soroban_server import (
     Durability,
     ResourceLeeway,
     _assemble_transaction,
+    _build_contract_instance_key,
     _generate_unique_request_id,
+    _validate_wasm_hash,
 )
 from .client.aiohttp_client import AiohttpClient
 from .exceptions import (
     AccountNotFoundException,
+    ContractCodeNotFoundError,
+    ContractInstanceNotFoundError,
+    ContractWasmRetrievalError,
     PrepareTransactionException,
+    SACHasNoWasmError,
     SorobanRpcErrorResponse,
     raise_request_exception,
 )
 from .keypair import Keypair
+from .sep.contract_info import ContractInfo
+from .sep.contract_meta import ContractMeta
+from .sep.contract_spec import ContractSpec
 from .soroban_rpc import *
 from .strkey import StrKey
 from .xdr import (
@@ -416,6 +425,92 @@ class SorobanServerAsync:
             return None
         return entries[0]
 
+    async def get_contract_wasm(self, contract_id: str) -> bytes:
+        """Fetch a contract's Wasm code.
+
+        :param contract_id: The contract ID encoded as a Stellar contract address.
+        :return: The raw Wasm code.
+        :raises: :exc:`ContractInstanceNotFoundError <stellar_sdk.exceptions.ContractInstanceNotFoundError>` - If the contract instance ledger entry is not found.
+        :raises: :exc:`SACHasNoWasmError <stellar_sdk.exceptions.SACHasNoWasmError>` - If the contract is a Stellar Asset Contract.
+        :raises: :exc:`ContractCodeNotFoundError <stellar_sdk.exceptions.ContractCodeNotFoundError>` - If the contract code ledger entry is not found or archived.
+        :raises: :exc:`ContractWasmRetrievalError <stellar_sdk.exceptions.ContractWasmRetrievalError>` - If the executable kind is not supported.
+        """
+        instance = await self._get_contract_instance(contract_id)
+        executable = instance.executable
+        if (
+            executable.type
+            == stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM
+        ):
+            if executable.wasm_hash is None:
+                raise ContractWasmRetrievalError(
+                    f"Contract {contract_id} executable is missing its Wasm hash."
+                )
+            return await self.get_contract_wasm_by_hash(executable.wasm_hash.hash)
+        if (
+            executable.type
+            == stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET
+        ):
+            raise SACHasNoWasmError(
+                f"Contract {contract_id} is a Stellar Asset Contract and has no Wasm code."
+            )
+        raise ContractWasmRetrievalError(
+            f"Contract {contract_id} uses unsupported executable kind: {executable.type!r}."
+        )
+
+    async def get_contract_wasm_by_hash(self, wasm_hash: bytes) -> bytes:
+        """Fetch raw contract Wasm code by its 32-byte hash.
+
+        :param wasm_hash: The 32-byte Wasm hash.
+        :return: The raw Wasm code.
+        :raises ValueError: If ``wasm_hash`` is not 32 bytes or is all zero bytes.
+        :raises TypeError: If ``wasm_hash`` is not bytes.
+        :raises: :exc:`ContractCodeNotFoundError <stellar_sdk.exceptions.ContractCodeNotFoundError>` - If the contract code ledger entry is not found or archived.
+        :raises: :exc:`ContractWasmRetrievalError <stellar_sdk.exceptions.ContractWasmRetrievalError>` - If the ledger entry response does not contain contract code.
+        """
+        _validate_wasm_hash(wasm_hash)
+        key = stellar_xdr.LedgerKey(
+            stellar_xdr.LedgerEntryType.CONTRACT_CODE,
+            contract_code=stellar_xdr.LedgerKeyContractCode(
+                hash=stellar_xdr.Hash(wasm_hash)
+            ),
+        )
+        resp = await self.get_ledger_entries([key])
+        if not resp.entries:
+            raise ContractCodeNotFoundError(
+                "Contract code ledger entry was not found or is archived. "
+                "Restoring the contract code footprint may be required."
+            )
+        data = stellar_xdr.LedgerEntryData.from_xdr(resp.entries[0].xdr)
+        if data.contract_code is None:
+            raise ContractWasmRetrievalError(
+                "Ledger entry response did not contain contract code."
+            )
+        return data.contract_code.code
+
+    async def get_contract_meta(self, contract_id: str) -> ContractMeta:
+        """Fetch and parse a contract's SEP-46 metadata.
+
+        :param contract_id: The contract ID encoded as a Stellar contract address.
+        :return: The contract metadata.
+        """
+        return ContractMeta.from_wasm(await self.get_contract_wasm(contract_id))
+
+    async def get_contract_spec(self, contract_id: str) -> ContractSpec:
+        """Fetch and parse a contract's SEP-48 interface specification.
+
+        :param contract_id: The contract ID encoded as a Stellar contract address.
+        :return: The contract interface specification.
+        """
+        return ContractSpec.from_wasm(await self.get_contract_wasm(contract_id))
+
+    async def get_contract_info(self, contract_id: str) -> ContractInfo:
+        """Fetch and parse a contract's metadata, spec, and environment metadata.
+
+        :param contract_id: The contract ID encoded as a Stellar contract address.
+        :return: The contract metadata, interface specification, and environment metadata.
+        """
+        return ContractInfo.from_wasm(await self.get_contract_wasm(contract_id))
+
     async def get_version_info(self) -> GetVersionInfoResponse:
         """Version information about the RPC and Captive core.
 
@@ -573,3 +668,27 @@ class SorobanServerAsync:
 
     def __repr__(self):
         return f"<SorobanServerAsync [server_url={self.server_url}, client={self._client}]>"
+
+    async def _get_contract_instance(
+        self, contract_id: str
+    ) -> stellar_xdr.SCContractInstance:
+        key = _build_contract_instance_key(contract_id)
+        resp = await self.get_ledger_entries([key])
+        if not resp.entries:
+            raise ContractInstanceNotFoundError(
+                f"Contract instance ledger entry was not found: {contract_id}."
+            )
+        data = stellar_xdr.LedgerEntryData.from_xdr(resp.entries[0].xdr)
+        if data.contract_data is None:
+            raise ContractWasmRetrievalError(
+                f"Ledger entry response did not contain contract data: {contract_id}."
+            )
+        val = data.contract_data.val
+        if (
+            val.type != stellar_xdr.SCValType.SCV_CONTRACT_INSTANCE
+            or val.instance is None
+        ):
+            raise ContractWasmRetrievalError(
+                f"Contract data entry did not contain a contract instance: {contract_id}."
+            )
+        return val.instance
