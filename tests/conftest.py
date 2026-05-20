@@ -67,7 +67,7 @@ class HorizonMock:
         )
         if body is not None:
             request.respond_with_response(
-                Response(body, content_type=content_type or "text/plain")
+                Response(body, status=status, content_type=content_type or "text/plain")
             )
         else:
             request.respond_with_json(json, status=status)

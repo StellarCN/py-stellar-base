@@ -28,17 +28,22 @@ class TestBaseCallBuilder:
 
     def test_stream_data(self, horizon_mock):
         url = horizon_mock.url + "ledgers"
-        client = RequestsClient()
         horizon_mock.expect(
             "/ledgers", body=hf.stream_body(), content_type="text/event-stream"
         )
-        resp = BaseCallBuilder(horizon_url=url, client=client).cursor("now")._stream()
-        messages = []
-        for msg in resp:
-            assert isinstance(msg, dict)
-            messages.append(msg)
-            if len(messages) == 2:
-                break
+        with RequestsClient() as client:
+            resp = (
+                BaseCallBuilder(horizon_url=url, client=client).cursor("now")._stream()
+            )
+            try:
+                messages = []
+                for msg in resp:
+                    assert isinstance(msg, dict)
+                    messages.append(msg)
+                    if len(messages) == 2:
+                        break
+            finally:
+                resp.close()
 
     def test_status_400_raise(self, horizon_mock):
         url = horizon_mock.url + "accounts/BADACCOUNTID"

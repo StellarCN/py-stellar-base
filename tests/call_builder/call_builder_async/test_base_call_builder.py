@@ -30,18 +30,22 @@ class TestBaseCallBuilder:
 
     async def test_get_stream_data(self, horizon_mock):
         url = horizon_mock.url + "ledgers"
-        client = AiohttpClient()
         horizon_mock.expect(
             "/ledgers", body=hf.stream_body(), content_type="text/event-stream"
         )
-        resp = BaseCallBuilder(horizon_url=url, client=client).cursor("now")._stream()
-        messages = []
-        async for msg in resp:
-            assert isinstance(msg, dict)
-            messages.append(msg)
-            if len(messages) == 2:
-                break
-        await client.close()
+        async with AiohttpClient() as client:
+            resp = (
+                BaseCallBuilder(horizon_url=url, client=client).cursor("now")._stream()
+            )
+            try:
+                messages = []
+                async for msg in resp:
+                    assert isinstance(msg, dict)
+                    messages.append(msg)
+                    if len(messages) == 2:
+                        break
+            finally:
+                await resp.aclose()
 
     async def test_status_400_raise(self, horizon_mock):
         url = horizon_mock.url + "accounts/BADACCOUNTID"
