@@ -3,9 +3,9 @@ from aioresponses import aioresponses
 
 from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
 from stellar_sdk.exceptions import ConnectionError, ContentSizeLimitExceededError
+from tests import _horizon_fixtures as hf
 
 
-@pytest.mark.slow
 class TestAiohttpClient:
     @pytest.mark.asyncio
     async def test_get(self, httpbin_url):
@@ -39,17 +39,17 @@ class TestAiohttpClient:
         await client.close()
 
     @pytest.mark.asyncio
-    @pytest.mark.timeout(30)
-    async def test_stream(self):
+    async def test_stream(self, horizon_mock):
+        horizon_mock.expect(
+            "/ledgers", body=hf.stream_body(), content_type="text/event-stream"
+        )
         async with AiohttpClient() as client:
-            resp = []
-            async for msg in client.stream(
-                "https://horizon.stellar.org/ledgers", {"cursor": "now"}
-            ):
-                assert isinstance(msg, dict)
-                resp.append(msg)
-                if len(resp) == 2:
-                    break
+            stream = client.stream(horizon_mock.url + "ledgers", {"cursor": "now"})
+            try:
+                assert await anext(stream) == {"id": "1"}
+                assert await anext(stream) == {"id": "2"}
+            finally:
+                await stream.aclose()
 
     @pytest.mark.asyncio
     async def test_with(self, httpbin_url):

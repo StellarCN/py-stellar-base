@@ -4,9 +4,9 @@ from stellar_sdk.__version__ import __version__
 from stellar_sdk.call_builder.call_builder_async import BaseCallBuilder
 from stellar_sdk.client.aiohttp_client import AiohttpClient
 from stellar_sdk.exceptions import BadRequestError, NotFoundError, NotPageableError
+from tests import _horizon_fixtures as hf
 
 
-@pytest.mark.slow
 @pytest.mark.asyncio
 class TestBaseCallBuilder:
     async def test_get_data(self, httpbin_url):
@@ -28,23 +28,32 @@ class TestBaseCallBuilder:
         assert resp["headers"]["X-Client-Version"] == __version__
         assert resp["url"] == httpbin_url + "get?cursor=89777&order=asc&limit=25"
 
-    @pytest.mark.timeout(30)
-    async def test_get_stream_data(self):
-        url = "https://horizon.stellar.org/ledgers"
-        client = AiohttpClient()
-        resp = BaseCallBuilder(horizon_url=url, client=client).cursor("now")._stream()
-        messages = []
-        async for msg in resp:
-            assert isinstance(msg, dict)
-            messages.append(msg)
-            if len(messages) == 2:
-                break
+    async def test_get_stream_data(self, horizon_mock):
+        url = horizon_mock.url + "ledgers"
+        horizon_mock.expect(
+            "/ledgers", body=hf.stream_body(), content_type="text/event-stream"
+        )
+        async with AiohttpClient() as client:
+            resp = (
+                BaseCallBuilder(horizon_url=url, client=client).cursor("now")._stream()
+            )
+            try:
+                messages = []
+                async for msg in resp:
+                    assert isinstance(msg, dict)
+                    messages.append(msg)
+                    if len(messages) == 2:
+                        break
+            finally:
+                await resp.aclose()
 
-    async def test_status_400_raise(self):
-        url = "https://horizon.stellar.org/accounts/BADACCOUNTID"
+    async def test_status_400_raise(self, horizon_mock):
+        url = horizon_mock.url + "accounts/BADACCOUNTID"
         client = AiohttpClient()
+        horizon_mock.expect("/accounts/BADACCOUNTID", json=hf.BAD_REQUEST, status=400)
         with pytest.raises(BadRequestError) as err:
             await BaseCallBuilder(horizon_url=url, client=client).call()
+        await client.close()
 
         exception = err.value
         assert exception.status == 400
@@ -56,11 +65,13 @@ class TestBaseCallBuilder:
             "reason": "Account ID must start with `G` and contain 56 alphanum characters",
         }
 
-    async def test_status_404_raise(self):
-        url = "https://horizon.stellar.org/not_found"
+    async def test_status_404_raise(self, horizon_mock):
+        url = horizon_mock.url + "not_found"
         client = AiohttpClient()
+        horizon_mock.expect("/not_found", json=hf.NOT_FOUND, status=404)
         with pytest.raises(NotFoundError) as err:
             await BaseCallBuilder(horizon_url=url, client=client).call()
+        await client.close()
 
         exception = err.value
         assert exception.status == 404
@@ -106,16 +117,47 @@ class TestBaseCallBuilder:
 
         await client.close()
 
-    async def test_get_data_page(self):
-        url = "https://horizon.stellar.org/transactions"
+    async def test_get_data_page(self, horizon_mock):
+        url = horizon_mock.url + "transactions"
         client = AiohttpClient()
+        next_href = horizon_mock.url + "transactions?cursor=next&limit=10&order=desc"
+        prev_href = horizon_mock.url + "transactions?cursor=prev&limit=10&order=asc"
+        first_page = {
+            "_links": {
+                "self": {
+                    "href": horizon_mock.url
+                    + "transactions?cursor=&limit=10&order=desc"
+                },
+                "next": {"href": next_href},
+            }
+        }
+        next_page = {
+            "_links": {
+                "self": {"href": next_href},
+                "prev": {"href": prev_href},
+            }
+        }
+        prev_page = {"_links": {"self": {"href": prev_href}}}
         call_builder = (
             BaseCallBuilder(horizon_url=url, client=client).limit(10).order(desc=True)
+        )
+        horizon_mock.expect(
+            "/transactions", query_string="limit=10&order=desc", json=first_page
+        )
+        horizon_mock.expect(
+            "/transactions",
+            query_string="cursor=next&limit=10&order=desc",
+            json=next_page,
+        )
+        horizon_mock.expect(
+            "/transactions",
+            query_string="cursor=prev&limit=10&order=asc",
+            json=prev_page,
         )
         first_resp = await call_builder.call()
         assert (
             first_resp["_links"]["self"]["href"]
-            == "https://horizon.stellar.org/transactions?cursor=&limit=10&order=desc"
+            == horizon_mock.url + "transactions?cursor=&limit=10&order=desc"
         )
 
         next_url = first_resp["_links"]["next"]["href"]
@@ -124,17 +166,17 @@ class TestBaseCallBuilder:
         next_resp = await call_builder.next()
         assert next_resp["_links"]["self"][
             "href"
-        ] == "https://horizon.stellar.org/transactions?cursor={}&limit=10&order=desc".format(
-            next_url_cursor
+        ] == "{}transactions?cursor={}&limit=10&order=desc".format(
+            horizon_mock.url, next_url_cursor
         )
 
         prev_url = next_resp["_links"]["prev"]["href"]
         prev_url_cursor = prev_url.split("cursor=")[1].split("&")[0]
-        prev_page = await call_builder.prev()
-        assert prev_page["_links"]["self"][
+        previous_page = await call_builder.prev()
+        assert previous_page["_links"]["self"][
             "href"
-        ] == "https://horizon.stellar.org/transactions?cursor={}&limit=10&order=asc".format(
-            prev_url_cursor
+        ] == "{}transactions?cursor={}&limit=10&order=asc".format(
+            horizon_mock.url, prev_url_cursor
         )
         await client.close()
 

@@ -10,7 +10,7 @@
 # Declare all targets that do not represent actual files to ensure they
 # are always executed and to improve 'make' performance.
 # ==============================================================================
-.PHONY: default unit-test full-unit-test integration-test package clean \
+.PHONY: default unit-test integration-test package clean \
         pre-commit type-check replace-xdr-keywords xdr-generate xdr \
         xdr-clean xdr-update xdr-generator-test xdr-generator-update-snapshots
 
@@ -69,11 +69,8 @@ default: ;
 unit-test:
 	$(UV_RUN_CMD) pytest -v -s -rs tests --cov --cov-report=html
 
-full-unit-test:
-	$(UV_RUN_CMD) pytest -v -s -rs tests --runslow --cov --cov-report=html
-
 integration-test:
-	$(UV_RUN_CMD) pytest -v -s -rs tests --runslow --integration --cov=./ --cov-report=xml
+	$(UV_RUN_CMD) pytest -v -s -rs tests --integration --cov=./ --cov-report=xml
 
 # ==============================================================================
 # Build & Clean Targets

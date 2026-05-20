@@ -68,7 +68,7 @@ jobs:
         run: make type-check
 
       - name: Test with pytest
-        run: make full-unit-test
+        run: make unit-test
 
   integration:
     runs-on: ubuntu-latest
