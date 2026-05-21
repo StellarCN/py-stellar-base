@@ -4,7 +4,7 @@ from . import xdr as stellar_xdr
 from .__version__ import __issues__
 from .strkey import StrKey, _get_version_byte_for_prefix, _VersionByte
 
-__all__ = ["SignerKey", "SignerKeyType", "SignedPayloadSigner"]
+__all__ = ["SignedPayloadSigner", "SignerKey", "SignerKeyType"]
 
 
 class SignerKeyType(IntEnum):

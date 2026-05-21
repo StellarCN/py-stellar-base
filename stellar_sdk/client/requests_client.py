@@ -66,7 +66,7 @@ class RequestsClient(BaseSyncClient):
         self.backoff_factor: float = backoff_factor
 
         # adding 504 to the tuple of statuses to retry
-        self.status_forcelist = tuple(Retry.RETRY_AFTER_STATUS_CODES) + (504,)
+        self.status_forcelist = (*Retry.RETRY_AFTER_STATUS_CODES, 504)
 
         # configure standard session
 
@@ -200,7 +200,7 @@ class RequestsClient(BaseSyncClient):
         :return: a Generator for server response
         :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>`
         """
-        query_params = params.copy() if params else dict()
+        query_params = params.copy() if params else {}
 
         query_params |= IDENTIFICATION_HEADERS
         retry = 0.1

@@ -34,7 +34,7 @@ from ..time_bounds import TimeBounds
 from ..transaction import Transaction
 from ..transaction_envelope import TransactionEnvelope
 
-__all__ = ["to_txrep", "from_txrep"]
+__all__ = ["from_txrep", "to_txrep"]
 
 _true = "true"
 _false = "false"

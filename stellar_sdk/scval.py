@@ -6,49 +6,49 @@ from . import xdr as stellar_xdr
 from .address import Address
 
 __all__ = [
-    "to_native",
-    "to_address",
     "from_address",
-    "to_bool",
     "from_bool",
-    "to_void",
-    "from_void",
-    "to_bytes",
     "from_bytes",
-    "to_duration",
     "from_duration",
-    "to_int32",
-    "from_int32",
-    "to_int64",
-    "from_int64",
-    "to_int128",
-    "from_int128",
-    "to_int256",
-    "from_int256",
-    "to_map",
-    "from_map",
-    "to_string",
-    "from_string",
-    "to_symbol",
-    "from_symbol",
-    "to_timepoint",
-    "from_timepoint",
-    "to_uint32",
-    "from_uint32",
-    "to_uint64",
-    "from_uint64",
-    "to_uint128",
-    "from_uint128",
-    "to_uint256",
-    "from_uint256",
-    "to_vec",
-    "from_vec",
-    "to_enum",
     "from_enum",
-    "to_struct",
+    "from_int32",
+    "from_int64",
+    "from_int128",
+    "from_int256",
+    "from_map",
+    "from_string",
     "from_struct",
-    "to_tuple_struct",
+    "from_symbol",
+    "from_timepoint",
     "from_tuple_struct",
+    "from_uint32",
+    "from_uint64",
+    "from_uint128",
+    "from_uint256",
+    "from_vec",
+    "from_void",
+    "to_address",
+    "to_bool",
+    "to_bytes",
+    "to_duration",
+    "to_enum",
+    "to_int32",
+    "to_int64",
+    "to_int128",
+    "to_int256",
+    "to_map",
+    "to_native",
+    "to_string",
+    "to_struct",
+    "to_symbol",
+    "to_timepoint",
+    "to_tuple_struct",
+    "to_uint32",
+    "to_uint64",
+    "to_uint128",
+    "to_uint256",
+    "to_vec",
+    "to_void",
 ]
 
 
@@ -438,7 +438,7 @@ def from_map(
     if sc_val.type != stellar_xdr.SCValType.SCV_MAP:
         raise ValueError(f"Invalid sc_val type, must be SCV_MAP, got {sc_val.type}")
     assert sc_val.map is not None
-    return dict([(entry.key, entry.val) for entry in sc_val.map.sc_map])
+    return {entry.key: entry.val for entry in sc_val.map.sc_map}
 
 
 def to_string(data: str | bytes) -> stellar_xdr.SCVal:
@@ -788,7 +788,7 @@ def to_struct(data: dict[str, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
     # sort the dict by key to ensure the order of the fields.
     # see https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046-01.md#validity
     sorted_data = dict(sorted(data.items()))
-    v = dict()
+    v: dict[stellar_xdr.SCVal, stellar_xdr.SCVal] = {}
     for key, val in sorted_data.items():
         v[to_symbol(key)] = val
     return to_map(v)
@@ -808,7 +808,7 @@ def from_struct(
     :return: A dict corresponding to the Struct in the Rust SDK.
     """
     v = from_map(sc_val)
-    return dict([(from_symbol(key), val) for key, val in v.items()])
+    return {from_symbol(key): val for key, val in v.items()}
 
 
 def _compare_sc_address(a: stellar_xdr.SCAddress, b: stellar_xdr.SCAddress) -> int:

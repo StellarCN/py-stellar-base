@@ -26,12 +26,12 @@ from ..transaction_envelope import TransactionEnvelope
 from .exceptions import InvalidSep45ChallengeError
 
 __all__ = [
+    "ChallengeAuthorizationEntries",
     "build_challenge_authorization_entries",
     "build_challenge_authorization_entries_async",
     "read_challenge_authorization_entries",
     "verify_challenge_authorization_entries",
     "verify_challenge_authorization_entries_async",
-    "ChallengeAuthorizationEntries",
 ]
 
 # A null account used for simulation purposes

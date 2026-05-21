@@ -60,7 +60,7 @@ project = "py-stellar-base"
 copyright = "2019, StellarCN and Individual Contributors"
 author = "StellarCN and Individual Contributors"
 
-import stellar_sdk
+import stellar_sdk  # noqa: E402
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

@@ -179,7 +179,7 @@ def process_csv(
             row_num = i + 1
 
             # --- Rust decode ---
-            rust_json, rust_type = rust_decode(xdr_b64)
+            rust_json, _ = rust_decode(xdr_b64)
             if rust_json is None:
                 stats.rust_errors += 1
                 if verbose:

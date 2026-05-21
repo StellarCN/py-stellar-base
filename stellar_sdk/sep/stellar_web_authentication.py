@@ -27,11 +27,11 @@ from .exceptions import InvalidSep10ChallengeError
 
 __all__ = [
     "build_challenge_transaction",
-    "verify_challenge_transaction_signers",
-    "verify_challenge_transaction_signed_by_client_master_key",
-    "verify_challenge_transaction_threshold",
     "read_challenge_transaction",
     "verify_challenge_transaction",
+    "verify_challenge_transaction_signed_by_client_master_key",
+    "verify_challenge_transaction_signers",
+    "verify_challenge_transaction_threshold",
 ]
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"

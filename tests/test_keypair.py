@@ -719,7 +719,7 @@ class TestKeypair:
                 "fO5dbYhXUhBMhe6kId/cuVq/AfEnHRHEvsP8vXh03M1uLpi5e46yO2Q8rEBzu3feXQewcQE5GArp88u6ePK6BA==",
             ),
             (
-                "こんにちは、世界！",
+                "こんにちは、世界！",  # noqa: RUF001
                 "CDU265Xs8y3OWbB/56H9jPgUss5G9A0qFuTqH2zs2YDgTm+++dIfmAEceFqB7bhfN3am59lCtDXrCtwH2k1GBA==",
             ),
             (

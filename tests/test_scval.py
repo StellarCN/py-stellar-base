@@ -762,7 +762,7 @@ class TestCompareScVal:
         m = stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_int32(42))])
         assert _compare_optional_sc_map(m, m) == 0
 
-    _ANTISYMMETRY_PAIRS = [
+    _ANTISYMMETRY_PAIRS = [  # noqa: RUF012
         (to_bool(False), to_bool(True)),
         (to_uint32(1), to_uint32(2)),
         (to_int32(-10), to_int32(10)),
@@ -792,7 +792,7 @@ class TestCompareScVal:
         """cmp(a, b) == -cmp(b, a) for all pairs."""
         assert _compare_sc_val(a, b) == -_compare_sc_val(b, a)
 
-    _TRANSITIVITY_TRIPLES = [
+    _TRANSITIVITY_TRIPLES = [  # noqa: RUF012
         (to_uint32(1), to_uint32(2), to_uint32(3)),
         (to_int32(-10), to_int32(0), to_int32(10)),
         (to_int128(-(2**127)), to_int128(0), to_int128(2**127 - 1)),
