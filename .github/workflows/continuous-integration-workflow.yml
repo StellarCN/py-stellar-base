@@ -14,9 +14,9 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
       - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Run pre-commit
@@ -25,9 +25,9 @@ jobs:
   type-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
       - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Run type check
@@ -60,9 +60,9 @@ jobs:
           ]
     runs-on: ${{ matrix.platform.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
       - name: Install uv and Python ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ matrix.platform.python-version }}
       - name: Run unit tests
@@ -86,15 +86,15 @@ jobs:
           --health-timeout 5s
           --health-retries 50
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
       - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Run integration tests
         run: make integration-test
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v6.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
@@ -108,9 +108,9 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
       - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
-        uses: astral-sh/setup-uv@v8
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Build packages
