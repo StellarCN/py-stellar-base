@@ -510,7 +510,7 @@ class AssembledTransactionAsync(Generic[T]):
                 self,
             )
         elif self.get_transaction_response.status == GetTransactionStatus.FAILED:
-            raise TransactionFailedError(f"Transaction failed.", self)
+            raise TransactionFailedError("Transaction failed.", self)
         else:
             raise ValueError("Unexpected transaction status.")
 

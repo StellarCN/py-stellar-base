@@ -25,7 +25,7 @@ class TestLiquidityPoolsBuilder:
             Asset("PHP", "GBUQWP3BOUZX34TOND2QV7QQ7K7VJTG6VSE7WMLBTMDJLLAW7YKGU6EP"),
         ]
         builder = LiquidityPoolsBuilder(horizon_url, client).for_reserves(reserves)
-        assert builder.endpoint == f"liquidity_pools"
+        assert builder.endpoint == "liquidity_pools"
         assert builder.params == {
             "reserves": "EURT:GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S,PHP:GBUQWP3BOUZX34TOND2QV7QQ7K7VJTG6VSE7WMLBTMDJLLAW7YKGU6EP"
         }
@@ -33,5 +33,5 @@ class TestLiquidityPoolsBuilder:
     def test_for_account(self):
         account_id = "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
         builder = LiquidityPoolsBuilder(horizon_url, client).for_account(account_id)
-        assert builder.endpoint == f"liquidity_pools"
+        assert builder.endpoint == "liquidity_pools"
         assert builder.params == {"account": account_id}
