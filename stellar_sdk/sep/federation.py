@@ -29,10 +29,10 @@ FEDERATION_RESPONSE_MAX_SIZE = 100 * 1024
 
 __all__ = [
     "FederationRecord",
-    "resolve_stellar_address",
-    "resolve_stellar_address_async",
     "resolve_account_id",
     "resolve_account_id_async",
+    "resolve_stellar_address",
+    "resolve_stellar_address_async",
 ]
 
 

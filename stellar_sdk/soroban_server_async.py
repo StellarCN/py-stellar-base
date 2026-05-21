@@ -49,7 +49,7 @@ if TYPE_CHECKING:
     from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
     from .transaction_envelope import TransactionEnvelope
 
-__all__ = ["SorobanServerAsync", "Durability"]
+__all__ = ["Durability", "SorobanServerAsync"]
 
 V = TypeVar("V", bound=BaseModel)
 

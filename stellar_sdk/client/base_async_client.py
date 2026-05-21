@@ -31,7 +31,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         :raise: :exc:`ContentSizeLimitExceededError <stellar_sdk.exceptions.ContentSizeLimitExceededError>`
         """
-        pass  # pragma: no cover
+        # pragma: no cover
 
     @abstractmethod
     async def post(
@@ -48,7 +48,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        pass  # pragma: no cover
+        # pragma: no cover
 
     @abstractmethod
     def stream(
@@ -65,7 +65,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
         :return: a dict AsyncGenerator for server response
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        pass  # pragma: no cover
+        # pragma: no cover
 
     @abstractmethod
     async def close(self) -> None:

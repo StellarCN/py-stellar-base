@@ -222,7 +222,7 @@ class AiohttpClient(BaseAsyncClient):
             timeout = aiohttp.ClientTimeout(total=60 * 5)
             self._sse_session = aiohttp.ClientSession(timeout=timeout)
 
-        query_params = params.copy() if params else dict()
+        query_params = params.copy() if params else {}
 
         query_params |= IDENTIFICATION_HEADERS
         retry = 0.1

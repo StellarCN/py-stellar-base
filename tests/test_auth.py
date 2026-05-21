@@ -414,10 +414,13 @@ class TestAuth:
         signer = Keypair.from_secret(
             "SAEZSI6DY7AXJFIYA4PM6SIBNEYYXIEM2MSOTHFGKHDW32MBQ7KVO6EN"
         )
-        signer_fn = lambda preimage: (
-            signer.public_key,
-            signer.sign(utils.sha256(preimage.to_xdr_bytes())),
-        )
+
+        def signer_fn(preimage):
+            return (
+                signer.public_key,
+                signer.sign(utils.sha256(preimage.to_xdr_bytes())),
+            )
+
         valid_until_ledger_sequence = 654656
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 

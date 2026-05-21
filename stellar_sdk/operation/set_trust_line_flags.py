@@ -9,7 +9,7 @@ from ..strkey import StrKey
 from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
-__all__ = ["TrustLineFlags", "SetTrustLineFlags"]
+__all__ = ["SetTrustLineFlags", "TrustLineFlags"]
 
 
 class TrustLineFlags(IntFlag):

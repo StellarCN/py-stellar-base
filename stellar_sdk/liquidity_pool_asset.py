@@ -2,7 +2,7 @@ from . import xdr as stellar_xdr
 from .asset import Asset
 from .utils import sha256
 
-__all__ = ["LiquidityPoolAsset", "LIQUIDITY_POOL_FEE_V18"]
+__all__ = ["LIQUIDITY_POOL_FEE_V18", "LiquidityPoolAsset"]
 
 #: LIQUIDITY_POOL_FEE_V18 is the default liquidity pool fee in protocol v18.
 #: It defaults to 30 base points (0.3%).

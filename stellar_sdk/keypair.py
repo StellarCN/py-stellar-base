@@ -325,7 +325,7 @@ class Keypair:
         :return: A new :class:`Keypair` object derived from the mnemonic phrases.
         """
         try:
-            import shamir_mnemonic  # noqa: F401
+            import shamir_mnemonic
         except ModuleNotFoundError as exc:
             message = "shamir_mnemonic must be installed to use method `from_shamir_mnemonic_phrases`."
             raise ModuleNotFoundError(message) from exc

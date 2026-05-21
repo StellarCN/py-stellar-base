@@ -34,7 +34,7 @@ class ContractInfo:
     :param env_meta: The contract environment metadata entries.
     """
 
-    __slots__ = ("_meta", "_spec", "_env_meta")
+    __slots__ = ("_env_meta", "_meta", "_spec")
 
     def __init__(
         self,

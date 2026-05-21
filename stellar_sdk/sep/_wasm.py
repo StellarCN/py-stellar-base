@@ -9,11 +9,11 @@ CONTRACT_SPEC_SECTION_NAME = "contractspecv0"
 CONTRACT_ENV_META_SECTION_NAME = "contractenvmetav0"
 
 __all__ = [
+    "CONTRACT_ENV_META_SECTION_NAME",
     "CONTRACT_META_SECTION_NAME",
     "CONTRACT_SPEC_SECTION_NAME",
-    "CONTRACT_ENV_META_SECTION_NAME",
-    "iter_wasm_custom_sections",
     "get_wasm_custom_sections",
+    "iter_wasm_custom_sections",
 ]
 
 _WASM_MAGIC = b"\x00asm"

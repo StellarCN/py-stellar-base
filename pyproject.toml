@@ -115,9 +115,22 @@ exclude_lines = [
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["F", "I"]
-# Star imports (F403/F405) are intentional in a couple of test files.
-ignore = ["F403", "F405"]
+select = ["F", "I", "E", "W", "C4", "PIE", "RUF"]
+ignore = [
+    # Star imports are used both in package __init__ re-exports and in a
+    # handful of test files; suppress globally rather than per-file.
+    "F403",
+    "F405",
+    # Let `ruff format` own line length; the linter shouldn't double-flag.
+    "E501",
+    # Unicode lookalike warnings: the few "ambiguous" characters in this
+    # codebase live in legitimate multilingual test data and docstrings.
+    "RUF002",
+    "RUF003",
+    # pytest.raises(match=...) patterns -- 100+ findings, address in a
+    # follow-up commit.
+    "RUF043",
+]
 
 [tool.ruff.lint.per-file-ignores]
 # Re-exports in package __init__ modules (was --ignore-init-module-imports

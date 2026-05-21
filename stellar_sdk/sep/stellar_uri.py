@@ -19,7 +19,7 @@ from ..keypair import Keypair
 from ..memo import HashMemo, IdMemo, Memo, NoneMemo, ReturnHashMemo, TextMemo
 from ..transaction_envelope import TransactionEnvelope
 
-__all__ = ["PayStellarUri", "TransactionStellarUri", "Replacement"]
+__all__ = ["PayStellarUri", "Replacement", "TransactionStellarUri"]
 
 STELLAR_SCHEME: str = "web+stellar"
 
@@ -369,7 +369,7 @@ class TransactionStellarUri(StellarUri):
         if not self.replace:
             return None
         replaces = []
-        hits = dict()
+        hits: dict[str, str] = {}
         for i in self.replace:
             hits[i.reference_identifier] = i.hint
             replaces.append(i.txrep_tx_field_name + ":" + i.reference_identifier)
@@ -382,7 +382,7 @@ class TransactionStellarUri(StellarUri):
 
         :return: Stellar Transaction URI.
         """
-        query_params = dict()
+        query_params: dict[str, str] = {}
         query_params["xdr"] = self.transaction_envelope.to_xdr()
         if self.callback is not None:
             query_params["callback"] = "url:" + self.callback

@@ -7,7 +7,7 @@ from werkzeug.wrappers import Response
 
 
 def _httpbin_headers(request):
-    return {key: value for key, value in request.headers.items()}
+    return dict(request.headers)
 
 
 def _json_response(payload):

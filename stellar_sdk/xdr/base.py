@@ -4,15 +4,15 @@ DEFAULT_XDR_MAX_DEPTH = 512
 
 __all__ = [
     "DEFAULT_XDR_MAX_DEPTH",
-    "Integer",
-    "UnsignedInteger",
-    "Float",
-    "Double",
-    "Hyper",
-    "UnsignedHyper",
     "Boolean",
-    "String",
+    "Double",
+    "Float",
+    "Hyper",
+    "Integer",
     "Opaque",
+    "String",
+    "UnsignedHyper",
+    "UnsignedInteger",
 ]
 
 

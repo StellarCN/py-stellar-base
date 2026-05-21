@@ -9,12 +9,12 @@ from .. import xdr as stellar_xdr
 from .exceptions import InvalidWasmError
 
 __all__ = [
+    "parse_sc_env_meta_entries",
     "parse_sc_meta_entries",
     "parse_sc_spec_entries",
-    "parse_sc_env_meta_entries",
+    "serialize_sc_env_meta_entries",
     "serialize_sc_meta_entries",
     "serialize_sc_spec_entries",
-    "serialize_sc_env_meta_entries",
 ]
 
 

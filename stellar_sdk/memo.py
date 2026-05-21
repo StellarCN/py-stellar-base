@@ -6,7 +6,7 @@ from . import xdr as stellar_xdr
 from .exceptions import MemoInvalidException
 from .utils import hex_to_bytes
 
-__all__ = ["Memo", "NoneMemo", "TextMemo", "IdMemo", "HashMemo", "ReturnHashMemo"]
+__all__ = ["HashMemo", "IdMemo", "Memo", "NoneMemo", "ReturnHashMemo", "TextMemo"]
 
 
 class Memo(object, metaclass=abc.ABCMeta):
