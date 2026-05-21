@@ -1168,7 +1168,7 @@ class TestSorobanServer:
             with pytest.raises(
                 ValueError,
                 match="Simulation results invalid",
-            ) as e:
+            ):
                 async with SorobanServerAsync(RPC_URL) as client:
                     await client.prepare_transaction(transaction)
 

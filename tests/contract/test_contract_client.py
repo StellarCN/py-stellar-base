@@ -44,7 +44,7 @@ def create_contract_from_asset(asset: Asset):
         return ContractClient.create_stellar_asset_contract_from_asset(
             asset, SOURCE.public_key, SOURCE, SorobanServer(RPC_URL)
         )
-    except Exception as e:
+    except Exception:
         pass
     return asset.contract_id(NETWORK_PASSPHRASE)
 

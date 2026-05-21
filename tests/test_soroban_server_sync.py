@@ -1182,7 +1182,7 @@ class TestSorobanServer:
             with pytest.raises(
                 ValueError,
                 match="Simulation results invalid",
-            ) as e:
+            ):
                 SorobanServer(RPC_URL).prepare_transaction(transaction)
 
     def test_send_transaction(self):

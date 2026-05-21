@@ -1302,7 +1302,6 @@ class TestStellarWebAuthentication:
         home_domain = "example.com"
         web_auth_domain = "auth.example.com"
         now = int(time.time())
-        nonce = os.urandom(48)
         server_account = Account(server_kp.public_key, -1)
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)

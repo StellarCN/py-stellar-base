@@ -47,7 +47,7 @@ async def create_contract_from_asset(asset: Asset):
             return await ContractClientAsync.create_stellar_asset_contract_from_asset(
                 asset, SOURCE.public_key, SOURCE, client
             )
-    except Exception as e:
+    except Exception:
         pass
     return asset.contract_id(NETWORK_PASSPHRASE)
 
