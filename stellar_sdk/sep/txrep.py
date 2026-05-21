@@ -1651,8 +1651,7 @@ def _add_operation(
         )
     else:
         raise ValueError(
-            f"This operation has not been implemented yet, "
-            f"operation type: {operation}."
+            f"This operation has not been implemented yet, operation type: {operation}."
         )
 
 

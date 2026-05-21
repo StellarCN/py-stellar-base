@@ -1,9 +1,8 @@
 import pytest
 
 from stellar_sdk import Asset, LiquidityPoolId, Operation, RevokeSponsorship, SignerKey
-from stellar_sdk.operation.revoke_sponsorship import Data, Offer
+from stellar_sdk.operation.revoke_sponsorship import Data, Offer, TrustLine
 from stellar_sdk.operation.revoke_sponsorship import Signer as RevokeSponsorshipSigner
-from stellar_sdk.operation.revoke_sponsorship import TrustLine
 
 
 class TestRevokeSponsorship:

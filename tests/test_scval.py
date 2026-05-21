@@ -271,9 +271,9 @@ def test_map_to_map_strictly_increasing():
     assert scval.map is not None
     keys = [entry.key for entry in scval.map.sc_map]
     for i in range(len(keys) - 1):
-        assert (
-            _compare_sc_val(keys[i], keys[i + 1]) < 0
-        ), f"keys[{i}] not strictly less than keys[{i + 1}]"
+        assert _compare_sc_val(keys[i], keys[i + 1]) < 0, (
+            f"keys[{i}] not strictly less than keys[{i + 1}]"
+        )
 
 
 def test_map_to_map_mixed_types():
@@ -992,9 +992,10 @@ def test_enum_with_value():
 
 def test_enum_with_multi_values():
     key = "Address"
-    v1, v2 = to_address(
-        "GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX"
-    ), to_address("GDCN3WSVMS7HM5FUQW6FRTU4E4LU4CJWYFT6DNK6CVNYWQYR5AW3BUEF")
+    v1, v2 = (
+        to_address("GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX"),
+        to_address("GDCN3WSVMS7HM5FUQW6FRTU4E4LU4CJWYFT6DNK6CVNYWQYR5AW3BUEF"),
+    )
     value = [v1, v2]
     scval = to_enum(key, value)
     expected_scval = xdr.SCVal(

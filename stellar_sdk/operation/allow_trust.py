@@ -131,7 +131,7 @@ class AllowTrust(Operation):
             )
         else:
             raise NotImplementedError(
-                "Operation of asset_type={} is not implemented" ".".format(asset_type)
+                "Operation of asset_type={} is not implemented.".format(asset_type)
             )
 
         asset_code = asset_code.rstrip("\x00")
