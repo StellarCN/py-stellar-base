@@ -119,7 +119,7 @@ select = ["F", "I"]
 # Suppressions match the legacy autoflake/isort behavior. F541 and F841
 # are real findings that ruff catches but autoflake didn't; leave them
 # silenced here and clean up in a follow-up.
-ignore = ["F403", "F405", "F541", "F841"]
+ignore = ["F403", "F405", "F841"]
 
 [tool.ruff.lint.per-file-ignores]
 # Re-exports in package __init__ modules (was --ignore-init-module-imports

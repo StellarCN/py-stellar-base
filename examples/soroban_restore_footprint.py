@@ -70,6 +70,6 @@ while True:
 print(f"transaction: {get_transaction_data}")
 
 if get_transaction_data.status == GetTransactionStatus.SUCCESS:
-    print(f"transaction success")
+    print("transaction success")
 else:
     print(f"Transaction failed: {get_transaction_data.result_xdr}")
