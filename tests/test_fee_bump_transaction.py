@@ -89,9 +89,6 @@ class TestFeeBumpTransaction:
         fee_source = Keypair.from_secret(
             "SB7ZMPZB3YMMK5CUWENXVLZWBK4KYX4YU5JBXQNZSK2DP2Q7V3LVTO5V"
         )
-        fee_source2 = Keypair.from_secret(
-            "SCVFDAOOXWR5TSPZF5U2MIE6V7M4LTOCNCD624Q6AEVBZ2XMH7HOWFZL"
-        )
         base_fee = 200
         fee_bump_tx = TransactionBuilder.build_fee_bump_transaction(
             fee_source.public_key,
