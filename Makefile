@@ -11,7 +11,7 @@
 # are always executed and to improve 'make' performance.
 # ==============================================================================
 .PHONY: default unit-test integration-test package clean \
-        pre-commit type-check replace-xdr-keywords xdr-generate xdr \
+        pre-commit type-check replace-xdr-keywords xdr-generate \
         xdr-clean xdr-update xdr-generator-test xdr-generator-update-snapshots
 
 # ==============================================================================
@@ -48,13 +48,13 @@ ifeq ($(shell uname), Darwin)
     SED_INPLACE := sed -i ''
     # Use find -exec with \; for macOS sed due to argument parsing differences
     REPLACE_KEYWORD_COMMAND := find xdr -type f -exec $(SED_INPLACE) 's/from;/from_;/g' {} +
-    REPLACE_DOCS := $(SED_INPLACE) '/stellar_sdk\.xdr/,$$d' docs/en/api.rst
 else
     SED_INPLACE := sed -i
     # Use find -exec with {} \; for Linux/GNU sed
     REPLACE_KEYWORD_COMMAND := find xdr -type f -exec $(SED_INPLACE) 's/from;/from_;/g' {} \;
-    REPLACE_DOCS := $(SED_INPLACE) '/stellar_sdk\.xdr/,$$d' docs/en/api.rst
 endif
+
+REPLACE_DOCS := $(SED_INPLACE) '/stellar_sdk\.xdr/,$$d' docs/en/api.rst
 
 # ==============================================================================
 # Default Target
@@ -80,15 +80,16 @@ package:
 	uv build
 
 clean:
-	find . -name \*.pyc -delete
-	rm -rf coverage.xml .coverage dist htmlcov stellar_sdk.egg-info tests/.mypy_cache tests/.pytest_cache docs/en/_build
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type f -name '*.pyc' -delete
+	rm -rf coverage.xml .coverage dist htmlcov stellar_sdk.egg-info .mypy_cache .pytest_cache docs/en/_build
 
 # ==============================================================================
 # Code Quality Checks
 # Targets for running pre-commit hooks and type checkers.
 # ==============================================================================
 pre-commit:
-	$(UV_RUN_CMD) pre-commit run --all-file
+	$(UV_RUN_CMD) pre-commit run --all-files
 
 type-check:
 	$(UV_RUN_CMD) pyright
@@ -104,15 +105,16 @@ replace-xdr-keywords:
 
 xdr-generate: $(XDRS) replace-xdr-keywords
 	@echo "--- Generating XDR Python files ---"
-	$(REPLACE_KEYWORD_COMMAND)
-	docker run -it --rm -v $(PWD):/wd -w /wd ruby:3.4 /bin/bash -c '\
+	docker run --rm -v $(PWD):/wd -w /wd ruby:3.4 /bin/bash -c '\
 		cd xdr-generator && \
 		bundle install --quiet && \
 		bundle exec ruby generate.rb'
 	@echo "--- Updating XDR API documentation ---"
 	$(REPLACE_DOCS)
 	$(UV_RUN_CMD) python docs/gen_xdr_api.py >> docs/en/api.rst
-	@echo "--- Running pre-commit hooks ---"
+	@echo "--- Formatting generated files ---"
+	-$(MAKE) pre-commit
+	@echo "--- Verifying pre-commit passes ---"
 	$(MAKE) pre-commit
 
 xdr/%.x:
@@ -135,7 +137,7 @@ xdr-generator-update-snapshots:
 
 xdr-clean:
 	@echo "--- Cleaning XDR files ---"
-	rm -f xdr/*.x stellar_sdk/xdr/*.py || true
+	rm -f xdr/*.x stellar_sdk/xdr/*.py
 
 xdr-update: xdr-clean xdr-generate
 	@echo "--- XDR update complete ---"
