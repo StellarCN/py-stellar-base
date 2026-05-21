@@ -6,23 +6,34 @@ on:
   release:
     types:
       - created
+
 env:
   DEFAULT_PYTHON_VERSION: "3.14"
 
 jobs:
-  pre-commit:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install the latest version of uv and set the python version to ${{ env.DEFAULT_PYTHON_VERSION }}
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v6.0.2
+      - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Run pre-commit
         run: make pre-commit
 
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v8.1.0
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Run type check
+        run: make type-check
+
   test:
-    needs: pre-commit
     strategy:
       fail-fast: false
       matrix:
@@ -49,25 +60,12 @@ jobs:
           ]
     runs-on: ${{ matrix.platform.os }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Wake up httpbin server
-        run: |
-          curl https://httpbinx.fly.dev/ip
-
-      - name: Install the latest version of uv and set the python version to ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v6.0.2
+      - name: Install uv and Python ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ matrix.platform.python-version }}
-
-      - name: Echo installed packages
-        run: uv tree
-
-      - name: Run type check
-        if: "!startsWith(matrix.platform.python-version, 'pypy')"
-        run: make type-check
-
-      - name: Test with pytest
+      - name: Run unit tests
         run: make unit-test
 
   integration:
@@ -88,22 +86,15 @@ jobs:
           --health-timeout 5s
           --health-retries 50
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Wake up httpbin server
-        run: |
-          curl https://httpbinx.fly.dev/ip
-
-      - name: Install the latest version of uv and set the python version to ${{ env.DEFAULT_PYTHON_VERSION }}
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v6.0.2
+      - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-
-      - name: Test with pytest
+      - name: Run integration tests
         run: make integration-test
-
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
@@ -111,28 +102,25 @@ jobs:
           name: codecov-umbrella
 
   deploy:
-    needs: [test, integration]
+    needs: [lint, type-check, test, integration]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'created'
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install the latest version of uv and set the python version to ${{ env.DEFAULT_PYTHON_VERSION }}
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v6.0.2
+      - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-
-      - name: Build Packages
+      - name: Build packages
         run: make package
-
       - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        run: uv publish --trusted-publishing automatic
 
   complete:
     if: always()
-    needs: [pre-commit, test, deploy]
+    needs: [lint, type-check, test, integration, deploy]
     runs-on: ubuntu-latest
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
