@@ -162,8 +162,9 @@ def test_authorize_contract_address_requires_preparation():
 
     assembled.authorize(
         address=contract_id,
-        signer=lambda preimage: seen_preimages.append(preimage)
-        or scval.to_bytes(b"sig"),
+        signer=lambda preimage: (
+            seen_preimages.append(preimage) or scval.to_bytes(b"sig")
+        ),
         valid_for_ledger_count=20,
     )
 
