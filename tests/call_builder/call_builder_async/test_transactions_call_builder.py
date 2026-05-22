@@ -15,23 +15,19 @@ class TestTransactionsCallBuilder:
         builder = TransactionsCallBuilder(horizon_url, client).transaction(
             transaction_hash
         )
-        assert builder.endpoint == "transactions/{transaction_hash}".format(
-            transaction_hash=transaction_hash
-        )
+        assert builder.endpoint == f"transactions/{transaction_hash}"
         assert builder.params == {}
 
     def test_for_account(self):
         account_id = "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"
         builder = TransactionsCallBuilder(horizon_url, client).for_account(account_id)
-        assert builder.endpoint == "accounts/{account_id}/transactions".format(
-            account_id=account_id
-        )
+        assert builder.endpoint == f"accounts/{account_id}/transactions"
         assert builder.params == {}
 
     def test_for_ledger(self):
         ledger = 123456
         builder = TransactionsCallBuilder(horizon_url, client).for_ledger(ledger)
-        assert builder.endpoint == "ledgers/{ledger}/transactions".format(ledger=ledger)
+        assert builder.endpoint == f"ledgers/{ledger}/transactions"
         assert builder.params == {}
 
     def test_claimable_balance(self):
@@ -43,9 +39,7 @@ class TestTransactionsCallBuilder:
         )
         assert (
             builder.endpoint
-            == "claimable_balances/{claimable_balance_id}/transactions".format(
-                claimable_balance_id=claimable_balance_id
-            )
+            == f"claimable_balances/{claimable_balance_id}/transactions"
         )
         assert builder.params == {}
 
@@ -66,9 +60,7 @@ class TestTransactionsCallBuilder:
             .for_account(account_id)
             .include_failed(True)
         )
-        assert builder.endpoint == "accounts/{account_id}/transactions".format(
-            account_id=account_id
-        )
+        assert builder.endpoint == f"accounts/{account_id}/transactions"
         assert builder.params == {"include_failed": "true"}
 
     def test_not_include_failed(self):
@@ -78,7 +70,5 @@ class TestTransactionsCallBuilder:
             .for_account(account_id)
             .include_failed(False)
         )
-        assert builder.endpoint == "accounts/{account_id}/transactions".format(
-            account_id=account_id
-        )
+        assert builder.endpoint == f"accounts/{account_id}/transactions"
         assert builder.params == {"include_failed": "false"}

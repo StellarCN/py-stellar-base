@@ -2,7 +2,8 @@ import asyncio
 import copy
 import dataclasses
 import time
-from typing import Callable, Generic, TypeVar, cast
+from collections.abc import Callable
+from typing import Generic, TypeVar, cast
 
 from .. import (
     Address,

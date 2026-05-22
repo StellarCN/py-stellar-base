@@ -11,5 +11,5 @@ class TestLedgersCallBuilder:
     def test_ledger(self):
         ledger_id = 1714814
         builder = LedgersCallBuilder(horizon_url, client).ledger(ledger_id)
-        assert builder.endpoint == "ledgers/{ledger}".format(ledger=ledger_id)
+        assert builder.endpoint == f"ledgers/{ledger_id}"
         assert builder.params == {}

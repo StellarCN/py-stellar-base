@@ -21,7 +21,7 @@ from stellar_sdk.transaction_builder import TransactionBuilder
 def get_txrep_file(filename):
     current_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(current_dir, "txrep_data", filename)
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         content = f.read()
         return content.strip()
 

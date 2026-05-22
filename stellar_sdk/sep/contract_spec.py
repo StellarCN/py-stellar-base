@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 from .. import xdr as stellar_xdr
 from ._wasm import CONTRACT_SPEC_SECTION_NAME, get_wasm_custom_sections
@@ -32,7 +32,7 @@ class ContractSpec:
         return self._entries
 
     @classmethod
-    def from_wasm(cls, wasm: bytes) -> "ContractSpec":
+    def from_wasm(cls, wasm: bytes) -> ContractSpec:
         """Creates a :class:`ContractSpec` object from contract Wasm bytes.
 
         :param wasm: The contract Wasm bytes.
@@ -49,7 +49,7 @@ class ContractSpec:
         return cls(parse_sc_spec_entries(sections[0]))
 
     @classmethod
-    def from_wasm_file(cls, path: str | os.PathLike[str]) -> "ContractSpec":
+    def from_wasm_file(cls, path: str | os.PathLike[str]) -> ContractSpec:
         """Creates a :class:`ContractSpec` object from a contract Wasm file.
 
         :param path: The path to the contract Wasm file.
@@ -59,7 +59,7 @@ class ContractSpec:
         return cls.from_wasm(Path(path).read_bytes())
 
     @classmethod
-    def from_xdr_bytes(cls, data: bytes) -> "ContractSpec":
+    def from_xdr_bytes(cls, data: bytes) -> ContractSpec:
         """Creates a :class:`ContractSpec` object from SEP-48 XDR stream bytes.
 
         :param data: The XDR stream bytes.

@@ -278,7 +278,7 @@ class TestKeypair:
     def test_create_from_invalid_secret_raise(self, invalid_secret):
         with pytest.raises(
             Ed25519SecretSeedInvalidError,
-            match="Invalid Ed25519 Secret Seed: {}".format(invalid_secret),
+            match=f"Invalid Ed25519 Secret Seed: {invalid_secret}",
         ):
             Keypair.from_secret(invalid_secret)
 
@@ -308,7 +308,7 @@ class TestKeypair:
     def test_create_from_invalid_public_key_raise(self, invalid_public_key):
         with pytest.raises(
             Ed25519PublicKeyInvalidError,
-            match="Invalid Ed25519 Public Key: {}".format(invalid_public_key),
+            match=f"Invalid Ed25519 Public Key: {invalid_public_key}",
         ):
             Keypair.from_public_key(invalid_public_key)
 
@@ -479,8 +479,7 @@ class TestKeypair:
         strength = 1024
         with pytest.raises(
             ValueError,
-            match=r"Strength should be one of the following \(128, 160, 192, 224, 256\), but it is not \(%d\)."
-            % strength,
+            match=rf"Strength should be one of the following \(128, 160, 192, 224, 256\), but it is not \({strength}\).",
         ):
             Keypair.generate_mnemonic_phrase(strength=strength)
 

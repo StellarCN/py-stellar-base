@@ -1,5 +1,5 @@
-from collections.abc import Sequence
-from typing import Callable, TypeVar
+from collections.abc import Callable, Sequence
+from typing import TypeVar
 
 from .. import Account, Asset, Keypair, MuxedAccount, scval
 from .. import xdr as stellar_xdr

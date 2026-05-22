@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
@@ -634,7 +634,7 @@ class SorobanServerAsync:
         te = _assemble_transaction(transaction_envelope, simulate_transaction_response)
         return te
 
-    async def _post(self, request_body: Request, response_body_type: Type[V]) -> V:
+    async def _post(self, request_body: Request, response_body_type: type[V]) -> V:
         json_data = request_body.model_dump_json(by_alias=True)
         data = await self._client.post(
             self.server_url,
@@ -660,7 +660,7 @@ class SorobanServerAsync:
         """Close underlying connector, and release all acquired resources."""
         await self._client.close()
 
-    async def __aenter__(self) -> "SorobanServerAsync":
+    async def __aenter__(self) -> SorobanServerAsync:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:

@@ -352,7 +352,7 @@ class TestTransaction:
                 contract_address=Address(
                     "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
                 ).to_xdr_sc_address(),
-                function_name=stellar_xdr.SCSymbol(sc_symbol="hello".encode("utf-8")),
+                function_name=stellar_xdr.SCSymbol(sc_symbol=b"hello"),
                 args=[],
             ),
         )

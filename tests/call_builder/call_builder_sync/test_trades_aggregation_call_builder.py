@@ -26,9 +26,7 @@ class TestTradeAggregationsCallBuilder:
         base = Asset("XCN", "GCOMOKXUA4TAEBB2QDHZD53SNRWKNTJMVEFLE47JYN5HS7KNLOABVA4Z")
         counter = Asset.native()
         resolution = 1000
-        with pytest.raises(
-            ValueError, match="Invalid resolution: {}".format(resolution)
-        ):
+        with pytest.raises(ValueError, match=f"Invalid resolution: {resolution}"):
             TradeAggregationsCallBuilder(
                 horizon_url, client, base=base, counter=counter, resolution=resolution
             )
@@ -38,7 +36,7 @@ class TestTradeAggregationsCallBuilder:
         counter = Asset.native()
         resolution = 300000
         offset = 600000
-        with pytest.raises(ValueError, match="Invalid offset: {}".format(offset)):
+        with pytest.raises(ValueError, match=f"Invalid offset: {offset}"):
             TradeAggregationsCallBuilder(
                 horizon_url,
                 client,

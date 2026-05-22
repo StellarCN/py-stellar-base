@@ -11,23 +11,19 @@ class TestOperationsCallBuilder:
     def test_operation(self):
         operation_id = 2243214
         builder = OperationsCallBuilder(horizon_url, client).operation(operation_id)
-        assert builder.endpoint == "operations/{operation}".format(
-            operation=operation_id
-        )
+        assert builder.endpoint == f"operations/{operation_id}"
         assert builder.params == {}
 
     def test_for_account(self):
         account_id = "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"
         builder = OperationsCallBuilder(horizon_url, client).for_account(account_id)
-        assert builder.endpoint == "accounts/{account_id}/operations".format(
-            account_id=account_id
-        )
+        assert builder.endpoint == f"accounts/{account_id}/operations"
         assert builder.params == {}
 
     def test_for_ledger(self):
         ledger = 123456
         builder = OperationsCallBuilder(horizon_url, client).for_ledger(ledger)
-        assert builder.endpoint == "ledgers/{ledger}/operations".format(ledger=ledger)
+        assert builder.endpoint == f"ledgers/{ledger}/operations"
         assert builder.params == {}
 
     def test_for_transaction(self):
@@ -37,9 +33,7 @@ class TestOperationsCallBuilder:
         builder = OperationsCallBuilder(horizon_url, client).for_transaction(
             transaction_hash
         )
-        assert builder.endpoint == "transactions/{transaction}/operations".format(
-            transaction=transaction_hash
-        )
+        assert builder.endpoint == f"transactions/{transaction_hash}/operations"
         assert builder.params == {}
 
     def test_for_claimable_balance(self):
@@ -49,8 +43,8 @@ class TestOperationsCallBuilder:
         builder = OperationsCallBuilder(horizon_url, client).for_claimable_balance(
             claimable_balance_id
         )
-        assert builder.endpoint == "claimable_balances/{transaction}/operations".format(
-            transaction=claimable_balance_id
+        assert (
+            builder.endpoint == f"claimable_balances/{claimable_balance_id}/operations"
         )
         assert builder.params == {}
 
@@ -71,9 +65,7 @@ class TestOperationsCallBuilder:
             .for_account(account_id)
             .include_failed(True)
         )
-        assert builder.endpoint == "accounts/{account_id}/operations".format(
-            account_id=account_id
-        )
+        assert builder.endpoint == f"accounts/{account_id}/operations"
         assert builder.params == {"include_failed": "true"}
 
     def test_not_include_failed(self):
@@ -83,9 +75,7 @@ class TestOperationsCallBuilder:
             .for_account(account_id)
             .include_failed(False)
         )
-        assert builder.endpoint == "accounts/{account_id}/operations".format(
-            account_id=account_id
-        )
+        assert builder.endpoint == f"accounts/{account_id}/operations"
         assert builder.params == {"include_failed": "false"}
 
     def test_join(self):
@@ -96,7 +86,5 @@ class TestOperationsCallBuilder:
             .include_failed(False)
             .join("transactions")
         )
-        assert builder.endpoint == "accounts/{account_id}/operations".format(
-            account_id=account_id
-        )
+        assert builder.endpoint == f"accounts/{account_id}/operations"
         assert builder.params == {"include_failed": "false", "join": "transactions"}

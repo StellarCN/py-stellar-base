@@ -12,15 +12,13 @@ class TestTradesCallBuilder:
     def test_for_offer(self):
         offer_id = 1233453
         builder = TradesCallBuilder(horizon_url, client).for_offer(offer_id)
-        assert builder.endpoint == "offers/{offer_id}/trades".format(offer_id=offer_id)
+        assert builder.endpoint == f"offers/{offer_id}/trades"
         assert builder.params == {}
 
     def test_for_account(self):
         account_id = "GCOMOKXUA4TAEBB2QDHZD53SNRWKNTJMVEFLE47JYN5HS7KNLOABVA4Z"
         builder = TradesCallBuilder(horizon_url, client).for_account(account_id)
-        assert builder.endpoint == "accounts/{account_id}/trades".format(
-            account_id=account_id
-        )
+        assert builder.endpoint == f"accounts/{account_id}/trades"
         assert builder.params == {}
 
     def test_for_asset_pair(self):

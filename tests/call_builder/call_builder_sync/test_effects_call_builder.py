@@ -11,23 +11,19 @@ class TestEffectsCallBuilder:
     def test_for_account(self):
         account_id = "GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"
         builder = EffectsCallBuilder(horizon_url, client).for_account(account_id)
-        assert builder.endpoint == "accounts/{account_id}/effects".format(
-            account_id=account_id
-        )
+        assert builder.endpoint == f"accounts/{account_id}/effects"
         assert builder.params == {}
 
     def test_for_ledger(self):
         ledger = 123456
         builder = EffectsCallBuilder(horizon_url, client).for_ledger(ledger)
-        assert builder.endpoint == "ledgers/{ledger}/effects".format(ledger=ledger)
+        assert builder.endpoint == f"ledgers/{ledger}/effects"
         assert builder.params == {}
 
     def test_for_operation(self):
         operation = 969696
         builder = EffectsCallBuilder(horizon_url, client).for_operation(operation)
-        assert builder.endpoint == "operations/{operation}/effects".format(
-            operation=operation
-        )
+        assert builder.endpoint == f"operations/{operation}/effects"
         assert builder.params == {}
 
     def test_for_transaction(self):
@@ -38,9 +34,7 @@ class TestEffectsCallBuilder:
         builder = EffectsCallBuilder(horizon_url, client).for_transaction(
             transaction_hash
         )
-        assert builder.endpoint == "transactions/{transaction}/effects".format(
-            transaction=transaction_hash
-        )
+        assert builder.endpoint == f"transactions/{transaction_hash}/effects"
         assert builder.params == {}
 
     def test_for_liquidity_pool(self):

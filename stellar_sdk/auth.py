@@ -1,6 +1,7 @@
 import copy
 import random
-from typing import Callable, TypeAlias
+from collections.abc import Callable
+from typing import TypeAlias
 
 from . import scval
 from . import xdr as stellar_xdr
