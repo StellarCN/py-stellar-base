@@ -1,5 +1,5 @@
+import builtins
 import re
-from typing import Type
 
 from . import xdr as stellar_xdr
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
@@ -174,9 +174,9 @@ class Asset:
     def _to_xdr_object(
         self,
         xdr_asset: (
-            Type[stellar_xdr.Asset]
-            | Type[stellar_xdr.ChangeTrustAsset]
-            | Type[stellar_xdr.TrustLineAsset]
+            builtins.type[stellar_xdr.Asset]
+            | builtins.type[stellar_xdr.ChangeTrustAsset]
+            | builtins.type[stellar_xdr.TrustLineAsset]
         ),
     ) -> stellar_xdr.Asset | stellar_xdr.ChangeTrustAsset | stellar_xdr.TrustLineAsset:
         if self.is_native():

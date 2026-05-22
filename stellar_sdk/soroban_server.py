@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import time
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
@@ -639,7 +639,7 @@ class SorobanServer:
         """Close underlying connector, and release all acquired resources."""
         self._client.close()
 
-    def _post(self, request_body: Request, response_body_type: Type[V]) -> V:
+    def _post(self, request_body: Request, response_body_type: type[V]) -> V:
         json_data = request_body.model_dump_json(by_alias=True)
         data = self._client.post(
             self.server_url,
@@ -661,7 +661,7 @@ class SorobanServer:
         assert raw_response.result is not None
         return response_body_type.model_validate(raw_response.result)
 
-    def __enter__(self) -> "SorobanServer":
+    def __enter__(self) -> SorobanServer:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):

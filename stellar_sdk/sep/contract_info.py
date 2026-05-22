@@ -62,7 +62,7 @@ class ContractInfo:
         return self._env_meta
 
     @classmethod
-    def from_wasm(cls, wasm: bytes) -> "ContractInfo":
+    def from_wasm(cls, wasm: bytes) -> ContractInfo:
         """Creates a :class:`ContractInfo` object from contract Wasm bytes.
 
         :param wasm: The contract Wasm bytes.
@@ -92,7 +92,7 @@ class ContractInfo:
         )
 
     @classmethod
-    def from_wasm_file(cls, path: str | os.PathLike[str]) -> "ContractInfo":
+    def from_wasm_file(cls, path: str | os.PathLike[str]) -> ContractInfo:
         """Creates a :class:`ContractInfo` object from a contract Wasm file.
 
         :param path: The path to the contract Wasm file.

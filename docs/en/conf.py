@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # py-stellar-base documentation build configuration file, created by
 # sphinx-quickstart on Sat Jan 20 11:58:02 2018.

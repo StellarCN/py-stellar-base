@@ -36,9 +36,7 @@ class TestMemo:
         invalid_value = "a" * 29
         with pytest.raises(
             MemoInvalidException,
-            match=r"Text should be <= 28 bytes \(ascii encoded\), got {:d} bytes.".format(
-                len(invalid_value)
-            ),
+            match=rf"Text should be <= 28 bytes \(ascii encoded\), got {len(invalid_value):d} bytes.",
         ):
             TextMemo(invalid_value)
 
@@ -81,9 +79,7 @@ class TestMemo:
         length = 33
         with pytest.raises(
             MemoInvalidException,
-            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(
-                length
-            ),
+            match=f"The length of HashMemo should be 32 bytes, got {length:d} bytes.",
         ):
             HashMemo(os.urandom(length))
 
@@ -91,9 +87,7 @@ class TestMemo:
         length = 16
         with pytest.raises(
             MemoInvalidException,
-            match="The length of HashMemo should be 32 bytes, got {:d} bytes.".format(
-                length
-            ),
+            match=f"The length of HashMemo should be 32 bytes, got {length:d} bytes.",
         ):
             HashMemo(os.urandom(length))
 
@@ -112,9 +106,7 @@ class TestMemo:
         length = 48
         with pytest.raises(
             MemoInvalidException,
-            match="The length of ReturnHashMemo should be 32 bytes, got {:d} bytes.".format(
-                length
-            ),
+            match=f"The length of ReturnHashMemo should be 32 bytes, got {length:d} bytes.",
         ):
             ReturnHashMemo(os.urandom(length))
 
@@ -122,9 +114,7 @@ class TestMemo:
         length = 16
         with pytest.raises(
             MemoInvalidException,
-            match="The length of ReturnHashMemo should be 32 bytes, got {:d} bytes.".format(
-                length
-            ),
+            match=f"The length of ReturnHashMemo should be 32 bytes, got {length:d} bytes.",
         ):
             ReturnHashMemo(os.urandom(length))
 

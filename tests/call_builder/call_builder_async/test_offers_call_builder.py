@@ -13,7 +13,7 @@ class TestOffersCallBuilder:
         offer_id = "1000"
         builder = OffersCallBuilder(horizon_url, client)
         builder.offer(offer_id)
-        assert builder.endpoint == "offers/{offer_id}".format(offer_id=offer_id)
+        assert builder.endpoint == f"offers/{offer_id}"
         assert builder.params == {}
 
     def test_for_asset(self):

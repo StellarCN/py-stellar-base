@@ -115,7 +115,7 @@ exclude_lines = [
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["F", "I", "E", "W", "C4", "PIE", "RUF"]
+select = ["F", "I", "E", "W", "C4", "PIE", "RUF", "UP"]
 ignore = [
     # Star imports are used both in package __init__ re-exports and in a
     # handful of test files; suppress globally rather than per-file.
@@ -136,6 +136,10 @@ ignore = [
 # Re-exports in package __init__ modules (was --ignore-init-module-imports
 # under autoflake).
 "__init__.py" = ["F401"]
+# stellar_sdk/xdr/* is regenerated from xdr-generator/. Modernizing the
+# generated output here would be reverted on the next `make xdr-generate`.
+# See LINT_TODO.md for the path to updating the generator templates.
+"stellar_sdk/xdr/*" = ["UP"]
 
 [tool.pyright]
 include = ["stellar_sdk", "tests", "examples"]

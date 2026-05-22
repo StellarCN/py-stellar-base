@@ -154,6 +154,4 @@ class MuxedAccount:
         )
 
     def __repr__(self):
-        return "<MuxedAccount [account_id={account_id}, account_muxed_id={account_muxed_id}]>".format(
-            account_id=self.account_id, account_muxed_id=self.account_muxed_id
-        )
+        return f"<MuxedAccount [account_id={self.account_id}, account_muxed_id={self.account_muxed_id}]>"

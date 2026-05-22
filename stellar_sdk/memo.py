@@ -9,7 +9,7 @@ from .utils import hex_to_bytes
 __all__ = ["HashMemo", "IdMemo", "Memo", "NoneMemo", "ReturnHashMemo", "TextMemo"]
 
 
-class Memo(object, metaclass=abc.ABCMeta):
+class Memo(metaclass=abc.ABCMeta):
     """The :class:`Memo` object, which represents the base class for memos for
     use with Stellar transactions.
 

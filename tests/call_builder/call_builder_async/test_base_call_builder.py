@@ -21,9 +21,10 @@ class TestBaseCallBuilder:
         )
 
         assert resp["args"] == {"cursor": "89777", "limit": "25", "order": "asc"}
-        assert resp["headers"][
-            "User-Agent"
-        ] == "py-stellar-base/{}/AiohttpClient".format(__version__)
+        assert (
+            resp["headers"]["User-Agent"]
+            == f"py-stellar-base/{__version__}/AiohttpClient"
+        )
         assert resp["headers"]["X-Client-Name"] == "py-stellar-base"
         assert resp["headers"]["X-Client-Version"] == __version__
         assert resp["url"] == httpbin_url + "get?cursor=89777&order=asc&limit=25"
@@ -164,19 +165,17 @@ class TestBaseCallBuilder:
         next_url_cursor = next_url.split("cursor=")[1].split("&")[0]
 
         next_resp = await call_builder.next()
-        assert next_resp["_links"]["self"][
-            "href"
-        ] == "{}transactions?cursor={}&limit=10&order=desc".format(
-            horizon_mock.url, next_url_cursor
+        assert (
+            next_resp["_links"]["self"]["href"]
+            == f"{horizon_mock.url}transactions?cursor={next_url_cursor}&limit=10&order=desc"
         )
 
         prev_url = next_resp["_links"]["prev"]["href"]
         prev_url_cursor = prev_url.split("cursor=")[1].split("&")[0]
         previous_page = await call_builder.prev()
-        assert previous_page["_links"]["self"][
-            "href"
-        ] == "{}transactions?cursor={}&limit=10&order=asc".format(
-            horizon_mock.url, prev_url_cursor
+        assert (
+            previous_page["_links"]["self"]["href"]
+            == f"{horizon_mock.url}transactions?cursor={prev_url_cursor}&limit=10&order=asc"
         )
         await client.close()
 
@@ -197,9 +196,10 @@ class TestBaseCallBuilder:
             "order": "desc",
             "version": "1.2",
         }
-        assert resp["headers"][
-            "User-Agent"
-        ] == "py-stellar-base/{}/AiohttpClient".format(__version__)
+        assert (
+            resp["headers"]["User-Agent"]
+            == f"py-stellar-base/{__version__}/AiohttpClient"
+        )
         assert resp["headers"]["X-Client-Name"] == "py-stellar-base"
         assert resp["headers"]["X-Client-Version"] == __version__
         assert (

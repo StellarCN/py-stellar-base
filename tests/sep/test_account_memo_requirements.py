@@ -1052,25 +1052,25 @@ class TestAccountMemoRequirements:
             "result_meta_xdr": "AAAAAQAAAAIAAAADAbk5gwAAAAAAAAAApZ/cq7U0DlhY/5C5e3Xf5rpn42PibD1CQ+5PFry5MukAAAAAAPQJcAExaGoAAABDAAAAAQAAAAEAAAAANlpgrn2zruLzED+4q1QzmnE7X3HhGRq7qInv0I8hSDEAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAABAbk5gwAAAAAAAAAApZ/cq7U0DlhY/5C5e3Xf5rpn42PibD1CQ+5PFry5MukAAAAAAPQJcAExaGoAAABEAAAAAQAAAAEAAAAANlpgrn2zruLzED+4q1QzmnE7X3HhGRq7qInv0I8hSDEAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAABAAAABAAAAAMBuTmDAAAAAQAAAAD8DdWB2us1eD88J78QF9kMeNi32l9jp/lO1Zz5R6PpqAAAAAFEUkEAAAAAAJKpAgQQTSW+FgU+wnF1hXPkDE2gOtrN7xUtmwW9oErLAAAAADLqDsB85mxQ4oQAAAAAAAEAAAAAAAAAAAAAAAEBuTmDAAAAAQAAAAD8DdWB2us1eD88J78QF9kMeNi32l9jp/lO1Zz5R6PpqAAAAAFEUkEAAAAAAJKpAgQQTSW+FgU+wnF1hXPkDE2gOtrN7xUtmwW9oErLAAAAADLymkB85mxQ4oQAAAAAAAEAAAAAAAAAAAAAAAMBuCrnAAAAAQAAAACln9yrtTQOWFj/kLl7dd/mumfjY+JsPUJD7k8WvLky6QAAAAFEUkEAAAAAAJKpAgQQTSW+FgU+wnF1hXPkDE2gOtrN7xUtmwW9oErLAAAAAAYNrsB//////////wAAAAEAAAAAAAAAAAAAAAEBuTmDAAAAAQAAAACln9yrtTQOWFj/kLl7dd/mumfjY+JsPUJD7k8WvLky6QAAAAFEUkEAAAAAAJKpAgQQTSW+FgU+wnF1hXPkDE2gOtrN7xUtmwW9oErLAAAAAAYFI0B//////////wAAAAEAAAAAAAAAAA==",
         }
         httpserver.expect_request(
-            "/accounts/%s" % self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A
+            f"/accounts/{self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A}"
         ).respond_with_json(memo_required_response)
         httpserver.expect_request(
-            "/accounts/%s" % self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B
+            f"/accounts/{self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B}"
         ).respond_with_json(memo_required_response)
         httpserver.expect_request(
-            "/accounts/%s" % self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C
+            f"/accounts/{self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C}"
         ).respond_with_json(memo_required_response)
         httpserver.expect_request(
-            "/accounts/%s" % self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D
+            f"/accounts/{self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D}"
         ).respond_with_json(memo_required_response)
         httpserver.expect_request(
-            "/accounts/%s" % self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED
+            f"/accounts/{self.DESTINATION_ACCOUNT_NO_MEMO_REQUIRED}"
         ).respond_with_json(no_memo_required_response)
         httpserver.expect_request(
-            "/accounts/%s" % self.DESTINATION_ACCOUNT_NO_FOUND
+            f"/accounts/{self.DESTINATION_ACCOUNT_NO_FOUND}"
         ).respond_with_data({}, 404)
         httpserver.expect_request(
-            "/accounts/%s" % self.DESTINATION_ACCOUNT_FETCH_ERROR
+            f"/accounts/{self.DESTINATION_ACCOUNT_FETCH_ERROR}"
         ).respond_with_data({}, 400)
         httpserver.expect_request("/transactions").respond_with_json(
             success_transaction_response

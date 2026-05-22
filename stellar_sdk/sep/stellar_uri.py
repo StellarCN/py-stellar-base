@@ -24,7 +24,7 @@ __all__ = ["PayStellarUri", "Replacement", "TransactionStellarUri"]
 STELLAR_SCHEME: str = "web+stellar"
 
 
-class StellarUri(object, metaclass=abc.ABCMeta):
+class StellarUri(metaclass=abc.ABCMeta):
     def __init__(self, signature: str | None = None):
         self.signature = signature
 

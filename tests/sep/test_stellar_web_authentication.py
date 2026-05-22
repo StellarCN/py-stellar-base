@@ -418,7 +418,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -521,7 +521,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain), data_value=nonce_encoded
+                data_name=f"{home_domain} auth", data_value=nonce_encoded
             )
             .append_manage_data_op(
                 data_name="web_auth_domain",
@@ -559,7 +559,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -601,7 +601,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -643,7 +643,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -686,7 +686,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -733,7 +733,7 @@ class TestStellarWebAuthentication:
         nonce = os.urandom(48)
         nonce_encoded = base64.b64encode(nonce)
         transaction_builder.append_manage_data_op(
-            data_name="{} auth".format(home_domain),
+            data_name=f"{home_domain} auth",
             data_value=nonce_encoded,
             source=client_kp.public_key,
         ).append_manage_data_op(
@@ -748,7 +748,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction not signed by server: {}".format(server_kp.public_key),
+            match=f"Transaction not signed by server: {server_kp.public_key}",
         ):
             verify_challenge_transaction(
                 challenge_tx,
@@ -799,7 +799,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -839,7 +839,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -881,7 +881,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -923,7 +923,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -960,7 +960,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -1038,7 +1038,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -1116,7 +1116,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -1166,7 +1166,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -1215,7 +1215,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -1263,7 +1263,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -1374,7 +1374,7 @@ class TestStellarWebAuthentication:
         challenge_te = (
             TransactionBuilder(server_account, network_passphrase, 100)
             .append_manage_data_op(
-                data_name="{} auth".format(home_domain),
+                data_name=f"{home_domain} auth",
                 data_value=nonce_encoded,
                 source=client_kp.public_key,
             )
@@ -1553,7 +1553,7 @@ class TestStellarWebAuthentication:
         ]
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction not signed by server: {}.".format(server_kp.public_key),
+            match=f"Transaction not signed by server: {server_kp.public_key}.",
         ):
             verify_challenge_transaction_signers(
                 challenge_tx,
