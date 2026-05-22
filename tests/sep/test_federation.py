@@ -75,7 +75,7 @@ class TestFederation:
             m.get("https://example.com/.well-known/stellar.toml", text="")
             with pytest.raises(
                 FederationServerNotFoundError,
-                match="Unable to find federation server at example.com",
+                match=r"Unable to find federation server at example.com",
             ):
                 resolve_stellar_address(self.STELLAR_ADDRESS)
 
@@ -85,7 +85,7 @@ class TestFederation:
             m.get("https://example.com/.well-known/stellar.toml", body="")
             with pytest.raises(
                 FederationServerNotFoundError,
-                match="Unable to find federation server at example.com.",
+                match=r"Unable to find federation server at example.com.",
             ):
                 await resolve_stellar_address_async(
                     self.STELLAR_ADDRESS, client=AiohttpClient()
@@ -161,7 +161,7 @@ class TestFederation:
 
     def test_resolve_by_account_id_without_domain_and_federation_url(self):
         with pytest.raises(
-            ValueError, match="You should provide either `domain` or `federation_url`."
+            ValueError, match=r"You should provide either `domain` or `federation_url`."
         ):
             resolve_account_id(self.ACCOUNT_ID)
 
@@ -170,7 +170,7 @@ class TestFederation:
             m.get("https://example.com/.well-known/stellar.toml", text="")
             with pytest.raises(
                 FederationServerNotFoundError,
-                match="Unable to find federation server at example.com.",
+                match=r"Unable to find federation server at example.com.",
             ):
                 resolve_account_id(self.ACCOUNT_ID, domain="example.com")
 
@@ -180,7 +180,7 @@ class TestFederation:
             m.get("https://example.com/.well-known/stellar.toml", body="")
             with pytest.raises(
                 FederationServerNotFoundError,
-                match="Unable to find federation server at example.com.",
+                match=r"Unable to find federation server at example.com.",
             ):
                 await resolve_account_id_async(
                     self.ACCOUNT_ID, domain="example.com", client=AiohttpClient()

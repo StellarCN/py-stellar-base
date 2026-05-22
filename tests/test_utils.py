@@ -43,7 +43,7 @@ class TestUtils:
 
     @pytest.mark.parametrize("v", ["0.0000000003", 2147483648])
     def test_best_rational_approximation_raise(self, v):
-        with pytest.raises(NoApproximationError, match="Couldn't find approximation."):
+        with pytest.raises(NoApproximationError, match=r"Couldn't find approximation."):
             best_rational_approximation(v)
 
     @pytest.mark.parametrize(

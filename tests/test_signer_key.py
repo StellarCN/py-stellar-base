@@ -257,7 +257,7 @@ class TestSignedPayloadSigner:
         signer_key = SignerKey(signer_key_data, signer_key_type)
         with pytest.raises(
             ValueError,
-            match="<SignerKeyType.SIGNER_KEY_TYPE_HASH_X: 2> is an unsupported signer "
+            match=r"<SignerKeyType.SIGNER_KEY_TYPE_HASH_X: 2> is an unsupported signer "
             "key type, it should be "
             "<SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD: 3>",
         ):

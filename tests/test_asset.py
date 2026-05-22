@@ -10,7 +10,7 @@ class TestAsset:
     def test_non_native_asset_without_issuer_raise(self, code):
         with pytest.raises(
             AssetIssuerInvalidError,
-            match="The issuer cannot be `None` except for the native asset.",
+            match=r"The issuer cannot be `None` except for the native asset.",
         ):
             Asset(code)
 
@@ -40,7 +40,7 @@ class TestAsset:
     )
     def test_invalid_issuer(self, issuer):
         with pytest.raises(
-            AssetIssuerInvalidError, match="The issuer should be a correct public key."
+            AssetIssuerInvalidError, match=r"The issuer should be a correct public key."
         ):
             Asset("XCN", issuer)
 
@@ -84,7 +84,7 @@ class TestAsset:
 
     def test_set_type_raise(self):
         asset = Asset.native()
-        with pytest.raises(AttributeError, match="Asset type is immutable."):
+        with pytest.raises(AttributeError, match=r"Asset type is immutable."):
             asset.type = "credit_alphanum4"
 
     def test_equals(self):

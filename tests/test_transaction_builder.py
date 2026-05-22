@@ -553,7 +553,7 @@ class TestTransaction:
     def test_build_set_timeout_with_timebounds_exists_raise(self):
         with pytest.raises(
             ValueError,
-            match="TimeBounds has been already set - setting timeout would overwrite it.",
+            match=r"TimeBounds has been already set - setting timeout would overwrite it.",
         ):
             _ = (
                 get_tx_builder()
@@ -571,7 +571,7 @@ class TestTransaction:
         )
         with pytest.warns(
             UserWarning,
-            match="It looks like you haven't set a TimeBounds for the transaction, "
+            match=r"It looks like you haven't set a TimeBounds for the transaction, "
             "we strongly recommend that you set it. "
             "You can learn why you should set it up through this link: "
             "https://www.stellar.org/developers-blog/transaction-submission-timeouts-and-dynamic-fees-faq",
@@ -1318,6 +1318,6 @@ class TestTransaction:
             base_fee=100,
         )
         with pytest.raises(
-            ValueError, match="`destination` is not a valid contract address."
+            ValueError, match=r"`destination` is not a valid contract address."
         ):
             builder.append_payment_to_contract_op(destination.public_key, asset, amount)

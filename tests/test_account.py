@@ -119,7 +119,7 @@ class TestAccount:
         account = Account(account=account_id, sequence=sequence)
         with pytest.raises(
             ValueError,
-            match='"raw_data" is None, unable to get thresholds from it.',
+            match=r'"raw_data" is None, unable to get thresholds from it.',
         ):
             _ = account.thresholds
 
@@ -129,7 +129,7 @@ class TestAccount:
         account = Account(account=account_id, sequence=sequence)
         with pytest.raises(
             ValueError,
-            match='"raw_data" is None, unable to get signers from it.',
+            match=r'"raw_data" is None, unable to get signers from it.',
         ):
             account.load_ed25519_public_key_signers()
 

@@ -60,7 +60,7 @@ class TestMemo:
     def test_id_memo_invalid_raise(self, id):
         with pytest.raises(
             MemoInvalidException,
-            match="IdMemo is an unsigned 64-bit integer and the max valid value is 18446744073709551615.",
+            match=r"IdMemo is an unsigned 64-bit integer and the max valid value is 18446744073709551615.",
         ):
             IdMemo(id)
 

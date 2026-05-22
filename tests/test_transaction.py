@@ -224,7 +224,7 @@ class TestTransaction:
         assert tx.memo == NoneMemo()
 
     # def test_no_operation_raise(self):
-    #     with pytest.raises(ValueError, match="At least one operation required."):
+    #     with pytest.raises(ValueError, match=r"At least one operation required."):
     #         source = Keypair.from_public_key(
     #             "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
     #         )
@@ -309,7 +309,7 @@ class TestTransaction:
         tx = Transaction(source, sequence, fee, [op])
         with pytest.raises(
             TypeError,
-            match="Type of the operation must be <class 'stellar_sdk.operation.create_claimable_balance.CreateClaimableBalance'>, got <class 'stellar_sdk.operation.manage_data.ManageData'> instead",
+            match=r"Type of the operation must be <class 'stellar_sdk.operation.create_claimable_balance.CreateClaimableBalance'>, got <class 'stellar_sdk.operation.manage_data.ManageData'> instead",
         ):
             tx.get_claimable_balance_id(0)
 

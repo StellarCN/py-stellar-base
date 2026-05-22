@@ -56,7 +56,7 @@ class TestMuxedAccount:
 
     def test_from_account_invalid_account_raise(self):
         invalid_account = "A" * 100
-        with pytest.raises(ValueError, match="This is not a valid account"):
+        with pytest.raises(ValueError, match=r"This is not a valid account"):
             MuxedAccount.from_account(invalid_account)
 
     def test_set_account_muxed_raise(self):
@@ -66,7 +66,7 @@ class TestMuxedAccount:
         muxed_account = MuxedAccount(account_id, account_id_id)
         with pytest.raises(
             AttributeError,
-            match="Can't set attribute, use `MuxedAccount.from_account` instead.",
+            match=r"Can't set attribute, use `MuxedAccount.from_account` instead.",
         ):
             muxed_account.account_muxed = (
                 "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
@@ -77,6 +77,6 @@ class TestMuxedAccount:
         account_id_id = -1
         with pytest.raises(
             ValueError,
-            match="`account_muxed_id` must be a non-negative integer if provided.",
+            match=r"`account_muxed_id` must be a non-negative integer if provided.",
         ):
             MuxedAccount(account_id, account_id_id)
