@@ -8,9 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry import AccountEntry
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .claimable_balance_entry import ClaimableBalanceEntry
 from .config_setting_entry import ConfigSettingEntry
 from .contract_code_entry import ContractCodeEntry

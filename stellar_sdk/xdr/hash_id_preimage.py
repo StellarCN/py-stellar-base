@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .envelope_type import EnvelopeType
 from .hash_id_preimage_contract_id import HashIDPreimageContractID
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID

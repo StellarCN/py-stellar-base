@@ -9,9 +9,7 @@ from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
 from .asset import Asset
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .int64 import Int64
 from .offer_entry_ext import OfferEntryExt
 from .price import Price

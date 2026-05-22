@@ -10,9 +10,7 @@ from xdrlib3 import Packer, Unpacker
 from .alpha_num4 import AlphaNum4
 from .alpha_num12 import AlphaNum12
 from .asset_type import AssetType
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .liquidity_pool_parameters import LiquidityPoolParameters
 
 __all__ = ["ChangeTrustAsset"]

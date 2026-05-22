@@ -7,10 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Boolean,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Boolean
 from .contract_event import ContractEvent
 
 __all__ = ["DiagnosticEvent"]

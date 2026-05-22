@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .scp_nomination import SCPNomination
 from .scp_statement_confirm import SCPStatementConfirm
 from .scp_statement_externalize import SCPStatementExternalize

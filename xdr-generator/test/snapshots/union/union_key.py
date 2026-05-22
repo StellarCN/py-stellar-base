@@ -7,7 +7,6 @@ import json
 from enum import IntEnum
 from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 
 _UNION_KEY_MAP = {0: "error", 1: "multi"}
 _UNION_KEY_REVERSE_MAP = {"error": 0, "multi": 1}

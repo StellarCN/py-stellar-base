@@ -9,9 +9,7 @@ from xdrlib3 import Packer, Unpacker
 
 from .account_merge_result import AccountMergeResult
 from .allow_trust_result import AllowTrustResult
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .begin_sponsoring_future_reserves_result import BeginSponsoringFutureReservesResult
 from .bump_sequence_result import BumpSequenceResult
 from .change_trust_result import ChangeTrustResult

@@ -8,9 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .int64 import Int64
 from .trust_line_asset import TrustLineAsset
 from .trust_line_entry_ext import TrustLineEntryExt

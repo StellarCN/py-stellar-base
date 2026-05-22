@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .claim_atom_type import ClaimAtomType
 from .claim_liquidity_atom import ClaimLiquidityAtom
 from .claim_offer_atom import ClaimOfferAtom

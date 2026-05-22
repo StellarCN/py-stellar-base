@@ -10,9 +10,7 @@ from xdrlib3 import Packer, Unpacker
 from .asset_code4 import AssetCode4
 from .asset_code12 import AssetCode12
 from .asset_type import AssetType
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 
 __all__ = ["AssetCode"]
 

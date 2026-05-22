@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
 from .int64 import Int64
 from .soroban_authorized_invocation import SorobanAuthorizedInvocation

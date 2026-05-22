@@ -7,10 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Integer,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 from .persisted_scp_state_v0 import PersistedSCPStateV0
 from .persisted_scp_state_v1 import PersistedSCPStateV1
 

@@ -7,7 +7,6 @@ import json
 from enum import IntEnum
 from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 
 _NESTER_NESTED_ENUM_MAP = {0: "1", 1: "2"}
 _NESTER_NESTED_ENUM_REVERSE_MAP = {"1": 0, "2": 1}

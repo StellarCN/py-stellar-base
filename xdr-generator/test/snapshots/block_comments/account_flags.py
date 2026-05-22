@@ -7,7 +7,6 @@ import json
 from enum import IntEnum
 from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 
 _ACCOUNT_FLAGS_MAP = {1: "auth_required_flag"}
 _ACCOUNT_FLAGS_REVERSE_MAP = {"auth_required_flag": 1}

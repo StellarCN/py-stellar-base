@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .inner_transaction_result_ext import InnerTransactionResultExt
 from .inner_transaction_result_result import InnerTransactionResultResult
 from .int64 import Int64

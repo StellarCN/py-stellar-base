@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .contract_event import ContractEvent
 from .diagnostic_event import DiagnosticEvent
 from .sc_val import SCVal

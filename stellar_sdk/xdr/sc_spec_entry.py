@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .sc_spec_entry_kind import SCSpecEntryKind
 from .sc_spec_event_v0 import SCSpecEventV0
 from .sc_spec_function_v0 import SCSpecFunctionV0

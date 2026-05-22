@@ -7,7 +7,6 @@ import json
 from enum import IntEnum
 from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 
 _KEYWORD_ENUM_MAP = {0: "from", 1: "class"}
 _KEYWORD_ENUM_REVERSE_MAP = {"from": 0, "class": 1}

@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .precondition_type import PreconditionType
 from .preconditions_v2 import PreconditionsV2
 from .time_bounds import TimeBounds

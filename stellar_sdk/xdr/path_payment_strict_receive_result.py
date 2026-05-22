@@ -8,9 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .path_payment_strict_receive_result_code import PathPaymentStrictReceiveResultCode
 from .path_payment_strict_receive_result_success import (
     PathPaymentStrictReceiveResultSuccess,

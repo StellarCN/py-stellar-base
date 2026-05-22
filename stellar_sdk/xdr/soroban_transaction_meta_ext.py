@@ -7,10 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Integer,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 from .soroban_transaction_meta_ext_v1 import SorobanTransactionMetaExtV1
 
 __all__ = ["SorobanTransactionMetaExt"]

@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .stellar_value import StellarValue
 from .stored_transaction_set import StoredTransactionSet
 from .uint32 import Uint32

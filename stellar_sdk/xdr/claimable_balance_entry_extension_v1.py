@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .claimable_balance_entry_extension_v1_ext import (
     ClaimableBalanceEntryExtensionV1Ext,
 )

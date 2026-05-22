@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .set_trust_line_flags_result_code import SetTrustLineFlagsResultCode
 
 __all__ = ["SetTrustLineFlagsResult"]

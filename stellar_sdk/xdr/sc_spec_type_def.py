@@ -8,9 +8,7 @@ from typing import TYPE_CHECKING
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .sc_spec_type import SCSpecType
 
 if TYPE_CHECKING:

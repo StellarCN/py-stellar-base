@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .soroban_address_credentials import SorobanAddressCredentials
 from .soroban_credentials_type import SorobanCredentialsType
 

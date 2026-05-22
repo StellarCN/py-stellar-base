@@ -7,10 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Integer,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 from .ledger_close_meta_ext_v1 import LedgerCloseMetaExtV1
 
 __all__ = ["LedgerCloseMetaExt"]

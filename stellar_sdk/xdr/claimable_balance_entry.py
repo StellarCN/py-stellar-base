@@ -8,9 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .claimable_balance_entry_ext import ClaimableBalanceEntryExt
 from .claimable_balance_id import ClaimableBalanceID
 from .claimant import Claimant

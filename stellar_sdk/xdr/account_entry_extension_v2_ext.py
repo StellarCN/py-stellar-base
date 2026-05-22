@@ -8,10 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry_extension_v3 import AccountEntryExtensionV3
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Integer,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 
 __all__ = ["AccountEntryExtensionV2Ext"]
 
