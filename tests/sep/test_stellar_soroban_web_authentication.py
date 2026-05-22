@@ -256,7 +256,7 @@ def test_read_challenge_invalid_xdr_format():
     """Test that invalid XDR raises error."""
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Invalid challenge_authorization_entries XDR format.",
+        match=r"Invalid challenge_authorization_entries XDR format.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries="invalid_xdr",
@@ -288,7 +288,7 @@ def test_read_challenge_less_than_two_entries():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Challenge must contain at least two authorization entries.",
+        match=r"Challenge must contain at least two authorization entries.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -327,7 +327,7 @@ def test_read_challenge_inconsistent_root_invocation():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Inconsistent root_invocation across authorization entries.",
+        match=r"Inconsistent root_invocation across authorization entries.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -379,7 +379,7 @@ def test_read_challenge_has_sub_invocations():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Authorization entry must not have sub-invocations.",
+        match=r"Authorization entry must not have sub-invocations.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -438,7 +438,7 @@ def test_read_challenge_wrong_function_name():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Function name does not match. Expected web_auth_verify, got wrong_function.",
+        match=r"Function name does not match. Expected web_auth_verify, got wrong_function.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -489,7 +489,7 @@ def test_read_challenge_wrong_args_count():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Expected exactly one argument in contract function call.",
+        match=r"Expected exactly one argument in contract function call.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -537,7 +537,7 @@ def test_read_challenge_invalid_struct():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Failed to parse contract function arguments.",
+        match=r"Failed to parse contract function arguments.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -581,7 +581,7 @@ def test_read_challenge_missing_account():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Missing 'account' in arguments.",
+        match=r"Missing 'account' in arguments.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -625,7 +625,7 @@ def test_read_challenge_missing_home_domain():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Missing 'home_domain' in arguments.",
+        match=r"Missing 'home_domain' in arguments.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -669,7 +669,7 @@ def test_read_challenge_missing_nonce():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Missing 'nonce' in arguments.",
+        match=r"Missing 'nonce' in arguments.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -713,7 +713,7 @@ def test_read_challenge_missing_web_auth_domain():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Missing 'web_auth_domain' in arguments.",
+        match=r"Missing 'web_auth_domain' in arguments.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -757,7 +757,7 @@ def test_read_challenge_missing_web_auth_domain_account():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Missing 'web_auth_domain_account' in arguments.",
+        match=r"Missing 'web_auth_domain_account' in arguments.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -875,7 +875,7 @@ def test_read_challenge_client_domain_without_account():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="'client_domain' and 'client_domain_account' must both be provided or both be absent.",
+        match=r"'client_domain' and 'client_domain_account' must both be provided or both be absent.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -925,7 +925,7 @@ def test_read_challenge_client_domain_account_without_domain():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="'client_domain' and 'client_domain_account' must both be provided or both be absent.",
+        match=r"'client_domain' and 'client_domain_account' must both be provided or both be absent.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -1015,7 +1015,7 @@ def test_read_challenge_missing_server_entry():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Challenge does not contain an authorization entry for the server.",
+        match=r"Challenge does not contain an authorization entry for the server.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -1064,7 +1064,7 @@ def test_read_challenge_missing_client_entry():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Challenge does not contain an authorization entry for the client.",
+        match=r"Challenge does not contain an authorization entry for the client.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -1105,7 +1105,7 @@ def test_read_challenge_missing_client_domain_entry():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Challenge does not contain an authorization entry for the client domain account.",
+        match=r"Challenge does not contain an authorization entry for the client domain account.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -1146,7 +1146,7 @@ def test_read_challenge_unsupported_credentials_type():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Unsupported SorobanCredentialsType:",
+        match=r"Unsupported SorobanCredentialsType:",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -1203,7 +1203,7 @@ def test_read_challenge_non_contract_function_type():
 
     with pytest.raises(
         InvalidSep45ChallengeError,
-        match="Authorization entry must invoke a contract function.",
+        match=r"Authorization entry must invoke a contract function.",
     ):
         read_challenge_authorization_entries(
             challenge_authorization_entries=entries.to_xdr(),
@@ -1798,7 +1798,7 @@ def test_verify_challenge_authorization_entries_failed():
             SorobanServer(MOCK_RPC_URL) as soroban_server,
             pytest.raises(
                 InvalidSep45ChallengeError,
-                match="Validation failed during simulation",
+                match=r"Validation failed during simulation",
             ),
         ):
             verify_challenge_authorization_entries(
@@ -1837,7 +1837,7 @@ async def test_verify_challenge_authorization_entries_async_failed():
         async with SorobanServerAsync(MOCK_RPC_URL) as soroban_server:
             with pytest.raises(
                 InvalidSep45ChallengeError,
-                match="Validation failed during simulation",
+                match=r"Validation failed during simulation",
             ):
                 await verify_challenge_authorization_entries_async(
                     soroban_server,
@@ -1855,7 +1855,7 @@ def test_challenge_authorization_entries_client_domain_without_account():
     entries = build_valid_entries_with_client_domain()
     with pytest.raises(
         ValueError,
-        match="client_domain and client_domain_account must both be provided or both be None.",
+        match=r"client_domain and client_domain_account must both be provided or both be None.",
     ):
         ChallengeAuthorizationEntries(
             authorization_entries=entries,
@@ -1875,7 +1875,7 @@ def test_challenge_authorization_entries_client_domain_account_without_domain():
     entries = build_valid_entries_with_client_domain()
     with pytest.raises(
         ValueError,
-        match="client_domain and client_domain_account must both be provided or both be None.",
+        match=r"client_domain and client_domain_account must both be provided or both be None.",
     ):
         ChallengeAuthorizationEntries(
             authorization_entries=entries,
@@ -1895,7 +1895,7 @@ def test_build_challenge_authorization_entries_client_domain_without_account():
     with (
         pytest.raises(
             ValueError,
-            match="client_domain and client_domain_account must both be provided or both be None.",
+            match=r"client_domain and client_domain_account must both be provided or both be None.",
         ),
         SorobanServer(MOCK_RPC_URL) as soroban_server,
     ):
@@ -1917,7 +1917,7 @@ def test_build_challenge_authorization_entries_client_domain_account_without_dom
     with (
         pytest.raises(
             ValueError,
-            match="client_domain and client_domain_account must both be provided or both be None.",
+            match=r"client_domain and client_domain_account must both be provided or both be None.",
         ),
         SorobanServer(MOCK_RPC_URL) as soroban_server,
     ):

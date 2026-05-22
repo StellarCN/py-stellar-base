@@ -347,7 +347,7 @@ class TestFeeBumpTransaction:
         base_fee = 150
         with pytest.raises(
             ValueError,
-            match="Invalid `base_fee`, it should be at least 200 stroops.",
+            match=r"Invalid `base_fee`, it should be at least 200 stroops.",
         ):
             TransactionBuilder.build_fee_bump_transaction(
                 fee_source.public_key,
@@ -380,7 +380,7 @@ class TestFeeBumpTransaction:
         base_fee = 60
         with pytest.raises(
             ValueError,
-            match="Invalid `base_fee`, it should be at least 100 stroops.",
+            match=r"Invalid `base_fee`, it should be at least 100 stroops.",
         ):
             TransactionBuilder.build_fee_bump_transaction(
                 fee_source.public_key,

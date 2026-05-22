@@ -155,7 +155,7 @@ class TestAccountMemoRequirements:
         transaction.sign(keypair)
         with pytest.raises(
             AccountRequiresMemoError,
-            match="Destination account requires a memo in the transaction.",
+            match=r"Destination account requires a memo in the transaction.",
         ) as err:
             server.submit_transaction(transaction)
         assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A
@@ -202,7 +202,7 @@ class TestAccountMemoRequirements:
         transaction.sign(keypair)
         with pytest.raises(
             AccountRequiresMemoError,
-            match="Destination account requires a memo in the transaction.",
+            match=r"Destination account requires a memo in the transaction.",
         ) as err:
             server.submit_transaction(transaction)
         assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B
@@ -249,7 +249,7 @@ class TestAccountMemoRequirements:
         transaction.sign(keypair)
         with pytest.raises(
             AccountRequiresMemoError,
-            match="Destination account requires a memo in the transaction.",
+            match=r"Destination account requires a memo in the transaction.",
         ) as err:
             server.submit_transaction(transaction)
         assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C
@@ -294,7 +294,7 @@ class TestAccountMemoRequirements:
         transaction.sign(keypair)
         with pytest.raises(
             AccountRequiresMemoError,
-            match="Destination account requires a memo in the transaction.",
+            match=r"Destination account requires a memo in the transaction.",
         ) as err:
             server.submit_transaction(transaction)
         assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D
@@ -341,7 +341,7 @@ class TestAccountMemoRequirements:
         transaction.sign(keypair)
         with pytest.raises(
             AccountRequiresMemoError,
-            match="Destination account requires a memo in the transaction.",
+            match=r"Destination account requires a memo in the transaction.",
         ) as err:
             server.submit_transaction(transaction)
         assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D
@@ -566,7 +566,7 @@ class TestAccountMemoRequirements:
             transaction.sign(keypair)
             with pytest.raises(
                 AccountRequiresMemoError,
-                match="Destination account requires a memo in the transaction.",
+                match=r"Destination account requires a memo in the transaction.",
             ) as err:
                 await server.submit_transaction(transaction)
             assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A
@@ -616,7 +616,7 @@ class TestAccountMemoRequirements:
             transaction.sign(keypair)
             with pytest.raises(
                 AccountRequiresMemoError,
-                match="Destination account requires a memo in the transaction.",
+                match=r"Destination account requires a memo in the transaction.",
             ) as err:
                 await server.submit_transaction(transaction)
             assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B
@@ -666,7 +666,7 @@ class TestAccountMemoRequirements:
             transaction.sign(keypair)
             with pytest.raises(
                 AccountRequiresMemoError,
-                match="Destination account requires a memo in the transaction.",
+                match=r"Destination account requires a memo in the transaction.",
             ) as err:
                 await server.submit_transaction(transaction)
             assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C
@@ -714,7 +714,7 @@ class TestAccountMemoRequirements:
             transaction.sign(keypair)
             with pytest.raises(
                 AccountRequiresMemoError,
-                match="Destination account requires a memo in the transaction.",
+                match=r"Destination account requires a memo in the transaction.",
             ) as err:
                 await server.submit_transaction(transaction)
             assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D
@@ -764,7 +764,7 @@ class TestAccountMemoRequirements:
             transaction.sign(keypair)
             with pytest.raises(
                 AccountRequiresMemoError,
-                match="Destination account requires a memo in the transaction.",
+                match=r"Destination account requires a memo in the transaction.",
             ) as err:
                 await server.submit_transaction(transaction)
             assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D

@@ -158,7 +158,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             ValueError,
-            match="memos are not valid for challenge transactions with a muxed client account",
+            match=r"memos are not valid for challenge transactions with a muxed client account",
         ):
             build_challenge_transaction(
                 server_secret=server_kp.secret,
@@ -242,7 +242,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             ValueError,
-            match="client_signing_key is required if client_domain is provided.",
+            match=r"client_signing_key is required if client_domain is provided.",
         ):
             build_challenge_transaction(
                 server_secret=server_kp.secret,
@@ -362,7 +362,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="The transaction's operation key name does not include the expected home domain.",
+            match=r"The transaction's operation key name does not include the expected home domain.",
         ):
             verify_challenge_transaction(
                 challenge_tx,
@@ -394,7 +394,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="The transaction's operation key name does not include the expected home domain.",
+            match=r"The transaction's operation key name does not include the expected home domain.",
         ):
             verify_challenge_transaction(
                 challenge_tx,
@@ -437,7 +437,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="The transaction sequence number should be zero.",
+            match=r"The transaction sequence number should be zero.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -468,7 +468,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction source account is not equal to server's account.",
+            match=r"Transaction source account is not equal to server's account.",
         ):
             verify_challenge_transaction(
                 challenge_tx,
@@ -498,7 +498,7 @@ class TestStellarWebAuthentication:
         challenge_tx_signed = challenge_te.to_xdr()
 
         with pytest.raises(
-            InvalidSep10ChallengeError, match="Operation type should be ManageData."
+            InvalidSep10ChallengeError, match=r"Operation type should be ManageData."
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -537,7 +537,7 @@ class TestStellarWebAuthentication:
         challenge_tx_signed = challenge_te.to_xdr()
 
         with pytest.raises(
-            InvalidSep10ChallengeError, match="Operation should have a source account."
+            InvalidSep10ChallengeError, match=r"Operation should have a source account."
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -578,7 +578,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Operation value should not be null.",
+            match=r"Operation value should not be null.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -620,7 +620,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="'web_auth_domain' operation value should not be null.",
+            match=r"'web_auth_domain' operation value should not be null.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -705,7 +705,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Operation value encoded as base64 should be 64 bytes long.",
+            match=r"Operation value encoded as base64 should be 64 bytes long.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -777,7 +777,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction not signed by any client signer.",
+            match=r"Transaction not signed by any client signer.",
         ):
             verify_challenge_transaction(
                 challenge,
@@ -816,7 +816,7 @@ class TestStellarWebAuthentication:
         challenge_tx_signed = challenge_te.to_xdr()
 
         with pytest.raises(
-            InvalidSep10ChallengeError, match="Transaction requires timebounds."
+            InvalidSep10ChallengeError, match=r"Transaction requires timebounds."
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -858,7 +858,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction requires non-infinite timebounds.",
+            match=r"Transaction requires non-infinite timebounds.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -900,7 +900,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction is not within range of the specified timebounds.",
+            match=r"Transaction is not within range of the specified timebounds.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -979,7 +979,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction is not within range of the specified timebounds.",
+            match=r"Transaction is not within range of the specified timebounds.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -1057,7 +1057,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="The transaction has operations that are unrecognized.",
+            match=r"The transaction has operations that are unrecognized.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -1090,7 +1090,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="The transaction's operation key name "
+            match=r"The transaction's operation key name "
             "does not include the expected home domain.",
         ):
             verify_challenge_transaction(
@@ -1190,7 +1190,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="The transaction has operations that are unrecognized.",
+            match=r"The transaction has operations that are unrecognized.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -1238,7 +1238,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Operation type should be ManageData.",
+            match=r"Operation type should be ManageData.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -1283,7 +1283,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Operation should have a source account.",
+            match=r"Operation should have a source account.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -1315,7 +1315,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction should contain at least one operation.",
+            match=r"Transaction should contain at least one operation.",
         ):
             verify_challenge_transaction(
                 challenge_tx_signed,
@@ -1389,7 +1389,7 @@ class TestStellarWebAuthentication:
 
         signers = []
         with pytest.raises(
-            InvalidSep10ChallengeError, match="Transaction has no signatures."
+            InvalidSep10ChallengeError, match=r"Transaction has no signatures."
         ):
             _verify_transaction_signatures(challenge_te, signers)
 
@@ -1465,7 +1465,7 @@ class TestStellarWebAuthentication:
         challenge_tx = transaction.to_xdr()
         signers = []
 
-        with pytest.raises(InvalidSep10ChallengeError, match="No signers provided."):
+        with pytest.raises(InvalidSep10ChallengeError, match=r"No signers provided."):
             verify_challenge_transaction_signers(
                 challenge_tx,
                 server_kp.public_key,
@@ -1508,7 +1508,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction not signed by any client signer.",
+            match=r"Transaction not signed by any client signer.",
         ):
             verify_challenge_transaction_signers(
                 challenge_tx,
@@ -1599,7 +1599,8 @@ class TestStellarWebAuthentication:
             Ed25519PublicKeySigner(Keypair.random().public_key, 255),
         ]
         with pytest.raises(
-            InvalidSep10ChallengeError, match="Transaction has unrecognized signatures."
+            InvalidSep10ChallengeError,
+            match=r"Transaction has unrecognized signatures.",
         ):
             verify_challenge_transaction_signers(
                 challenge_tx,
@@ -1723,7 +1724,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction not signed by the source account of the 'client_domain' ManageData operation",
+            match=r"Transaction not signed by the source account of the 'client_domain' ManageData operation",
         ):
             verify_challenge_transaction_signers(
                 challenge_tx,
@@ -1786,7 +1787,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Transaction not signed by any client signer.",
+            match=r"Transaction not signed by any client signer.",
         ):
             verify_challenge_transaction_signed_by_client_master_key(
                 challenge_tx,
@@ -1877,7 +1878,7 @@ class TestStellarWebAuthentication:
         med_threshold = 10
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="signers with weight 7 do not meet threshold 10.",
+            match=r"signers with weight 7 do not meet threshold 10.",
         ):
             verify_challenge_transaction_threshold(
                 challenge_tx,
@@ -1907,7 +1908,7 @@ class TestStellarWebAuthentication:
         )
         with pytest.raises(
             ValueError,
-            match="Invalid server_account_id, multiplexed account are not supported.",
+            match=r"Invalid server_account_id, multiplexed account are not supported.",
         ):
             read_challenge_transaction(
                 challenge_transaction=challenge,
@@ -2004,7 +2005,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Invalid challenge, memos are not permitted if the client account is muxed",
+            match=r"Invalid challenge, memos are not permitted if the client account is muxed",
         ):
             read_challenge_transaction(
                 challenge_transaction=challenge.to_xdr(),
@@ -2045,7 +2046,7 @@ class TestStellarWebAuthentication:
 
         with pytest.raises(
             InvalidSep10ChallengeError,
-            match="Invalid memo, only ID memos are permitted",
+            match=r"Invalid memo, only ID memos are permitted",
         ):
             read_challenge_transaction(
                 challenge_transaction=challenge.to_xdr(),
@@ -2090,7 +2091,7 @@ class TestStellarWebAuthentication:
         challenge = fee_bump_tx.to_xdr()
         with pytest.raises(
             ValueError,
-            match="Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope.",
+            match=r"Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope.",
         ):
             read_challenge_transaction(
                 challenge,
@@ -2127,7 +2128,8 @@ class TestStellarWebAuthentication:
 
         challenge_tx = transaction.to_xdr()
         with pytest.raises(
-            InvalidSep10ChallengeError, match="Transaction has unrecognized signatures."
+            InvalidSep10ChallengeError,
+            match=r"Transaction has unrecognized signatures.",
         ):
             verify_challenge_transaction_signed_by_client_master_key(
                 challenge_tx,

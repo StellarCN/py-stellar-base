@@ -127,9 +127,6 @@ ignore = [
     # codebase live in legitimate multilingual test data and docstrings.
     "RUF002",
     "RUF003",
-    # pytest.raises(match=...) patterns -- 100+ findings, address in a
-    # follow-up commit.
-    "RUF043",
 ]
 
 [tool.ruff.lint.flake8-pytest-style]

@@ -42,12 +42,12 @@ class TestAddress:
 
     def test_constructor_invalid_address_throws(self):
         account_id = "GINVALID"
-        with pytest.raises(ValueError, match="Unsupported address type."):
+        with pytest.raises(ValueError, match=r"Unsupported address type."):
             Address(account_id)
 
     def test_constructor_secret_throws(self):
         secret = "SBUIAXRYKAEJWBSJZYE6P4N4X4ATXP5GAFK5TZ6SKKQ6TS4MLX6G6E4M"
-        with pytest.raises(ValueError, match="Unsupported address type."):
+        with pytest.raises(ValueError, match=r"Unsupported address type."):
             Address(secret)
 
     def test_from_account_byte(self):

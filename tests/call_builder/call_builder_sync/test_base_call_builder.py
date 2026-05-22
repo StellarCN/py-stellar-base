@@ -105,10 +105,10 @@ class TestBaseCallBuilder:
             .order(desc=True)
         )
         call_builder.call()
-        with pytest.raises(NotPageableError, match="The next page does not exist."):
+        with pytest.raises(NotPageableError, match=r"The next page does not exist."):
             call_builder.next()
 
-        with pytest.raises(NotPageableError, match="The prev page does not exist."):
+        with pytest.raises(NotPageableError, match=r"The prev page does not exist."):
             call_builder.prev()
 
     def test_get_data_page(self, horizon_mock):

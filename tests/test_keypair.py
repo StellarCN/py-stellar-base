@@ -329,7 +329,7 @@ class TestKeypair:
         )
         with pytest.raises(
             MissingEd25519SecretSeedError,
-            match="The keypair does not contain secret seed. Use Keypair.from_secret, "
+            match=r"The keypair does not contain secret seed. Use Keypair.from_secret, "
             "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed.",
         ):
             can_not_sign_kp.sign(data)
@@ -340,7 +340,7 @@ class TestKeypair:
         )
         with pytest.raises(
             MissingEd25519SecretSeedError,
-            match="The keypair does not contain secret seed. Use Keypair.from_secret, "
+            match=r"The keypair does not contain secret seed. Use Keypair.from_secret, "
             "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed.",
         ):
             can_not_sign_kp.raw_secret_key()
@@ -364,9 +364,9 @@ class TestKeypair:
         )
         data = b"Hello, Stellar!"
         signature = kp.sign(data)
-        with pytest.raises(BadSignatureError, match="Signature verification failed."):
+        with pytest.raises(BadSignatureError, match=r"Signature verification failed."):
             kp.verify(data, signature + b"failed")
-        with pytest.raises(BadSignatureError, match="Signature verification failed."):
+        with pytest.raises(BadSignatureError, match=r"Signature verification failed."):
             kp.verify(b"test_verify_failed", signature)
 
     @pytest.mark.parametrize(
@@ -403,13 +403,13 @@ class TestKeypair:
         kp = Keypair.from_secret(secret)
         with pytest.raises(
             AttributeError,
-            match="Please use `Keypair.from_secret` to generate a new Keypair object.",
+            match=r"Please use `Keypair.from_secret` to generate a new Keypair object.",
         ):
             kp.secret = "SAMWF63FZ5ZNHY75SNYNAFMWTL5FPBMIV7DLB3UDAVLL7DKPI5ZFS2S6"
 
         with pytest.raises(
             AttributeError,
-            match="Please use `Keypair.from_public_key` to generate a new Keypair object.",
+            match=r"Please use `Keypair.from_public_key` to generate a new Keypair object.",
         ):
             kp.public_key = "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
 
@@ -472,7 +472,7 @@ class TestKeypair:
         assert len(mnemonic_phrase.split(" ")) == length
 
     def test_generate_mnemonic_phrase_unsupported_language_raise(self):
-        with pytest.raises(ValueError, match="This language is not supported."):
+        with pytest.raises(ValueError, match=r"This language is not supported."):
             Keypair.generate_mnemonic_phrase("unsupported_language")
 
     def test_generate_mnemonic_phrase_invalid_strength_raise(self):
@@ -517,7 +517,7 @@ class TestKeypair:
     def test_invalid_mnemonic_raise(self, mnemonic, language):
         with pytest.raises(
             ValueError,
-            match="Invalid mnemonic, please check if the mnemonic is correct, "
+            match=r"Invalid mnemonic, please check if the mnemonic is correct, "
             "or if the language is set correctly.",
         ):
             assert Keypair.from_mnemonic_phrase(
@@ -558,23 +558,23 @@ class TestKeypair:
         ]
         _ = Keypair.from_shamir_mnemonic_phrases(shares[:-1])  # validate good run
 
-        with pytest.raises(ValueError, match="Wrong number of mnemonics"):
+        with pytest.raises(ValueError, match=r"Wrong number of mnemonics"):
             Keypair.from_shamir_mnemonic_phrases(shares)
 
-        with pytest.raises(ValueError, match="Wrong number of mnemonics"):
+        with pytest.raises(ValueError, match=r"Wrong number of mnemonics"):
             Keypair.from_shamir_mnemonic_phrases([shares[0]])
 
-        with pytest.raises(ValueError, match="mnemonic word"):
+        with pytest.raises(ValueError, match=r"mnemonic word"):
             Keypair.from_shamir_mnemonic_phrases([shares[0], shares[1] + "a"])
 
         # remove first word
         shares_1 = "buyer academic agency burden payroll alpha oven large amount smear forward pharmacy symbolic junk axle exercise segment frequent axle"
-        with pytest.raises(ValueError, match="mnemonic length"):
+        with pytest.raises(ValueError, match=r"mnemonic length"):
             Keypair.from_shamir_mnemonic_phrases([shares[0], shares_1])
 
         # another first word
         shares_1 = "acid buyer academic agency burden payroll alpha oven large amount smear forward pharmacy symbolic junk axle exercise segment frequent axle"
-        with pytest.raises(ValueError, match="mnemonic checksum"):
+        with pytest.raises(ValueError, match=r"mnemonic checksum"):
             Keypair.from_shamir_mnemonic_phrases([shares[0], shares_1])
 
     @pytest.mark.parametrize(
@@ -750,5 +750,5 @@ class TestKeypair:
         )
         message = "Hello, World!"
 
-        with pytest.raises(BadSignatureError, match="Signature verification failed."):
+        with pytest.raises(BadSignatureError, match=r"Signature verification failed."):
             kp.verify_message(message, base64.b64decode(signature))

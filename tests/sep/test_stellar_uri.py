@@ -218,7 +218,9 @@ class TestStellarTransactionStellarUri:
 
     def test_message_too_long_raise(self):
         message = "_" * 301
-        with pytest.raises(ValueError, match="Message must not exceed 300 characters."):
+        with pytest.raises(
+            ValueError, match=r"Message must not exceed 300 characters."
+        ):
             TransactionStellarUri(
                 transaction_envelope=self.tx,
                 message=message,
@@ -231,43 +233,43 @@ class TestStellarTransactionStellarUri:
 
     def test_invalid_callback_raise(self):
         uri = "web+stellar:tx?xdr=AAAAAP%2Byw%2BZEuNg533pUmwlYxfrq6%2FBoMJqiJ8vuQhf6rHWmAAAAZAB8NHAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAYAAAABSFVHAAAAAABAH0wIyY3BJBS2qHdRPAV80M8hF7NBpxRjXyjuT9kEbH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FAAAAAAAAAAA%3D&callback=https%3A%2F%2FsomeSigningService.com&replace=sourceAccount%3AX%3BX%3Aaccount%20on%20which%20to%20create%20the%20trustline&pubkey=GAU2ZSYYEYO5S5ZQSMMUENJ2TANY4FPXYGGIMU6GMGKTNVDG5QYFW6JS&msg=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=8uiZ2r7KT3gRsO%2BrzmofGHyl%2FLFMfOgNtx5oOddK2rAy8M%2BOgBYOSQpASNbIm%2BIvZVojxv8tKTYuzOkbyhPODA%3D%3D"
-        with pytest.raises(ValueError, match="`callback` should start with `url:`."):
+        with pytest.raises(ValueError, match=r"`callback` should start with `url:`."):
             TransactionStellarUri.from_uri(uri, Network.TESTNET_NETWORK_PASSPHRASE)
 
     def test_missing_network_passphrase_raise(self):
         uri = "web+stellar:tx?xdr=AAAAAP%2Byw%2BZEuNg533pUmwlYxfrq6%2FBoMJqiJ8vuQhf6rHWmAAAAZAB8NHAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAYAAAABSFVHAAAAAABAH0wIyY3BJBS2qHdRPAV80M8hF7NBpxRjXyjuT9kEbH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FAAAAAAAAAAA%3D&callback=https%3A%2F%2FsomeSigningService.com&replace=sourceAccount%3AX%3BX%3Aaccount%20on%20which%20to%20create%20the%20trustline&pubkey=GAU2ZSYYEYO5S5ZQSMMUENJ2TANY4FPXYGGIMU6GMGKTNVDG5QYFW6JS&msg=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&origin_domain=someDomain.com&signature=8uiZ2r7KT3gRsO%2BrzmofGHyl%2FLFMfOgNtx5oOddK2rAy8M%2BOgBYOSQpASNbIm%2BIvZVojxv8tKTYuzOkbyhPODA%3D%3D"
-        with pytest.raises(ValueError, match="`network_passphrase` is required."):
+        with pytest.raises(ValueError, match=r"`network_passphrase` is required."):
             TransactionStellarUri.from_uri(uri, None)
 
     def test_invalid_scheme_raise(self):
         uri = "invalid+web+stellar:tx?xdr=AAAAAP%2Byw%2BZEuNg533pUmwlYxfrq6%2FBoMJqiJ8vuQhf6rHWmAAAAZAB8NHAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAYAAAABSFVHAAAAAABAH0wIyY3BJBS2qHdRPAV80M8hF7NBpxRjXyjuT9kEbH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FAAAAAAAAAAA%3D&callback=url%3Ahttps%3A%2F%2FsomeSigningService.com&replace=sourceAccount%3AX%3BX%3Aaccount%20on%20which%20to%20create%20the%20trustline&pubkey=GAU2ZSYYEYO5S5ZQSMMUENJ2TANY4FPXYGGIMU6GMGKTNVDG5QYFW6JS&msg=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=8uiZ2r7KT3gRsO%2BrzmofGHyl%2FLFMfOgNtx5oOddK2rAy8M%2BOgBYOSQpASNbIm%2BIvZVojxv8tKTYuzOkbyhPODA%3D%3D"
         # TODO: recheck: Stellar URI scheme should be `web+stellar`, but got `invalid+web+stellar`.
-        with pytest.raises(ValueError, match="Stellar URI scheme should be"):
+        with pytest.raises(ValueError, match=r"Stellar URI scheme should be"):
             TransactionStellarUri.from_uri(uri, Network.TESTNET_NETWORK_PASSPHRASE)
 
     def test_invalid_path_raise(self):
         uri = "web+stellar:invalid_tx?xdr=AAAAAP%2Byw%2BZEuNg533pUmwlYxfrq6%2FBoMJqiJ8vuQhf6rHWmAAAAZAB8NHAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAYAAAABSFVHAAAAAABAH0wIyY3BJBS2qHdRPAV80M8hF7NBpxRjXyjuT9kEbH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FAAAAAAAAAAA%3D&callback=url%3Ahttps%3A%2F%2FsomeSigningService.com&replace=sourceAccount%3AX%3BX%3Aaccount%20on%20which%20to%20create%20the%20trustline&pubkey=GAU2ZSYYEYO5S5ZQSMMUENJ2TANY4FPXYGGIMU6GMGKTNVDG5QYFW6JS&msg=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=8uiZ2r7KT3gRsO%2BrzmofGHyl%2FLFMfOgNtx5oOddK2rAy8M%2BOgBYOSQpASNbIm%2BIvZVojxv8tKTYuzOkbyhPODA%3D%3D"
         with pytest.raises(
-            ValueError, match="Stellar URI path should be `tx`, but got `invalid_tx`."
+            ValueError, match=r"Stellar URI path should be `tx`, but got `invalid_tx`."
         ):
             TransactionStellarUri.from_uri(uri, Network.TESTNET_NETWORK_PASSPHRASE)
 
     # TODO: add more tests
     def test_invalid_replace_raise(self):
         uri = "web+stellar:tx?xdr=AAAAAP%2Byw%2BZEuNg533pUmwlYxfrq6%2FBoMJqiJ8vuQhf6rHWmAAAAZAB8NHAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAYAAAABSFVHAAAAAABAH0wIyY3BJBS2qHdRPAV80M8hF7NBpxRjXyjuT9kEbH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FAAAAAAAAAAA%3D&callback=url%3Ahttps%3A%2F%2FsomeSigningService.com&replace=sourceAccount%3AX%3BY%3Aaccount%20on%20which%20to%20create%20the%20trustline&pubkey=GAU2ZSYYEYO5S5ZQSMMUENJ2TANY4FPXYGGIMU6GMGKTNVDG5QYFW6JS&msg=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=8uiZ2r7KT3gRsO%2BrzmofGHyl%2FLFMfOgNtx5oOddK2rAy8M%2BOgBYOSQpASNbIm%2BIvZVojxv8tKTYuzOkbyhPODA%3D%3D"
-        with pytest.raises(ValueError, match="Invalid `replace`."):
+        with pytest.raises(ValueError, match=r"Invalid `replace`."):
             TransactionStellarUri.from_uri(uri, Network.TESTNET_NETWORK_PASSPHRASE)
 
     def test_missing_xdr_passphrase_raise(self):
         uri = "web+stellar:tx?callback=url%3Ahttps%3A%2F%2FsomeSigningService.com&replace=sourceAccount%3AX%3BX%3Aaccount%20on%20which%20to%20create%20the%20trustline&pubkey=GAU2ZSYYEYO5S5ZQSMMUENJ2TANY4FPXYGGIMU6GMGKTNVDG5QYFW6JS&msg=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=8uiZ2r7KT3gRsO%2BrzmofGHyl%2FLFMfOgNtx5oOddK2rAy8M%2BOgBYOSQpASNbIm%2BIvZVojxv8tKTYuzOkbyhPODA%3D%3D"
-        with pytest.raises(ValueError, match="`xdr` is missing from uri."):
+        with pytest.raises(ValueError, match=r"`xdr` is missing from uri."):
             TransactionStellarUri.from_uri(uri, Network.TESTNET_NETWORK_PASSPHRASE)
 
     def test_network_passphrase_mismatch_raise(self):
         uri = "web+stellar:tx?xdr=AAAAAP%2Byw%2BZEuNg533pUmwlYxfrq6%2FBoMJqiJ8vuQhf6rHWmAAAAZAB8NHAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAYAAAABSFVHAAAAAABAH0wIyY3BJBS2qHdRPAV80M8hF7NBpxRjXyjuT9kEbH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FAAAAAAAAAAA%3D&callback=url%3Ahttps%3A%2F%2FsomeSigningService.com&replace=sourceAccount%3AX%3BX%3Aaccount%20on%20which%20to%20create%20the%20trustline&pubkey=GAU2ZSYYEYO5S5ZQSMMUENJ2TANY4FPXYGGIMU6GMGKTNVDG5QYFW6JS&msg=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=8uiZ2r7KT3gRsO%2BrzmofGHyl%2FLFMfOgNtx5oOddK2rAy8M%2BOgBYOSQpASNbIm%2BIvZVojxv8tKTYuzOkbyhPODA%3D%3D"
         with pytest.raises(
             ValueError,
-            match="The `network_passphrase` in the function parameter does not "
+            match=r"The `network_passphrase` in the function parameter does not "
             "match the `network_passphrase` in the uri.",
         ):
             TransactionStellarUri.from_uri(uri, Network.PUBLIC_NETWORK_PASSPHRASE)
@@ -512,7 +514,9 @@ class TestPayStellarUri:
 
     def test_message_too_long_raise(self):
         message = "_" * 301
-        with pytest.raises(ValueError, match="Message must not exceed 300 characters."):
+        with pytest.raises(
+            ValueError, match=r"Message must not exceed 300 characters."
+        ):
             PayStellarUri(
                 "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",
                 message=message,
@@ -537,35 +541,36 @@ class TestPayStellarUri:
 
     def test_invalid_callback_raise(self):
         uri = "web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=120.1234567&asset_code=Hello&asset_issuer=GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF&memo=Hello%20World&memo_type=MEMO_TEXT&callback=https%3A%2F%2Fexample.com%2Fcallback&msg=pay%20me%20with%20lumens&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=k5cDMVTD2W2lKeEGqakjOTf3aPuPumlr8ObBOvauaa2QiXqa7%2Bw9WRgtmo6NaPXdOoFG5ScUIp9k7PdeuPieCw%3D%3D"
-        with pytest.raises(ValueError, match="`callback` should start with `url:`."):
+        with pytest.raises(ValueError, match=r"`callback` should start with `url:`."):
             PayStellarUri.from_uri(uri)
 
     def test_invalid_scheme_raise(self):
         uri = "invalid+web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=120.1234567&asset_code=Hello&asset_issuer=GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF&memo=Hello%20World&memo_type=MEMO_TEXT&callback=url%3Ahttps%3A%2F%2Fexample.com%2Fcallback&msg=pay%20me%20with%20lumens&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=k5cDMVTD2W2lKeEGqakjOTf3aPuPumlr8ObBOvauaa2QiXqa7%2Bw9WRgtmo6NaPXdOoFG5ScUIp9k7PdeuPieCw%3D%3D"
         # TODO: recheck: Stellar URI scheme should be `web+stellar`, but got `invalid+web+stellar`.
-        with pytest.raises(ValueError, match="Stellar URI scheme should be"):
+        with pytest.raises(ValueError, match=r"Stellar URI scheme should be"):
             PayStellarUri.from_uri(uri)
 
     def test_invalid_path_raise(self):
         uri = "web+stellar:invalid_pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=120.1234567&asset_code=Hello&asset_issuer=GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF&memo=Hello%20World&memo_type=MEMO_TEXT&callback=url%3Ahttps%3A%2F%2Fexample.com%2Fcallback&msg=pay%20me%20with%20lumens&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=k5cDMVTD2W2lKeEGqakjOTf3aPuPumlr8ObBOvauaa2QiXqa7%2Bw9WRgtmo6NaPXdOoFG5ScUIp9k7PdeuPieCw%3D%3D"
         with pytest.raises(
-            ValueError, match="Stellar URI path should be `pay`, but got `invalid_pay`."
+            ValueError,
+            match=r"Stellar URI path should be `pay`, but got `invalid_pay`.",
         ):
             PayStellarUri.from_uri(uri)
 
     def test_destination_missing_raise(self):
         uri = "web+stellar:pay?amount=120.1234567&asset_code=Hello&asset_issuer=GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF&memo=Hello%20World&memo_type=MEMO_TEXT&callback=url%3Ahttps%3A%2F%2Fexample.com%2Fcallback&msg=pay%20me%20with%20lumens&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=k5cDMVTD2W2lKeEGqakjOTf3aPuPumlr8ObBOvauaa2QiXqa7%2Bw9WRgtmo6NaPXdOoFG5ScUIp9k7PdeuPieCw%3D%3D"
-        with pytest.raises(ValueError, match="`destination` is missing from uri."):
+        with pytest.raises(ValueError, match=r"`destination` is missing from uri."):
             PayStellarUri.from_uri(uri)
 
     def test_memo_no_value_raise(self):
         uri = "web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=120.1234567&asset_code=Hello&asset_issuer=GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF&memo_type=MEMO_TEXT&callback=url%3Ahttps%3A%2F%2Fexample.com%2Fcallback&msg=pay%20me%20with%20lumens&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=k5cDMVTD2W2lKeEGqakjOTf3aPuPumlr8ObBOvauaa2QiXqa7%2Bw9WRgtmo6NaPXdOoFG5ScUIp9k7PdeuPieCw%3D%3D"
-        with pytest.raises(ValueError, match="`memo` is missing from uri."):
+        with pytest.raises(ValueError, match=r"`memo` is missing from uri."):
             PayStellarUri.from_uri(uri)
 
     def test_invalid_memo_type_raise(self):
         uri = "web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=120.1234567&asset_code=Hello&asset_issuer=GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF&memo=Hello%20World&memo_type=MEMO_TEXT_INVALID&callback=url%3Ahttps%3A%2F%2Fexample.com%2Fcallback&msg=pay%20me%20with%20lumens&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=k5cDMVTD2W2lKeEGqakjOTf3aPuPumlr8ObBOvauaa2QiXqa7%2Bw9WRgtmo6NaPXdOoFG5ScUIp9k7PdeuPieCw%3D%3D"
-        with pytest.raises(ValueError, match="Invalid `memo_type`."):
+        with pytest.raises(ValueError, match=r"Invalid `memo_type`."):
             PayStellarUri.from_uri(uri)
 
 

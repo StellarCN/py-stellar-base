@@ -1150,7 +1150,7 @@ class TestSorobanServer:
             m.post(RPC_URL, json=data)
             with pytest.raises(
                 PrepareTransactionException,
-                match="Simulation transaction failed, the response contains error information.",
+                match=r"Simulation transaction failed, the response contains error information.",
             ) as e:
                 SorobanServer(RPC_URL).prepare_transaction(transaction)
             assert (
@@ -1181,7 +1181,7 @@ class TestSorobanServer:
             m.post(RPC_URL, json=data)
             with pytest.raises(
                 ValueError,
-                match="Simulation results invalid",
+                match=r"Simulation results invalid",
             ):
                 SorobanServer(RPC_URL).prepare_transaction(transaction)
 

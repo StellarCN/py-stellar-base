@@ -110,10 +110,10 @@ class TestBaseCallBuilder:
             .order(desc=True)
         )
         await call_builder.call()
-        with pytest.raises(NotPageableError, match="The next page does not exist."):
+        with pytest.raises(NotPageableError, match=r"The next page does not exist."):
             await call_builder.next()
 
-        with pytest.raises(NotPageableError, match="The prev page does not exist."):
+        with pytest.raises(NotPageableError, match=r"The prev page does not exist."):
             await call_builder.prev()
 
         await client.close()

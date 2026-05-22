@@ -1078,7 +1078,7 @@ class TestTxrep:
             _get_bool_value(raw_data_map, key)
 
     def test_decode_asset_raise(self):
-        with pytest.raises(ValueError, match="Failed to decode asset string."):
+        with pytest.raises(ValueError, match=r"Failed to decode asset string."):
             _decode_asset("bad:assert:string")
 
     def test_get_memo_raise(self):
