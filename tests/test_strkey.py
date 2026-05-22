@@ -100,7 +100,7 @@ class TestStrKey:
             StrKey.decode_sha256_hash(key)
 
     @pytest.mark.parametrize(
-        "key, valid",
+        ("key", "valid"),
         [
             ("GDWZCOEQRODFCH6ISYQPWY67L3ULLWS5ISXYYL5GH43W7YFMTLB65PYM", True),
             ("GDWZCOEQRODFCH6ISYQPWY67L3ULLWS5ISXYYL5GH43W7Y", False),
@@ -112,7 +112,7 @@ class TestStrKey:
         assert StrKey.is_valid_ed25519_public_key(key) is valid
 
     @pytest.mark.parametrize(
-        "key, valid",
+        ("key", "valid"),
         [
             ("SBCVMMCBEDB64TVJZFYJOJAERZC4YVVUOE6SYR2Y76CBTENGUSGWRRVO", True),
             ("SBCVMMCBEDB64TVJZFYJOJAERZC4YVVUOE6SYR2Y76CBTENGUSG", False),
@@ -124,7 +124,7 @@ class TestStrKey:
         assert StrKey.is_valid_ed25519_secret_seed(key) is valid
 
     @pytest.mark.parametrize(
-        "key, valid",
+        ("key", "valid"),
         [
             ("TDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH234BSS", True),
             ("TDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH23", False),
@@ -136,7 +136,7 @@ class TestStrKey:
         assert StrKey.is_valid_pre_auth_tx(key) is valid
 
     @pytest.mark.parametrize(
-        "key, valid",
+        ("key", "valid"),
         [
             ("XDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH235FXL", True),
             ("XDNA2V62PVEFBZ74CDJKTUHLY4Y7PL5UAV2MAM4VWF6USFE3SH23", False),
@@ -192,7 +192,7 @@ class TestStrKey:
         assert StrKey.encode_med25519_public_key(data) == expected
 
     @pytest.mark.parametrize(
-        "key, valid",
+        ("key", "valid"),
         [
             ("GDWZCOEQRODFCH6ISYQPWY67L3ULLWS5ISXYYL5GH43W7YFMTLB65PYM", False),
             ("GDWZCOEQRODFCH6ISYQPWY67L3ULLWS5ISXYYL5GH43W7Y", False),
@@ -236,7 +236,7 @@ class TestStrKey:
             StrKey.decode_ed25519_signed_payload(key)
 
     @pytest.mark.parametrize(
-        "key, valid",
+        ("key", "valid"),
         [
             (
                 "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM",

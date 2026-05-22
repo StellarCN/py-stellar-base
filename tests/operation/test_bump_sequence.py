@@ -7,7 +7,7 @@ from . import *
 
 class TestBumpSequence:
     @pytest.mark.parametrize(
-        "bump_to, source, xdr",
+        ("bump_to", "source", "xdr"),
         [
             pytest.param(
                 1234567890, None, "AAAAAAAAAAsAAAAASZYC0g==", id="without_source"

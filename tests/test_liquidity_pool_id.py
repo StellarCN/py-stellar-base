@@ -40,7 +40,7 @@ class TestLiquidityPoolId:
         assert asset == LiquidityPoolId.from_xdr_object(trust_line_asset_xdr_object)
 
     @pytest.mark.parametrize(
-        "asset_code, asset_issuer, asset_type",
+        ("asset_code", "asset_issuer", "asset_type"),
         [
             ("XLM", None, AssetType.ASSET_TYPE_NATIVE),
             (

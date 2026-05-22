@@ -194,7 +194,7 @@ class TestSignerKey:
 
 class TestSignedPayloadSigner:
     @pytest.mark.parametrize(
-        "account_id, payload, strkey",
+        ("account_id", "payload", "strkey"),
         [
             (
                 "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ",
@@ -216,7 +216,7 @@ class TestSignedPayloadSigner:
         assert SignerKey.from_encoded_signer_key(strkey) == signer_key
 
     @pytest.mark.parametrize(
-        "account_id, payload, strkey",
+        ("account_id", "payload", "strkey"),
         [
             (
                 "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ",

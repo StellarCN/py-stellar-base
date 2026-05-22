@@ -5,7 +5,7 @@ from stellar_sdk import LedgerBounds
 
 class TestLedgerBounds:
     @pytest.mark.parametrize(
-        "min_ledger, max_ledger",
+        ("min_ledger", "max_ledger"),
         [
             (1560844454, 1560846000),
             (1560844454, 0),
@@ -22,7 +22,7 @@ class TestLedgerBounds:
         assert from_instance.min_ledger == min_ledger
 
     @pytest.mark.parametrize(
-        "min_ledger, max_ledger, message",
+        ("min_ledger", "max_ledger", "message"),
         [
             (-1, 1560844454, "min_ledger cannot be negative."),
             (1560844454, -1, "max_ledger cannot be negative."),

@@ -9,7 +9,7 @@ from . import *
 
 class TestCreateAccount:
     @pytest.mark.parametrize(
-        "starting_balance, source, xdr",
+        ("starting_balance", "source", "xdr"),
         [
             pytest.param(
                 "100",

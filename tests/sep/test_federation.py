@@ -187,10 +187,7 @@ class TestFederation:
                 )
 
     def test_not_found_record_at_federation(self):
-        with (
-            pytest.raises(BadFederationResponseError) as err,
-            requests_mock.Mocker() as m,
-        ):
+        with requests_mock.Mocker() as m:
             m.get(
                 "https://example.com/.well-known/stellar.toml",
                 text=self.TOML_CONTENT,
@@ -199,8 +196,8 @@ class TestFederation:
                 "https://federation.example.com/?type=name&q=hello%2Aexample.com",
                 status_code=404,
             )
-            record = resolve_stellar_address(self.STELLAR_ADDRESS)
-            assert record == self.FEDERATION_RECORD
+            with pytest.raises(BadFederationResponseError) as err:
+                resolve_stellar_address(self.STELLAR_ADDRESS)
         assert err.value.status == 404
 
     def test_split_address(self):

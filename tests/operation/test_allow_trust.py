@@ -7,7 +7,7 @@ from . import *
 
 class TestAllowTrust:
     @pytest.mark.parametrize(
-        "asset_code, authorize, source, xdr",
+        ("asset_code", "authorize", "source", "xdr"),
         [
             pytest.param(
                 "USD",

@@ -1093,7 +1093,7 @@ class TestTxrep:
             _get_memo(raw_data_map, prefix)
 
     @pytest.mark.parametrize(
-        "k, v",
+        ("k", "v"),
         [
             ('"hello world"', "hello world"),
             ("", ""),
@@ -1106,7 +1106,7 @@ class TestTxrep:
         assert _get_string_value(raw_data_map, key) == v
 
     @pytest.mark.parametrize(
-        "k, v",
+        ("k", "v"),
         [
             ("", ""),
             ("  ", ""),

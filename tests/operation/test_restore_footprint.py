@@ -8,7 +8,7 @@ from . import *
 
 class TestRestoreFootprint:
     @pytest.mark.parametrize(
-        "source, xdr",
+        ("source", "xdr"),
         [
             pytest.param(None, "AAAAAAAAABoAAAAA", id="without_source"),
             pytest.param(

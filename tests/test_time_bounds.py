@@ -5,7 +5,7 @@ from stellar_sdk import TimeBounds
 
 class TestTimeBounds:
     @pytest.mark.parametrize(
-        "min_time, max_time, xdr",
+        ("min_time", "max_time", "xdr"),
         [
             (1560844454, 1560846000, "AAAAAF0ImKYAAAAAXQiesA=="),
             (1560844454, 0, "AAAAAF0ImKYAAAAAAAAAAA=="),
@@ -21,7 +21,7 @@ class TestTimeBounds:
         assert from_instance.min_time == min_time
 
     @pytest.mark.parametrize(
-        "min_time, max_time, message",
+        ("min_time", "max_time", "message"),
         [
             (-1, 1560844454, "min_time cannot be negative."),
             (1560844454, -1, "max_time cannot be negative."),

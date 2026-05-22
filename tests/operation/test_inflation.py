@@ -7,7 +7,7 @@ from . import *
 
 class TestInflation:
     @pytest.mark.parametrize(
-        "source, xdr",
+        ("source", "xdr"),
         [
             pytest.param(
                 None,
