@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _TRANSACTION_EVENT_STAGE_MAP = {0: "before_all_txs", 1: "after_tx", 2: "after_all_txs"}
 _TRANSACTION_EVENT_STAGE_REVERSE_MAP = {
     "before_all_txs": 0,

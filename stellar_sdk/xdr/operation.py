@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .muxed_account import MuxedAccount
 from .operation_body import OperationBody
 
@@ -89,7 +91,7 @@ class Operation:
 
     def __init__(
         self,
-        source_account: Optional[MuxedAccount],
+        source_account: MuxedAccount | None,
         body: OperationBody,
     ) -> None:
         self.source_account = source_account
@@ -152,11 +154,9 @@ class Operation:
 
     def to_json_dict(self) -> dict:
         return {
-            "source_account": (
-                self.source_account.to_json_dict()
-                if self.source_account is not None
-                else None
-            ),
+            "source_account": self.source_account.to_json_dict()
+            if self.source_account is not None
+            else None,
             "body": self.body.to_json_dict(),
         }
 

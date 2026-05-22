@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Boolean
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Boolean,
+)
+from .constants import *
 from .sc_val_type import SCValType
 
 if TYPE_CHECKING:
@@ -103,26 +107,26 @@ class SCVal:
     def __init__(
         self,
         type: SCValType,
-        b: Optional[bool] = None,
-        error: Optional[SCError] = None,
-        u32: Optional[Uint32] = None,
-        i32: Optional[Int32] = None,
-        u64: Optional[Uint64] = None,
-        i64: Optional[Int64] = None,
-        timepoint: Optional[TimePoint] = None,
-        duration: Optional[Duration] = None,
-        u128: Optional[UInt128Parts] = None,
-        i128: Optional[Int128Parts] = None,
-        u256: Optional[UInt256Parts] = None,
-        i256: Optional[Int256Parts] = None,
-        bytes: Optional[SCBytes] = None,
-        str: Optional[SCString] = None,
-        sym: Optional[SCSymbol] = None,
-        vec: Optional[Optional[SCVec]] = None,
-        map: Optional[Optional[SCMap]] = None,
-        address: Optional[SCAddress] = None,
-        instance: Optional[SCContractInstance] = None,
-        nonce_key: Optional[SCNonceKey] = None,
+        b: bool | None = None,
+        error: SCError | None = None,
+        u32: Uint32 | None = None,
+        i32: Int32 | None = None,
+        u64: Uint64 | None = None,
+        i64: Int64 | None = None,
+        timepoint: TimePoint | None = None,
+        duration: Duration | None = None,
+        u128: UInt128Parts | None = None,
+        i128: Int128Parts | None = None,
+        u256: UInt256Parts | None = None,
+        i256: Int256Parts | None = None,
+        bytes: SCBytes | None = None,
+        str: SCString | None = None,
+        sym: SCSymbol | None = None,
+        vec: SCVec | None | None = None,
+        map: SCMap | None | None = None,
+        address: SCAddress | None = None,
+        instance: SCContractInstance | None = None,
+        nonce_key: SCNonceKey | None = None,
     ) -> None:
         self.type = type
         self.b = b

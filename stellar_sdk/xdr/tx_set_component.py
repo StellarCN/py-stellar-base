@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .tx_set_component_txs_maybe_discounted_fee import (
     TxSetComponentTxsMaybeDiscountedFee,
 )
@@ -35,7 +37,7 @@ class TxSetComponent:
     def __init__(
         self,
         type: TxSetComponentType,
-        txs_maybe_discounted_fee: Optional[TxSetComponentTxsMaybeDiscountedFee] = None,
+        txs_maybe_discounted_fee: TxSetComponentTxsMaybeDiscountedFee | None = None,
     ) -> None:
         self.type = type
         self.txs_maybe_discounted_fee = txs_maybe_discounted_fee

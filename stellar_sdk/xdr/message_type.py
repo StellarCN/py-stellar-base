@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _MESSAGE_TYPE_MAP = {
     0: "error_msg",
     2: "auth",

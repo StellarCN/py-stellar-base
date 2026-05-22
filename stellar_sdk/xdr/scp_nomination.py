@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .hash import Hash
 from .value import Value
 
@@ -30,8 +32,8 @@ class SCPNomination:
     def __init__(
         self,
         quorum_set_hash: Hash,
-        votes: List[Value],
-        accepted: List[Value],
+        votes: list[Value],
+        accepted: list[Value],
     ) -> None:
         _expect_max_length = 4294967295
         if votes and len(votes) > _expect_max_length:

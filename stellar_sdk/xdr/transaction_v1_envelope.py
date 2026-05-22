@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .decorated_signature import DecoratedSignature
 from .transaction import Transaction
 
@@ -31,7 +33,7 @@ class TransactionV1Envelope:
     def __init__(
         self,
         tx: Transaction,
-        signatures: List[DecoratedSignature],
+        signatures: list[DecoratedSignature],
     ) -> None:
         _expect_max_length = 20
         if signatures and len(signatures) > _expect_max_length:

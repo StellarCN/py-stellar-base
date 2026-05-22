@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .time_sliced_peer_data import TimeSlicedPeerData
 
 __all__ = ["TimeSlicedPeerDataList"]
@@ -21,7 +23,7 @@ class TimeSlicedPeerDataList:
         typedef TimeSlicedPeerData TimeSlicedPeerDataList<25>;
     """
 
-    def __init__(self, time_sliced_peer_data_list: List[TimeSlicedPeerData]) -> None:
+    def __init__(self, time_sliced_peer_data_list: list[TimeSlicedPeerData]) -> None:
         _expect_max_length = 25
         if (
             time_sliced_peer_data_list

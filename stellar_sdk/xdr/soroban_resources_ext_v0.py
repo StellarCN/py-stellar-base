@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .uint32 import Uint32
 
 __all__ = ["SorobanResourcesExtV0"]
@@ -29,7 +31,7 @@ class SorobanResourcesExtV0:
 
     def __init__(
         self,
-        archived_soroban_entries: List[Uint32],
+        archived_soroban_entries: list[Uint32],
     ) -> None:
         _expect_max_length = 4294967295
         if (

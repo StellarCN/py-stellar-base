@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _CONTRACT_DATA_DURABILITY_MAP = {0: "temporary", 1: "persistent"}
 _CONTRACT_DATA_DURABILITY_REVERSE_MAP = {"temporary": 0, "persistent": 1}
 __all__ = ["ContractDataDurability"]

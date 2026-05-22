@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .ledger_entry_type import LedgerEntryType
 from .ledger_key_account import LedgerKeyAccount
 from .ledger_key_claimable_balance import LedgerKeyClaimableBalance
@@ -97,16 +99,16 @@ class LedgerKey:
     def __init__(
         self,
         type: LedgerEntryType,
-        account: Optional[LedgerKeyAccount] = None,
-        trust_line: Optional[LedgerKeyTrustLine] = None,
-        offer: Optional[LedgerKeyOffer] = None,
-        data: Optional[LedgerKeyData] = None,
-        claimable_balance: Optional[LedgerKeyClaimableBalance] = None,
-        liquidity_pool: Optional[LedgerKeyLiquidityPool] = None,
-        contract_data: Optional[LedgerKeyContractData] = None,
-        contract_code: Optional[LedgerKeyContractCode] = None,
-        config_setting: Optional[LedgerKeyConfigSetting] = None,
-        ttl: Optional[LedgerKeyTtl] = None,
+        account: LedgerKeyAccount | None = None,
+        trust_line: LedgerKeyTrustLine | None = None,
+        offer: LedgerKeyOffer | None = None,
+        data: LedgerKeyData | None = None,
+        claimable_balance: LedgerKeyClaimableBalance | None = None,
+        liquidity_pool: LedgerKeyLiquidityPool | None = None,
+        contract_data: LedgerKeyContractData | None = None,
+        contract_code: LedgerKeyContractCode | None = None,
+        config_setting: LedgerKeyConfigSetting | None = None,
+        ttl: LedgerKeyTtl | None = None,
     ) -> None:
         self.type = type
         self.account = account

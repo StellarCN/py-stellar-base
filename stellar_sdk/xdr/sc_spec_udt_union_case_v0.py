@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .sc_spec_udt_union_case_tuple_v0 import SCSpecUDTUnionCaseTupleV0
 from .sc_spec_udt_union_case_v0_kind import SCSpecUDTUnionCaseV0Kind
 from .sc_spec_udt_union_case_void_v0 import SCSpecUDTUnionCaseVoidV0
@@ -32,8 +34,8 @@ class SCSpecUDTUnionCaseV0:
     def __init__(
         self,
         kind: SCSpecUDTUnionCaseV0Kind,
-        void_case: Optional[SCSpecUDTUnionCaseVoidV0] = None,
-        tuple_case: Optional[SCSpecUDTUnionCaseTupleV0] = None,
+        void_case: SCSpecUDTUnionCaseVoidV0 | None = None,
+        tuple_case: SCSpecUDTUnionCaseTupleV0 | None = None,
     ) -> None:
         self.kind = kind
         self.void_case = void_case

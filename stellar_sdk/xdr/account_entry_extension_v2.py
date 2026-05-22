@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry_extension_v2_ext import AccountEntryExtensionV2Ext
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .constants import *
 from .sponsorship_descriptor import SponsorshipDescriptor
 from .uint32 import Uint32
@@ -42,7 +43,7 @@ class AccountEntryExtensionV2:
         self,
         num_sponsored: Uint32,
         num_sponsoring: Uint32,
-        signer_sponsoring_i_ds: List[SponsorshipDescriptor],
+        signer_sponsoring_i_ds: list[SponsorshipDescriptor],
         ext: AccountEntryExtensionV2Ext,
     ) -> None:
         _expect_max_length = MAX_SIGNERS

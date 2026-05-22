@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .duration import Duration
 from .ledger_bounds import LedgerBounds
 from .sequence_number import SequenceNumber
@@ -59,12 +61,12 @@ class PreconditionsV2:
 
     def __init__(
         self,
-        time_bounds: Optional[TimeBounds],
-        ledger_bounds: Optional[LedgerBounds],
-        min_seq_num: Optional[SequenceNumber],
+        time_bounds: TimeBounds | None,
+        ledger_bounds: LedgerBounds | None,
+        min_seq_num: SequenceNumber | None,
         min_seq_age: Duration,
         min_seq_ledger_gap: Uint32,
-        extra_signers: List[SignerKey],
+        extra_signers: list[SignerKey],
     ) -> None:
         _expect_max_length = 2
         if extra_signers and len(extra_signers) > _expect_max_length:
@@ -173,21 +175,15 @@ class PreconditionsV2:
 
     def to_json_dict(self) -> dict:
         return {
-            "time_bounds": (
-                self.time_bounds.to_json_dict()
-                if self.time_bounds is not None
-                else None
-            ),
-            "ledger_bounds": (
-                self.ledger_bounds.to_json_dict()
-                if self.ledger_bounds is not None
-                else None
-            ),
-            "min_seq_num": (
-                self.min_seq_num.to_json_dict()
-                if self.min_seq_num is not None
-                else None
-            ),
+            "time_bounds": self.time_bounds.to_json_dict()
+            if self.time_bounds is not None
+            else None,
+            "ledger_bounds": self.ledger_bounds.to_json_dict()
+            if self.ledger_bounds is not None
+            else None,
+            "min_seq_num": self.min_seq_num.to_json_dict()
+            if self.min_seq_num is not None
+            else None,
             "min_seq_age": self.min_seq_age.to_json_dict(),
             "min_seq_ledger_gap": self.min_seq_ledger_gap.to_json_dict(),
             "extra_signers": [item.to_json_dict() for item in self.extra_signers],

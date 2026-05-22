@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .path_payment_strict_receive_result_code import PathPaymentStrictReceiveResultCode
 from .path_payment_strict_receive_result_success import (
     PathPaymentStrictReceiveResultSuccess,
@@ -52,8 +54,8 @@ class PathPaymentStrictReceiveResult:
     def __init__(
         self,
         code: PathPaymentStrictReceiveResultCode,
-        success: Optional[PathPaymentStrictReceiveResultSuccess] = None,
-        no_issuer: Optional[Asset] = None,
+        success: PathPaymentStrictReceiveResultSuccess | None = None,
+        no_issuer: Asset | None = None,
     ) -> None:
         self.code = code
         self.success = success

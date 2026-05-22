@@ -4,15 +4,17 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claim_atom_type import ClaimAtomType
 from .claim_liquidity_atom import ClaimLiquidityAtom
 from .claim_offer_atom import ClaimOfferAtom
 from .claim_offer_atom_v0 import ClaimOfferAtomV0
+from .constants import *
 
 __all__ = ["ClaimAtom"]
 
@@ -35,9 +37,9 @@ class ClaimAtom:
     def __init__(
         self,
         type: ClaimAtomType,
-        v0: Optional[ClaimOfferAtomV0] = None,
-        order_book: Optional[ClaimOfferAtom] = None,
-        liquidity_pool: Optional[ClaimLiquidityAtom] = None,
+        v0: ClaimOfferAtomV0 | None = None,
+        order_book: ClaimOfferAtom | None = None,
+        liquidity_pool: ClaimLiquidityAtom | None = None,
     ) -> None:
         self.type = type
         self.v0 = v0

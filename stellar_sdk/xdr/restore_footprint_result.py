@@ -7,7 +7,10 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .restore_footprint_result_code import RestoreFootprintResultCode
 
 __all__ = ["RestoreFootprintResult"]

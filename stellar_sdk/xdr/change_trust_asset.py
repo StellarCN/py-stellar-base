@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .alpha_num4 import AlphaNum4
 from .alpha_num12 import AlphaNum12
 from .asset_type import AssetType
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .liquidity_pool_parameters import LiquidityPoolParameters
 
 __all__ = ["ChangeTrustAsset"]
@@ -42,9 +44,9 @@ class ChangeTrustAsset:
     def __init__(
         self,
         type: AssetType,
-        alpha_num4: Optional[AlphaNum4] = None,
-        alpha_num12: Optional[AlphaNum12] = None,
-        liquidity_pool: Optional[LiquidityPoolParameters] = None,
+        alpha_num4: AlphaNum4 | None = None,
+        alpha_num12: AlphaNum12 | None = None,
+        liquidity_pool: LiquidityPoolParameters | None = None,
     ) -> None:
         self.type = type
         self.alpha_num4 = alpha_num4

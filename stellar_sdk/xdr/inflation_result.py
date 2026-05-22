@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .inflation_payout import InflationPayout
 from .inflation_result_code import InflationResultCode
 
@@ -31,7 +33,7 @@ class InflationResult:
     def __init__(
         self,
         code: InflationResultCode,
-        payouts: Optional[List[InflationPayout]] = None,
+        payouts: list[InflationPayout] | None = None,
     ) -> None:
         _expect_max_length = 4294967295
         if payouts and len(payouts) > _expect_max_length:

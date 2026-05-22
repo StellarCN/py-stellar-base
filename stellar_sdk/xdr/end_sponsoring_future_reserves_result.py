@@ -7,7 +7,10 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .end_sponsoring_future_reserves_result_code import (
     EndSponsoringFutureReservesResultCode,
 )

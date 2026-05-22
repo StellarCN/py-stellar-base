@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import json
 from enum import IntEnum
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
@@ -28,7 +28,7 @@ class KeywordUnion:
     def __init__(
         self,
         from_: KeywordEnum,
-        class_: Optional[Pass] = None,
+        class_: Pass | None = None,
     ) -> None:
         self.from_ = from_
         self.class_ = class_

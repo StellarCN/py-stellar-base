@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .config_setting_entry import ConfigSettingEntry
+from .constants import *
 
 __all__ = ["ConfigUpgradeSet"]
 
@@ -25,7 +27,7 @@ class ConfigUpgradeSet:
 
     def __init__(
         self,
-        updated_entry: List[ConfigSettingEntry],
+        updated_entry: list[ConfigSettingEntry],
     ) -> None:
         _expect_max_length = 4294967295
         if updated_entry and len(updated_entry) > _expect_max_length:

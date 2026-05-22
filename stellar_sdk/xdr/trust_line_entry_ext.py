@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Integer,
+)
+from .constants import *
 from .trust_line_entry_v1 import TrustLineEntryV1
 
 __all__ = ["TrustLineEntryExt"]
@@ -42,7 +45,7 @@ class TrustLineEntryExt:
     def __init__(
         self,
         v: int,
-        v1: Optional[TrustLineEntryV1] = None,
+        v1: TrustLineEntryV1 | None = None,
     ) -> None:
         self.v = v
         self.v1 = v1

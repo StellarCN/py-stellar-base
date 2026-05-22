@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .operation_result import OperationResult
 from .transaction_result_code import TransactionResultCode
 
@@ -49,7 +51,7 @@ class InnerTransactionResultResult:
     def __init__(
         self,
         code: TransactionResultCode,
-        results: Optional[List[OperationResult]] = None,
+        results: list[OperationResult] | None = None,
     ) -> None:
         _expect_max_length = 4294967295
         if results and len(results) > _expect_max_length:

@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Integer,
+)
 from .claimable_balance_entry_extension_v1 import ClaimableBalanceEntryExtensionV1
+from .constants import *
 
 __all__ = ["ClaimableBalanceEntryExt"]
 
@@ -30,7 +33,7 @@ class ClaimableBalanceEntryExt:
     def __init__(
         self,
         v: int,
-        v1: Optional[ClaimableBalanceEntryExtensionV1] = None,
+        v1: ClaimableBalanceEntryExtensionV1 | None = None,
     ) -> None:
         self.v = v
         self.v1 = v1

@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .sc_val import SCVal
 from .soroban_transaction_meta_ext import SorobanTransactionMetaExt
 
@@ -30,7 +32,7 @@ class SorobanTransactionMetaV2:
     def __init__(
         self,
         ext: SorobanTransactionMetaExt,
-        return_value: Optional[SCVal],
+        return_value: SCVal | None,
     ) -> None:
         self.ext = ext
         self.return_value = return_value
@@ -91,11 +93,9 @@ class SorobanTransactionMetaV2:
     def to_json_dict(self) -> dict:
         return {
             "ext": self.ext.to_json_dict(),
-            "return_value": (
-                self.return_value.to_json_dict()
-                if self.return_value is not None
-                else None
-            ),
+            "return_value": self.return_value.to_json_dict()
+            if self.return_value is not None
+            else None,
         }
 
     @classmethod

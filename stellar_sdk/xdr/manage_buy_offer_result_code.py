@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _MANAGE_BUY_OFFER_RESULT_CODE_MAP = {
     0: "success",
     -1: "malformed",

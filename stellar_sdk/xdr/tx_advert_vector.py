@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .constants import *
 from .hash import Hash
 
@@ -22,7 +23,7 @@ class TxAdvertVector:
         typedef Hash TxAdvertVector<TX_ADVERT_VECTOR_MAX_SIZE>;
     """
 
-    def __init__(self, tx_advert_vector: List[Hash]) -> None:
+    def __init__(self, tx_advert_vector: list[Hash]) -> None:
         _expect_max_length = TX_ADVERT_VECTOR_MAX_SIZE
         if tx_advert_vector and len(tx_advert_vector) > _expect_max_length:
             raise ValueError(

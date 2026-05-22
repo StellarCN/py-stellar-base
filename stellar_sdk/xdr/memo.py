@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, String
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    String,
+)
+from .constants import *
 from .hash import Hash
 from .memo_type import MemoType
 from .uint64 import Uint64
@@ -38,10 +41,10 @@ class Memo:
     def __init__(
         self,
         type: MemoType,
-        text: Optional[bytes] = None,
-        id: Optional[Uint64] = None,
-        hash: Optional[Hash] = None,
-        ret_hash: Optional[Hash] = None,
+        text: bytes | None = None,
+        id: Uint64 | None = None,
+        hash: Hash | None = None,
+        ret_hash: Hash | None = None,
     ) -> None:
         _expect_max_length = 28
         if text and len(text) > _expect_max_length:

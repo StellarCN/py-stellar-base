@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .contract_executable import ContractExecutable
 from .contract_id_preimage import ContractIDPreimage
 from .sc_val import SCVal
@@ -33,7 +35,7 @@ class CreateContractArgsV2:
         self,
         contract_id_preimage: ContractIDPreimage,
         executable: ContractExecutable,
-        constructor_args: List[SCVal],
+        constructor_args: list[SCVal],
     ) -> None:
         _expect_max_length = 4294967295
         if constructor_args and len(constructor_args) > _expect_max_length:

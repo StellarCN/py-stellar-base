@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _BUCKET_ENTRY_TYPE_MAP = {
     -1: "metaentry",
     0: "liveentry",

@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .manage_offer_success_result import ManageOfferSuccessResult
 from .manage_sell_offer_result_code import ManageSellOfferResultCode
 
@@ -42,7 +44,7 @@ class ManageSellOfferResult:
     def __init__(
         self,
         code: ManageSellOfferResultCode,
-        success: Optional[ManageOfferSuccessResult] = None,
+        success: ManageOfferSuccessResult | None = None,
     ) -> None:
         self.code = code
         self.success = success

@@ -224,7 +224,7 @@ class Generator < Xdrgen::Generators::Base
     out.indent(2) do
       non_void_arms(union).each do |arm|
         arm_name = safe_identifier(arm.name.underscore)
-        out.puts "#{arm_name}: Optional[#{type_hint_string(arm.declaration, union_name)}] = None,"
+        out.puts "#{arm_name}: #{type_hint_string(arm.declaration, union_name)} | None = None,"
       end
     end
 
@@ -566,7 +566,7 @@ class Generator < Xdrgen::Generators::Base
       import base64
       import json
       from enum import IntEnum
-      from typing import List, Optional, TYPE_CHECKING
+      from typing import TYPE_CHECKING
       from xdrlib3 import Packer, Unpacker
       from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
       from .constants import *
@@ -1587,9 +1587,9 @@ class Generator < Xdrgen::Generators::Base
 
     case decl.type.sub_type
     when :optional
-      "Optional[#{type_hint}]"
+      "#{type_hint} | None"
     when :var_array, :array
-      "List[#{type_hint}]"
+      "list[#{type_hint}]"
     else
       type_hint
     end

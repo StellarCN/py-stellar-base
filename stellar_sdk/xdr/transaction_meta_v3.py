@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .extension_point import ExtensionPoint
 from .ledger_entry_changes import LedgerEntryChanges
 from .operation_meta import OperationMeta
@@ -39,9 +41,9 @@ class TransactionMetaV3:
         self,
         ext: ExtensionPoint,
         tx_changes_before: LedgerEntryChanges,
-        operations: List[OperationMeta],
+        operations: list[OperationMeta],
         tx_changes_after: LedgerEntryChanges,
-        soroban_meta: Optional[SorobanTransactionMeta],
+        soroban_meta: SorobanTransactionMeta | None,
     ) -> None:
         _expect_max_length = 4294967295
         if operations and len(operations) > _expect_max_length:
@@ -134,11 +136,9 @@ class TransactionMetaV3:
             "tx_changes_before": self.tx_changes_before.to_json_dict(),
             "operations": [item.to_json_dict() for item in self.operations],
             "tx_changes_after": self.tx_changes_after.to_json_dict(),
-            "soroban_meta": (
-                self.soroban_meta.to_json_dict()
-                if self.soroban_meta is not None
-                else None
-            ),
+            "soroban_meta": self.soroban_meta.to_json_dict()
+            if self.soroban_meta is not None
+            else None,
         }
 
     @classmethod

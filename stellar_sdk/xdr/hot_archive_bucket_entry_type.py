@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _HOT_ARCHIVE_BUCKET_ENTRY_TYPE_MAP = {-1: "metaentry", 0: "archived", 1: "live"}
 _HOT_ARCHIVE_BUCKET_ENTRY_TYPE_REVERSE_MAP = {"metaentry": -1, "archived": 0, "live": 1}
 __all__ = ["HotArchiveBucketEntryType"]

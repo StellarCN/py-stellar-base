@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import json
 from enum import IntEnum
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
@@ -18,7 +18,7 @@ class Hashes3:
 
         typedef Hash Hashes3<>;
     """
-    def __init__(self, hashes3: List[Hash]) -> None:
+    def __init__(self, hashes3: list[Hash]) -> None:
         _expect_max_length = 4294967295
         if hashes3 and len(hashes3) > _expect_max_length:
             raise ValueError(f"The maximum length of `hashes3` should be {_expect_max_length}, but got {len(hashes3)}.")

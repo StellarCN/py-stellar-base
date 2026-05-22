@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .liquidity_pool_entry_constant_product import LiquidityPoolEntryConstantProduct
 from .liquidity_pool_type import LiquidityPoolType
 
@@ -38,7 +40,7 @@ class LiquidityPoolEntryBody:
     def __init__(
         self,
         type: LiquidityPoolType,
-        constant_product: Optional[LiquidityPoolEntryConstantProduct] = None,
+        constant_product: LiquidityPoolEntryConstantProduct | None = None,
     ) -> None:
         self.type = type
         self.constant_product = constant_product

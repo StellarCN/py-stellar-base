@@ -8,7 +8,10 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .trust_line_asset import TrustLineAsset
 
 __all__ = ["LedgerKeyTrustLine"]

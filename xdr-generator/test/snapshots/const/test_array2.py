@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import json
 from enum import IntEnum
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
@@ -17,7 +17,7 @@ class TestArray2:
 
         typedef int TestArray2<FOO>;
     """
-    def __init__(self, test_array2: List[int]) -> None:
+    def __init__(self, test_array2: list[int]) -> None:
         _expect_max_length = FOO
         if test_array2 and len(test_array2) > _expect_max_length:
             raise ValueError(f"The maximum length of `test_array2` should be {_expect_max_length}, but got {len(test_array2)}.")

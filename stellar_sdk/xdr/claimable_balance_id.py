@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claimable_balance_id_type import ClaimableBalanceIDType
+from .constants import *
 from .hash import Hash
 
 __all__ = ["ClaimableBalanceID"]
@@ -29,7 +31,7 @@ class ClaimableBalanceID:
     def __init__(
         self,
         type: ClaimableBalanceIDType,
-        v0: Optional[Hash] = None,
+        v0: Hash | None = None,
     ) -> None:
         self.type = type
         self.v0 = v0

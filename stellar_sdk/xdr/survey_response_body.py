@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .survey_message_response_type import SurveyMessageResponseType
 from .topology_response_body_v2 import TopologyResponseBodyV2
 
@@ -29,7 +31,7 @@ class SurveyResponseBody:
     def __init__(
         self,
         type: SurveyMessageResponseType,
-        topology_response_body_v2: Optional[TopologyResponseBodyV2] = None,
+        topology_response_body_v2: TopologyResponseBodyV2 | None = None,
     ) -> None:
         self.type = type
         self.topology_response_body_v2 = topology_response_body_v2

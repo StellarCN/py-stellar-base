@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import json
 from enum import IntEnum
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
@@ -38,8 +38,8 @@ class MyUnion:
     def __init__(
         self,
         type: UnionKey,
-        one: Optional[MyUnionOne] = None,
-        two: Optional[MyUnionTwo] = None,
+        one: MyUnionOne | None = None,
+        two: MyUnionTwo | None = None,
     ) -> None:
         self.type = type
         self.one = one

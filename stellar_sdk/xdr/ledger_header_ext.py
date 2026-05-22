@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Integer,
+)
+from .constants import *
 from .ledger_header_extension_v1 import LedgerHeaderExtensionV1
 
 __all__ = ["LedgerHeaderExt"]
@@ -30,7 +33,7 @@ class LedgerHeaderExt:
     def __init__(
         self,
         v: int,
-        v1: Optional[LedgerHeaderExtensionV1] = None,
+        v1: LedgerHeaderExtensionV1 | None = None,
     ) -> None:
         self.v = v
         self.v1 = v1

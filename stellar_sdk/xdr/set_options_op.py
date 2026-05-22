@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .signer import Signer
 from .string32 import String32
 from .uint32 import Uint32
@@ -44,15 +46,15 @@ class SetOptionsOp:
 
     def __init__(
         self,
-        inflation_dest: Optional[AccountID],
-        clear_flags: Optional[Uint32],
-        set_flags: Optional[Uint32],
-        master_weight: Optional[Uint32],
-        low_threshold: Optional[Uint32],
-        med_threshold: Optional[Uint32],
-        high_threshold: Optional[Uint32],
-        home_domain: Optional[String32],
-        signer: Optional[Signer],
+        inflation_dest: AccountID | None,
+        clear_flags: Uint32 | None,
+        set_flags: Uint32 | None,
+        master_weight: Uint32 | None,
+        low_threshold: Uint32 | None,
+        med_threshold: Uint32 | None,
+        high_threshold: Uint32 | None,
+        home_domain: String32 | None,
+        signer: Signer | None,
     ) -> None:
         self.inflation_dest = inflation_dest
         self.clear_flags = clear_flags
@@ -192,44 +194,30 @@ class SetOptionsOp:
 
     def to_json_dict(self) -> dict:
         return {
-            "inflation_dest": (
-                self.inflation_dest.to_json_dict()
-                if self.inflation_dest is not None
-                else None
-            ),
-            "clear_flags": (
-                self.clear_flags.to_json_dict()
-                if self.clear_flags is not None
-                else None
-            ),
-            "set_flags": (
-                self.set_flags.to_json_dict() if self.set_flags is not None else None
-            ),
-            "master_weight": (
-                self.master_weight.to_json_dict()
-                if self.master_weight is not None
-                else None
-            ),
-            "low_threshold": (
-                self.low_threshold.to_json_dict()
-                if self.low_threshold is not None
-                else None
-            ),
-            "med_threshold": (
-                self.med_threshold.to_json_dict()
-                if self.med_threshold is not None
-                else None
-            ),
-            "high_threshold": (
-                self.high_threshold.to_json_dict()
-                if self.high_threshold is not None
-                else None
-            ),
-            "home_domain": (
-                self.home_domain.to_json_dict()
-                if self.home_domain is not None
-                else None
-            ),
+            "inflation_dest": self.inflation_dest.to_json_dict()
+            if self.inflation_dest is not None
+            else None,
+            "clear_flags": self.clear_flags.to_json_dict()
+            if self.clear_flags is not None
+            else None,
+            "set_flags": self.set_flags.to_json_dict()
+            if self.set_flags is not None
+            else None,
+            "master_weight": self.master_weight.to_json_dict()
+            if self.master_weight is not None
+            else None,
+            "low_threshold": self.low_threshold.to_json_dict()
+            if self.low_threshold is not None
+            else None,
+            "med_threshold": self.med_threshold.to_json_dict()
+            if self.med_threshold is not None
+            else None,
+            "high_threshold": self.high_threshold.to_json_dict()
+            if self.high_threshold is not None
+            else None,
+            "home_domain": self.home_domain.to_json_dict()
+            if self.home_domain is not None
+            else None,
             "signer": self.signer.to_json_dict() if self.signer is not None else None,
         }
 

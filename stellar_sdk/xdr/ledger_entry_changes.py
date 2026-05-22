@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .ledger_entry_change import LedgerEntryChange
 
 __all__ = ["LedgerEntryChanges"]
@@ -21,7 +23,7 @@ class LedgerEntryChanges:
         typedef LedgerEntryChange LedgerEntryChanges<>;
     """
 
-    def __init__(self, ledger_entry_changes: List[LedgerEntryChange]) -> None:
+    def __init__(self, ledger_entry_changes: list[LedgerEntryChange]) -> None:
         _expect_max_length = 4294967295
         if ledger_entry_changes and len(ledger_entry_changes) > _expect_max_length:
             raise ValueError(

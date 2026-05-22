@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _SC_SPEC_EVENT_DATA_FORMAT_MAP = {0: "single_value", 1: "vec", 2: "map"}
 _SC_SPEC_EVENT_DATA_FORMAT_REVERSE_MAP = {"single_value": 0, "vec": 1, "map": 2}
 __all__ = ["SCSpecEventDataFormat"]

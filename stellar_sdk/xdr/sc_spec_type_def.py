@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .sc_spec_type import SCSpecType
 
 if TYPE_CHECKING:
@@ -68,13 +71,13 @@ class SCSpecTypeDef:
     def __init__(
         self,
         type: SCSpecType,
-        option: Optional[SCSpecTypeOption] = None,
-        result: Optional[SCSpecTypeResult] = None,
-        vec: Optional[SCSpecTypeVec] = None,
-        map: Optional[SCSpecTypeMap] = None,
-        tuple: Optional[SCSpecTypeTuple] = None,
-        bytes_n: Optional[SCSpecTypeBytesN] = None,
-        udt: Optional[SCSpecTypeUDT] = None,
+        option: SCSpecTypeOption | None = None,
+        result: SCSpecTypeResult | None = None,
+        vec: SCSpecTypeVec | None = None,
+        map: SCSpecTypeMap | None = None,
+        tuple: SCSpecTypeTuple | None = None,
+        bytes_n: SCSpecTypeBytesN | None = None,
+        udt: SCSpecTypeUDT | None = None,
     ) -> None:
         self.type = type
         self.option = option

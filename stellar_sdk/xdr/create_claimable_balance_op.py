@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claimant import Claimant
+from .constants import *
 from .int64 import Int64
 
 __all__ = ["CreateClaimableBalanceOp"]
@@ -32,7 +34,7 @@ class CreateClaimableBalanceOp:
         self,
         asset: Asset,
         amount: Int64,
-        claimants: List[Claimant],
+        claimants: list[Claimant],
     ) -> None:
         _expect_max_length = 10
         if claimants and len(claimants) > _expect_max_length:

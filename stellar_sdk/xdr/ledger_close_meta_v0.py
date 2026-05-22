@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .ledger_header_history_entry import LedgerHeaderHistoryEntry
 from .scp_history_entry import SCPHistoryEntry
 from .transaction_result_meta import TransactionResultMeta
@@ -45,9 +47,9 @@ class LedgerCloseMetaV0:
         self,
         ledger_header: LedgerHeaderHistoryEntry,
         tx_set: TransactionSet,
-        tx_processing: List[TransactionResultMeta],
-        upgrades_processing: List[UpgradeEntryMeta],
-        scp_info: List[SCPHistoryEntry],
+        tx_processing: list[TransactionResultMeta],
+        upgrades_processing: list[UpgradeEntryMeta],
+        scp_info: list[SCPHistoryEntry],
     ) -> None:
         _expect_max_length = 4294967295
         if tx_processing and len(tx_processing) > _expect_max_length:

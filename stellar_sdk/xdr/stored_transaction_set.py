@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Integer,
+)
+from .constants import *
 from .generalized_transaction_set import GeneralizedTransactionSet
 from .transaction_set import TransactionSet
 
@@ -31,8 +34,8 @@ class StoredTransactionSet:
     def __init__(
         self,
         v: int,
-        tx_set: Optional[TransactionSet] = None,
-        generalized_tx_set: Optional[GeneralizedTransactionSet] = None,
+        tx_set: TransactionSet | None = None,
+        generalized_tx_set: GeneralizedTransactionSet | None = None,
     ) -> None:
         self.v = v
         self.tx_set = tx_set

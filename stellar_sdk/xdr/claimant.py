@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claimant_type import ClaimantType
 from .claimant_v0 import ClaimantV0
+from .constants import *
 
 __all__ = ["Claimant"]
 
@@ -33,7 +35,7 @@ class Claimant:
     def __init__(
         self,
         type: ClaimantType,
-        v0: Optional[ClaimantV0] = None,
+        v0: ClaimantV0 | None = None,
     ) -> None:
         self.type = type
         self.v0 = v0

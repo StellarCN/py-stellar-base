@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _CONFIG_SETTING_ID_MAP = {
     0: "contract_max_size_bytes",
     1: "contract_compute_v0",

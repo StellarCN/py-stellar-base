@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _CONTRACT_EVENT_TYPE_MAP = {0: "system", 1: "contract", 2: "diagnostic"}
 _CONTRACT_EVENT_TYPE_REVERSE_MAP = {"system": 0, "contract": 1, "diagnostic": 2}
 __all__ = ["ContractEventType"]

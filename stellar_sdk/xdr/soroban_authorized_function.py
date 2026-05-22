@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .create_contract_args import CreateContractArgs
 from .create_contract_args_v2 import CreateContractArgsV2
 from .invoke_contract_args import InvokeContractArgs
@@ -43,9 +45,9 @@ class SorobanAuthorizedFunction:
     def __init__(
         self,
         type: SorobanAuthorizedFunctionType,
-        contract_fn: Optional[InvokeContractArgs] = None,
-        create_contract_host_fn: Optional[CreateContractArgs] = None,
-        create_contract_v2_host_fn: Optional[CreateContractArgsV2] = None,
+        contract_fn: InvokeContractArgs | None = None,
+        create_contract_host_fn: CreateContractArgs | None = None,
+        create_contract_v2_host_fn: CreateContractArgsV2 | None = None,
     ) -> None:
         self.type = type
         self.contract_fn = contract_fn

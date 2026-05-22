@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .hash import Hash
 from .invoke_host_function_result_code import InvokeHostFunctionResultCode
 
@@ -35,7 +37,7 @@ class InvokeHostFunctionResult:
     def __init__(
         self,
         code: InvokeHostFunctionResultCode,
-        success: Optional[Hash] = None,
+        success: Hash | None = None,
     ) -> None:
         self.code = code
         self.success = success

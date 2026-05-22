@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .encoded_ledger_key import EncodedLedgerKey
 
 __all__ = ["FrozenLedgerKeysDelta"]
@@ -26,8 +28,8 @@ class FrozenLedgerKeysDelta:
 
     def __init__(
         self,
-        keys_to_freeze: List[EncodedLedgerKey],
-        keys_to_unfreeze: List[EncodedLedgerKey],
+        keys_to_freeze: list[EncodedLedgerKey],
+        keys_to_unfreeze: list[EncodedLedgerKey],
     ) -> None:
         _expect_max_length = 4294967295
         if keys_to_freeze and len(keys_to_freeze) > _expect_max_length:

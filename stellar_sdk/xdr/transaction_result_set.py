@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .transaction_result_pair import TransactionResultPair
 
 __all__ = ["TransactionResultSet"]
@@ -26,7 +28,7 @@ class TransactionResultSet:
 
     def __init__(
         self,
-        results: List[TransactionResultPair],
+        results: list[TransactionResultPair],
     ) -> None:
         _expect_max_length = 4294967295
         if results and len(results) > _expect_max_length:

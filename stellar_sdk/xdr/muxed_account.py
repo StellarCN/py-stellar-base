@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .crypto_key_type import CryptoKeyType
 from .muxed_account_med25519 import MuxedAccountMed25519
 from .uint256 import Uint256
@@ -36,8 +38,8 @@ class MuxedAccount:
     def __init__(
         self,
         type: CryptoKeyType,
-        ed25519: Optional[Uint256] = None,
-        med25519: Optional[MuxedAccountMed25519] = None,
+        ed25519: Uint256 | None = None,
+        med25519: MuxedAccountMed25519 | None = None,
     ) -> None:
         self.type = type
         self.ed25519 = ed25519

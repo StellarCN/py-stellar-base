@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claimable_balance_id import ClaimableBalanceID
+from .constants import *
 from .create_claimable_balance_result_code import CreateClaimableBalanceResultCode
 
 __all__ = ["CreateClaimableBalanceResult"]
@@ -36,7 +38,7 @@ class CreateClaimableBalanceResult:
     def __init__(
         self,
         code: CreateClaimableBalanceResultCode,
-        balance_id: Optional[ClaimableBalanceID] = None,
+        balance_id: ClaimableBalanceID | None = None,
     ) -> None:
         self.code = code
         self.balance_id = balance_id

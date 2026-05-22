@@ -4,15 +4,17 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claimable_balance_entry_ext import ClaimableBalanceEntryExt
 from .claimable_balance_id import ClaimableBalanceID
 from .claimant import Claimant
+from .constants import *
 from .int64 import Int64
 
 __all__ = ["ClaimableBalanceEntry"]
@@ -51,7 +53,7 @@ class ClaimableBalanceEntry:
     def __init__(
         self,
         balance_id: ClaimableBalanceID,
-        claimants: List[Claimant],
+        claimants: list[Claimant],
         asset: Asset,
         amount: Int64,
         ext: ClaimableBalanceEntryExt,

@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .bucket_entry_type import BucketEntryType
 from .bucket_metadata import BucketMetadata
+from .constants import *
 from .ledger_entry import LedgerEntry
 from .ledger_key import LedgerKey
 
@@ -37,9 +39,9 @@ class BucketEntry:
     def __init__(
         self,
         type: BucketEntryType,
-        live_entry: Optional[LedgerEntry] = None,
-        dead_entry: Optional[LedgerKey] = None,
-        meta_entry: Optional[BucketMetadata] = None,
+        live_entry: LedgerEntry | None = None,
+        dead_entry: LedgerKey | None = None,
+        meta_entry: BucketMetadata | None = None,
     ) -> None:
         self.type = type
         self.live_entry = live_entry

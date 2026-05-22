@@ -7,7 +7,10 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .hash import Hash
 from .transaction_signature_payload_tagged_transaction import (
     TransactionSignaturePayloadTaggedTransaction,

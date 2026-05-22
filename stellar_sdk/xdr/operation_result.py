@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .operation_result_code import OperationResultCode
 from .operation_result_tr import OperationResultTr
 
@@ -93,7 +95,7 @@ class OperationResult:
     def __init__(
         self,
         code: OperationResultCode,
-        tr: Optional[OperationResultTr] = None,
+        tr: OperationResultTr | None = None,
     ) -> None:
         self.code = code
         self.tr = tr

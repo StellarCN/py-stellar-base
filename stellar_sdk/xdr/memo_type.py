@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _MEMO_TYPE_MAP = {0: "none", 1: "text", 2: "id", 3: "hash", 4: "return"}
 _MEMO_TYPE_REVERSE_MAP = {"none": 0, "text": 1, "id": 2, "hash": 3, "return": 4}
 __all__ = ["MemoType"]

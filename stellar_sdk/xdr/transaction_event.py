@@ -7,7 +7,10 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .contract_event import ContractEvent
 from .transaction_event_stage import TransactionEventStage
 
