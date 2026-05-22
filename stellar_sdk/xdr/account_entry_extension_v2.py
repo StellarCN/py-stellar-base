@@ -8,9 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry_extension_v2_ext import AccountEntryExtensionV2Ext
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .constants import MAX_SIGNERS
 from .sponsorship_descriptor import SponsorshipDescriptor
 from .uint32 import Uint32

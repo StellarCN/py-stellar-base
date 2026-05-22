@@ -7,10 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Integer,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 from .scp_history_entry_v0 import SCPHistoryEntryV0
 
 __all__ = ["SCPHistoryEntry"]

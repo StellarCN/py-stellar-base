@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .time_sliced_peer_data import TimeSlicedPeerData
 
 __all__ = ["TimeSlicedPeerDataList"]

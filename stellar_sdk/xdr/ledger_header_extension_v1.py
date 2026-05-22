@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .ledger_header_extension_v1_ext import LedgerHeaderExtensionV1Ext
 from .uint32 import Uint32
 

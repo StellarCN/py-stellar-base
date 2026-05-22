@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .bucket_entry_type import BucketEntryType
 from .bucket_metadata import BucketMetadata
 from .ledger_entry import LedgerEntry

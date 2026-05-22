@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .claim_claimable_balance_result_code import ClaimClaimableBalanceResultCode
 
 __all__ = ["ClaimClaimableBalanceResult"]

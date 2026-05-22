@@ -7,10 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Opaque,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Opaque
 
 __all__ = ["Signature"]
 

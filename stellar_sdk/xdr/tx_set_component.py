@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .tx_set_component_txs_maybe_discounted_fee import (
     TxSetComponentTxsMaybeDiscountedFee,
 )

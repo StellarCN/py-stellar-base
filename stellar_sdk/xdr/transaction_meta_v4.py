@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .diagnostic_event import DiagnosticEvent
 from .extension_point import ExtensionPoint
 from .ledger_entry_changes import LedgerEntryChanges

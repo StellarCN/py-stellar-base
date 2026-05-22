@@ -7,10 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Hyper,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Hyper
 
 __all__ = ["Int64"]
 

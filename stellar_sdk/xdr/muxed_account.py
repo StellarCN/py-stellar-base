@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .crypto_key_type import CryptoKeyType
 from .muxed_account_med25519 import MuxedAccountMed25519
 from .uint256 import Uint256

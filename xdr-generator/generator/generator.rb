@@ -63,11 +63,11 @@ class Generator < Xdrgen::Generators::Base
     @init_out.puts "from .#{python_module_name(type_name)} import *"
   end
 
-  def open_definition_file(definition_name, used_constants = [])
+  def open_definition_file(definition_name, used_base_imports = [], used_constants = [])
     register_init_import(definition_name)
     @imported_types = Set.new
     out = @output.open("#{python_module_name(definition_name)}.py")
-    render_common_import(out, used_constants)
+    render_common_import(out, used_base_imports, used_constants)
     out
   end
 
@@ -102,6 +102,53 @@ class Generator < Xdrgen::Generators::Base
   # literal size; XDR consts are always UPPER_SNAKE_CASE identifiers.
   def constant_name?(size)
     size.is_a?(String) && size =~ /\A[A-Z][A-Z0-9_]*\z/
+  end
+
+  # Map an XDR primitive type to the matching `.base` class name; nil
+  # for non-primitive (struct/union/enum/typedef) members which are
+  # imported separately by name.
+  def base_class_for_type(type)
+    case type
+    when AST::Typespecs::Int then "Integer"
+    when AST::Typespecs::UnsignedInt then "UnsignedInteger"
+    when AST::Typespecs::Hyper then "Hyper"
+    when AST::Typespecs::UnsignedHyper then "UnsignedHyper"
+    when AST::Typespecs::Float then "Float"
+    when AST::Typespecs::Double then "Double"
+    when AST::Typespecs::Bool then "Boolean"
+    when AST::Typespecs::Opaque then "Opaque"
+    when AST::Typespecs::String then "String"
+    end
+  end
+
+  # Walk a definition's members/arms and return the sorted list of
+  # `.base` symbols it actually needs. Enums emit no pack/unpack code
+  # that references these, so they get an empty list.
+  def collect_base_imports_used(defn)
+    return [] if defn.is_a?(AST::Definitions::Enum)
+
+    imports = Set.new(["DEFAULT_XDR_MAX_DEPTH"])
+
+    declarations =
+      case defn
+      when AST::Definitions::Struct
+        defn.members.map(&:declaration)
+      when AST::Definitions::Union
+        # The discriminant is packed/unpacked alongside the arms, so its
+        # primitive type also needs an import.
+        non_void_arms(defn).map(&:declaration) + [defn.discriminant]
+      when AST::Definitions::Typedef
+        [defn.declaration]
+      else
+        []
+      end
+
+    declarations.each do |decl|
+      cls = base_class_for_type(decl.type)
+      imports << cls if cls
+    end
+
+    imports.to_a.sort
   end
 
   def render_definitions(node)
@@ -140,7 +187,7 @@ class Generator < Xdrgen::Generators::Base
 
   def render_enum(enum)
     enum_name = name(enum)
-    out = open_definition_file(enum_name, collect_constants_used(enum))
+    out = open_definition_file(enum_name, collect_base_imports_used(enum), collect_constants_used(enum))
 
     prefix_len = enum_prefix_length(enum)
     render_enum_maps(out, enum, enum_name, prefix_len)
@@ -174,7 +221,7 @@ class Generator < Xdrgen::Generators::Base
     typedef_name = safe_identifier(typedef.name.camelize)
     typedef_name_underscore = safe_identifier(typedef.name.underscore)
 
-    out = open_definition_file(typedef_name, collect_constants_used(typedef))
+    out = open_definition_file(typedef_name, collect_base_imports_used(typedef), collect_constants_used(typedef))
     render_import(out, typedef, typedef_name)
 
     out.puts "__all__ = ['#{typedef_name}']"
@@ -395,7 +442,7 @@ class Generator < Xdrgen::Generators::Base
 
   def render_union(union, render_import_in_func = false)
     union_name = name(union)
-    out = open_definition_file(union_name, collect_constants_used(union))
+    out = open_definition_file(union_name, collect_base_imports_used(union), collect_constants_used(union))
 
     render_import(out, union.discriminant, union_name)
     render_union_arm_imports(out, union, union_name, render_import_in_func)
@@ -497,7 +544,7 @@ class Generator < Xdrgen::Generators::Base
 
   def render_struct(struct)
     struct_name = name(struct)
-    out = open_definition_file(struct_name, collect_constants_used(struct))
+    out = open_definition_file(struct_name, collect_base_imports_used(struct), collect_constants_used(struct))
 
     struct.members.each do |member|
       render_import(out, member.declaration, struct_name)
@@ -590,7 +637,7 @@ class Generator < Xdrgen::Generators::Base
     end
   end
 
-  def render_common_import(out, used_constants = [])
+  def render_common_import(out, used_base_imports = [], used_constants = [])
     out.puts <<~EOS
       # This is an automatically generated file.
       # DO NOT EDIT or your changes may be overwritten
@@ -601,8 +648,10 @@ class Generator < Xdrgen::Generators::Base
       from enum import IntEnum
       from typing import TYPE_CHECKING
       from xdrlib3 import Packer, Unpacker
-      from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
     EOS
+    unless used_base_imports.empty?
+      out.puts "from .base import #{used_base_imports.join(', ')}"
+    end
     unless used_constants.empty?
       out.puts "from .constants import #{used_constants.join(', ')}"
     end

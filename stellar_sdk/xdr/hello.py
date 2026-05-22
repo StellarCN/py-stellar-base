@@ -8,11 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .auth_cert import AuthCert
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Integer,
-    String,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer, String
 from .hash import Hash
 from .node_id import NodeID
 from .uint32 import Uint32

@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .envelope_type import EnvelopeType
 from .fee_bump_transaction import FeeBumpTransaction
 from .transaction import Transaction

@@ -8,10 +8,7 @@ from typing import TYPE_CHECKING
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Boolean,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Boolean
 from .sc_val_type import SCValType
 
 if TYPE_CHECKING:

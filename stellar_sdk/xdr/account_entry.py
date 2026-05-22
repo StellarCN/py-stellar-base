@@ -9,9 +9,7 @@ from xdrlib3 import Packer, Unpacker
 
 from .account_entry_ext import AccountEntryExt
 from .account_id import AccountID
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .constants import MAX_SIGNERS
 from .int64 import Int64
 from .sequence_number import SequenceNumber

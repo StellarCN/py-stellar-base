@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .manage_buy_offer_result_code import ManageBuyOfferResultCode
 from .manage_offer_success_result import ManageOfferSuccessResult
 

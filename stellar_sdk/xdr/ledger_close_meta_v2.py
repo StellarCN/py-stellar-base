@@ -7,9 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .generalized_transaction_set import GeneralizedTransactionSet
 from .ledger_close_meta_ext import LedgerCloseMetaExt
 from .ledger_header_history_entry import LedgerHeaderHistoryEntry

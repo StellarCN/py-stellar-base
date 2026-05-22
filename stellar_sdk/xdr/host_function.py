@@ -7,10 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Opaque,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Opaque
 from .create_contract_args import CreateContractArgs
 from .create_contract_args_v2 import CreateContractArgsV2
 from .host_function_type import HostFunctionType

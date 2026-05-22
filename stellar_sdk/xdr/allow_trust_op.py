@@ -9,9 +9,7 @@ from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
 from .asset_code import AssetCode
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .uint32 import Uint32
 
 __all__ = ["AllowTrustOp"]

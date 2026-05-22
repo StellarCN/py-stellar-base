@@ -9,9 +9,7 @@ from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
 from .asset import Asset
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .pool_id import PoolID
 from .sequence_number import SequenceNumber
 from .uint32 import Uint32

@@ -8,9 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .auth import Auth
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .dont_have import DontHave
 from .error import Error
 from .flood_advert import FloodAdvert

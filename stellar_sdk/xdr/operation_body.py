@@ -8,9 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .allow_trust_op import AllowTrustOp
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .begin_sponsoring_future_reserves_op import BeginSponsoringFutureReservesOp
 from .bump_sequence_op import BumpSequenceOp
 from .change_trust_op import ChangeTrustOp

@@ -7,7 +7,6 @@ import json
 from enum import IntEnum
 from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 
 _COLOR_MAP = {0: "red", 5: "blue", 6: "green"}
 _COLOR_REVERSE_MAP = {"red": 0, "blue": 5, "green": 6}

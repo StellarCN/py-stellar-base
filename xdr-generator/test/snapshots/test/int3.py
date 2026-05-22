@@ -7,7 +7,7 @@ import json
 from enum import IntEnum
 from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
+from .base import DEFAULT_XDR_MAX_DEPTH, UnsignedInteger
 
 __all__ = ['Int3']
 class Int3:

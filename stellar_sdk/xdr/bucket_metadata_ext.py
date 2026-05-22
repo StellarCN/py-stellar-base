@@ -7,10 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Integer,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 from .bucket_list_type import BucketListType
 
 __all__ = ["BucketMetadataExt"]

@@ -7,10 +7,7 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import (
-    DEFAULT_XDR_MAX_DEPTH,
-    Integer,
-)
+from .base import DEFAULT_XDR_MAX_DEPTH, Integer
 from .contract_code_entry_v1 import ContractCodeEntryV1
 
 __all__ = ["ContractCodeEntryExt"]
