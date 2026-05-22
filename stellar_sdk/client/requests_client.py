@@ -132,7 +132,7 @@ class RequestsClient(BaseSyncClient):
             else:
                 text = resp.text
         except (RequestException, NewConnectionError) as err:
-            raise ConnectionError(err)
+            raise ConnectionError(err) from err
 
         return Response(
             status_code=resp.status_code,
@@ -178,7 +178,7 @@ class RequestsClient(BaseSyncClient):
                 url, data=data, json=json_data, timeout=self.post_timeout
             )
         except (RequestException, NewConnectionError) as err:
-            raise ConnectionError(err)
+            raise ConnectionError(err) from err
         return Response(
             status_code=resp.status_code,
             text=resp.text,

@@ -62,12 +62,14 @@ def test_contract_info_without_env_meta_uses_empty_tuple():
     assert repr(info).startswith("<ContractInfo [meta=")
     with pytest.raises(TypeError, match="unhashable"):
         hash(info)
+    # Intentionally use setattr to exercise the read-only property guards;
+    # static checkers would otherwise flag direct assignment as a type error.
     with pytest.raises(AttributeError):
-        setattr(info, "meta", info.meta)
+        setattr(info, "meta", info.meta)  # noqa: B010
     with pytest.raises(AttributeError):
-        setattr(info, "spec", ContractSpec())
+        setattr(info, "spec", ContractSpec())  # noqa: B010
     with pytest.raises(AttributeError):
-        setattr(info, "env_meta", ())
+        setattr(info, "env_meta", ())  # noqa: B010
 
 
 def test_contract_info_from_wasm_file(tmp_path):

@@ -100,6 +100,7 @@ class SetOptions(Operation):
             warnings.warn(
                 "`set_flags` is a int, we recommend using AuthorizationFlag.",
                 DeprecationWarning,
+                stacklevel=2,
             )
             set_flags = AuthorizationFlag(set_flags)
 
@@ -107,6 +108,7 @@ class SetOptions(Operation):
             warnings.warn(
                 "`clear_flags` is a int, we recommend using AuthorizationFlag.",
                 DeprecationWarning,
+                stacklevel=2,
             )
             clear_flags = AuthorizationFlag(clear_flags)
 

@@ -107,7 +107,7 @@ def test_contract_spec_classifies_and_finds_entries():
     assert spec.get_udt("missing") is None
     assert parse_sc_spec_entries(spec.to_xdr_bytes()) == entries
     with pytest.raises(AttributeError):
-        setattr(spec, "entries", ())
+        setattr(spec, "entries", ())  # noqa: B010
 
 
 def test_contract_spec_empty_and_from_wasm_file(tmp_path):

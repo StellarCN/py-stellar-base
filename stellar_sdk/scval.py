@@ -868,7 +868,7 @@ def _compare_optional_sc_map(
         return -1
     if b is None:
         return 1
-    for ae, be in zip(a.sc_map, b.sc_map):
+    for ae, be in zip(a.sc_map, b.sc_map, strict=False):
         c = _compare_sc_val(ae.key, be.key)
         if c != 0:
             return c
@@ -1022,7 +1022,7 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
 
     if t == stellar_xdr.SCValType.SCV_VEC:
         assert a.vec is not None and b.vec is not None
-        for ae, be in zip(a.vec.sc_vec, b.vec.sc_vec):
+        for ae, be in zip(a.vec.sc_vec, b.vec.sc_vec, strict=False):
             c = _compare_sc_val(ae, be)
             if c != 0:
                 return c
@@ -1032,7 +1032,7 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
 
     if t == stellar_xdr.SCValType.SCV_MAP:
         assert a.map is not None and b.map is not None
-        for am, bm in zip(a.map.sc_map, b.map.sc_map):
+        for am, bm in zip(a.map.sc_map, b.map.sc_map, strict=False):
             c = _compare_sc_val(am.key, bm.key)
             if c != 0:
                 return c
