@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _OFFER_ENTRY_FLAGS_MAP = {1: "passive_flag"}
 _OFFER_ENTRY_FLAGS_REVERSE_MAP = {"passive_flag": 1}
 __all__ = ["OfferEntryFlags"]

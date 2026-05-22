@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .bucket_metadata import BucketMetadata
-from .constants import *
 from .hot_archive_bucket_entry_type import HotArchiveBucketEntryType
 from .ledger_entry import LedgerEntry
 from .ledger_key import LedgerKey

@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     String,
 )
-from .constants import *
 from .error_code import ErrorCode
 
 __all__ = ["Error"]

@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .claimable_balance_id import ClaimableBalanceID
-from .constants import *
 
 __all__ = ["LedgerKeyClaimableBalance"]
 

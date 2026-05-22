@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _LEDGER_HEADER_FLAGS_MAP = {1: "trading_flag", 2: "deposit_flag", 4: "withdrawal_flag"}
 _LEDGER_HEADER_FLAGS_REVERSE_MAP = {
     "trading_flag": 1,

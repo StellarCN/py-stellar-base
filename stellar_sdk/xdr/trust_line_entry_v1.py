@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .liabilities import Liabilities
 from .trust_line_entry_v1_ext import TrustLineEntryV1Ext
 

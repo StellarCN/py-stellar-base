@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .time_sliced_node_data import TimeSlicedNodeData
 from .time_sliced_peer_data_list import TimeSlicedPeerDataList
 

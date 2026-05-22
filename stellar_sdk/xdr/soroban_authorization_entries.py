@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .soroban_authorization_entry import SorobanAuthorizationEntry
 
 __all__ = ["SorobanAuthorizationEntries"]

@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _IP_ADDR_TYPE_MAP = {0: "ipv4", 1: "ipv6"}
 _IP_ADDR_TYPE_REVERSE_MAP = {"ipv4": 0, "ipv6": 1}
 __all__ = ["IPAddrType"]

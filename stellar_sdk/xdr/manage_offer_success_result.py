@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .claim_atom import ClaimAtom
-from .constants import *
 from .manage_offer_success_result_offer import ManageOfferSuccessResultOffer
 
 __all__ = ["ManageOfferSuccessResult"]

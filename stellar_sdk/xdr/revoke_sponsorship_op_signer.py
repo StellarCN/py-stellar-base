@@ -11,7 +11,6 @@ from .account_id import AccountID
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .signer_key import SignerKey
 
 __all__ = ["RevokeSponsorshipOpSigner"]

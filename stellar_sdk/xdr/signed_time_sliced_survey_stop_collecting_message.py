@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .signature import Signature
 from .time_sliced_survey_stop_collecting_message import (
     TimeSlicedSurveyStopCollectingMessage,

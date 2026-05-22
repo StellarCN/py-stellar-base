@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .survey_message_response_type import SurveyMessageResponseType
 from .topology_response_body_v2 import TopologyResponseBodyV2
 

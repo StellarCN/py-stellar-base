@@ -12,7 +12,6 @@ from .base import (
     Integer,
 )
 from .bucket_list_type import BucketListType
-from .constants import *
 
 __all__ = ["BucketMetadataExt"]
 

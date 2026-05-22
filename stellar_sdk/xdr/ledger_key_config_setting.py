@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .config_setting_id import ConfigSettingID
-from .constants import *
 
 __all__ = ["LedgerKeyConfigSetting"]
 

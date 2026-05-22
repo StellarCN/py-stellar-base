@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _TRUST_LINE_FLAGS_MAP = {
     1: "authorized_flag",
     2: "authorized_to_maintain_liabilities_flag",

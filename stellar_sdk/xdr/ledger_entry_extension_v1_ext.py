@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 
 __all__ = ["LedgerEntryExtensionV1Ext"]
 

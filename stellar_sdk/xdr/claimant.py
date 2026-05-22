@@ -12,7 +12,6 @@ from .base import (
 )
 from .claimant_type import ClaimantType
 from .claimant_v0 import ClaimantV0
-from .constants import *
 
 __all__ = ["Claimant"]
 

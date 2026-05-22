@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     String,
 )
-from .constants import *
 from .hash import Hash
 from .memo_type import MemoType
 from .uint64 import Uint64

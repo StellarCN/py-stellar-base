@@ -17,7 +17,6 @@ from .change_trust_op import ChangeTrustOp
 from .claim_claimable_balance_op import ClaimClaimableBalanceOp
 from .clawback_claimable_balance_op import ClawbackClaimableBalanceOp
 from .clawback_op import ClawbackOp
-from .constants import *
 from .create_account_op import CreateAccountOp
 from .create_claimable_balance_op import CreateClaimableBalanceOp
 from .create_passive_sell_offer_op import CreatePassiveSellOfferOp

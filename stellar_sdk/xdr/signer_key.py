@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
 from .signer_key_type import SignerKeyType
 from .uint256 import Uint256

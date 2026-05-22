@@ -11,7 +11,7 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     String,
 )
-from .constants import *
+from .constants import SC_SPEC_DOC_LIMIT
 from .sc_spec_udt_struct_field_v0 import SCSpecUDTStructFieldV0
 
 __all__ = ["SCSpecUDTStructV0"]

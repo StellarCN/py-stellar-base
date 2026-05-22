@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .extend_footprint_ttl_result_code import ExtendFootprintTTLResultCode
 
 __all__ = ["ExtendFootprintTTLResult"]

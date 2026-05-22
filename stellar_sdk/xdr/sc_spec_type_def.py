@@ -11,7 +11,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .sc_spec_type import SCSpecType
 
 if TYPE_CHECKING:

@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .claim_atom import ClaimAtom
-from .constants import *
 from .simple_payment_result import SimplePaymentResult
 
 __all__ = ["PathPaymentStrictSendResultSuccess"]

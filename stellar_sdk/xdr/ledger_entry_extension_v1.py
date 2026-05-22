@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .ledger_entry_extension_v1_ext import LedgerEntryExtensionV1Ext
 from .sponsorship_descriptor import SponsorshipDescriptor
 

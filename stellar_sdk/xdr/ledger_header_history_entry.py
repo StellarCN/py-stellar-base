@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .hash import Hash
 from .ledger_header import LedgerHeader
 from .ledger_header_history_entry_ext import LedgerHeaderHistoryEntryExt

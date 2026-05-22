@@ -13,7 +13,6 @@ from .asset_type import AssetType
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .liquidity_pool_parameters import LiquidityPoolParameters
 
 __all__ = ["ChangeTrustAsset"]

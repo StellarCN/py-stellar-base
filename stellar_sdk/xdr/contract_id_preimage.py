@@ -11,7 +11,6 @@ from .asset import Asset
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .contract_id_preimage_from_address import ContractIDPreimageFromAddress
 from .contract_id_preimage_type import ContractIDPreimageType
 

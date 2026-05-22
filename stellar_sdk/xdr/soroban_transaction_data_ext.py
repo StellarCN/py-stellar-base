@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .soroban_resources_ext_v0 import SorobanResourcesExtV0
 
 __all__ = ["SorobanTransactionDataExt"]

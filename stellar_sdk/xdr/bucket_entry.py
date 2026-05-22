@@ -12,7 +12,6 @@ from .base import (
 )
 from .bucket_entry_type import BucketEntryType
 from .bucket_metadata import BucketMetadata
-from .constants import *
 from .ledger_entry import LedgerEntry
 from .ledger_key import LedgerKey
 

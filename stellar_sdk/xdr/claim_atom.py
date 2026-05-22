@@ -14,7 +14,6 @@ from .claim_atom_type import ClaimAtomType
 from .claim_liquidity_atom import ClaimLiquidityAtom
 from .claim_offer_atom import ClaimOfferAtom
 from .claim_offer_atom_v0 import ClaimOfferAtomV0
-from .constants import *
 
 __all__ = ["ClaimAtom"]
 

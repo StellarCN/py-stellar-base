@@ -13,7 +13,6 @@ from .base import (
 )
 from .claimable_balance_entry import ClaimableBalanceEntry
 from .config_setting_entry import ConfigSettingEntry
-from .constants import *
 from .contract_code_entry import ContractCodeEntry
 from .contract_data_entry import ContractDataEntry
 from .data_entry import DataEntry

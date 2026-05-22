@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .bump_sequence_result_code import BumpSequenceResultCode
-from .constants import *
 
 __all__ = ["BumpSequenceResult"]
 

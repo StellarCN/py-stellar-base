@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _TX_SET_COMPONENT_TYPE_MAP = {0: "txset_comp_txs_maybe_discounted_fee"}
 _TX_SET_COMPONENT_TYPE_REVERSE_MAP = {"txset_comp_txs_maybe_discounted_fee": 0}
 __all__ = ["TxSetComponentType"]

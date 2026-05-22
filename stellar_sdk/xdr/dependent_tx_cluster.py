@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .transaction_envelope import TransactionEnvelope
 
 __all__ = ["DependentTxCluster"]

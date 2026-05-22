@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _SCP_STATEMENT_TYPE_MAP = {0: "prepare", 1: "confirm", 2: "externalize", 3: "nominate"}
 _SCP_STATEMENT_TYPE_REVERSE_MAP = {
     "prepare": 0,

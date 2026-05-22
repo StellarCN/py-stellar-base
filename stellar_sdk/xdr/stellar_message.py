@@ -11,7 +11,6 @@ from .auth import Auth
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .dont_have import DontHave
 from .error import Error
 from .flood_advert import FloodAdvert

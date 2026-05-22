@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .soroban_transaction_meta_ext_v1 import SorobanTransactionMetaExtV1
 
 __all__ = ["SorobanTransactionMetaExt"]

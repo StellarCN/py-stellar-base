@@ -11,7 +11,6 @@ from .account_id import AccountID
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .data_entry_ext import DataEntryExt
 from .data_value import DataValue
 from .string64 import String64

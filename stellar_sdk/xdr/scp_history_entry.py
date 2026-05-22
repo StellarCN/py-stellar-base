@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .scp_history_entry_v0 import SCPHistoryEntryV0
 
 __all__ = ["SCPHistoryEntry"]

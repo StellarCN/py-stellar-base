@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _SOROBAN_AUTHORIZED_FUNCTION_TYPE_MAP = {
     0: "contract_fn",
     1: "create_contract_host_fn",

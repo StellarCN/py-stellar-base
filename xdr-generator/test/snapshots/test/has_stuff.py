@@ -8,7 +8,6 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
-from .constants import *
 
 from .lots_of_my_structs import LotsOfMyStructs
 __all__ = ['HasStuff']

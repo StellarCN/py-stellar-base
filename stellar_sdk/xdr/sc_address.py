@@ -12,7 +12,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .claimable_balance_id import ClaimableBalanceID
-from .constants import *
 from .contract_id import ContractID
 from .muxed_ed25519_account import MuxedEd25519Account
 from .pool_id import PoolID

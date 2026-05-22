@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .int64 import Int64
 from .sc_address import SCAddress
 from .sc_val import SCVal

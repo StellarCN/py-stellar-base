@@ -12,7 +12,6 @@ from .asset_code4 import AssetCode4
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 
 __all__ = ["AlphaNum4"]
 

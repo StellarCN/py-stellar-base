@@ -10,7 +10,7 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
+from .constants import MAX_OPS_PER_TX
 from .memo import Memo
 from .operation import Operation
 from .sequence_number import SequenceNumber

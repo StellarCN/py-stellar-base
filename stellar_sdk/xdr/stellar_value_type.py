@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _STELLAR_VALUE_TYPE_MAP = {0: "basic", 1: "signed"}
 _STELLAR_VALUE_TYPE_REVERSE_MAP = {"basic": 0, "signed": 1}
 __all__ = ["StellarValueType"]

@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .sc_env_meta_entry_interface_version import SCEnvMetaEntryInterfaceVersion
 from .sc_env_meta_kind import SCEnvMetaKind
 

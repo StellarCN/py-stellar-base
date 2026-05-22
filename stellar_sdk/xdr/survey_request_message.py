@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .curve25519_public import Curve25519Public
 from .node_id import NodeID
 from .survey_message_command_type import SurveyMessageCommandType

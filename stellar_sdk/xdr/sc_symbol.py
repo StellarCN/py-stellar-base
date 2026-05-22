@@ -11,7 +11,7 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     String,
 )
-from .constants import *
+from .constants import SCSYMBOL_LIMIT
 
 __all__ = ["SCSymbol"]
 

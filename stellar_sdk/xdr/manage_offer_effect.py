@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _MANAGE_OFFER_EFFECT_MAP = {0: "created", 1: "updated", 2: "deleted"}
 _MANAGE_OFFER_EFFECT_REVERSE_MAP = {"created": 0, "updated": 1, "deleted": 2}
 __all__ = ["ManageOfferEffect"]

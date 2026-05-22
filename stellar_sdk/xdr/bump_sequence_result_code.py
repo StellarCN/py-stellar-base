@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _BUMP_SEQUENCE_RESULT_CODE_MAP = {0: "success", -1: "bad_seq"}
 _BUMP_SEQUENCE_RESULT_CODE_REVERSE_MAP = {"success": 0, "bad_seq": -1}
 __all__ = ["BumpSequenceResultCode"]

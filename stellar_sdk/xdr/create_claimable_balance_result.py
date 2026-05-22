@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .claimable_balance_id import ClaimableBalanceID
-from .constants import *
 from .create_claimable_balance_result_code import CreateClaimableBalanceResultCode
 
 __all__ = ["CreateClaimableBalanceResult"]

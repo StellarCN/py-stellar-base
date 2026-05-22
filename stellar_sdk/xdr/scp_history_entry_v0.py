@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .ledger_scp_messages import LedgerSCPMessages
 from .scp_quorum_set import SCPQuorumSet
 

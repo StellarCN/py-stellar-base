@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .contract_code_entry_v1 import ContractCodeEntryV1
 
 __all__ = ["ContractCodeEntryExt"]

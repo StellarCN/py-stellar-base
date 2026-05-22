@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _BINARY_FUSE_FILTER_TYPE_MAP = {0: "8_bit", 1: "16_bit", 2: "32_bit"}
 _BINARY_FUSE_FILTER_TYPE_REVERSE_MAP = {"8_bit": 0, "16_bit": 1, "32_bit": 2}
 __all__ = ["BinaryFuseFilterType"]
