@@ -68,6 +68,7 @@ class AllowTrust(Operation):
         warnings.warn(
             "Use `stellar_sdk.operation.set_trust_line_flags.SetTrustLineFlags` instead.",
             DeprecationWarning,
+            stacklevel=2,
         )
         super().__init__(source)
 

@@ -48,8 +48,10 @@ class StrKey:
         """
         try:
             return _decode_check(_VersionByte.ED25519_PUBLIC_KEY, data)
-        except Exception:
-            raise Ed25519PublicKeyInvalidError(f"Invalid Ed25519 Public Key: {data}")
+        except Exception as e:
+            raise Ed25519PublicKeyInvalidError(
+                f"Invalid Ed25519 Public Key: {data}"
+            ) from e
 
     @staticmethod
     def is_valid_ed25519_public_key(public_key: str) -> bool:
@@ -82,8 +84,10 @@ class StrKey:
         """
         try:
             return _decode_check(_VersionByte.ED25519_SECRET_SEED, data)
-        except Exception:
-            raise Ed25519SecretSeedInvalidError(f"Invalid Ed25519 Secret Seed: {data}")
+        except Exception as e:
+            raise Ed25519SecretSeedInvalidError(
+                f"Invalid Ed25519 Secret Seed: {data}"
+            ) from e
 
     @staticmethod
     def is_valid_ed25519_secret_seed(seed: str) -> bool:
@@ -184,8 +188,8 @@ class StrKey:
         """
         try:
             return _decode_check(_VersionByte.MED25519_PUBLIC_KEY, data)
-        except Exception:
-            raise ValueError(f"Invalid Med25519 Public Key: {data}")
+        except Exception as e:
+            raise ValueError(f"Invalid Med25519 Public Key: {data}") from e
 
     @staticmethod
     def is_valid_med25519_public_key(public_key: str) -> bool:
@@ -339,8 +343,8 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
 
     try:
         decoded_data = base64.b32decode(encoded_data)
-    except binascii.Error:
-        raise ValueError("Incorrect padding.")
+    except binascii.Error as e:
+        raise ValueError("Incorrect padding.") from e
 
     if encoded_data != base64.b32encode(decoded_data):  # Is that even possible?
         raise ValueError("Invalid encoded bytes.")

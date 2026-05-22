@@ -79,7 +79,7 @@ def test_contract_meta_value_semantics_and_decode_errors():
     with pytest.raises(TypeError, match="unhashable"):
         hash(meta)
     with pytest.raises(AttributeError):
-        setattr(meta, "entries", ())
+        setattr(meta, "entries", ())  # noqa: B010
 
     invalid = ContractMeta(
         (

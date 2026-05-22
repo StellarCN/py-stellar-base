@@ -150,7 +150,7 @@ class AiohttpClient(BaseAsyncClient):
                 url=str(response.url),
             )
         except aiohttp.ClientError as e:  # TODO: need more research
-            raise ConnectionError(e)
+            raise ConnectionError(e) from e
 
     async def _read_with_limit(
         self, response: "aiohttp.ClientResponse", max_content_size: int
@@ -202,7 +202,7 @@ class AiohttpClient(BaseAsyncClient):
                 url=str(response.url),
             )
         except aiohttp.ClientError as e:
-            raise ConnectionError(e)
+            raise ConnectionError(e) from e
 
     async def stream(
         self, url: str, params: dict[str, str] | None = None

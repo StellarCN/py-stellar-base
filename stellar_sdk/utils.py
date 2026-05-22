@@ -155,10 +155,10 @@ def to_xdr_amount(value: str | Decimal) -> int:
         amount = int(
             (Decimal(value) * _ONE).to_integral_exact(context=Context(traps=[Inexact]))
         )
-    except Inexact:
+    except Inexact as e:
         raise ValueError(
             f"Value of '{value}' must have at most 7 digits after the decimal."
-        )
+        ) from e
 
     if amount < 0 or amount > 9223372036854775807:
         raise ValueError(

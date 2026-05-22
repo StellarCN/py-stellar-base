@@ -32,6 +32,7 @@ def parse_transaction_envelope_from_xdr(
     warnings.warn(
         "This function is deprecated. Use `TransactionBuilder.from_xdr` instead.",
         DeprecationWarning,
+        stacklevel=2,
     )
     if FeeBumpTransactionEnvelope.is_fee_bump_transaction_envelope(xdr):
         return FeeBumpTransactionEnvelope.from_xdr(xdr, network_passphrase)

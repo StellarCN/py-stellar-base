@@ -195,10 +195,10 @@ def read_challenge_transaction(
         transaction_envelope = TransactionEnvelope.from_xdr(
             challenge_transaction, network_passphrase=network_passphrase
         )
-    except Exception:
+    except Exception as e:
         raise InvalidSep10ChallengeError(
             "Importing XDR failed, please check if XDR is correct."
-        )
+        ) from e
 
     transaction = transaction_envelope.transaction
 

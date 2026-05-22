@@ -128,7 +128,8 @@ class TransactionBuilder:
                 "It looks like you haven't set a TimeBounds for the transaction, "
                 "we strongly recommend that you set it. "
                 "You can learn why you should set it up through this link: "
-                "https://www.stellar.org/developers-blog/transaction-submission-timeouts-and-dynamic-fees-faq"
+                "https://www.stellar.org/developers-blog/transaction-submission-timeouts-and-dynamic-fees-faq",
+                stacklevel=2,
             )
 
         source = self.source_account.account
@@ -610,6 +611,7 @@ class TransactionBuilder:
         warnings.warn(
             "Use `stellar_sdk.transaction_builder.TransactionBuilder.append_set_trust_line_flags_op` instead.",
             DeprecationWarning,
+            stacklevel=2,
         )
         op = AllowTrust(trustor, asset_code, authorize, source)
         return self.append_operation(op)
