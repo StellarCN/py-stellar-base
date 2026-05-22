@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .scp_statement import SCPStatement
 from .signature import Signature
 

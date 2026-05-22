@@ -11,7 +11,6 @@ from .asset import Asset
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .path_payment_strict_send_result_code import PathPaymentStrictSendResultCode
 from .path_payment_strict_send_result_success import PathPaymentStrictSendResultSuccess
 

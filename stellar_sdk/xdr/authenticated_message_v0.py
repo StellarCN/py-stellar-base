@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .hmac_sha256_mac import HmacSha256Mac
 from .stellar_message import StellarMessage
 from .uint64 import Uint64

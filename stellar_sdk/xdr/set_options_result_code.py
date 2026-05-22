@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _SET_OPTIONS_RESULT_CODE_MAP = {
     0: "success",
     -1: "low_reserve",

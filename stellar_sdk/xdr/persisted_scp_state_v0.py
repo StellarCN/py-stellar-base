@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .scp_envelope import SCPEnvelope
 from .scp_quorum_set import SCPQuorumSet
 from .stored_transaction_set import StoredTransactionSet

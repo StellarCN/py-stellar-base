@@ -13,7 +13,6 @@ from .base import (
     Integer,
     String,
 )
-from .constants import *
 from .hash import Hash
 from .node_id import NodeID
 from .uint32 import Uint32

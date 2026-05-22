@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _CLAIMABLE_BALANCE_FLAGS_MAP = {1: "claimable_balance_clawback_enabled_flag"}
 _CLAIMABLE_BALANCE_FLAGS_REVERSE_MAP = {"claimable_balance_clawback_enabled_flag": 1}
 __all__ = ["ClaimableBalanceFlags"]

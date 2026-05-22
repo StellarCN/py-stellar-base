@@ -12,7 +12,6 @@ from .asset_code import AssetCode
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .uint32 import Uint32
 
 __all__ = ["AllowTrustOp"]

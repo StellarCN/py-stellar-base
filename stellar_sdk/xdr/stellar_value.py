@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .hash import Hash
 from .stellar_value_ext import StellarValueExt
 from .time_point import TimePoint

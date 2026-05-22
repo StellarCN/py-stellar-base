@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .trust_line_entry_v1 import TrustLineEntryV1
 
 __all__ = ["TrustLineEntryExt"]

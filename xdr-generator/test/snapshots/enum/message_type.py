@@ -8,7 +8,6 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
-from .constants import *
 
 _MESSAGE_TYPE_MAP = {0: "error_msg", 1: "hello", 2: "dont_have", 3: "get_peers", 4: "peers", 5: "get_tx_set", 6: "tx_set", 7: "get_validations", 8: "validations", 9: "transaction", 10: "json_transaction", 11: "get_fba_quorumset", 12: "fba_quorumset", 13: "fba_message"}
 _MESSAGE_TYPE_REVERSE_MAP = {"error_msg": 0, "hello": 1, "dont_have": 2, "get_peers": 3, "peers": 4, "get_tx_set": 5, "tx_set": 6, "get_validations": 7, "validations": 8, "transaction": 9, "json_transaction": 10, "get_fba_quorumset": 11, "fba_quorumset": 12, "fba_message": 13}

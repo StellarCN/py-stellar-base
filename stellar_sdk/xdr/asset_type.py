@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _ASSET_TYPE_MAP = {
     0: "native",
     1: "credit_alphanum4",

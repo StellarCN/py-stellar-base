@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .ledger_entry_type import LedgerEntryType
 from .ledger_key_account import LedgerKeyAccount
 from .ledger_key_claimable_balance import LedgerKeyClaimableBalance

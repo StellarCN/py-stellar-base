@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .int64 import Int64
 from .transaction_result_ext import TransactionResultExt
 from .transaction_result_result import TransactionResultResult

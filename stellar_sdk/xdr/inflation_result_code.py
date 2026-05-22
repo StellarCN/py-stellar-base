@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _INFLATION_RESULT_CODE_MAP = {0: "success", -1: "not_time"}
 _INFLATION_RESULT_CODE_REVERSE_MAP = {"success": 0, "not_time": -1}
 __all__ = ["InflationResultCode"]

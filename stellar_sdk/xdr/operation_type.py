@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _OPERATION_TYPE_MAP = {
     0: "create_account",
     1: "payment",

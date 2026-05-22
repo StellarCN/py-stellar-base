@@ -12,7 +12,6 @@ from .base import (
     Integer,
 )
 from .claimable_balance_entry_extension_v1 import ClaimableBalanceEntryExtensionV1
-from .constants import *
 
 __all__ = ["ClaimableBalanceEntryExt"]
 

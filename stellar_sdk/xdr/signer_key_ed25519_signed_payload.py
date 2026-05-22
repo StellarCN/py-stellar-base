@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Opaque,
 )
-from .constants import *
 from .uint256 import Uint256
 
 __all__ = ["SignerKeyEd25519SignedPayload"]

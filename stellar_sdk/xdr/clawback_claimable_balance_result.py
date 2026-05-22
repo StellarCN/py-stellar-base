@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .clawback_claimable_balance_result_code import ClawbackClaimableBalanceResultCode
-from .constants import *
 
 __all__ = ["ClawbackClaimableBalanceResult"]
 

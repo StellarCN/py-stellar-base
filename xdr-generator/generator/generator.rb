@@ -63,12 +63,45 @@ class Generator < Xdrgen::Generators::Base
     @init_out.puts "from .#{python_module_name(type_name)} import *"
   end
 
-  def open_definition_file(definition_name)
+  def open_definition_file(definition_name, used_constants = [])
     register_init_import(definition_name)
     @imported_types = Set.new
     out = @output.open("#{python_module_name(definition_name)}.py")
-    render_common_import(out, definition_name)
+    render_common_import(out, used_constants)
     out
+  end
+
+  # Walk a definition's members/arms and return the set of XDR `const`
+  # names referenced as array/string/opaque size. Only definitions that
+  # actually use one of these need `from .constants import ...`.
+  def collect_constants_used(defn)
+    declarations =
+      case defn
+      when AST::Definitions::Struct then defn.members.map(&:declaration)
+      when AST::Definitions::Union then non_void_arms(defn).map(&:declaration)
+      when AST::Definitions::Typedef then [defn.declaration]
+      else []
+      end
+
+    used = []
+    declarations.each do |decl|
+      case decl
+      when AST::Declarations::Array
+        _, size = decl.type.array_size
+        used << size if constant_name?(size)
+      end
+      case decl.type
+      when AST::Typespecs::Opaque, AST::Typespecs::String
+        used << decl.size if constant_name?(decl.size)
+      end
+    end
+    used.uniq.sort
+  end
+
+  # Distinguish a constant name (e.g. "MAX_OPS_PER_TX") from a numeric
+  # literal size; XDR consts are always UPPER_SNAKE_CASE identifiers.
+  def constant_name?(size)
+    size.is_a?(String) && size =~ /\A[A-Z][A-Z0-9_]*\z/
   end
 
   def render_definitions(node)
@@ -107,7 +140,7 @@ class Generator < Xdrgen::Generators::Base
 
   def render_enum(enum)
     enum_name = name(enum)
-    out = open_definition_file(enum_name)
+    out = open_definition_file(enum_name, collect_constants_used(enum))
 
     prefix_len = enum_prefix_length(enum)
     render_enum_maps(out, enum, enum_name, prefix_len)
@@ -141,7 +174,7 @@ class Generator < Xdrgen::Generators::Base
     typedef_name = safe_identifier(typedef.name.camelize)
     typedef_name_underscore = safe_identifier(typedef.name.underscore)
 
-    out = open_definition_file(typedef_name)
+    out = open_definition_file(typedef_name, collect_constants_used(typedef))
     render_import(out, typedef, typedef_name)
 
     out.puts "__all__ = ['#{typedef_name}']"
@@ -362,7 +395,7 @@ class Generator < Xdrgen::Generators::Base
 
   def render_union(union, render_import_in_func = false)
     union_name = name(union)
-    out = open_definition_file(union_name)
+    out = open_definition_file(union_name, collect_constants_used(union))
 
     render_import(out, union.discriminant, union_name)
     render_union_arm_imports(out, union, union_name, render_import_in_func)
@@ -464,7 +497,7 @@ class Generator < Xdrgen::Generators::Base
 
   def render_struct(struct)
     struct_name = name(struct)
-    out = open_definition_file(struct_name)
+    out = open_definition_file(struct_name, collect_constants_used(struct))
 
     struct.members.each do |member|
       render_import(out, member.declaration, struct_name)
@@ -557,7 +590,7 @@ class Generator < Xdrgen::Generators::Base
     end
   end
 
-  def render_common_import(out, definition_name = nil)
+  def render_common_import(out, used_constants = [])
     out.puts <<~EOS
       # This is an automatically generated file.
       # DO NOT EDIT or your changes may be overwritten
@@ -569,8 +602,10 @@ class Generator < Xdrgen::Generators::Base
       from typing import TYPE_CHECKING
       from xdrlib3 import Packer, Unpacker
       from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
-      from .constants import *
     EOS
+    unless used_constants.empty?
+      out.puts "from .constants import #{used_constants.join(', ')}"
+    end
     out.break
   end
 

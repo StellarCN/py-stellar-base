@@ -13,7 +13,6 @@ from .base import (
 from .begin_sponsoring_future_reserves_result_code import (
     BeginSponsoringFutureReservesResultCode,
 )
-from .constants import *
 
 __all__ = ["BeginSponsoringFutureReservesResult"]
 

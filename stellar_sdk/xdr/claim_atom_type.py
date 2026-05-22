@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _CLAIM_ATOM_TYPE_MAP = {0: "v0", 1: "order_book", 2: "liquidity_pool"}
 _CLAIM_ATOM_TYPE_REVERSE_MAP = {"v0": 0, "order_book": 1, "liquidity_pool": 2}
 __all__ = ["ClaimAtomType"]

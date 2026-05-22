@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Opaque,
 )
-from .constants import *
 from .create_contract_args import CreateContractArgs
 from .create_contract_args_v2 import CreateContractArgsV2
 from .host_function_type import HostFunctionType

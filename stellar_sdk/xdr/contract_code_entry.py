@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Opaque,
 )
-from .constants import *
 from .contract_code_entry_ext import ContractCodeEntryExt
 from .hash import Hash
 

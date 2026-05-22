@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .change_trust_result_code import ChangeTrustResultCode
-from .constants import *
 
 __all__ = ["ChangeTrustResult"]
 

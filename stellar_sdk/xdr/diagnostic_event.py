@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Boolean,
 )
-from .constants import *
 from .contract_event import ContractEvent
 
 __all__ = ["DiagnosticEvent"]

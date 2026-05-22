@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .ledger_header_history_entry import LedgerHeaderHistoryEntry
 from .scp_history_entry import SCPHistoryEntry
 from .transaction_result_meta import TransactionResultMeta

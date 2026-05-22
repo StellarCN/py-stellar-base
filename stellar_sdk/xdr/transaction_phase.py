@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .parallel_txs_component import ParallelTxsComponent
 from .tx_set_component import TxSetComponent
 

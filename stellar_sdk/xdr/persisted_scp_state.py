@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .persisted_scp_state_v0 import PersistedSCPStateV0
 from .persisted_scp_state_v1 import PersistedSCPStateV1
 

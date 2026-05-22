@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .generalized_transaction_set import GeneralizedTransactionSet
 
 __all__ = ["TransactionHistoryEntryExt"]

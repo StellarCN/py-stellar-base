@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .change_trust_asset import ChangeTrustAsset
-from .constants import *
 from .int64 import Int64
 
 __all__ = ["ChangeTrustOp"]

@@ -12,7 +12,7 @@ from .account_id import AccountID
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
+from .constants import MAX_SIGNERS
 from .int64 import Int64
 from .sequence_number import SequenceNumber
 from .signer import Signer

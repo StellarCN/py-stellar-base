@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .operation_meta import OperationMeta
 from .transaction_meta_v1 import TransactionMetaV1
 from .transaction_meta_v2 import TransactionMetaV2

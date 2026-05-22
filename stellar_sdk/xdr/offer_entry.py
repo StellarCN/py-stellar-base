@@ -12,7 +12,6 @@ from .asset import Asset
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .int64 import Int64
 from .offer_entry_ext import OfferEntryExt
 from .price import Price

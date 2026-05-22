@@ -11,7 +11,6 @@ from .account_id import AccountID
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .string64 import String64
 
 __all__ = ["LedgerKeyData"]

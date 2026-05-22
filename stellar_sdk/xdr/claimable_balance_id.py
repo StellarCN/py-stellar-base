@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .claimable_balance_id_type import ClaimableBalanceIDType
-from .constants import *
 from .hash import Hash
 
 __all__ = ["ClaimableBalanceID"]

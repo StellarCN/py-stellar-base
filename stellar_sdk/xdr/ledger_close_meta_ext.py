@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .ledger_close_meta_ext_v1 import LedgerCloseMetaExtV1
 
 __all__ = ["LedgerCloseMetaExt"]

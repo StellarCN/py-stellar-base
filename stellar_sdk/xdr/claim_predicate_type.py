@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _CLAIM_PREDICATE_TYPE_MAP = {
     0: "unconditional",
     1: "and",

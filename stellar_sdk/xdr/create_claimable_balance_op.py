@@ -12,7 +12,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .claimant import Claimant
-from .constants import *
 from .int64 import Int64
 
 __all__ = ["CreateClaimableBalanceOp"]

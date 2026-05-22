@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _SC_VAL_TYPE_MAP = {
     0: "bool",
     1: "void",

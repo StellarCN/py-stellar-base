@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _ACCOUNT_FLAGS_MAP = {
     1: "required_flag",
     2: "revocable_flag",

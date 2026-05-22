@@ -11,7 +11,7 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     String,
 )
-from .constants import *
+from .constants import SC_SPEC_DOC_LIMIT
 from .sc_spec_event_data_format import SCSpecEventDataFormat
 from .sc_spec_event_param_v0 import SCSpecEventParamV0
 from .sc_symbol import SCSymbol

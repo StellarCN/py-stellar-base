@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _THRESHOLD_INDEXES_MAP = {0: "master_weight", 1: "low", 2: "med", 3: "high"}
 _THRESHOLD_INDEXES_REVERSE_MAP = {"master_weight": 0, "low": 1, "med": 2, "high": 3}
 __all__ = ["ThresholdIndexes"]

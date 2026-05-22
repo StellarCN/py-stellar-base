@@ -12,7 +12,6 @@ from .base import (
     Opaque,
 )
 from .binary_fuse_filter_type import BinaryFuseFilterType
-from .constants import *
 from .short_hash_seed import ShortHashSeed
 from .uint32 import Uint32
 

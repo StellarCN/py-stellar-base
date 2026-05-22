@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _SC_SPEC_UDT_UNION_CASE_V0_KIND_MAP = {0: "void_v0", 1: "tuple_v0"}
 _SC_SPEC_UDT_UNION_CASE_V0_KIND_REVERSE_MAP = {"void_v0": 0, "tuple_v0": 1}
 __all__ = ["SCSpecUDTUnionCaseV0Kind"]

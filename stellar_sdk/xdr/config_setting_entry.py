@@ -28,7 +28,6 @@ from .config_setting_contract_parallel_compute_v0 import (
 )
 from .config_setting_id import ConfigSettingID
 from .config_setting_scp_timing import ConfigSettingSCPTiming
-from .constants import *
 from .contract_cost_params import ContractCostParams
 from .eviction_iterator import EvictionIterator
 from .freeze_bypass_txs import FreezeBypassTxs

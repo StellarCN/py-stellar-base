@@ -8,7 +8,6 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
-from .constants import *
 
 _COLOR3_MAP = {1: "1", 2: "2_two", 3: "3"}
 _COLOR3_REVERSE_MAP = {"1": 1, "2_two": 2, "3": 3}

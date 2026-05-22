@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _SC_ERROR_CODE_MAP = {
     0: "arith_domain",
     1: "index_bounds",

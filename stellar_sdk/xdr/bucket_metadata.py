@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .bucket_metadata_ext import BucketMetadataExt
-from .constants import *
 from .uint32 import Uint32
 
 __all__ = ["BucketMetadata"]

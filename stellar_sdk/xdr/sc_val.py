@@ -12,7 +12,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Boolean,
 )
-from .constants import *
 from .sc_val_type import SCValType
 
 if TYPE_CHECKING:

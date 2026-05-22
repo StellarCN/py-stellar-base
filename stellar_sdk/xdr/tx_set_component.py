@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .tx_set_component_txs_maybe_discounted_fee import (
     TxSetComponentTxsMaybeDiscountedFee,
 )

@@ -11,7 +11,6 @@ from .account_id import AccountID
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .signer import Signer
 from .string32 import String32
 from .uint32 import Uint32

@@ -10,7 +10,7 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
+from .constants import TX_ADVERT_VECTOR_MAX_SIZE
 from .hash import Hash
 
 __all__ = ["TxAdvertVector"]

@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _CREATE_ACCOUNT_RESULT_CODE_MAP = {
     0: "success",
     -1: "malformed",

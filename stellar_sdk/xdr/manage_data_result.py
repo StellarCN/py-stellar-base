@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .manage_data_result_code import ManageDataResultCode
 
 __all__ = ["ManageDataResult"]

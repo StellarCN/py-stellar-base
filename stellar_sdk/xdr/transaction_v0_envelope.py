@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .decorated_signature import DecoratedSignature
 from .transaction_v0 import TransactionV0
 

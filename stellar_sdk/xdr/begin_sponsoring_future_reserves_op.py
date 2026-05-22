@@ -11,7 +11,6 @@ from .account_id import AccountID
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 
 __all__ = ["BeginSponsoringFutureReservesOp"]
 

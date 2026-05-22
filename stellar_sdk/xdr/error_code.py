@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _ERROR_CODE_MAP = {0: "misc", 1: "data", 2: "conf", 3: "auth", 4: "load"}
 _ERROR_CODE_REVERSE_MAP = {"misc": 0, "data": 1, "conf": 2, "auth": 3, "load": 4}
 __all__ = ["ErrorCode"]

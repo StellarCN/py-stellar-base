@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .curve25519_public import Curve25519Public
 from .signature import Signature
 from .uint64 import Uint64

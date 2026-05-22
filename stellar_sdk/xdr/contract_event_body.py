@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
     Integer,
 )
-from .constants import *
 from .contract_event_v0 import ContractEventV0
 
 __all__ = ["ContractEventBody"]

@@ -10,7 +10,6 @@ from xdrlib3 import Packer, Unpacker
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .create_contract_args import CreateContractArgs
 from .create_contract_args_v2 import CreateContractArgsV2
 from .invoke_contract_args import InvokeContractArgs

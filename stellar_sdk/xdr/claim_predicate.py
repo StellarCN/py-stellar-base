@@ -11,7 +11,6 @@ from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
 from .claim_predicate_type import ClaimPredicateType
-from .constants import *
 from .int64 import Int64
 
 __all__ = ["ClaimPredicate"]

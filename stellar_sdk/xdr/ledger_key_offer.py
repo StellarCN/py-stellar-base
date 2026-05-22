@@ -11,7 +11,6 @@ from .account_id import AccountID
 from .base import (
     DEFAULT_XDR_MAX_DEPTH,
 )
-from .constants import *
 from .int64 import Int64
 
 __all__ = ["LedgerKeyOffer"]

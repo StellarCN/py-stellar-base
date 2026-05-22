@@ -8,8 +8,6 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-from .constants import *
-
 _SC_ERROR_TYPE_MAP = {
     0: "contract",
     1: "wasm_vm",
