@@ -9,7 +9,7 @@ from . import *
 
 class TestLiquidityPoolWithdraw:
     @pytest.mark.parametrize(
-        "amount, min_amount_a, min_amount_b, source, xdr",
+        ("amount", "min_amount_a", "min_amount_b", "source", "xdr"),
         [
             pytest.param(
                 "5",

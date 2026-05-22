@@ -8,7 +8,7 @@ from . import *
 
 class TestExtendFootprintTTL:
     @pytest.mark.parametrize(
-        "extend_to, source, xdr",
+        ("extend_to", "source", "xdr"),
         [
             pytest.param(
                 1234567890, None, "AAAAAAAAABkAAAAASZYC0g==", id="without_source"

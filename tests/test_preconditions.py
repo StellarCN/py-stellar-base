@@ -150,7 +150,7 @@ class TestPreconditions:
         assert cond.extra_signers == restore_cond.extra_signers == []
 
     @pytest.mark.parametrize(
-        "preconditions, is_null",
+        ("preconditions", "is_null"),
         [
             (Preconditions(), True),
             (Preconditions(time_bounds=TimeBounds(0, 1)), False),
@@ -178,7 +178,7 @@ class TestPreconditions:
         assert preconditions._is_empty_preconditions() is is_null
 
     @pytest.mark.parametrize(
-        "preconditions, is_v2",
+        ("preconditions", "is_v2"),
         [
             (Preconditions(), False),
             (Preconditions(time_bounds=TimeBounds(0, 1)), False),

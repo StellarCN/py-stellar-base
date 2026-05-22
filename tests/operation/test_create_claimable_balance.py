@@ -10,7 +10,7 @@ from . import *
 
 class TestCreateClaimableBalance:
     @pytest.mark.parametrize(
-        "amount, source, xdr",
+        ("amount", "source", "xdr"),
         [
             pytest.param(
                 "100",

@@ -816,15 +816,18 @@ def _compare_sc_address(a: stellar_xdr.SCAddress, b: stellar_xdr.SCAddress) -> i
     if c != 0:
         return c
     if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
-        assert a.account_id is not None and b.account_id is not None
+        assert a.account_id is not None
+        assert b.account_id is not None
         ax, bx = a.account_id.to_xdr_bytes(), b.account_id.to_xdr_bytes()
         return (ax > bx) - (ax < bx)
     if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CONTRACT:
-        assert a.contract_id is not None and b.contract_id is not None
+        assert a.contract_id is not None
+        assert b.contract_id is not None
         ax, bx = a.contract_id.to_xdr_bytes(), b.contract_id.to_xdr_bytes()
         return (ax > bx) - (ax < bx)
     if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT:
-        assert a.muxed_account is not None and b.muxed_account is not None
+        assert a.muxed_account is not None
+        assert b.muxed_account is not None
         at = (a.muxed_account.id.uint64, a.muxed_account.ed25519.uint256)
         bt = (b.muxed_account.id.uint64, b.muxed_account.ed25519.uint256)
         return (at > bt) - (at < bt)
@@ -837,7 +840,8 @@ def _compare_sc_address(a: stellar_xdr.SCAddress, b: stellar_xdr.SCAddress) -> i
         )
         return (ax > bx) - (ax < bx)
     if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL:
-        assert a.liquidity_pool_id is not None and b.liquidity_pool_id is not None
+        assert a.liquidity_pool_id is not None
+        assert b.liquidity_pool_id is not None
         ax, bx = (
             a.liquidity_pool_id.to_xdr_bytes(),
             b.liquidity_pool_id.to_xdr_bytes(),
@@ -853,7 +857,8 @@ def _compare_contract_executable(
     if c != 0:
         return c
     if a.type == stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM:
-        assert a.wasm_hash is not None and b.wasm_hash is not None
+        assert a.wasm_hash is not None
+        assert b.wasm_hash is not None
         ah, bh = a.wasm_hash.hash, b.wasm_hash.hash
         return (ah > bh) - (ah < bh)
     return 0
@@ -921,7 +926,8 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
     t = a.type
 
     if t == stellar_xdr.SCValType.SCV_BOOL:
-        assert a.b is not None and b.b is not None
+        assert a.b is not None
+        assert b.b is not None
         ai, bi = int(a.b), int(b.b)
         return (ai > bi) - (ai < bi)
 
@@ -932,49 +938,58 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
         return 0
 
     if t == stellar_xdr.SCValType.SCV_U32:
-        assert a.u32 is not None and b.u32 is not None
+        assert a.u32 is not None
+        assert b.u32 is not None
         av, bv = a.u32.uint32, b.u32.uint32
         return (av > bv) - (av < bv)
 
     if t == stellar_xdr.SCValType.SCV_I32:
-        assert a.i32 is not None and b.i32 is not None
+        assert a.i32 is not None
+        assert b.i32 is not None
         av, bv = a.i32.int32, b.i32.int32
         return (av > bv) - (av < bv)
 
     if t == stellar_xdr.SCValType.SCV_U64:
-        assert a.u64 is not None and b.u64 is not None
+        assert a.u64 is not None
+        assert b.u64 is not None
         av, bv = a.u64.uint64, b.u64.uint64
         return (av > bv) - (av < bv)
 
     if t == stellar_xdr.SCValType.SCV_I64:
-        assert a.i64 is not None and b.i64 is not None
+        assert a.i64 is not None
+        assert b.i64 is not None
         av, bv = a.i64.int64, b.i64.int64
         return (av > bv) - (av < bv)
 
     if t == stellar_xdr.SCValType.SCV_TIMEPOINT:
-        assert a.timepoint is not None and b.timepoint is not None
+        assert a.timepoint is not None
+        assert b.timepoint is not None
         av, bv = a.timepoint.time_point.uint64, b.timepoint.time_point.uint64
         return (av > bv) - (av < bv)
 
     if t == stellar_xdr.SCValType.SCV_DURATION:
-        assert a.duration is not None and b.duration is not None
+        assert a.duration is not None
+        assert b.duration is not None
         av, bv = a.duration.duration.uint64, b.duration.duration.uint64
         return (av > bv) - (av < bv)
 
     if t == stellar_xdr.SCValType.SCV_U128:
-        assert a.u128 is not None and b.u128 is not None
+        assert a.u128 is not None
+        assert b.u128 is not None
         at = (a.u128.hi.uint64, a.u128.lo.uint64)
         bt = (b.u128.hi.uint64, b.u128.lo.uint64)
         return (at > bt) - (at < bt)
 
     if t == stellar_xdr.SCValType.SCV_I128:
-        assert a.i128 is not None and b.i128 is not None
+        assert a.i128 is not None
+        assert b.i128 is not None
         at = (a.i128.hi.int64, a.i128.lo.uint64)
         bt = (b.i128.hi.int64, b.i128.lo.uint64)
         return (at > bt) - (at < bt)
 
     if t == stellar_xdr.SCValType.SCV_U256:
-        assert a.u256 is not None and b.u256 is not None
+        assert a.u256 is not None
+        assert b.u256 is not None
         at256 = (
             a.u256.hi_hi.uint64,
             a.u256.hi_lo.uint64,
@@ -990,7 +1005,8 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
         return (at256 > bt256) - (at256 < bt256)
 
     if t == stellar_xdr.SCValType.SCV_I256:
-        assert a.i256 is not None and b.i256 is not None
+        assert a.i256 is not None
+        assert b.i256 is not None
         ai256 = (
             a.i256.hi_hi.int64,
             a.i256.hi_lo.uint64,
@@ -1006,22 +1022,26 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
         return (ai256 > bi256) - (ai256 < bi256)
 
     if t == stellar_xdr.SCValType.SCV_BYTES:
-        assert a.bytes is not None and b.bytes is not None
+        assert a.bytes is not None
+        assert b.bytes is not None
         ab, bb = a.bytes.sc_bytes, b.bytes.sc_bytes
         return (ab > bb) - (ab < bb)
 
     if t == stellar_xdr.SCValType.SCV_STRING:
-        assert a.str is not None and b.str is not None
+        assert a.str is not None
+        assert b.str is not None
         ab, bb = a.str.sc_string, b.str.sc_string
         return (ab > bb) - (ab < bb)
 
     if t == stellar_xdr.SCValType.SCV_SYMBOL:
-        assert a.sym is not None and b.sym is not None
+        assert a.sym is not None
+        assert b.sym is not None
         ab, bb = a.sym.sc_symbol, b.sym.sc_symbol
         return (ab > bb) - (ab < bb)
 
     if t == stellar_xdr.SCValType.SCV_VEC:
-        assert a.vec is not None and b.vec is not None
+        assert a.vec is not None
+        assert b.vec is not None
         for ae, be in zip(a.vec.sc_vec, b.vec.sc_vec, strict=False):
             c = _compare_sc_val(ae, be)
             if c != 0:
@@ -1031,7 +1051,8 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
         )
 
     if t == stellar_xdr.SCValType.SCV_MAP:
-        assert a.map is not None and b.map is not None
+        assert a.map is not None
+        assert b.map is not None
         for am, bm in zip(a.map.sc_map, b.map.sc_map, strict=False):
             c = _compare_sc_val(am.key, bm.key)
             if c != 0:
@@ -1044,11 +1065,13 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
         )
 
     if t == stellar_xdr.SCValType.SCV_ADDRESS:
-        assert a.address is not None and b.address is not None
+        assert a.address is not None
+        assert b.address is not None
         return _compare_sc_address(a.address, b.address)
 
     if t == stellar_xdr.SCValType.SCV_ERROR:
-        assert a.error is not None and b.error is not None
+        assert a.error is not None
+        assert b.error is not None
         c = (a.error.type.value > b.error.type.value) - (
             a.error.type.value < b.error.type.value
         )
@@ -1059,20 +1082,23 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
             assert b.error.contract_code is not None
             av, bv = a.error.contract_code.uint32, b.error.contract_code.uint32
             return (av > bv) - (av < bv)
-        assert a.error.code is not None and b.error.code is not None
+        assert a.error.code is not None
+        assert b.error.code is not None
         return (a.error.code.value > b.error.code.value) - (
             a.error.code.value < b.error.code.value
         )
 
     if t == stellar_xdr.SCValType.SCV_CONTRACT_INSTANCE:
-        assert a.instance is not None and b.instance is not None
+        assert a.instance is not None
+        assert b.instance is not None
         c = _compare_contract_executable(a.instance.executable, b.instance.executable)
         if c != 0:
             return c
         return _compare_optional_sc_map(a.instance.storage, b.instance.storage)
 
     if t == stellar_xdr.SCValType.SCV_LEDGER_KEY_NONCE:
-        assert a.nonce_key is not None and b.nonce_key is not None
+        assert a.nonce_key is not None
+        assert b.nonce_key is not None
         av, bv = a.nonce_key.nonce.int64, b.nonce_key.nonce.int64
         return (av > bv) - (av < bv)
 

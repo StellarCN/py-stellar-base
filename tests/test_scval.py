@@ -15,7 +15,7 @@ from stellar_sdk.scval import (
 
 
 @pytest.mark.parametrize(
-    "sc_val, native",
+    ("sc_val", "native"),
     [
         (to_bool(True), True),
         (to_void(), None),
@@ -167,7 +167,7 @@ def test_int64_out_of_range_raise(v):
 
 
 @pytest.mark.parametrize(
-    "v, expected_xdr",
+    ("v", "expected_xdr"),
     [
         (0, "AAAACgAAAAAAAAAAAAAAAAAAAAA="),
         (1, "AAAACgAAAAAAAAAAAAAAAAAAAAE="),
@@ -193,7 +193,7 @@ def test_int128_out_of_range_raise(v):
 
 
 @pytest.mark.parametrize(
-    "v, expected_xdr",
+    ("v", "expected_xdr"),
     [
         (0, "AAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
         (1, "AAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB"),
@@ -784,7 +784,7 @@ class TestCompareScVal:
     ]
 
     @pytest.mark.parametrize(
-        "a, b",
+        ("a", "b"),
         _ANTISYMMETRY_PAIRS,
         ids=[f"pair{i}" for i in range(len(_ANTISYMMETRY_PAIRS))],
     )
@@ -803,7 +803,7 @@ class TestCompareScVal:
     ]
 
     @pytest.mark.parametrize(
-        "a, b, c",
+        ("a", "b", "c"),
         _TRANSITIVITY_TRIPLES,
         ids=[f"triple{i}" for i in range(len(_TRANSITIVITY_TRIPLES))],
     )
@@ -908,7 +908,7 @@ def test_uint64_out_of_range_raise(v):
 
 
 @pytest.mark.parametrize(
-    "v, expected_xdr",
+    ("v", "expected_xdr"),
     [
         (0, "AAAACQAAAAAAAAAAAAAAAAAAAAA="),
         (1, "AAAACQAAAAAAAAAAAAAAAAAAAAE="),
@@ -931,7 +931,7 @@ def test_uint128_out_of_range_raise(v):
 
 
 @pytest.mark.parametrize(
-    "v, expected_xdr",
+    ("v", "expected_xdr"),
     [
         (0, "AAAACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
         (1, "AAAACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB"),

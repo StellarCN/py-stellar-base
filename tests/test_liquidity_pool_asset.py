@@ -17,7 +17,7 @@ class TestLiquidityPoolAsset:
         assert asset.type == "liquidity_pool_shares"
 
     @pytest.mark.parametrize(
-        "asset_a, asset_b, fee, msg",
+        ("asset_a", "asset_b", "fee", "msg"),
         [
             (asset_b, asset_a, fee, "Assets are not in lexicographic order."),
             (asset_a, asset_b, fee + 10, "`fee` is invalid."),
@@ -61,7 +61,7 @@ class TestLiquidityPoolAsset:
         )
 
     @pytest.mark.parametrize(
-        "asset_code, asset_issuer, asset_type",
+        ("asset_code", "asset_issuer", "asset_type"),
         [
             ("XLM", None, AssetType.ASSET_TYPE_NATIVE),
             (
@@ -86,7 +86,7 @@ class TestLiquidityPoolAsset:
     anum12 = Asset("BANANA", "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ")
 
     @pytest.mark.parametrize(
-        "asset_a, asset_b, result",
+        ("asset_a", "asset_b", "result"),
         [
             (xlm, xlm, False),
             (xlm, anum4, True),
@@ -112,7 +112,7 @@ class TestLiquidityPoolAsset:
     )
 
     @pytest.mark.parametrize(
-        "asset_a, asset_b, result",
+        ("asset_a", "asset_b", "result"),
         [
             (asset_arst, asset_arst, False),
             (asset_arst, asset_usdx, True),
@@ -133,7 +133,7 @@ class TestLiquidityPoolAsset:
     )
 
     @pytest.mark.parametrize(
-        "asset_a, asset_b, result",
+        ("asset_a", "asset_b", "result"),
         [
             (asset_issuer_a, asset_issuer_b, True),
             (asset_issuer_a, asset_issuer_a, False),

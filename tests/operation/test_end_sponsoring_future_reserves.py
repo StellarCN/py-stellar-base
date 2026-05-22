@@ -7,7 +7,7 @@ from . import *
 
 class TestEndSponsoringFutureReserves:
     @pytest.mark.parametrize(
-        "source, xdr",
+        ("source", "xdr"),
         [
             pytest.param(
                 None,

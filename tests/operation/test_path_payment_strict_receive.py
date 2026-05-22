@@ -9,7 +9,7 @@ from . import *
 
 class TestPathPaymentStrictReceive:
     @pytest.mark.parametrize(
-        "destination, send_max, dest_amount, path, source, xdr",
+        ("destination", "send_max", "dest_amount", "path", "source", "xdr"),
         [
             pytest.param(
                 kp2.public_key,

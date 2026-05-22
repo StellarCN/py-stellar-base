@@ -9,7 +9,7 @@ from . import *
 
 class TestLiquidityPoolDeposit:
     @pytest.mark.parametrize(
-        "max_amount_a, max_amount_b, min_price, max_price, source, xdr",
+        ("max_amount_a", "max_amount_b", "min_price", "max_price", "source", "xdr"),
         [
             pytest.param(
                 "10",

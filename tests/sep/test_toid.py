@@ -9,7 +9,7 @@ op_first = 1  # op index 1
 
 class TestTOID:
     @pytest.mark.parametrize(
-        "id, expected",
+        ("id", "expected"),
         [
             # accommodates 12-bits of precision for the operation field
             (TOID(0, 0, 1), 1),
@@ -36,7 +36,7 @@ class TestTOID:
         assert TOID.from_int64(expected) == id
 
     @pytest.mark.parametrize(
-        "ledger_sequence, transaction_order, operation_order",
+        ("ledger_sequence", "transaction_order", "operation_order"),
         [
             (2**31, 0, 0),
             (0, 0, 4096),
@@ -56,7 +56,7 @@ class TestTOID:
             TOID.from_int64(value)
 
     @pytest.mark.parametrize(
-        "start, end, start_ledger, end_ledger",
+        ("start", "end", "start_ledger", "end_ledger"),
         [
             (1, 1, 0, 2),
             (1, 2, 0, 3),
@@ -81,7 +81,7 @@ class TestTOID:
             TOID.ledger_range_inclusive(2, 1)
 
     @pytest.mark.parametrize(
-        "ledger_seq, toid",
+        ("ledger_seq", "toid"),
         [
             (1, TOID(0, 0, 0)),
             (2**31 - 1, TOID(0, 0, 0)),

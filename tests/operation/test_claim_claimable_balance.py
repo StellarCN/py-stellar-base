@@ -7,7 +7,7 @@ from . import *
 
 class TestClaimClaimableBalance:
     @pytest.mark.parametrize(
-        "source, xdr",
+        ("source", "xdr"),
         [
             pytest.param(
                 None,

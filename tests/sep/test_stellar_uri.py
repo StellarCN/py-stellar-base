@@ -23,7 +23,18 @@ class TestStellarTransactionStellarUri:
     )
 
     @pytest.mark.parametrize(
-        "tx, replace, callback, pubkey, message, network_passphrase, origin_domain, signature, signer, uri",
+        (
+            "tx",
+            "replace",
+            "callback",
+            "pubkey",
+            "message",
+            "network_passphrase",
+            "origin_domain",
+            "signature",
+            "signer",
+            "uri",
+        ),
         [
             (
                 tx,
@@ -264,7 +275,19 @@ class TestStellarTransactionStellarUri:
 
 class TestPayStellarUri:
     @pytest.mark.parametrize(
-        "destination, amount, asset, memo, callback, message, network_passphrase, origin_domain, signature, signer, uri",
+        (
+            "destination",
+            "amount",
+            "asset",
+            "memo",
+            "callback",
+            "message",
+            "network_passphrase",
+            "origin_domain",
+            "signature",
+            "signer",
+            "uri",
+        ),
         [
             (
                 "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",

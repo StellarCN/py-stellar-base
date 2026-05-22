@@ -105,7 +105,7 @@ class TestAsset:
         assert asset1 != asset4
 
     @pytest.mark.parametrize(
-        "asset, xdr",
+        ("asset", "xdr"),
         [
             pytest.param(Asset.native(), "AAAAAA==", id="native"),
             pytest.param(
@@ -131,7 +131,7 @@ class TestAsset:
         assert Asset.from_xdr_object(xdr_object) == asset
 
     @pytest.mark.parametrize(
-        "asset, xdr",
+        ("asset", "xdr"),
         [
             pytest.param(Asset.native(), "AAAAAA==", id="native"),
             pytest.param(
@@ -157,7 +157,7 @@ class TestAsset:
         assert Asset.from_xdr_object(xdr_object) == asset
 
     @pytest.mark.parametrize(
-        "asset, xdr",
+        ("asset", "xdr"),
         [
             pytest.param(Asset.native(), "AAAAAA==", id="native"),
             pytest.param(
@@ -183,7 +183,7 @@ class TestAsset:
         assert Asset.from_xdr_object(xdr_object) == asset
 
     @pytest.mark.parametrize(
-        "asset, network_passphrase, contract_id",
+        ("asset", "network_passphrase", "contract_id"),
         [
             pytest.param(
                 Asset.native(),

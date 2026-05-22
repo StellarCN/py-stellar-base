@@ -9,7 +9,7 @@ from . import *
 
 class TestClawback:
     @pytest.mark.parametrize(
-        "from_, amount, source, xdr",
+        ("from_", "amount", "source", "xdr"),
         [
             pytest.param(
                 kp2.public_key,

@@ -7,7 +7,7 @@ from . import *
 
 class TestAccountMerge:
     @pytest.mark.parametrize(
-        "destination, source, xdr",
+        ("destination", "source", "xdr"),
         [
             pytest.param(
                 kp2.public_key,

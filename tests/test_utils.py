@@ -15,7 +15,7 @@ from stellar_sdk.utils import (
 
 class TestUtils:
     @pytest.mark.parametrize(
-        "n, d, v",
+        ("n", "d", "v"),
         [
             (1, 10, "0.1"),
             (1, 100, "0.01"),
@@ -47,7 +47,7 @@ class TestUtils:
             best_rational_approximation(v)
 
     @pytest.mark.parametrize(
-        "input_value, except_return",
+        ("input_value", "except_return"),
         [
             (b"hello", b"hello"),
             (
@@ -60,7 +60,7 @@ class TestUtils:
         assert hex_to_bytes(input_value) == except_return
 
     @pytest.mark.parametrize(
-        "base, path, output",
+        ("base", "path", "output"),
         [
             (
                 "https://horizon.stellar.org/",
@@ -123,7 +123,7 @@ class TestUtils:
         assert output == urljoin_with_query(base, path)
 
     @pytest.mark.parametrize(
-        "data, result",
+        ("data", "result"),
         [
             ("", False),
             ("abc", False),
@@ -144,7 +144,7 @@ class TestUtils:
         assert is_valid_hash(data) == result
 
     @pytest.mark.parametrize(
-        "account_id, argument_name, raise_err",
+        ("account_id", "argument_name", "raise_err"),
         [
             ("", "account_id", True),
             ("", "account_id2", True),
@@ -179,7 +179,7 @@ class TestUtils:
             raise_if_not_valid_ed25519_public_key(account_id, argument_name)
 
     @pytest.mark.parametrize(
-        "amount, argument_name, raise_err",
+        ("amount", "argument_name", "raise_err"),
         [
             ("-0.1", "amount", True),
             ("-0.1", "amount2", True),
@@ -201,7 +201,7 @@ class TestUtils:
             raise_if_not_valid_amount(amount, argument_name)
 
     @pytest.mark.parametrize(
-        "amount, argument_name, raise_err",
+        ("amount", "argument_name", "raise_err"),
         [
             ("922337203685.47758070", "amount", True),
             ("922337203685.47758070", "amount2", True),
@@ -220,7 +220,7 @@ class TestUtils:
             raise_if_not_valid_amount(amount, argument_name)
 
     @pytest.mark.parametrize(
-        "hash, argument_name, raise_err",
+        ("hash", "argument_name", "raise_err"),
         [
             ("", "hash", True),
             ("", "hash2", True),
@@ -263,7 +263,7 @@ class TestUtils:
             raise_if_not_valid_hash(hash, argument_name)
 
     @pytest.mark.parametrize(
-        "balance_id, argument_name, raise_err",
+        ("balance_id", "argument_name", "raise_err"),
         [
             ("", "balance_id", True),
             ("", "balance_id2", True),

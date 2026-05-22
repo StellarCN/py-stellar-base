@@ -17,7 +17,7 @@ class TestMemo:
         assert base_memo.to_xdr_object().to_xdr() == "AAAAAA=="
 
     @pytest.mark.parametrize(
-        "text, xdr",
+        ("text", "xdr"),
         [
             ("Hello, Eno!", "AAAAAQAAAAtIZWxsbywgRW5vIQA="),
             ("星星之火。", "AAAAAQAAAA/mmJ/mmJ/kuYvngavjgIIA"),
@@ -41,7 +41,7 @@ class TestMemo:
             TextMemo(invalid_value)
 
     @pytest.mark.parametrize(
-        "id, xdr",
+        ("id", "xdr"),
         [
             (0, "AAAAAgAAAAAAAAAA"),
             (123123123, "AAAAAgAAAAAHVrWz"),
@@ -119,7 +119,7 @@ class TestMemo:
             ReturnHashMemo(os.urandom(length))
 
     @pytest.mark.parametrize(
-        "asset_a, asset_b, equal",
+        ("asset_a", "asset_b", "equal"),
         [
             pytest.param(NoneMemo(), NoneMemo(), True, id="NoneMemo_equals"),
             pytest.param(IdMemo(1), IdMemo(1), True, id="IdMemo_equals"),

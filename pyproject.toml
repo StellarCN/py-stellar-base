@@ -115,7 +115,7 @@ exclude_lines = [
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["F", "I", "E", "W", "C4", "PIE", "RUF", "UP", "B", "SIM"]
+select = ["F", "I", "E", "W", "C4", "PIE", "RUF", "UP", "B", "SIM", "PT"]
 ignore = [
     # Star imports are used both in package __init__ re-exports and in a
     # handful of test files; suppress globally rather than per-file.
@@ -132,6 +132,12 @@ ignore = [
     "RUF043",
 ]
 
+[tool.ruff.lint.flake8-pytest-style]
+# `pytest.raises(ValueError)` without `match=` is fine here; some tests
+# only care that *any* ValueError is raised. The default require-match
+# list includes ValueError, which we don't want.
+raises-require-match-for = ["BaseException", "Exception"]
+
 [tool.ruff.lint.per-file-ignores]
 # Re-exports in package __init__ modules (was --ignore-init-module-imports
 # under autoflake).
@@ -140,6 +146,8 @@ ignore = [
 # generated output here would be reverted on the next `make xdr-generate`.
 # See LINT_TODO.md for the path to updating the generator templates.
 "stellar_sdk/xdr/*" = ["UP"]
+# examples/* are illustrative scripts, not pytest tests.
+"examples/*" = ["PT"]
 
 [tool.pyright]
 include = ["stellar_sdk", "tests", "examples"]

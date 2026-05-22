@@ -370,7 +370,7 @@ class TestKeypair:
             kp.verify(b"test_verify_failed", signature)
 
     @pytest.mark.parametrize(
-        "secret, hint",
+        ("secret", "hint"),
         [
             ("SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36", "0bfad134"),
             ("SAQVS3IPN6U3TBMTXQH32ZESY7SUOZGLEFBH6XWMA6DVNPJ4CLO5M54B", "4ab84399"),
@@ -381,7 +381,7 @@ class TestKeypair:
         assert Keypair.from_secret(secret).signature_hint().hex() == hint
 
     @pytest.mark.parametrize(
-        "public_key, hint",
+        ("public_key", "hint"),
         [
             ("GDFQVQCYYB7GKCGSCUSIQYXTPLV5YJ3XWDMWGQMDNM4EAXAL7LITIBQ7", "0bfad134"),
             ("GD4UGX3TOGNPUOFHT64JR65P6CYIEGDOJKY234UGCNMB2ASKXBBZTAM6", "4ab84399"),
@@ -414,7 +414,7 @@ class TestKeypair:
             kp.public_key = "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
 
     @pytest.mark.parametrize(
-        "kp1, kp2, equal",
+        ("kp1", "kp2", "equal"),
         [
             (
                 "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36",
@@ -454,7 +454,7 @@ class TestKeypair:
         assert kp4 != kp6
 
     @pytest.mark.parametrize(
-        "language, strength, length",
+        ("language", "strength", "length"),
         [
             (Language.CHINESE_SIMPLIFIED, 128, 12),
             ("english", 128, 12),
@@ -494,7 +494,7 @@ class TestKeypair:
                 assert data["accounts"][i] == (kp.public_key, kp.secret)
 
     @pytest.mark.parametrize(
-        "mnemonic, language",
+        ("mnemonic", "language"),
         [
             (
                 "usual canvas judge video wall ride rookie together enhance able evoke one",
@@ -525,7 +525,7 @@ class TestKeypair:
             )
 
     @pytest.mark.parametrize(
-        "public_key, index",
+        ("public_key", "index"),
         [
             (
                 "GDZ4GYLVRLM2E6CGCOVYXAYMXJJAV3IHDXU6RUHX5AJVYS4AE6R6CHPJ",
@@ -578,7 +578,7 @@ class TestKeypair:
             Keypair.from_shamir_mnemonic_phrases([shares[0], shares_1])
 
     @pytest.mark.parametrize(
-        "member_threshold, member_count, strength, n_words, passphrase",
+        ("member_threshold", "member_count", "strength", "n_words", "passphrase"),
         [
             (1, 1, 128, 20, ""),
             (1, 1, 128, 20, "abcde"),
@@ -606,7 +606,7 @@ class TestKeypair:
             )
 
     @pytest.mark.parametrize(
-        "member_threshold, member_count, strength, err_msg",
+        ("member_threshold", "member_count", "strength", "err_msg"),
         [
             (0, 1, 128, "threshold must be a positive"),
             (1, 2, 128, "multiple member shares with member threshold 1"),
@@ -694,7 +694,7 @@ class TestKeypair:
         assert sign_decorated.signature == kp.sign(data)
 
     @pytest.mark.parametrize(
-        "payload, hint",
+        ("payload", "hint"),
         [
             (b"cat!!!", [0x22, 0xDD, 0x24, 0xD6]),
             (b"cat!", [0x35, 0x9D, 0x71, 0xD6]),
@@ -711,7 +711,7 @@ class TestKeypair:
         assert sign_decorated.signature == kp.sign(payload)
 
     @pytest.mark.parametrize(
-        "message, expected_signature",
+        ("message", "expected_signature"),
         [
             (
                 "Hello, World!",

@@ -9,7 +9,7 @@ from . import *
 
 class TestChangeTrust:
     @pytest.mark.parametrize(
-        "asset, limit, source, xdr",
+        ("asset", "limit", "source", "xdr"),
         [
             pytest.param(
                 asset1,

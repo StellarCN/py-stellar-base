@@ -9,7 +9,7 @@ from . import *
 
 class TestPayment:
     @pytest.mark.parametrize(
-        "destination, amount, source, xdr",
+        ("destination", "amount", "source", "xdr"),
         [
             pytest.param(
                 kp2.public_key,

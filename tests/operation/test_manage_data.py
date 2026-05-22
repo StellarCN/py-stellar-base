@@ -7,7 +7,7 @@ from . import *
 
 class TestManageData:
     @pytest.mark.parametrize(
-        "key, value, source, xdr",
+        ("key", "value", "source", "xdr"),
         [
             pytest.param(
                 "hello",
@@ -82,7 +82,7 @@ class TestManageData:
         assert Operation.from_xdr_object(xdr_object) == op
 
     @pytest.mark.parametrize(
-        "name, value",
+        ("name", "value"),
         [
             pytest.param("name_too_long" + "-" * 64, "value", id="name_too_long"),
             pytest.param("value_too_long", "value" + "a" * 64, id="value_too_long"),

@@ -7,7 +7,7 @@ from . import *
 
 class TestSetTrustLineFlags:
     @pytest.mark.parametrize(
-        "clear_flags, set_flags, source, xdr",
+        ("clear_flags", "set_flags", "source", "xdr"),
         [
             pytest.param(
                 TrustLineFlags.AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG,

@@ -9,7 +9,7 @@ from . import *
 
 class TestCreatePassiveSellOffer:
     @pytest.mark.parametrize(
-        "amount, price, source, xdr",
+        ("amount", "price", "source", "xdr"),
         [
             pytest.param(
                 "100",
