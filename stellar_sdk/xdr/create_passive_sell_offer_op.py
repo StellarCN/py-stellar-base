@@ -8,7 +8,10 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .int64 import Int64
 from .price import Price
 

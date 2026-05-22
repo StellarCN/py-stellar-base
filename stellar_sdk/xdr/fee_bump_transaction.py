@@ -7,7 +7,10 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .fee_bump_transaction_ext import FeeBumpTransactionExt
 from .fee_bump_transaction_inner_tx import FeeBumpTransactionInnerTx
 from .int64 import Int64

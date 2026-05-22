@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _REVOKE_SPONSORSHIP_TYPE_MAP = {0: "ledger_entry", 1: "signer"}
 _REVOKE_SPONSORSHIP_TYPE_REVERSE_MAP = {"ledger_entry": 0, "signer": 1}
 __all__ = ["RevokeSponsorshipType"]

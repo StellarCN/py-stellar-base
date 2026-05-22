@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _PATH_PAYMENT_STRICT_RECEIVE_RESULT_CODE_MAP = {
     0: "success",
     -1: "malformed",

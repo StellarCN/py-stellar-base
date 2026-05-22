@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _LEDGER_UPGRADE_TYPE_MAP = {
     1: "version",
     2: "base_fee",

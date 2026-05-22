@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _SC_SPEC_EVENT_PARAM_LOCATION_V0_MAP = {0: "data", 1: "topic_list"}
 _SC_SPEC_EVENT_PARAM_LOCATION_V0_REVERSE_MAP = {"data": 0, "topic_list": 1}
 __all__ = ["SCSpecEventParamLocationV0"]

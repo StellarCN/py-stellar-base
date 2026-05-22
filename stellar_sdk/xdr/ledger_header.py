@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .hash import Hash
 from .int64 import Int64
 from .ledger_header_ext import LedgerHeaderExt
@@ -79,7 +81,7 @@ class LedgerHeader:
         base_fee: Uint32,
         base_reserve: Uint32,
         max_tx_set_size: Uint32,
-        skip_list: List[Hash],
+        skip_list: list[Hash],
         ext: LedgerHeaderExt,
     ) -> None:
         _expect_length = 4

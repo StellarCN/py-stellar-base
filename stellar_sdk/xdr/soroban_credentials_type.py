@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _SOROBAN_CREDENTIALS_TYPE_MAP = {0: "source_account", 1: "address"}
 _SOROBAN_CREDENTIALS_TYPE_REVERSE_MAP = {"source_account": 0, "address": 1}
 __all__ = ["SorobanCredentialsType"]

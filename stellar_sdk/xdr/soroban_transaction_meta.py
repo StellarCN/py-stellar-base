@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .contract_event import ContractEvent
 from .diagnostic_event import DiagnosticEvent
 from .sc_val import SCVal
@@ -39,9 +41,9 @@ class SorobanTransactionMeta:
     def __init__(
         self,
         ext: SorobanTransactionMetaExt,
-        events: List[ContractEvent],
+        events: list[ContractEvent],
         return_value: SCVal,
-        diagnostic_events: List[DiagnosticEvent],
+        diagnostic_events: list[DiagnosticEvent],
     ) -> None:
         _expect_max_length = 4294967295
         if events and len(events) > _expect_max_length:

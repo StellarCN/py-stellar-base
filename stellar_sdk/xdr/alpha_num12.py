@@ -9,7 +9,10 @@ from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
 from .asset_code12 import AssetCode12
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 
 __all__ = ["AlphaNum12"]
 

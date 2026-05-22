@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
 from .signer_key_type import SignerKeyType
 from .uint256 import Uint256
@@ -44,10 +46,10 @@ class SignerKey:
     def __init__(
         self,
         type: SignerKeyType,
-        ed25519: Optional[Uint256] = None,
-        pre_auth_tx: Optional[Uint256] = None,
-        hash_x: Optional[Uint256] = None,
-        ed25519_signed_payload: Optional[SignerKeyEd25519SignedPayload] = None,
+        ed25519: Uint256 | None = None,
+        pre_auth_tx: Uint256 | None = None,
+        hash_x: Uint256 | None = None,
+        ed25519_signed_payload: SignerKeyEd25519SignedPayload | None = None,
     ) -> None:
         self.type = type
         self.ed25519 = ed25519

@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Integer,
+)
+from .constants import *
 from .soroban_resources_ext_v0 import SorobanResourcesExtV0
 
 __all__ = ["SorobanTransactionDataExt"]
@@ -30,7 +33,7 @@ class SorobanTransactionDataExt:
     def __init__(
         self,
         v: int,
-        resource_ext: Optional[SorobanResourcesExtV0] = None,
+        resource_ext: SorobanResourcesExtV0 | None = None,
     ) -> None:
         self.v = v
         self.resource_ext = resource_ext

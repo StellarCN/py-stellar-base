@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .scp_nomination import SCPNomination
 from .scp_statement_confirm import SCPStatementConfirm
 from .scp_statement_externalize import SCPStatementExternalize
@@ -58,10 +60,10 @@ class SCPStatementPledges:
     def __init__(
         self,
         type: SCPStatementType,
-        prepare: Optional[SCPStatementPrepare] = None,
-        confirm: Optional[SCPStatementConfirm] = None,
-        externalize: Optional[SCPStatementExternalize] = None,
-        nominate: Optional[SCPNomination] = None,
+        prepare: SCPStatementPrepare | None = None,
+        confirm: SCPStatementConfirm | None = None,
+        externalize: SCPStatementExternalize | None = None,
+        nominate: SCPNomination | None = None,
     ) -> None:
         self.type = type
         self.prepare = prepare

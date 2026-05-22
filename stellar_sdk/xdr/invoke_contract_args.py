@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .sc_address import SCAddress
 from .sc_symbol import SCSymbol
 from .sc_val import SCVal
@@ -31,7 +33,7 @@ class InvokeContractArgs:
         self,
         contract_address: SCAddress,
         function_name: SCSymbol,
-        args: List[SCVal],
+        args: list[SCVal],
     ) -> None:
         _expect_max_length = 4294967295
         if args and len(args) > _expect_max_length:

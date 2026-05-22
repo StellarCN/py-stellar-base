@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .envelope_type import EnvelopeType
 from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
 from .transaction_v0_envelope import TransactionV0Envelope
@@ -35,9 +37,9 @@ class TransactionEnvelope:
     def __init__(
         self,
         type: EnvelopeType,
-        v0: Optional[TransactionV0Envelope] = None,
-        v1: Optional[TransactionV1Envelope] = None,
-        fee_bump: Optional[FeeBumpTransactionEnvelope] = None,
+        v0: TransactionV0Envelope | None = None,
+        v1: TransactionV1Envelope | None = None,
+        fee_bump: FeeBumpTransactionEnvelope | None = None,
     ) -> None:
         self.type = type
         self.v0 = v0

@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _SC_ENV_META_KIND_MAP = {0: "sc_env_meta_kind_interface_version"}
 _SC_ENV_META_KIND_REVERSE_MAP = {"sc_env_meta_kind_interface_version": 0}
 __all__ = ["SCEnvMetaKind"]

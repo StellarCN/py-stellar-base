@@ -7,8 +7,12 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Opaque
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Opaque,
+)
 from .binary_fuse_filter_type import BinaryFuseFilterType
+from .constants import *
 from .short_hash_seed import ShortHashSeed
 from .uint32 import Uint32
 

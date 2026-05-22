@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import json
 from enum import IntEnum
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
@@ -18,7 +18,7 @@ class Hashes1:
 
         typedef Hash Hashes1[12];
     """
-    def __init__(self, hashes1: List[Hash]) -> None:
+    def __init__(self, hashes1: list[Hash]) -> None:
         _expect_length = 12
         if hashes1 and len(hashes1) != _expect_length:
             raise ValueError(f"The length of `hashes1` should be {_expect_length}, but got {len(hashes1)}.")

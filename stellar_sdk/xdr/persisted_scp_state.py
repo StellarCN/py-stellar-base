@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Integer,
+)
+from .constants import *
 from .persisted_scp_state_v0 import PersistedSCPStateV0
 from .persisted_scp_state_v1 import PersistedSCPStateV1
 
@@ -31,8 +34,8 @@ class PersistedSCPState:
     def __init__(
         self,
         v: int,
-        v0: Optional[PersistedSCPStateV0] = None,
-        v1: Optional[PersistedSCPStateV1] = None,
+        v0: PersistedSCPStateV0 | None = None,
+        v1: PersistedSCPStateV1 | None = None,
     ) -> None:
         self.v = v
         self.v0 = v0

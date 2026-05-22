@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _SC_SPEC_ENTRY_KIND_MAP = {
     0: "function_v0",
     1: "udt_struct_v0",

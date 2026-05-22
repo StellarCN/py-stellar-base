@@ -7,7 +7,10 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .transaction_history_entry_ext import TransactionHistoryEntryExt
 from .transaction_set import TransactionSet
 from .uint32 import Uint32

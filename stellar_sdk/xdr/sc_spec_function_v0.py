@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, String
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    String,
+)
 from .constants import *
 from .sc_spec_function_input_v0 import SCSpecFunctionInputV0
 from .sc_spec_type_def import SCSpecTypeDef
@@ -34,8 +36,8 @@ class SCSpecFunctionV0:
         self,
         doc: bytes,
         name: SCSymbol,
-        inputs: List[SCSpecFunctionInputV0],
-        outputs: List[SCSpecTypeDef],
+        inputs: list[SCSpecFunctionInputV0],
+        outputs: list[SCSpecTypeDef],
     ) -> None:
         _expect_max_length = SC_SPEC_DOC_LIMIT
         if doc and len(doc) > _expect_max_length:

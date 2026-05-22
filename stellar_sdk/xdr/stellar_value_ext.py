@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .ledger_close_value_signature import LedgerCloseValueSignature
 from .stellar_value_type import StellarValueType
 
@@ -31,7 +33,7 @@ class StellarValueExt:
     def __init__(
         self,
         v: StellarValueType,
-        lc_value_signature: Optional[LedgerCloseValueSignature] = None,
+        lc_value_signature: LedgerCloseValueSignature | None = None,
     ) -> None:
         self.v = v
         self.lc_value_signature = lc_value_signature

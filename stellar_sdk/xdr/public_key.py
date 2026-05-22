@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .public_key_type import PublicKeyType
 from .uint256 import Uint256
 
@@ -29,7 +31,7 @@ class PublicKey:
     def __init__(
         self,
         type: PublicKeyType,
-        ed25519: Optional[Uint256] = None,
+        ed25519: Uint256 | None = None,
     ) -> None:
         self.type = type
         self.ed25519 = ed25519

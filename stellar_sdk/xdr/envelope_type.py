@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _ENVELOPE_TYPE_MAP = {
     0: "tx_v0",
     1: "scp",

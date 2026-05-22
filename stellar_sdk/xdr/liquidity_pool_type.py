@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _LIQUIDITY_POOL_TYPE_MAP = {0: "liquidity_pool_constant_product"}
 _LIQUIDITY_POOL_TYPE_REVERSE_MAP = {"liquidity_pool_constant_product": 0}
 __all__ = ["LiquidityPoolType"]

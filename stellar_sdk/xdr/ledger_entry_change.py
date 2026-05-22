@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .ledger_entry import LedgerEntry
 from .ledger_entry_change_type import LedgerEntryChangeType
 from .ledger_key import LedgerKey
@@ -38,11 +40,11 @@ class LedgerEntryChange:
     def __init__(
         self,
         type: LedgerEntryChangeType,
-        created: Optional[LedgerEntry] = None,
-        updated: Optional[LedgerEntry] = None,
-        removed: Optional[LedgerKey] = None,
-        state: Optional[LedgerEntry] = None,
-        restored: Optional[LedgerEntry] = None,
+        created: LedgerEntry | None = None,
+        updated: LedgerEntry | None = None,
+        removed: LedgerKey | None = None,
+        state: LedgerEntry | None = None,
+        restored: LedgerEntry | None = None,
     ) -> None:
         self.type = type
         self.created = created

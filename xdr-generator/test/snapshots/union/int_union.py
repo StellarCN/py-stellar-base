@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import json
 from enum import IntEnum
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
@@ -29,8 +29,8 @@ class IntUnion:
     def __init__(
         self,
         type: int,
-        error: Optional[Error] = None,
-        things: Optional[List[Multi]] = None,
+        error: Error | None = None,
+        things: list[Multi] | None = None,
     ) -> None:
         _expect_max_length = 4294967295
         if things and len(things) > _expect_max_length:

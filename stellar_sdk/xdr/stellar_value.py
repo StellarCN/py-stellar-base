@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .hash import Hash
 from .stellar_value_ext import StellarValueExt
 from .time_point import TimePoint
@@ -49,7 +51,7 @@ class StellarValue:
         self,
         tx_set_hash: Hash,
         close_time: TimePoint,
-        upgrades: List[UpgradeType],
+        upgrades: list[UpgradeType],
         ext: StellarValueExt,
     ) -> None:
         _expect_max_length = 6

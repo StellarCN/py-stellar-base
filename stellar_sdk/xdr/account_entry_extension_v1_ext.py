@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry_extension_v2 import AccountEntryExtensionV2
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Integer,
+)
+from .constants import *
 
 __all__ = ["AccountEntryExtensionV1Ext"]
 
@@ -30,7 +33,7 @@ class AccountEntryExtensionV1Ext:
     def __init__(
         self,
         v: int,
-        v2: Optional[AccountEntryExtensionV2] = None,
+        v2: AccountEntryExtensionV2 | None = None,
     ) -> None:
         self.v = v
         self.v2 = v2

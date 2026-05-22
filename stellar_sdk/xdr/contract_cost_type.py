@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _CONTRACT_COST_TYPE_MAP = {
     0: "wasminsnexec",
     1: "memalloc",

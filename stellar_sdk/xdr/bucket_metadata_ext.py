@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Integer,
+)
 from .bucket_list_type import BucketListType
+from .constants import *
 
 __all__ = ["BucketMetadataExt"]
 
@@ -30,7 +33,7 @@ class BucketMetadataExt:
     def __init__(
         self,
         v: int,
-        bucket_list_type: Optional[BucketListType] = None,
+        bucket_list_type: BucketListType | None = None,
     ) -> None:
         self.v = v
         self.bucket_list_type = bucket_list_type

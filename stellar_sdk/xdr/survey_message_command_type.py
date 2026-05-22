@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _SURVEY_MESSAGE_COMMAND_TYPE_MAP = {1: "time_sliced_survey_topology"}
 _SURVEY_MESSAGE_COMMAND_TYPE_REVERSE_MAP = {"time_sliced_survey_topology": 1}
 __all__ = ["SurveyMessageCommandType"]

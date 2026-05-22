@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import json
 from enum import IntEnum
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
@@ -23,7 +23,7 @@ class LotsOfMyStructs:
     """
     def __init__(
         self,
-        members: List[MyStruct],
+        members: list[MyStruct],
     ) -> None:
         _expect_max_length = 4294967295
         if members and len(members) > _expect_max_length:

@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _SURVEY_MESSAGE_RESPONSE_TYPE_MAP = {2: "survey_topology_response_v2"}
 _SURVEY_MESSAGE_RESPONSE_TYPE_REVERSE_MAP = {"survey_topology_response_v2": 2}
 __all__ = ["SurveyMessageResponseType"]

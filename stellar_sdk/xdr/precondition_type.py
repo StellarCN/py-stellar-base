@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _PRECONDITION_TYPE_MAP = {0: "none", 1: "time", 2: "v2"}
 _PRECONDITION_TYPE_REVERSE_MAP = {"none": 0, "time": 1, "v2": 2}
 __all__ = ["PreconditionType"]

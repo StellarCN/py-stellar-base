@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _CRYPTO_KEY_TYPE_MAP = {
     0: "ed25519",
     1: "pre_auth_tx",

@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claim_atom import ClaimAtom
+from .constants import *
 from .manage_offer_success_result_offer import ManageOfferSuccessResultOffer
 
 __all__ = ["ManageOfferSuccessResult"]
@@ -38,7 +40,7 @@ class ManageOfferSuccessResult:
 
     def __init__(
         self,
-        offers_claimed: List[ClaimAtom],
+        offers_claimed: list[ClaimAtom],
         offer: ManageOfferSuccessResultOffer,
     ) -> None:
         _expect_max_length = 4294967295

@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import json
 from enum import IntEnum
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from xdrlib3 import Packer, Unpacker
 from .base import DEFAULT_XDR_MAX_DEPTH, Integer, UnsignedInteger, Float, Double, Hyper, UnsignedHyper, Boolean, String, Opaque
 from .constants import *
@@ -25,9 +25,9 @@ class HasOptions:
     """
     def __init__(
         self,
-        first_option: Optional[int],
-        second_option: Optional[int],
-        third_option: Optional[Arr],
+        first_option: int | None,
+        second_option: int | None,
+        third_option: Arr | None,
     ) -> None:
         self.first_option = first_option
         self.second_option = second_option

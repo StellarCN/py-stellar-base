@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _HOST_FUNCTION_TYPE_MAP = {
     0: "invoke_contract",
     1: "create_contract",

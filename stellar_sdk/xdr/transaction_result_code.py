@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _TRANSACTION_RESULT_CODE_MAP = {
     1: "txfee_bump_inner_success",
     0: "txsuccess",

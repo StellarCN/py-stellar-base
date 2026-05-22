@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .scp_envelope import SCPEnvelope
 from .scp_quorum_set import SCPQuorumSet
 
@@ -29,8 +31,8 @@ class PersistedSCPStateV1:
 
     def __init__(
         self,
-        scp_envelopes: List[SCPEnvelope],
-        quorum_sets: List[SCPQuorumSet],
+        scp_envelopes: list[SCPEnvelope],
+        quorum_sets: list[SCPQuorumSet],
     ) -> None:
         _expect_max_length = 4294967295
         if scp_envelopes and len(scp_envelopes) > _expect_max_length:

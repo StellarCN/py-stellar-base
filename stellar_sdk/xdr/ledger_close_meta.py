@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Integer,
+)
+from .constants import *
 from .ledger_close_meta_v0 import LedgerCloseMetaV0
 from .ledger_close_meta_v1 import LedgerCloseMetaV1
 from .ledger_close_meta_v2 import LedgerCloseMetaV2
@@ -34,9 +37,9 @@ class LedgerCloseMeta:
     def __init__(
         self,
         v: int,
-        v0: Optional[LedgerCloseMetaV0] = None,
-        v1: Optional[LedgerCloseMetaV1] = None,
-        v2: Optional[LedgerCloseMetaV2] = None,
+        v0: LedgerCloseMetaV0 | None = None,
+        v1: LedgerCloseMetaV1 | None = None,
+        v2: LedgerCloseMetaV2 | None = None,
     ) -> None:
         self.v = v
         self.v0 = v0

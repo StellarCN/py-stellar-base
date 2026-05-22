@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .authenticated_message_v0 import AuthenticatedMessageV0
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .uint32 import Uint32
 
 __all__ = ["AuthenticatedMessage"]
@@ -34,7 +36,7 @@ class AuthenticatedMessage:
     def __init__(
         self,
         v: Uint32,
-        v0: Optional[AuthenticatedMessageV0] = None,
+        v0: AuthenticatedMessageV0 | None = None,
     ) -> None:
         self.v = v
         self.v0 = v0

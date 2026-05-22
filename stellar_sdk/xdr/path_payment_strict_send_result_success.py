@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claim_atom import ClaimAtom
+from .constants import *
 from .simple_payment_result import SimplePaymentResult
 
 __all__ = ["PathPaymentStrictSendResultSuccess"]
@@ -28,7 +30,7 @@ class PathPaymentStrictSendResultSuccess:
 
     def __init__(
         self,
-        offers: List[ClaimAtom],
+        offers: list[ClaimAtom],
         last: SimplePaymentResult,
     ) -> None:
         _expect_max_length = 4294967295

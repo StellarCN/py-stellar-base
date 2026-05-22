@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Integer
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Integer,
+)
+from .constants import *
 from .contract_code_entry_v1 import ContractCodeEntryV1
 
 __all__ = ["ContractCodeEntryExt"]
@@ -34,7 +37,7 @@ class ContractCodeEntryExt:
     def __init__(
         self,
         v: int,
-        v1: Optional[ContractCodeEntryV1] = None,
+        v1: ContractCodeEntryV1 | None = None,
     ) -> None:
         self.v = v
         self.v1 = v1

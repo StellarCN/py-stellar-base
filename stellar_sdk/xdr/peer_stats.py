@@ -7,7 +7,11 @@ import json
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, String
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    String,
+)
+from .constants import *
 from .node_id import NodeID
 from .uint64 import Uint64
 

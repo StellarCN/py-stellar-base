@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .transaction_envelope import TransactionEnvelope
 
 __all__ = ["DependentTxCluster"]
@@ -21,7 +23,7 @@ class DependentTxCluster:
         typedef TransactionEnvelope DependentTxCluster<>;
     """
 
-    def __init__(self, dependent_tx_cluster: List[TransactionEnvelope]) -> None:
+    def __init__(self, dependent_tx_cluster: list[TransactionEnvelope]) -> None:
         _expect_max_length = 4294967295
         if dependent_tx_cluster and len(dependent_tx_cluster) > _expect_max_length:
             raise ValueError(

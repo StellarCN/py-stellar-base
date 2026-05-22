@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .asset import Asset
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .contract_id_preimage_from_address import ContractIDPreimageFromAddress
 from .contract_id_preimage_type import ContractIDPreimageType
 
@@ -36,8 +38,8 @@ class ContractIDPreimage:
     def __init__(
         self,
         type: ContractIDPreimageType,
-        from_address: Optional[ContractIDPreimageFromAddress] = None,
-        from_asset: Optional[Asset] = None,
+        from_address: ContractIDPreimageFromAddress | None = None,
+        from_asset: Asset | None = None,
     ) -> None:
         self.type = type
         self.from_address = from_address

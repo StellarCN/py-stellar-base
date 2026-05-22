@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry_ext import AccountEntryExt
 from .account_id import AccountID
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .constants import *
 from .int64 import Int64
 from .sequence_number import SequenceNumber
@@ -62,11 +63,11 @@ class AccountEntry:
         balance: Int64,
         seq_num: SequenceNumber,
         num_sub_entries: Uint32,
-        inflation_dest: Optional[AccountID],
+        inflation_dest: AccountID | None,
         flags: Uint32,
         home_domain: String32,
         thresholds: Thresholds,
-        signers: List[Signer],
+        signers: list[Signer],
         ext: AccountEntryExt,
     ) -> None:
         _expect_max_length = MAX_SIGNERS
@@ -180,11 +181,9 @@ class AccountEntry:
             "balance": self.balance.to_json_dict(),
             "seq_num": self.seq_num.to_json_dict(),
             "num_sub_entries": self.num_sub_entries.to_json_dict(),
-            "inflation_dest": (
-                self.inflation_dest.to_json_dict()
-                if self.inflation_dest is not None
-                else None
-            ),
+            "inflation_dest": self.inflation_dest.to_json_dict()
+            if self.inflation_dest is not None
+            else None,
             "flags": self.flags.to_json_dict(),
             "home_domain": self.home_domain.to_json_dict(),
             "thresholds": self.thresholds.to_json_dict(),

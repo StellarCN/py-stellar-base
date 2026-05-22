@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .soroban_address_credentials import SorobanAddressCredentials
 from .soroban_credentials_type import SorobanCredentialsType
 
@@ -31,7 +33,7 @@ class SorobanCredentials:
     def __init__(
         self,
         type: SorobanCredentialsType,
-        address: Optional[SorobanAddressCredentials] = None,
+        address: SorobanAddressCredentials | None = None,
     ) -> None:
         self.type = type
         self.address = address

@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .ledger_entry_changes import LedgerEntryChanges
 from .operation_meta import OperationMeta
 
@@ -29,7 +31,7 @@ class TransactionMetaV1:
     def __init__(
         self,
         tx_changes: LedgerEntryChanges,
-        operations: List[OperationMeta],
+        operations: list[OperationMeta],
     ) -> None:
         _expect_max_length = 4294967295
         if operations and len(operations) > _expect_max_length:

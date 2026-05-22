@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .config_upgrade_set_key import ConfigUpgradeSetKey
+from .constants import *
 from .ledger_upgrade_type import LedgerUpgradeType
 from .uint32 import Uint32
 
@@ -45,13 +47,13 @@ class LedgerUpgrade:
     def __init__(
         self,
         type: LedgerUpgradeType,
-        new_ledger_version: Optional[Uint32] = None,
-        new_base_fee: Optional[Uint32] = None,
-        new_max_tx_set_size: Optional[Uint32] = None,
-        new_base_reserve: Optional[Uint32] = None,
-        new_flags: Optional[Uint32] = None,
-        new_config: Optional[ConfigUpgradeSetKey] = None,
-        new_max_soroban_tx_set_size: Optional[Uint32] = None,
+        new_ledger_version: Uint32 | None = None,
+        new_base_fee: Uint32 | None = None,
+        new_max_tx_set_size: Uint32 | None = None,
+        new_base_reserve: Uint32 | None = None,
+        new_flags: Uint32 | None = None,
+        new_config: ConfigUpgradeSetKey | None = None,
+        new_max_soroban_tx_set_size: Uint32 | None = None,
     ) -> None:
         self.type = type
         self.new_ledger_version = new_ledger_version

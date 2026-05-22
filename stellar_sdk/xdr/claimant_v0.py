@@ -8,8 +8,11 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .account_id import AccountID
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claim_predicate import ClaimPredicate
+from .constants import *
 
 __all__ = ["ClaimantV0"]
 

@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _CONTRACT_ID_PREIMAGE_TYPE_MAP = {0: "address", 1: "asset"}
 _CONTRACT_ID_PREIMAGE_TYPE_REVERSE_MAP = {"address": 0, "asset": 1}
 __all__ = ["ContractIDPreimageType"]

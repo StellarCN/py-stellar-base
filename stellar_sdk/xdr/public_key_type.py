@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _PUBLIC_KEY_TYPE_MAP = {0: "public_key_type_ed25519"}
 _PUBLIC_KEY_TYPE_REVERSE_MAP = {"public_key_type_ed25519": 0}
 __all__ = ["PublicKeyType"]

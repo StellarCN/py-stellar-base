@@ -139,10 +139,6 @@ raises-require-match-for = ["BaseException", "Exception"]
 # Re-exports in package __init__ modules (was --ignore-init-module-imports
 # under autoflake).
 "__init__.py" = ["F401"]
-# stellar_sdk/xdr/* is regenerated from xdr-generator/. Modernizing the
-# generated output here would be reverted on the next `make xdr-generate`.
-# See LINT_TODO.md for the path to updating the generator templates.
-"stellar_sdk/xdr/*" = ["UP"]
 # examples/* are illustrative scripts, not pytest tests.
 "examples/*" = ["PT"]
 

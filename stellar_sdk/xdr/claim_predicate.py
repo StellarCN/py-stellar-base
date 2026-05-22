@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claim_predicate_type import ClaimPredicateType
+from .constants import *
 from .int64 import Int64
 
 __all__ = ["ClaimPredicate"]
@@ -40,11 +42,11 @@ class ClaimPredicate:
     def __init__(
         self,
         type: ClaimPredicateType,
-        and_predicates: Optional[List["ClaimPredicate"]] = None,
-        or_predicates: Optional[List["ClaimPredicate"]] = None,
-        not_predicate: Optional[Optional["ClaimPredicate"]] = None,
-        abs_before: Optional[Int64] = None,
-        rel_before: Optional[Int64] = None,
+        and_predicates: list[ClaimPredicate] | None = None,
+        or_predicates: list[ClaimPredicate] | None = None,
+        not_predicate: ClaimPredicate | None | None = None,
+        abs_before: Int64 | None = None,
+        rel_before: Int64 | None = None,
     ) -> None:
         _expect_max_length = 2
         if and_predicates and len(and_predicates) > _expect_max_length:

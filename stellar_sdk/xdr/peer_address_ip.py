@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH, Opaque
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+    Opaque,
+)
+from .constants import *
 from .ip_addr_type import IPAddrType
 
 __all__ = ["PeerAddressIp"]
@@ -30,8 +33,8 @@ class PeerAddressIp:
     def __init__(
         self,
         type: IPAddrType,
-        ipv4: Optional[bytes] = None,
-        ipv6: Optional[bytes] = None,
+        ipv4: bytes | None = None,
+        ipv6: bytes | None = None,
     ) -> None:
         _expect_length = 4
         if ipv4 and len(ipv4) != _expect_length:

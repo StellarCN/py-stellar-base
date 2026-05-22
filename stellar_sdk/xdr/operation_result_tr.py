@@ -4,19 +4,21 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_merge_result import AccountMergeResult
 from .allow_trust_result import AllowTrustResult
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .begin_sponsoring_future_reserves_result import BeginSponsoringFutureReservesResult
 from .bump_sequence_result import BumpSequenceResult
 from .change_trust_result import ChangeTrustResult
 from .claim_claimable_balance_result import ClaimClaimableBalanceResult
 from .clawback_claimable_balance_result import ClawbackClaimableBalanceResult
 from .clawback_result import ClawbackResult
+from .constants import *
 from .create_account_result import CreateAccountResult
 from .create_claimable_balance_result import CreateClaimableBalanceResult
 from .end_sponsoring_future_reserves_result import EndSponsoringFutureReservesResult
@@ -106,41 +108,36 @@ class OperationResultTr:
     def __init__(
         self,
         type: OperationType,
-        create_account_result: Optional[CreateAccountResult] = None,
-        payment_result: Optional[PaymentResult] = None,
-        path_payment_strict_receive_result: Optional[
-            PathPaymentStrictReceiveResult
-        ] = None,
-        manage_sell_offer_result: Optional[ManageSellOfferResult] = None,
-        create_passive_sell_offer_result: Optional[ManageSellOfferResult] = None,
-        set_options_result: Optional[SetOptionsResult] = None,
-        change_trust_result: Optional[ChangeTrustResult] = None,
-        allow_trust_result: Optional[AllowTrustResult] = None,
-        account_merge_result: Optional[AccountMergeResult] = None,
-        inflation_result: Optional[InflationResult] = None,
-        manage_data_result: Optional[ManageDataResult] = None,
-        bump_seq_result: Optional[BumpSequenceResult] = None,
-        manage_buy_offer_result: Optional[ManageBuyOfferResult] = None,
-        path_payment_strict_send_result: Optional[PathPaymentStrictSendResult] = None,
-        create_claimable_balance_result: Optional[CreateClaimableBalanceResult] = None,
-        claim_claimable_balance_result: Optional[ClaimClaimableBalanceResult] = None,
-        begin_sponsoring_future_reserves_result: Optional[
-            BeginSponsoringFutureReservesResult
-        ] = None,
-        end_sponsoring_future_reserves_result: Optional[
-            EndSponsoringFutureReservesResult
-        ] = None,
-        revoke_sponsorship_result: Optional[RevokeSponsorshipResult] = None,
-        clawback_result: Optional[ClawbackResult] = None,
-        clawback_claimable_balance_result: Optional[
-            ClawbackClaimableBalanceResult
-        ] = None,
-        set_trust_line_flags_result: Optional[SetTrustLineFlagsResult] = None,
-        liquidity_pool_deposit_result: Optional[LiquidityPoolDepositResult] = None,
-        liquidity_pool_withdraw_result: Optional[LiquidityPoolWithdrawResult] = None,
-        invoke_host_function_result: Optional[InvokeHostFunctionResult] = None,
-        extend_footprint_ttl_result: Optional[ExtendFootprintTTLResult] = None,
-        restore_footprint_result: Optional[RestoreFootprintResult] = None,
+        create_account_result: CreateAccountResult | None = None,
+        payment_result: PaymentResult | None = None,
+        path_payment_strict_receive_result: PathPaymentStrictReceiveResult
+        | None = None,
+        manage_sell_offer_result: ManageSellOfferResult | None = None,
+        create_passive_sell_offer_result: ManageSellOfferResult | None = None,
+        set_options_result: SetOptionsResult | None = None,
+        change_trust_result: ChangeTrustResult | None = None,
+        allow_trust_result: AllowTrustResult | None = None,
+        account_merge_result: AccountMergeResult | None = None,
+        inflation_result: InflationResult | None = None,
+        manage_data_result: ManageDataResult | None = None,
+        bump_seq_result: BumpSequenceResult | None = None,
+        manage_buy_offer_result: ManageBuyOfferResult | None = None,
+        path_payment_strict_send_result: PathPaymentStrictSendResult | None = None,
+        create_claimable_balance_result: CreateClaimableBalanceResult | None = None,
+        claim_claimable_balance_result: ClaimClaimableBalanceResult | None = None,
+        begin_sponsoring_future_reserves_result: BeginSponsoringFutureReservesResult
+        | None = None,
+        end_sponsoring_future_reserves_result: EndSponsoringFutureReservesResult
+        | None = None,
+        revoke_sponsorship_result: RevokeSponsorshipResult | None = None,
+        clawback_result: ClawbackResult | None = None,
+        clawback_claimable_balance_result: ClawbackClaimableBalanceResult | None = None,
+        set_trust_line_flags_result: SetTrustLineFlagsResult | None = None,
+        liquidity_pool_deposit_result: LiquidityPoolDepositResult | None = None,
+        liquidity_pool_withdraw_result: LiquidityPoolWithdrawResult | None = None,
+        invoke_host_function_result: InvokeHostFunctionResult | None = None,
+        extend_footprint_ttl_result: ExtendFootprintTTLResult | None = None,
+        restore_footprint_result: RestoreFootprintResult | None = None,
     ) -> None:
         self.type = type
         self.create_account_result = create_account_result

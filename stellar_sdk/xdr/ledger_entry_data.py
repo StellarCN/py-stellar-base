@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
 from .account_entry import AccountEntry
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .claimable_balance_entry import ClaimableBalanceEntry
 from .config_setting_entry import ConfigSettingEntry
+from .constants import *
 from .contract_code_entry import ContractCodeEntry
 from .contract_data_entry import ContractDataEntry
 from .data_entry import DataEntry
@@ -56,16 +58,16 @@ class LedgerEntryData:
     def __init__(
         self,
         type: LedgerEntryType,
-        account: Optional[AccountEntry] = None,
-        trust_line: Optional[TrustLineEntry] = None,
-        offer: Optional[OfferEntry] = None,
-        data: Optional[DataEntry] = None,
-        claimable_balance: Optional[ClaimableBalanceEntry] = None,
-        liquidity_pool: Optional[LiquidityPoolEntry] = None,
-        contract_data: Optional[ContractDataEntry] = None,
-        contract_code: Optional[ContractCodeEntry] = None,
-        config_setting: Optional[ConfigSettingEntry] = None,
-        ttl: Optional[TTLEntry] = None,
+        account: AccountEntry | None = None,
+        trust_line: TrustLineEntry | None = None,
+        offer: OfferEntry | None = None,
+        data: DataEntry | None = None,
+        claimable_balance: ClaimableBalanceEntry | None = None,
+        liquidity_pool: LiquidityPoolEntry | None = None,
+        contract_data: ContractDataEntry | None = None,
+        contract_code: ContractCodeEntry | None = None,
+        config_setting: ConfigSettingEntry | None = None,
+        ttl: TTLEntry | None = None,
     ) -> None:
         self.type = type
         self.account = account

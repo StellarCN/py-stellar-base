@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _BUCKET_LIST_TYPE_MAP = {0: "live", 1: "hot_archive"}
 _BUCKET_LIST_TYPE_REVERSE_MAP = {"live": 0, "hot_archive": 1}
 __all__ = ["BucketListType"]

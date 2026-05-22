@@ -8,6 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
+from .constants import *
+
 _CONTRACT_EXECUTABLE_TYPE_MAP = {0: "wasm", 1: "stellar_asset"}
 _CONTRACT_EXECUTABLE_TYPE_REVERSE_MAP = {"wasm": 0, "stellar_asset": 1}
 __all__ = ["ContractExecutableType"]

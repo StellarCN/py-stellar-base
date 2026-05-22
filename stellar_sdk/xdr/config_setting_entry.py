@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List, Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
 from .config_setting_contract_bandwidth_v0 import ConfigSettingContractBandwidthV0
 from .config_setting_contract_compute_v0 import ConfigSettingContractComputeV0
 from .config_setting_contract_events_v0 import ConfigSettingContractEventsV0
@@ -27,6 +28,7 @@ from .config_setting_contract_parallel_compute_v0 import (
 )
 from .config_setting_id import ConfigSettingID
 from .config_setting_scp_timing import ConfigSettingSCPTiming
+from .constants import *
 from .contract_cost_params import ContractCostParams
 from .eviction_iterator import EvictionIterator
 from .freeze_bypass_txs import FreezeBypassTxs
@@ -94,33 +96,27 @@ class ConfigSettingEntry:
     def __init__(
         self,
         config_setting_id: ConfigSettingID,
-        contract_max_size_bytes: Optional[Uint32] = None,
-        contract_compute: Optional[ConfigSettingContractComputeV0] = None,
-        contract_ledger_cost: Optional[ConfigSettingContractLedgerCostV0] = None,
-        contract_historical_data: Optional[
-            ConfigSettingContractHistoricalDataV0
-        ] = None,
-        contract_events: Optional[ConfigSettingContractEventsV0] = None,
-        contract_bandwidth: Optional[ConfigSettingContractBandwidthV0] = None,
-        contract_cost_params_cpu_insns: Optional[ContractCostParams] = None,
-        contract_cost_params_mem_bytes: Optional[ContractCostParams] = None,
-        contract_data_key_size_bytes: Optional[Uint32] = None,
-        contract_data_entry_size_bytes: Optional[Uint32] = None,
-        state_archival_settings: Optional[StateArchivalSettings] = None,
-        contract_execution_lanes: Optional[
-            ConfigSettingContractExecutionLanesV0
-        ] = None,
-        live_soroban_state_size_window: Optional[List[Uint64]] = None,
-        eviction_iterator: Optional[EvictionIterator] = None,
-        contract_parallel_compute: Optional[
-            ConfigSettingContractParallelComputeV0
-        ] = None,
-        contract_ledger_cost_ext: Optional[ConfigSettingContractLedgerCostExtV0] = None,
-        contract_scp_timing: Optional[ConfigSettingSCPTiming] = None,
-        frozen_ledger_keys: Optional[FrozenLedgerKeys] = None,
-        frozen_ledger_keys_delta: Optional[FrozenLedgerKeysDelta] = None,
-        freeze_bypass_txs: Optional[FreezeBypassTxs] = None,
-        freeze_bypass_txs_delta: Optional[FreezeBypassTxsDelta] = None,
+        contract_max_size_bytes: Uint32 | None = None,
+        contract_compute: ConfigSettingContractComputeV0 | None = None,
+        contract_ledger_cost: ConfigSettingContractLedgerCostV0 | None = None,
+        contract_historical_data: ConfigSettingContractHistoricalDataV0 | None = None,
+        contract_events: ConfigSettingContractEventsV0 | None = None,
+        contract_bandwidth: ConfigSettingContractBandwidthV0 | None = None,
+        contract_cost_params_cpu_insns: ContractCostParams | None = None,
+        contract_cost_params_mem_bytes: ContractCostParams | None = None,
+        contract_data_key_size_bytes: Uint32 | None = None,
+        contract_data_entry_size_bytes: Uint32 | None = None,
+        state_archival_settings: StateArchivalSettings | None = None,
+        contract_execution_lanes: ConfigSettingContractExecutionLanesV0 | None = None,
+        live_soroban_state_size_window: list[Uint64] | None = None,
+        eviction_iterator: EvictionIterator | None = None,
+        contract_parallel_compute: ConfigSettingContractParallelComputeV0 | None = None,
+        contract_ledger_cost_ext: ConfigSettingContractLedgerCostExtV0 | None = None,
+        contract_scp_timing: ConfigSettingSCPTiming | None = None,
+        frozen_ledger_keys: FrozenLedgerKeys | None = None,
+        frozen_ledger_keys_delta: FrozenLedgerKeysDelta | None = None,
+        freeze_bypass_txs: FreezeBypassTxs | None = None,
+        freeze_bypass_txs_delta: FreezeBypassTxsDelta | None = None,
     ) -> None:
         _expect_max_length = 4294967295
         if (

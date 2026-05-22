@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .sc_spec_type_def import SCSpecTypeDef
 
 __all__ = ["SCSpecTypeTuple"]
@@ -26,7 +28,7 @@ class SCSpecTypeTuple:
 
     def __init__(
         self,
-        value_types: List[SCSpecTypeDef],
+        value_types: list[SCSpecTypeDef],
     ) -> None:
         _expect_max_length = 12
         if value_types and len(value_types) > _expect_max_length:

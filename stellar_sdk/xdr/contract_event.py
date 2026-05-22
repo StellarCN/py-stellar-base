@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Optional
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .contract_event_body import ContractEventBody
 from .contract_event_type import ContractEventType
 from .contract_id import ContractID
@@ -46,7 +48,7 @@ class ContractEvent:
     def __init__(
         self,
         ext: ExtensionPoint,
-        contract_id: Optional[ContractID],
+        contract_id: ContractID | None,
         type: ContractEventType,
         body: ContractEventBody,
     ) -> None:
@@ -119,11 +121,9 @@ class ContractEvent:
     def to_json_dict(self) -> dict:
         return {
             "ext": self.ext.to_json_dict(),
-            "contract_id": (
-                self.contract_id.to_json_dict()
-                if self.contract_id is not None
-                else None
-            ),
+            "contract_id": self.contract_id.to_json_dict()
+            if self.contract_id is not None
+            else None,
             "type": self.type.to_json_dict(),
             "body": self.body.to_json_dict(),
         }

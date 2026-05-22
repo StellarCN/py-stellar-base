@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import List
 
 from xdrlib3 import Packer, Unpacker
 
-from .base import DEFAULT_XDR_MAX_DEPTH
+from .base import (
+    DEFAULT_XDR_MAX_DEPTH,
+)
+from .constants import *
 from .ledger_scp_messages import LedgerSCPMessages
 from .scp_quorum_set import SCPQuorumSet
 
@@ -28,7 +30,7 @@ class SCPHistoryEntryV0:
 
     def __init__(
         self,
-        quorum_sets: List[SCPQuorumSet],
+        quorum_sets: list[SCPQuorumSet],
         ledger_messages: LedgerSCPMessages,
     ) -> None:
         _expect_max_length = 4294967295
