@@ -342,10 +342,13 @@ class AssembledTransactionAsync(Generic[T]):
         address: Address | str | Keypair | AuthorizationSigner | None,
         signer: Keypair | AuthorizationSigner | None,
     ) -> tuple[Address | str | None, Keypair | AuthorizationSigner]:
-        if signer is None and address is not None:
-            if isinstance(address, Keypair) or callable(address):
-                signer = cast(Keypair | AuthorizationSigner, address)
-                address = None
+        if (
+            signer is None
+            and address is not None
+            and (isinstance(address, Keypair) or callable(address))
+        ):
+            signer = cast(Keypair | AuthorizationSigner, address)
+            address = None
 
         if signer is None:
             raise ValueError("`signer` is required.")
