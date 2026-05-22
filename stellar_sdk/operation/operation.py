@@ -102,7 +102,7 @@ class Operation(metaclass=ABCMeta):
             subclass) instance from.
         """
         for sub_cls in cls.__subclasses__():
-            if sub_cls._XDR_OPERATION_TYPE == xdr_object.body.type:
+            if xdr_object.body.type == sub_cls._XDR_OPERATION_TYPE:
                 return sub_cls.from_xdr_object(xdr_object)
         raise NotImplementedError(
             f"Operation of type={xdr_object.body.type} is not implemented."

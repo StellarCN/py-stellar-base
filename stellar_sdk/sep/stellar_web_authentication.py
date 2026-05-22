@@ -615,18 +615,14 @@ def _verify_transaction_signatures(
 def _verify_te_signed_by_account_id(
     transaction_envelope: TransactionEnvelope, account_id: str
 ) -> bool:
-    signers_found = _verify_transaction_signatures(
-        transaction_envelope, [Ed25519PublicKeySigner(account_id)]
+    return bool(
+        _verify_transaction_signatures(
+            transaction_envelope, [Ed25519PublicKeySigner(account_id)]
+        )
     )
-    if not signers_found:
-        return False
-    return True
 
 
 def _signer_in_signers(
     signer: Ed25519PublicKeySigner, signers: Sequence[Ed25519PublicKeySigner]
 ) -> bool:
-    for s in signers:
-        if s.account_id == signer.account_id:
-            return True
-    return False
+    return any(s.account_id == signer.account_id for s in signers)

@@ -115,7 +115,7 @@ exclude_lines = [
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["F", "I", "E", "W", "C4", "PIE", "RUF", "UP", "B"]
+select = ["F", "I", "E", "W", "C4", "PIE", "RUF", "UP", "B", "SIM"]
 ignore = [
     # Star imports are used both in package __init__ re-exports and in a
     # handful of test files; suppress globally rather than per-file.

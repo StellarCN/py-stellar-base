@@ -259,12 +259,10 @@ class Transaction:
     def is_soroban_transaction(self) -> bool:
         if len(self.operations) != 1:
             return False
-        if not isinstance(
+        return isinstance(
             self.operations[0],
             (RestoreFootprint, InvokeHostFunction, ExtendFootprintTTL),
-        ):
-            return False
-        return True
+        )
 
     def __hash__(self):
         return hash(

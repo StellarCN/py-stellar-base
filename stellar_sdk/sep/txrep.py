@@ -150,7 +150,7 @@ def from_txrep(
     """
     raw_data_map = _get_raw_data_map(txrep)
     tx_type = _EnvelopeType(_get_value(raw_data_map, "type"))
-    is_fee_bump = True if tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP else False
+    is_fee_bump = tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP
 
     prefix = "feeBump.tx.innerTx.tx." if is_fee_bump else "tx."
 
@@ -164,11 +164,7 @@ def from_txrep(
     prefix = "feeBump.tx.innerTx." if is_fee_bump else ""
     transaction_signatures = _get_signatures(raw_data_map, prefix)
 
-    v1 = (
-        False
-        if not is_fee_bump and tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_V0
-        else True
-    )
+    v1 = not (not is_fee_bump and tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_V0)
     transaction = Transaction(
         source=source,
         sequence=sequence,
@@ -718,7 +714,7 @@ def _get_change_trust_op(
     source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> ChangeTrust:
     # Keep compatibility
-    line_type = raw_data_map.get(f"{operation_prefix}line.type", None)
+    line_type = raw_data_map.get(f"{operation_prefix}line.type")
     if line_type == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE.name:
         asset_a = _get_asset(
             raw_data_map, f"{operation_prefix}line.liquidityPool.constantProduct.assetA"
@@ -969,14 +965,8 @@ def _get_set_trust_line_flags_op(
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
     clear_flags_raw = _get_int_value(raw_data_map, f"{operation_prefix}clearFlags")
     set_flags_raw = _get_int_value(raw_data_map, f"{operation_prefix}setFlags")
-    if clear_flags_raw == 0:
-        clear_flags = None
-    else:
-        clear_flags = TrustLineFlags(clear_flags_raw)
-    if set_flags_raw == 0:
-        set_flags = None
-    else:
-        set_flags = TrustLineFlags(set_flags_raw)
+    clear_flags = None if clear_flags_raw == 0 else TrustLineFlags(clear_flags_raw)
+    set_flags = None if set_flags_raw == 0 else TrustLineFlags(set_flags_raw)
     return SetTrustLineFlags(
         trustor=trustor,
         asset=asset,
@@ -1261,7 +1251,7 @@ def _add_operation(
         operation_type = operation.__class__.__name__
         key = f"body.{_to_camel_case(operation_type)}Op.{key}"
         if optional:
-            present = True if value is not None else False
+            present = value is not None
             add_operation_line(f"{key}._present", _true if present else _false)
             if present:
                 assert value is not None
@@ -1697,11 +1687,7 @@ def _to_amount(amount: Decimal | str) -> int:
 
 
 def _to_price(price: Price | str | Decimal) -> Price:
-    if isinstance(price, Price):
-        price_fraction = price
-    else:
-        price_fraction = Price.from_raw_price(price)
-    return price_fraction
+    return price if isinstance(price, Price) else Price.from_raw_price(price)
 
 
 def _to_camel_case(cap_words: str) -> str:

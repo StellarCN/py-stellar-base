@@ -1,3 +1,4 @@
+import contextlib
 from json import JSONDecodeError
 
 from .client.response import Response
@@ -97,10 +98,8 @@ class BaseHorizonError(BaseRequestError):
         self.status: int = response.status_code
 
         message = {}
-        try:
+        with contextlib.suppress(JSONDecodeError):  # pragma: no cover
             message = response.json()
-        except JSONDecodeError:
-            pass  # pragma: no cover
         self.type: str | None = message.get("type")
         self.title: str | None = message.get("title")
         self.detail: str | None = message.get("detail")
