@@ -98,7 +98,7 @@ class BaseHorizonError(BaseRequestError):
         self.status: int = response.status_code
 
         message = {}
-        with contextlib.suppress(JSONDecodeError):  # pragma: no cover
+        with contextlib.suppress(JSONDecodeError):
             message = response.json()
         self.type: str | None = message.get("type")
         self.title: str | None = message.get("title")
@@ -232,7 +232,7 @@ class ContentSizeLimitExceededError(BaseRequestError):
 def raise_request_exception(response: Response) -> None:
     status_code = response.status_code
     if 200 <= status_code < 300:
-        pass  # pragma: no cover
+        pass
     elif status_code == 404:
         raise NotFoundError(response)
     elif 400 <= status_code < 500:
