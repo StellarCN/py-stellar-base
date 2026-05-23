@@ -57,11 +57,11 @@ class Memo(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def __hash__(self) -> int:
-        pass  # pragma: no cover
+        pass
 
     @abc.abstractmethod
     def __eq__(self, other: object) -> bool:
-        pass  # pragma: no cover
+        pass
 
 
 class NoneMemo(Memo):

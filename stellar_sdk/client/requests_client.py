@@ -232,7 +232,7 @@ class RequestsClient(BaseSyncClient):
                                 yield json.loads(data)
                         except json.JSONDecodeError:
                             # Content was not json-decodable
-                            pass  # pragma: no cover
+                            pass
             except requests.Timeout:
                 logger.warning(
                     f"We have encountered an timeout error and we will try to reconnect, cursor = {query_params.get('cursor')}"
