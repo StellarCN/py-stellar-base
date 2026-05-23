@@ -8,7 +8,7 @@ Created: 2018-08-31
 
 import json
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from enum import Enum
 
@@ -1670,7 +1670,7 @@ def _to_asset(asset: Asset | LiquidityPoolAsset | LiquidityPoolId) -> str:
 
 
 def _to_readable_utc_time_comment(timestamp: int) -> str:
-    utc_time = datetime.utcfromtimestamp(timestamp)
+    utc_time = datetime.fromtimestamp(timestamp, timezone.utc)
     return utc_time.strftime("%Y-%m-%d %H:%M:%S.%f+00:00 (UTC)")
 
 
