@@ -139,11 +139,11 @@ class BaseTransactionEnvelope(Generic[T]):
 
     @abstractmethod
     def __hash__(self) -> int:
-        pass  # pragma: no cover
+        pass
 
     @abstractmethod
     def __eq__(self, other: object) -> bool:
-        pass  # pragma: no cover
+        pass
 
     def __repr__(self):
         return (

@@ -92,7 +92,7 @@ class BaseCallBuilder:
 
     def _add_query_param(self, key: str, value: str | float | int | bool | None):
         if value is None:
-            pass  # pragma: no cover
+            pass
         elif value is True:
             self.params[key] = "true"
         elif value is False:

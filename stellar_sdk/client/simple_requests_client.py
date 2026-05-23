@@ -92,10 +92,10 @@ class SimpleRequestsClient(BaseSyncClient):
         :param params: the request params
         :return: None
         """
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError
 
     def close(self):
-        pass  # pragma: no cover
+        pass
 
     def __repr__(self):
         return "<SimpleRequestsClient>"
