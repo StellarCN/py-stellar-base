@@ -81,7 +81,7 @@ class Operation(metaclass=ABCMeta):
 
     @abstractmethod
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        pass  # pragma: no cover
+        pass
 
     def to_xdr_object(self) -> stellar_xdr.Operation:
         """Creates an XDR Operation object that represents this
