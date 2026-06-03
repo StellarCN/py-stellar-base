@@ -2,6 +2,12 @@ Release History
 ===============
 
 ### Pending
+
+### Version 14.0.0
+
+Released on June 03, 2026
+
+#### Update
 - Add SEP-46 contract metadata, SEP-47 contract interface discovery, and SEP-48 contract interface specification introspection APIs for Soroban contract Wasm, including `ContractMeta`, `ContractSpec`, `ContractInfo`, and `SorobanServer[Async].get_contract_*` helpers.
 - Add an Agent Skills compatible `stellar-sdk` skill with Claude Code plugin marketplace metadata and topic references for transactions, Horizon, Soroban, XDR/SCVal, async workflows, SEP integrations, security, and troubleshooting.
 
