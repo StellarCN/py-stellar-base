@@ -4,17 +4,19 @@ from __future__ import annotations
 
 import base64
 import json
-from enum import IntEnum
-from typing import TYPE_CHECKING
-from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH
 
+from xdrlib3 import Packer, Unpacker
+
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
 from .int64 import Int64
-from .uint32 import Uint32
 from .sc_address import SCAddress
 from .soroban_authorized_invocation import SorobanAuthorizedInvocation
-__all__ = ['HashIDPreimageSorobanAuthorizationWithAddress']
+from .uint32 import Uint32
+
+__all__ = ["HashIDPreimageSorobanAuthorizationWithAddress"]
+
+
 class HashIDPreimageSorobanAuthorizationWithAddress:
     """
     XDR Source Code::
@@ -28,6 +30,7 @@ class HashIDPreimageSorobanAuthorizationWithAddress:
                 SorobanAuthorizedInvocation invocation;
             }
     """
+
     def __init__(
         self,
         network_id: Hash,
@@ -41,14 +44,18 @@ class HashIDPreimageSorobanAuthorizationWithAddress:
         self.signature_expiration_ledger = signature_expiration_ledger
         self.address = address
         self.invocation = invocation
+
     def pack(self, packer: Packer) -> None:
         self.network_id.pack(packer)
         self.nonce.pack(packer)
         self.signature_expiration_ledger.pack(packer)
         self.address.pack(packer)
         self.invocation.pack(packer)
+
     @classmethod
-    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> HashIDPreimageSorobanAuthorizationWithAddress:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> HashIDPreimageSorobanAuthorizationWithAddress:
         if depth_limit <= 0:
             raise ValueError("Maximum decoding depth reached")
         network_id = Hash.unpack(unpacker, depth_limit - 1)
@@ -63,13 +70,16 @@ class HashIDPreimageSorobanAuthorizationWithAddress:
             address=address,
             invocation=invocation,
         )
+
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
         self.pack(packer)
         return packer.get_buffer()
 
     @classmethod
-    def from_xdr_bytes(cls, xdr: bytes) -> HashIDPreimageSorobanAuthorizationWithAddress:
+    def from_xdr_bytes(
+        cls, xdr: bytes
+    ) -> HashIDPreimageSorobanAuthorizationWithAddress:
         unpacker = Unpacker(xdr)
         result = cls.unpack(unpacker)
         remaining = len(xdr) - unpacker.get_position()
@@ -92,6 +102,7 @@ class HashIDPreimageSorobanAuthorizationWithAddress:
     @classmethod
     def from_json(cls, json_str: str) -> HashIDPreimageSorobanAuthorizationWithAddress:
         return cls.from_json_dict(json.loads(json_str))
+
     def to_json_dict(self) -> dict:
         return {
             "network_id": self.network_id.to_json_dict(),
@@ -100,11 +111,16 @@ class HashIDPreimageSorobanAuthorizationWithAddress:
             "address": self.address.to_json_dict(),
             "invocation": self.invocation.to_json_dict(),
         }
+
     @classmethod
-    def from_json_dict(cls, json_dict: dict) -> HashIDPreimageSorobanAuthorizationWithAddress:
+    def from_json_dict(
+        cls, json_dict: dict
+    ) -> HashIDPreimageSorobanAuthorizationWithAddress:
         network_id = Hash.from_json_dict(json_dict["network_id"])
         nonce = Int64.from_json_dict(json_dict["nonce"])
-        signature_expiration_ledger = Uint32.from_json_dict(json_dict["signature_expiration_ledger"])
+        signature_expiration_ledger = Uint32.from_json_dict(
+            json_dict["signature_expiration_ledger"]
+        )
         address = SCAddress.from_json_dict(json_dict["address"])
         invocation = SorobanAuthorizedInvocation.from_json_dict(json_dict["invocation"])
         return cls(
@@ -114,18 +130,35 @@ class HashIDPreimageSorobanAuthorizationWithAddress:
             address=address,
             invocation=invocation,
         )
+
     def __hash__(self):
-        return hash((self.network_id, self.nonce, self.signature_expiration_ledger, self.address, self.invocation,))
+        return hash(
+            (
+                self.network_id,
+                self.nonce,
+                self.signature_expiration_ledger,
+                self.address,
+                self.invocation,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.network_id == other.network_id and self.nonce == other.nonce and self.signature_expiration_ledger == other.signature_expiration_ledger and self.address == other.address and self.invocation == other.invocation
+        return (
+            self.network_id == other.network_id
+            and self.nonce == other.nonce
+            and self.signature_expiration_ledger == other.signature_expiration_ledger
+            and self.address == other.address
+            and self.invocation == other.invocation
+        )
+
     def __repr__(self):
         out = [
-            f'network_id={self.network_id}',
-            f'nonce={self.nonce}',
-            f'signature_expiration_ledger={self.signature_expiration_ledger}',
-            f'address={self.address}',
-            f'invocation={self.invocation}',
+            f"network_id={self.network_id}",
+            f"nonce={self.nonce}",
+            f"signature_expiration_ledger={self.signature_expiration_ledger}",
+            f"address={self.address}",
+            f"invocation={self.invocation}",
         ]
         return f"<HashIDPreimageSorobanAuthorizationWithAddress [{', '.join(out)}]>"
