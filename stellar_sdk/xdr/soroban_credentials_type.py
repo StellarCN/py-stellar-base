@@ -8,8 +8,18 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-_SOROBAN_CREDENTIALS_TYPE_MAP = {0: "source_account", 1: "address"}
-_SOROBAN_CREDENTIALS_TYPE_REVERSE_MAP = {"source_account": 0, "address": 1}
+_SOROBAN_CREDENTIALS_TYPE_MAP = {
+    0: "source_account",
+    1: "address",
+    2: "address_v2",
+    3: "address_with_delegates",
+}
+_SOROBAN_CREDENTIALS_TYPE_REVERSE_MAP = {
+    "source_account": 0,
+    "address": 1,
+    "address_v2": 2,
+    "address_with_delegates": 3,
+}
 __all__ = ["SorobanCredentialsType"]
 
 
@@ -20,12 +30,16 @@ class SorobanCredentialsType(IntEnum):
         enum SorobanCredentialsType
         {
             SOROBAN_CREDENTIALS_SOURCE_ACCOUNT = 0,
-            SOROBAN_CREDENTIALS_ADDRESS = 1
+            SOROBAN_CREDENTIALS_ADDRESS = 1,
+            SOROBAN_CREDENTIALS_ADDRESS_V2 = 2,
+            SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES = 3
         };
     """
 
     SOROBAN_CREDENTIALS_SOURCE_ACCOUNT = 0
     SOROBAN_CREDENTIALS_ADDRESS = 1
+    SOROBAN_CREDENTIALS_ADDRESS_V2 = 2
+    SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES = 3
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update
+- chore: upgrade generated XDR definitions to Protocol 27.
+
 ### Version 14.0.0
 
 Released on June 03, 2026

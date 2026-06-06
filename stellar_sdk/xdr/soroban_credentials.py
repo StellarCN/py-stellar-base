@@ -9,6 +9,9 @@ from xdrlib3 import Packer, Unpacker
 
 from .base import DEFAULT_XDR_MAX_DEPTH
 from .soroban_address_credentials import SorobanAddressCredentials
+from .soroban_address_credentials_with_delegates import (
+    SorobanAddressCredentialsWithDelegates,
+)
 from .soroban_credentials_type import SorobanCredentialsType
 
 __all__ = ["SorobanCredentials"]
@@ -24,6 +27,10 @@ class SorobanCredentials:
             void;
         case SOROBAN_CREDENTIALS_ADDRESS:
             SorobanAddressCredentials address;
+        case SOROBAN_CREDENTIALS_ADDRESS_V2:
+            SorobanAddressCredentials addressV2;
+        case SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES:
+            SorobanAddressCredentialsWithDelegates addressWithDelegates;
         };
     """
 
@@ -31,9 +38,13 @@ class SorobanCredentials:
         self,
         type: SorobanCredentialsType,
         address: SorobanAddressCredentials | None = None,
+        address_v2: SorobanAddressCredentials | None = None,
+        address_with_delegates: SorobanAddressCredentialsWithDelegates | None = None,
     ) -> None:
         self.type = type
         self.address = address
+        self.address_v2 = address_v2
+        self.address_with_delegates = address_with_delegates
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -43,6 +54,19 @@ class SorobanCredentials:
             if self.address is None:
                 raise ValueError("address should not be None.")
             self.address.pack(packer)
+            return
+        if self.type == SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2:
+            if self.address_v2 is None:
+                raise ValueError("address_v2 should not be None.")
+            self.address_v2.pack(packer)
+            return
+        if (
+            self.type
+            == SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES
+        ):
+            if self.address_with_delegates is None:
+                raise ValueError("address_with_delegates should not be None.")
+            self.address_with_delegates.pack(packer)
             return
         raise ValueError("Invalid type.")
 
@@ -58,6 +82,14 @@ class SorobanCredentials:
         if type == SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS:
             address = SorobanAddressCredentials.unpack(unpacker, depth_limit - 1)
             return cls(type=type, address=address)
+        if type == SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2:
+            address_v2 = SorobanAddressCredentials.unpack(unpacker, depth_limit - 1)
+            return cls(type=type, address_v2=address_v2)
+        if type == SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES:
+            address_with_delegates = SorobanAddressCredentialsWithDelegates.unpack(
+                unpacker, depth_limit - 1
+            )
+            return cls(type=type, address_with_delegates=address_with_delegates)
         raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
@@ -96,6 +128,17 @@ class SorobanCredentials:
         if self.type == SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS:
             assert self.address is not None
             return {"address": self.address.to_json_dict()}
+        if self.type == SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2:
+            assert self.address_v2 is not None
+            return {"address_v2": self.address_v2.to_json_dict()}
+        if (
+            self.type
+            == SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES
+        ):
+            assert self.address_with_delegates is not None
+            return {
+                "address_with_delegates": self.address_with_delegates.to_json_dict()
+            }
         raise ValueError(f"Unknown type in SorobanCredentials: {self.type}")
 
     @classmethod
@@ -116,6 +159,18 @@ class SorobanCredentials:
         if key == "address":
             address = SorobanAddressCredentials.from_json_dict(json_value["address"])
             return cls(type=type, address=address)
+        if key == "address_v2":
+            address_v2 = SorobanAddressCredentials.from_json_dict(
+                json_value["address_v2"]
+            )
+            return cls(type=type, address_v2=address_v2)
+        if key == "address_with_delegates":
+            address_with_delegates = (
+                SorobanAddressCredentialsWithDelegates.from_json_dict(
+                    json_value["address_with_delegates"]
+                )
+            )
+            return cls(type=type, address_with_delegates=address_with_delegates)
         raise ValueError(f"Unknown key '{key}' for SorobanCredentials")
 
     def __hash__(self):
@@ -123,17 +178,28 @@ class SorobanCredentials:
             (
                 self.type,
                 self.address,
+                self.address_v2,
+                self.address_with_delegates,
             )
         )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.address == other.address
+        return (
+            self.type == other.type
+            and self.address == other.address
+            and self.address_v2 == other.address_v2
+            and self.address_with_delegates == other.address_with_delegates
+        )
 
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         if self.address is not None:
             out.append(f"address={self.address}")
+        if self.address_v2 is not None:
+            out.append(f"address_v2={self.address_v2}")
+        if self.address_with_delegates is not None:
+            out.append(f"address_with_delegates={self.address_with_delegates}")
         return f"<SorobanCredentials [{', '.join(out)}]>"
