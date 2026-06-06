@@ -150,6 +150,7 @@ from .hash_id_preimage_contract_id import *
 from .hash_id_preimage_operation_id import *
 from .hash_id_preimage_revoke_id import *
 from .hash_id_preimage_soroban_authorization import *
+from .hash_id_preimage_soroban_authorization_with_address import *
 from .hello import *
 from .hmac_sha256_key import *
 from .hmac_sha256_mac import *
@@ -375,6 +376,7 @@ from .signer_key_ed25519_signed_payload import *
 from .signer_key_type import *
 from .simple_payment_result import *
 from .soroban_address_credentials import *
+from .soroban_address_credentials_with_delegates import *
 from .soroban_authorization_entries import *
 from .soroban_authorization_entry import *
 from .soroban_authorized_function import *
@@ -382,6 +384,7 @@ from .soroban_authorized_function_type import *
 from .soroban_authorized_invocation import *
 from .soroban_credentials import *
 from .soroban_credentials_type import *
+from .soroban_delegate_signature import *
 from .soroban_resources import *
 from .soroban_resources_ext_v0 import *
 from .soroban_transaction_data import *

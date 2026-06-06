@@ -13,6 +13,9 @@ from .hash_id_preimage_contract_id import HashIDPreimageContractID
 from .hash_id_preimage_operation_id import HashIDPreimageOperationID
 from .hash_id_preimage_revoke_id import HashIDPreimageRevokeID
 from .hash_id_preimage_soroban_authorization import HashIDPreimageSorobanAuthorization
+from .hash_id_preimage_soroban_authorization_with_address import (
+    HashIDPreimageSorobanAuthorizationWithAddress,
+)
 
 __all__ = ["HashIDPreimage"]
 
@@ -53,6 +56,15 @@ class HashIDPreimage:
                 uint32 signatureExpirationLedger;
                 SorobanAuthorizedInvocation invocation;
             } sorobanAuthorization;
+        case ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS:
+            struct
+            {
+                Hash networkID;
+                int64 nonce;
+                uint32 signatureExpirationLedger;
+                SCAddress address;
+                SorobanAuthorizedInvocation invocation;
+            } sorobanAuthorizationWithAddress;
         };
     """
 
@@ -63,12 +75,15 @@ class HashIDPreimage:
         revoke_id: HashIDPreimageRevokeID | None = None,
         contract_id: HashIDPreimageContractID | None = None,
         soroban_authorization: HashIDPreimageSorobanAuthorization | None = None,
+        soroban_authorization_with_address: HashIDPreimageSorobanAuthorizationWithAddress
+        | None = None,
     ) -> None:
         self.type = type
         self.operation_id = operation_id
         self.revoke_id = revoke_id
         self.contract_id = contract_id
         self.soroban_authorization = soroban_authorization
+        self.soroban_authorization_with_address = soroban_authorization_with_address
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -91,6 +106,13 @@ class HashIDPreimage:
             if self.soroban_authorization is None:
                 raise ValueError("soroban_authorization should not be None.")
             self.soroban_authorization.pack(packer)
+            return
+        if self.type == EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS:
+            if self.soroban_authorization_with_address is None:
+                raise ValueError(
+                    "soroban_authorization_with_address should not be None."
+                )
+            self.soroban_authorization_with_address.pack(packer)
             return
         raise ValueError("Invalid type.")
 
@@ -115,6 +137,16 @@ class HashIDPreimage:
                 unpacker, depth_limit - 1
             )
             return cls(type=type, soroban_authorization=soroban_authorization)
+        if type == EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS:
+            soroban_authorization_with_address = (
+                HashIDPreimageSorobanAuthorizationWithAddress.unpack(
+                    unpacker, depth_limit - 1
+                )
+            )
+            return cls(
+                type=type,
+                soroban_authorization_with_address=soroban_authorization_with_address,
+            )
         raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
@@ -160,6 +192,11 @@ class HashIDPreimage:
         if self.type == EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION:
             assert self.soroban_authorization is not None
             return {"soroban_authorization": self.soroban_authorization.to_json_dict()}
+        if self.type == EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS:
+            assert self.soroban_authorization_with_address is not None
+            return {
+                "soroban_authorization_with_address": self.soroban_authorization_with_address.to_json_dict()
+            }
         raise ValueError(f"Unknown type in HashIDPreimage: {self.type}")
 
     @classmethod
@@ -188,6 +225,16 @@ class HashIDPreimage:
                 json_value["soroban_authorization"]
             )
             return cls(type=type, soroban_authorization=soroban_authorization)
+        if key == "soroban_authorization_with_address":
+            soroban_authorization_with_address = (
+                HashIDPreimageSorobanAuthorizationWithAddress.from_json_dict(
+                    json_value["soroban_authorization_with_address"]
+                )
+            )
+            return cls(
+                type=type,
+                soroban_authorization_with_address=soroban_authorization_with_address,
+            )
         raise ValueError(f"Unknown key '{key}' for HashIDPreimage")
 
     def __hash__(self):
@@ -198,6 +245,7 @@ class HashIDPreimage:
                 self.revoke_id,
                 self.contract_id,
                 self.soroban_authorization,
+                self.soroban_authorization_with_address,
             )
         )
 
@@ -210,6 +258,8 @@ class HashIDPreimage:
             and self.revoke_id == other.revoke_id
             and self.contract_id == other.contract_id
             and self.soroban_authorization == other.soroban_authorization
+            and self.soroban_authorization_with_address
+            == other.soroban_authorization_with_address
         )
 
     def __repr__(self):
@@ -223,4 +273,8 @@ class HashIDPreimage:
             out.append(f"contract_id={self.contract_id}")
         if self.soroban_authorization is not None:
             out.append(f"soroban_authorization={self.soroban_authorization}")
+        if self.soroban_authorization_with_address is not None:
+            out.append(
+                f"soroban_authorization_with_address={self.soroban_authorization_with_address}"
+            )
         return f"<HashIDPreimage [{', '.join(out)}]>"

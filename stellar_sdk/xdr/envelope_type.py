@@ -19,6 +19,7 @@ _ENVELOPE_TYPE_MAP = {
     7: "pool_revoke_op_id",
     8: "contract_id",
     9: "soroban_authorization",
+    10: "soroban_authorization_with_address",
 }
 _ENVELOPE_TYPE_REVERSE_MAP = {
     "tx_v0": 0,
@@ -31,6 +32,7 @@ _ENVELOPE_TYPE_REVERSE_MAP = {
     "pool_revoke_op_id": 7,
     "contract_id": 8,
     "soroban_authorization": 9,
+    "soroban_authorization_with_address": 10,
 }
 __all__ = ["EnvelopeType"]
 
@@ -50,7 +52,8 @@ class EnvelopeType(IntEnum):
             ENVELOPE_TYPE_OP_ID = 6,
             ENVELOPE_TYPE_POOL_REVOKE_OP_ID = 7,
             ENVELOPE_TYPE_CONTRACT_ID = 8,
-            ENVELOPE_TYPE_SOROBAN_AUTHORIZATION = 9
+            ENVELOPE_TYPE_SOROBAN_AUTHORIZATION = 9,
+            ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS = 10
         };
     """
 
@@ -64,6 +67,7 @@ class EnvelopeType(IntEnum):
     ENVELOPE_TYPE_POOL_REVOKE_OP_ID = 7
     ENVELOPE_TYPE_CONTRACT_ID = 8
     ENVELOPE_TYPE_SOROBAN_AUTHORIZATION = 9
+    ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS = 10
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

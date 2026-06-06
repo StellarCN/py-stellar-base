@@ -1546,6 +1546,10 @@ HashIDPreimageSorobanAuthorization
 ----------------------------------
 .. autoclass:: stellar_sdk.xdr.hash_id_preimage_soroban_authorization.HashIDPreimageSorobanAuthorization
 
+HashIDPreimageSorobanAuthorizationWithAddress
+---------------------------------------------
+.. autoclass:: stellar_sdk.xdr.hash_id_preimage_soroban_authorization_with_address.HashIDPreimageSorobanAuthorizationWithAddress
+
 Hello
 -----
 .. autoclass:: stellar_sdk.xdr.hello.Hello
@@ -2458,6 +2462,10 @@ SorobanAddressCredentials
 -------------------------
 .. autoclass:: stellar_sdk.xdr.soroban_address_credentials.SorobanAddressCredentials
 
+SorobanAddressCredentialsWithDelegates
+--------------------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_address_credentials_with_delegates.SorobanAddressCredentialsWithDelegates
+
 SorobanAuthorizationEntries
 ---------------------------
 .. autoclass:: stellar_sdk.xdr.soroban_authorization_entries.SorobanAuthorizationEntries
@@ -2485,6 +2493,10 @@ SorobanCredentials
 SorobanCredentialsType
 ----------------------
 .. autoclass:: stellar_sdk.xdr.soroban_credentials_type.SorobanCredentialsType
+
+SorobanDelegateSignature
+------------------------
+.. autoclass:: stellar_sdk.xdr.soroban_delegate_signature.SorobanDelegateSignature
 
 SorobanResources
 ----------------
