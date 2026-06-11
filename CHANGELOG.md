@@ -4,6 +4,19 @@ Release History
 ### Pending
 
 #### Update
+- Add CAP-71 (Protocol 27) Soroban authorization support across the high-level API.
+  - New credential types (from the Protocol 27 XDR):
+    - `SOROBAN_CREDENTIALS_ADDRESS_V2` (CAP-71-02) — same fields as the legacy `SOROBAN_CREDENTIALS_ADDRESS`, but the signed payload is bound to the signer's address.
+    - `SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES` (CAP-71-01) — delegated / multi-party signing via a (possibly nested) tree of delegate signatures.
+  - `stellar_sdk.auth.authorize_entry` (and `stellar_sdk.auth.build_authorization_preimage`):
+    - Sign all three address-based credential types, selecting the signature payload from the credential type: legacy `ADDRESS` keeps the non-address-bound preimage; `ADDRESS_V2` and `ADDRESS_WITH_DELEGATES` use the address-bound `ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS` preimage. `authorize_entry` previously returned entries with non-`ADDRESS` credentials unchanged, without signing them.
+    - `authorize_entry` gains a keyword-only `for_address` parameter that writes the signature into a specific (possibly nested) delegate node. All signers of one delegated entry sign the same payload, bound to the top-level address, and must use the same `valid_until_ledger_sequence`.
+  - `stellar_sdk.auth.authorize_invocation`:
+    - Still builds legacy `ADDRESS` entries by default, so its output stays valid on every network regardless of Protocol 27 activation.
+    - Gains a keyword-only `credentials_type` parameter to opt in to `ADDRESS_V2`. The default will flip to V2 once Protocol 28 makes it mandatory.
+  - New `stellar_sdk.auth.build_with_delegates_entry` / `stellar_sdk.auth.DelegateSignature` wrap an `ADDRESS`/`ADDRESS_V2` entry together with delegate signers (CAP-71-01), sorting each delegates level by address and rejecting duplicates, as the protocol requires.
+  - `AssembledTransaction`: `sign_auth_entries` and `needs_non_invoker_signing_by` (and the async variants) handle all address-based credential types; V2 entries previously crashed with `AssertionError`.
+  - SEP-45 (`stellar_sdk.sep.stellar_soroban_web_authentication`): challenge parsing and building accept `ADDRESS_V2` entries in addition to the legacy type; delegated entries are rejected.
 - chore: upgrade generated XDR definitions to Protocol 27.
 - feat: add `auth_v2` support to `SorobanServer[Async].simulate_transaction` and contract clients to request `ADDRESS_V2` auth entries. Enable it only when targeting Protocol 27 RPC behavior and callers need V2 auth entries; older RPC servers may silently ignore the flag and return legacy `ADDRESS` credentials.
 
