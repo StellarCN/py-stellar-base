@@ -888,6 +888,7 @@ class TestSorobanServer:
             "transaction": transaction.to_xdr(),
             "resourceConfig": None,
             "authMode": None,
+            "authV2": False,
         }
 
     def test_simulate_transaction_with_addl_resources(self):
@@ -928,6 +929,7 @@ class TestSorobanServer:
             "transaction": transaction.to_xdr(),
             "resourceConfig": {"instructionLeeway": 1000000},
             "authMode": None,
+            "authV2": False,
         }
 
     def test_simulate_transaction_with_auth_mode(self):
@@ -976,6 +978,57 @@ class TestSorobanServer:
             "transaction": transaction.to_xdr(),
             "resourceConfig": None,
             "authMode": "record_allow_nonroot",
+            "authV2": False,
+        }
+
+    def test_simulate_transaction_with_auth_v2(self):
+        result = {"latestLedger": 1479}
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": result,
+        }
+        transaction = _build_soroban_transaction(None, [])
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).simulate_transaction(
+                transaction, auth_v2=True
+            ) == SimulateTransactionResponse.model_validate(result)
+
+        request_data = m.last_request.json()
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "simulateTransaction"
+        assert request_data["params"] == {
+            "transaction": transaction.to_xdr(),
+            "resourceConfig": None,
+            "authMode": None,
+            "authV2": True,
+        }
+
+    def test_simulate_transaction_with_auth_v2_false(self):
+        result = {"latestLedger": 1479}
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": result,
+        }
+        transaction = _build_soroban_transaction(None, [])
+        with requests_mock.Mocker() as m:
+            m.post(RPC_URL, json=data)
+            assert SorobanServer(RPC_URL).simulate_transaction(
+                transaction, auth_v2=False
+            ) == SimulateTransactionResponse.model_validate(result)
+
+        request_data = m.last_request.json()
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "simulateTransaction"
+        assert request_data["params"] == {
+            "transaction": transaction.to_xdr(),
+            "resourceConfig": None,
+            "authMode": None,
+            "authV2": False,
         }
 
     def test_prepare_transaction_without_auth_and_soroban_data(self):

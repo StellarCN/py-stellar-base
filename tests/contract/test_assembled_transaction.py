@@ -72,7 +72,7 @@ class _FakeSorobanServer:
         return SimpleNamespace(sequence=100)
 
     def simulate_transaction(
-        self, transaction, addl_resources=None, auth_mode=None
+        self, transaction, addl_resources=None, auth_mode=None, auth_v2=False
     ) -> SimpleNamespace:
         self.simulated_transactions.append(transaction)
         restore_preamble = (
@@ -92,7 +92,7 @@ class _FakeSorobanServerAsync:
         return SimpleNamespace(sequence=100)
 
     async def simulate_transaction(
-        self, transaction, addl_resources=None, auth_mode=None
+        self, transaction, addl_resources=None, auth_mode=None, auth_v2=False
     ) -> SimpleNamespace:
         self.simulated_transactions.append(transaction)
         restore_preamble = (

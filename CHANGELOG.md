@@ -5,6 +5,7 @@ Release History
 
 #### Update
 - chore: upgrade generated XDR definitions to Protocol 27.
+- feat: add `auth_v2` support to `SorobanServer[Async].simulate_transaction` and contract clients to request `ADDRESS_V2` auth entries. Enable it only when targeting Protocol 27 RPC behavior and callers need V2 auth entries; older RPC servers may silently ignore the flag and return legacy `ADDRESS` credentials.
 
 ### Version 14.1.0
 
