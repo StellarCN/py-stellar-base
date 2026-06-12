@@ -58,6 +58,7 @@ class ContractClient:
         restore: bool = True,
         addl_resources: ResourceLeeway | None = None,
         auth_mode: AuthMode | None = None,
+        auth_v2: bool = False,
     ) -> AssembledTransaction[T]:
         """Build an :py:class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>` to invoke a contract function.
 
@@ -73,6 +74,7 @@ class ContractClient:
         :param restore: Whether to restore the transaction, only valid when simulate is True, and the signer is provided.
         :param addl_resources: Additional resource leeway forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>`.
         :param auth_mode: Authorization mode forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>`.
+        :param auth_v2: Whether simulations performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>` should request ``ADDRESS_V2`` credentials in returned auth entries. Set to ``True`` when targeting Protocol 27 RPC behavior and V2 auth entries are required.
         :return:
         """
         builder = (
@@ -92,6 +94,7 @@ class ContractClient:
             submit_timeout,
             addl_resources=addl_resources,
             auth_mode=auth_mode,
+            auth_v2=auth_v2,
         )
         if simulate:
             assembled = assembled.simulate(restore)
