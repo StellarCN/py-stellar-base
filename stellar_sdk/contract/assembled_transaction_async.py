@@ -15,6 +15,7 @@ from .. import (
 )
 from ..auth import (
     AuthorizationSigner,
+    _get_address_credentials,
     _resolve_account_or_contract_address,
     authorize_entry,
 )
@@ -415,15 +416,10 @@ class AssembledTransactionAsync(Generic[T]):
 
         signed_any = False
         for i, e in enumerate(op.auth):
-            if (
-                e.credentials.type
-                == xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
-            ):
+            addr_auth = _get_address_credentials(e.credentials)
+            if addr_auth is None:
                 continue
-            assert e.credentials.address is not None
-            entry_address = Address.from_xdr_sc_address(
-                e.credentials.address.address
-            ).address
+            entry_address = Address.from_xdr_sc_address(addr_auth.address).address
             if entry_address != target_address.address:
                 continue
             op.auth[i] = authorize_entry(
@@ -531,6 +527,10 @@ class AssembledTransactionAsync(Generic[T]):
     ) -> set[str]:
         """Get the addresses that need to sign the authorization entries.
 
+        Only the top-level address credentials of each entry are considered;
+        delegate signers (CAP-71-01) are account-specific policy and are not
+        reported.
+
         :param include_already_signed: Whether to include addresses that have already signed the authorization entries.
         :return: The addresses that need to sign the authorization entries.
         :raises: :exc:`NotYetSimulatedError <stellar_sdk.contract.exceptions.NotYetSimulatedError>`: If the transaction has not been simulated
@@ -544,21 +544,14 @@ class AssembledTransactionAsync(Generic[T]):
 
         result = set()
         for entry in invoke_host_function_op.auth or []:
+            addr_auth = _get_address_credentials(entry.credentials)
+            if addr_auth is None:
+                continue
             if (
-                entry.credentials.type
-                == xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
+                include_already_signed
+                or addr_auth.signature.type == xdr.SCValType.SCV_VOID
             ):
-                assert entry.credentials.address is not None
-
-                if (
-                    include_already_signed
-                    or entry.credentials.address.signature.type
-                    == xdr.SCValType.SCV_VOID
-                ):
-                    address = Address.from_xdr_sc_address(
-                        entry.credentials.address.address
-                    ).address
-                    result.add(address)
+                result.add(Address.from_xdr_sc_address(addr_auth.address).address)
         return result
 
     def result(self) -> T | xdr.SCVal:

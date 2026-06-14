@@ -104,20 +104,27 @@ def build_entry(
     if root_invocation is None:
         root_invocation = build_root_invocation()
 
+    address_credentials = stellar_xdr.SorobanAddressCredentials(
+        address=Address(address).to_xdr_sc_address(),
+        nonce=stellar_xdr.Int64(nonce),
+        signature_expiration_ledger=stellar_xdr.Uint32(signature_expiration_ledger),
+        signature=build_signature(public_key_hex, signature_hex),
+    )
     if (
         credentials_type
         == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
     ):
         credentials = stellar_xdr.SorobanCredentials(
             type=credentials_type,
-            address=stellar_xdr.SorobanAddressCredentials(
-                address=Address(address).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(nonce),
-                signature_expiration_ledger=stellar_xdr.Uint32(
-                    signature_expiration_ledger
-                ),
-                signature=build_signature(public_key_hex, signature_hex),
-            ),
+            address=address_credentials,
+        )
+    elif (
+        credentials_type
+        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2
+    ):
+        credentials = stellar_xdr.SorobanCredentials(
+            type=credentials_type,
+            address_v2=address_credentials,
         )
     else:
         credentials = stellar_xdr.SorobanCredentials(
@@ -1932,3 +1939,163 @@ def test_build_challenge_authorization_entries_client_domain_account_without_dom
             client_domain=None,
             client_domain_account=CLIENT_DOMAIN_ACCOUNT,
         )
+
+
+def test_read_challenge_success_with_v2_credentials():
+    """SOROBAN_CREDENTIALS_ADDRESS_V2 (CAP-71) challenge entries are accepted."""
+    root_invocation = build_root_invocation(
+        args=build_args(client_domain=None, client_domain_account=None)
+    )
+    entries = stellar_xdr.SorobanAuthorizationEntries(
+        [
+            build_entry(
+                address=CLIENT_CONTRACT_ACCOUNT,
+                nonce=2539107559517135815,
+                signature_expiration_ledger=79857,
+                public_key_hex="5215c67951e2d4153a9af7376210efb44e123e0d2dbe69a8db62dd5217f3c4a5",
+                signature_hex="0ff220ae2a7f0e3369f1b178ee5560e1c9b57fc11eb1a4af2d1a60a58679aa13390c59a7e7db919902a98b5cbd45bf785b2b7d122fd832d24eabf0bcbe36130e",
+                root_invocation=root_invocation,
+                credentials_type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+            ),
+            build_entry(
+                address=SERVER_ACCOUNT,
+                nonce=4328727000093922294,
+                signature_expiration_ledger=80007,
+                public_key_hex="a4d88a8cf106454a418350e7fbce6a19af16a2c3f663e0c3e363b1ab85f6fb9d",
+                signature_hex="6dbc3b36f6c96a316ff1e7fcefb1b044cbfdafa70236aad669f9d209565c2ba3086412bfff0218365a97cd1f8c3d2483f0daf29ab434531c3276bad8bbbd5102",
+                root_invocation=root_invocation,
+                credentials_type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+            ),
+        ]
+    )
+
+    parsed = read_challenge_authorization_entries(
+        challenge_authorization_entries=entries.to_xdr(),
+        server_account_id=SERVER_ACCOUNT,
+        home_domains=HOME_DOMAIN,
+        web_auth_domain=WEB_AUTH_DOMAIN,
+        web_auth_contract=WEB_AUTH_CONTRACT,
+    )
+
+    assert parsed.server_account_id == SERVER_ACCOUNT
+    assert parsed.client_account_id == CLIENT_CONTRACT_ACCOUNT
+    assert parsed.matched_home_domain == HOME_DOMAIN
+    assert parsed.client_domain is None
+
+
+def test_read_challenge_rejects_with_delegates_credentials():
+    """SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES entries are rejected."""
+    root_invocation = build_root_invocation(
+        args=build_args(client_domain=None, client_domain_account=None)
+    )
+    client_entry = build_entry(
+        address=CLIENT_CONTRACT_ACCOUNT,
+        nonce=2539107559517135815,
+        signature_expiration_ledger=79857,
+        public_key_hex="5215c67951e2d4153a9af7376210efb44e123e0d2dbe69a8db62dd5217f3c4a5",
+        signature_hex="0ff220ae2a7f0e3369f1b178ee5560e1c9b57fc11eb1a4af2d1a60a58679aa13390c59a7e7db919902a98b5cbd45bf785b2b7d122fd832d24eabf0bcbe36130e",
+        root_invocation=root_invocation,
+    )
+    server_entry = build_entry(
+        address=SERVER_ACCOUNT,
+        nonce=4328727000093922294,
+        signature_expiration_ledger=80007,
+        public_key_hex="a4d88a8cf106454a418350e7fbce6a19af16a2c3f663e0c3e363b1ab85f6fb9d",
+        signature_hex="6dbc3b36f6c96a316ff1e7fcefb1b044cbfdafa70236aad669f9d209565c2ba3086412bfff0218365a97cd1f8c3d2483f0daf29ab434531c3276bad8bbbd5102",
+        root_invocation=root_invocation,
+    )
+    assert server_entry.credentials.address is not None
+    delegated_server_entry = stellar_xdr.SorobanAuthorizationEntry(
+        credentials=stellar_xdr.SorobanCredentials(
+            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES,
+            address_with_delegates=stellar_xdr.SorobanAddressCredentialsWithDelegates(
+                address_credentials=server_entry.credentials.address,
+                delegates=[],
+            ),
+        ),
+        root_invocation=root_invocation,
+    )
+    entries = stellar_xdr.SorobanAuthorizationEntries(
+        [client_entry, delegated_server_entry]
+    )
+
+    with pytest.raises(
+        InvalidSep45ChallengeError,
+        match=r"Unsupported SorobanCredentialsType:",
+    ):
+        read_challenge_authorization_entries(
+            challenge_authorization_entries=entries.to_xdr(),
+            server_account_id=SERVER_ACCOUNT,
+            home_domains=HOME_DOMAIN,
+            web_auth_domain=WEB_AUTH_DOMAIN,
+            web_auth_contract=WEB_AUTH_CONTRACT,
+        )
+
+
+def test_build_challenge_signs_v2_entries():
+    """build_challenge signs server entries that use ADDRESS_V2 credentials."""
+
+    def unsigned_v2_entry(address: str) -> stellar_xdr.SorobanAuthorizationEntry:
+        return stellar_xdr.SorobanAuthorizationEntry(
+            credentials=stellar_xdr.SorobanCredentials(
+                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+                address_v2=stellar_xdr.SorobanAddressCredentials(
+                    address=Address(address).to_xdr_sc_address(),
+                    nonce=stellar_xdr.Int64(1),
+                    signature_expiration_ledger=stellar_xdr.Uint32(0),
+                    signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
+                ),
+            ),
+            root_invocation=build_root_invocation(
+                args=build_args(client_domain=None, client_domain_account=None)
+            ),
+        )
+
+    mock_data = {
+        "jsonrpc": "2.0",
+        "id": "e1f7a93268e44a0ba2b6e0c6a3155e60",
+        "result": {
+            "results": [
+                {
+                    "auth": [
+                        unsigned_v2_entry(CLIENT_CONTRACT_ACCOUNT).to_xdr(),
+                        unsigned_v2_entry(SERVER_ACCOUNT).to_xdr(),
+                    ],
+                    "xdr": "AAAAAQ==",
+                }
+            ],
+            "latestLedger": 82106,
+        },
+    }
+
+    with requests_mock.Mocker() as m:
+        m.post(MOCK_RPC_URL, json=mock_data)
+        with SorobanServer(MOCK_RPC_URL) as soroban_server:
+            challenge = build_challenge_authorization_entries(
+                soroban_server=soroban_server,
+                web_auth_contract=WEB_AUTH_CONTRACT,
+                server_secret=SERVER_SECRET,
+                client_account_id=CLIENT_CONTRACT_ACCOUNT,
+                home_domain=HOME_DOMAIN,
+                web_auth_domain=WEB_AUTH_DOMAIN,
+                network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            )
+
+    entries = stellar_xdr.SorobanAuthorizationEntries.from_xdr(
+        challenge
+    ).soroban_authorization_entries
+    assert len(entries) == 2
+    client_entry, server_entry = entries
+    assert client_entry.credentials.address_v2 is not None
+    assert (
+        client_entry.credentials.address_v2.signature.type
+        == stellar_xdr.SCValType.SCV_VOID
+    )
+    assert server_entry.credentials.address_v2 is not None
+    assert (
+        server_entry.credentials.address_v2.signature.type
+        == stellar_xdr.SCValType.SCV_VEC
+    )
+    assert server_entry.credentials.address_v2.signature_expiration_ledger == (
+        stellar_xdr.Uint32(82106 + 180)
+    )
