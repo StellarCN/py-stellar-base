@@ -16,7 +16,7 @@ from .. import StrKey, scval
 from .. import xdr as stellar_xdr
 from ..account import Account
 from ..address import Address
-from ..auth import authorize_entry
+from ..auth import _get_address_credentials, authorize_entry
 from ..keypair import Keypair
 from ..soroban_rpc import SimulateTransactionResponse
 from ..soroban_server import SorobanServer
@@ -33,6 +33,14 @@ __all__ = [
     "verify_challenge_authorization_entries",
     "verify_challenge_authorization_entries_async",
 ]
+
+# Credential types accepted in SEP-45 challenge entries. Delegated credentials
+# (SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES) are rejected until the ecosystem
+# defines how they interact with SEP-45.
+_ALLOWED_CREDENTIAL_TYPES = (
+    stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+    stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+)
 
 # A null account used for simulation purposes
 NULL_ACCOUNT = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF"
@@ -273,18 +281,14 @@ def read_challenge_authorization_entries(
     client_domain_entry_found = False
 
     for entry in entries:
-        if (
-            entry.credentials.type
-            != stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
-        ):
+        if entry.credentials.type not in _ALLOWED_CREDENTIAL_TYPES:
             raise InvalidSep45ChallengeError(
                 f"Unsupported SorobanCredentialsType: {entry.credentials.type}."
             )
 
-        assert entry.credentials.address is not None
-        entry_address = Address.from_xdr_sc_address(
-            entry.credentials.address.address
-        ).address
+        addr_auth = _get_address_credentials(entry.credentials)
+        assert addr_auth is not None
+        entry_address = Address.from_xdr_sc_address(addr_auth.address).address
 
         if entry_address == server_account_id:
             server_entry_found = True
@@ -603,17 +607,13 @@ def _process_build_challenge_response(
     authorization_entries = []
     for raw_entry in raw_entries:
         entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr(raw_entry)
-        if (
-            entry.credentials.type
-            != stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
-        ):
+        if entry.credentials.type not in _ALLOWED_CREDENTIAL_TYPES:
             raise ValueError(
                 f"Unsupported SorobanCredentialsType: {entry.credentials.type}."
             )
-        assert entry.credentials.address is not None
-        entry_address = Address.from_xdr_sc_address(
-            entry.credentials.address.address
-        ).address
+        addr_auth = _get_address_credentials(entry.credentials)
+        assert addr_auth is not None
+        entry_address = Address.from_xdr_sc_address(addr_auth.address).address
         if entry_address == web_auth_domain_account:
             # Sign with server
             entry = authorize_entry(

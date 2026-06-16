@@ -12,6 +12,7 @@ from stellar_sdk import (
     scval,
 )
 from stellar_sdk import xdr as stellar_xdr
+from stellar_sdk.auth import DelegateSignature, build_with_delegates_entry
 from stellar_sdk.contract import (
     AssembledTransaction,
     AssembledTransactionAsync,
@@ -48,17 +49,29 @@ def _sample_invocation(
     )
 
 
-def _sample_auth_entry(address: str) -> stellar_xdr.SorobanAuthorizationEntry:
+def _sample_auth_entry(
+    address: str,
+    credentials_type: stellar_xdr.SorobanCredentialsType = stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+) -> stellar_xdr.SorobanAuthorizationEntry:
+    address_credentials = stellar_xdr.SorobanAddressCredentials(
+        address=Address(address).to_xdr_sc_address(),
+        nonce=stellar_xdr.Int64(123456789),
+        signature_expiration_ledger=stellar_xdr.Uint32(0),
+        signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
+    )
+    if (
+        credentials_type
+        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
+    ):
+        credentials = stellar_xdr.SorobanCredentials(
+            type=credentials_type, address=address_credentials
+        )
+    else:
+        credentials = stellar_xdr.SorobanCredentials(
+            type=credentials_type, address_v2=address_credentials
+        )
     return stellar_xdr.SorobanAuthorizationEntry(
-        credentials=stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-            address=stellar_xdr.SorobanAddressCredentials(
-                address=Address(address).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-            ),
-        ),
+        credentials=credentials,
         root_invocation=_sample_invocation(),
     )
 
@@ -103,7 +116,7 @@ class _FakeSorobanServerAsync:
         )
 
 
-def _assembled_with_auth(address: str, server=None):
+def _assembled_with_auth(address: str, server=None, *, entries=None):
     source = Keypair.random()
     server = cast(Any, server or _FakeSorobanServer())
     builder = (
@@ -117,7 +130,7 @@ def _assembled_with_auth(address: str, server=None):
             contract_id="CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
             function_name="increment",
             parameters=[],
-            auth=[_sample_auth_entry(address)],
+            auth=entries if entries is not None else [_sample_auth_entry(address)],
         )
     )
     assembled: AssembledTransaction[Any] = AssembledTransaction(builder, server, source)
@@ -128,7 +141,7 @@ def _assembled_with_auth(address: str, server=None):
     return assembled, source, server
 
 
-def _assembled_async_with_auth(address: str, server=None):
+def _assembled_async_with_auth(address: str, server=None, *, entries=None):
     source = Keypair.random()
     server = cast(Any, server or _FakeSorobanServerAsync())
     builder = (
@@ -142,7 +155,7 @@ def _assembled_async_with_auth(address: str, server=None):
             contract_id="CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
             function_name="increment",
             parameters=[],
-            auth=[_sample_auth_entry(address)],
+            auth=entries if entries is not None else [_sample_auth_entry(address)],
         )
     )
     assembled: AssembledTransactionAsync[Any] = AssembledTransactionAsync(
@@ -396,3 +409,140 @@ async def test_async_prepare_restores_footprint_after_contract_address_auth(
     assert restored == [restore_preamble]
     assert len(server.simulated_transactions) == 2
     assert assembled._needs_preparation is False
+
+
+def test_sign_auth_entries_signs_v2_entry():
+    signer = Keypair.random()
+    assembled, _, _ = _assembled_with_auth(
+        signer.public_key,
+        entries=[
+            _sample_auth_entry(
+                signer.public_key,
+                stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+            )
+        ],
+    )
+
+    assembled.sign_auth_entries(signer, valid_until_ledger_sequence=120)
+
+    assert assembled.built_transaction is not None
+    op = assembled.built_transaction.transaction.operations[0]
+    assert isinstance(op, InvokeHostFunction)
+    entry = op.auth[0]
+    assert (
+        entry.credentials.type
+        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2
+    )
+    assert entry.credentials.address_v2 is not None
+    assert entry.credentials.address_v2.signature.type == stellar_xdr.SCValType.SCV_VEC
+    assert entry.credentials.address_v2.signature_expiration_ledger == (
+        stellar_xdr.Uint32(120)
+    )
+
+
+@pytest.mark.asyncio
+async def test_async_sign_auth_entries_signs_v2_entry():
+    signer = Keypair.random()
+    assembled, _, _ = _assembled_async_with_auth(
+        signer.public_key,
+        entries=[
+            _sample_auth_entry(
+                signer.public_key,
+                stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+            )
+        ],
+    )
+
+    await assembled.sign_auth_entries(signer, valid_until_ledger_sequence=120)
+
+    assert assembled.built_transaction is not None
+    op = assembled.built_transaction.transaction.operations[0]
+    assert isinstance(op, InvokeHostFunction)
+    entry = op.auth[0]
+    assert (
+        entry.credentials.type
+        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2
+    )
+    assert entry.credentials.address_v2 is not None
+    assert entry.credentials.address_v2.signature.type == stellar_xdr.SCValType.SCV_VEC
+
+
+def _mixed_credential_entries():
+    legacy_signer = Keypair.random()
+    v2_signer = Keypair.random()
+    delegating_signer = Keypair.random()
+    delegate = Keypair.random()
+    entries = [
+        _sample_auth_entry(legacy_signer.public_key),
+        _sample_auth_entry(
+            v2_signer.public_key,
+            stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+        ),
+        build_with_delegates_entry(
+            _sample_auth_entry(
+                delegating_signer.public_key,
+                stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+            ),
+            120,
+            [DelegateSignature(delegate.public_key)],
+        ),
+        stellar_xdr.SorobanAuthorizationEntry(
+            credentials=stellar_xdr.SorobanCredentials(
+                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
+            ),
+            root_invocation=_sample_invocation(),
+        ),
+    ]
+    return entries, legacy_signer, v2_signer, delegating_signer, delegate
+
+
+def test_needs_non_invoker_signing_by_counts_all_address_credential_types():
+    entries, legacy_signer, v2_signer, delegating_signer, delegate = (
+        _mixed_credential_entries()
+    )
+    assembled, _, _ = _assembled_with_auth(legacy_signer.public_key, entries=entries)
+
+    needs = assembled.needs_non_invoker_signing_by()
+
+    # top-level addresses of every address-based credential type are reported,
+    # delegate signers and source-account entries are not
+    assert needs == {
+        legacy_signer.public_key,
+        v2_signer.public_key,
+        delegating_signer.public_key,
+    }
+    assert delegate.public_key not in needs
+
+    assembled.sign_auth_entries(v2_signer, valid_until_ledger_sequence=120)
+    assert assembled.needs_non_invoker_signing_by() == {
+        legacy_signer.public_key,
+        delegating_signer.public_key,
+    }
+    assert v2_signer.public_key in assembled.needs_non_invoker_signing_by(
+        include_already_signed=True
+    )
+
+
+@pytest.mark.asyncio
+async def test_async_needs_non_invoker_signing_by_counts_all_address_credential_types():
+    entries, legacy_signer, v2_signer, delegating_signer, delegate = (
+        _mixed_credential_entries()
+    )
+    assembled, _, _ = _assembled_async_with_auth(
+        legacy_signer.public_key, entries=entries
+    )
+
+    needs = assembled.needs_non_invoker_signing_by()
+
+    assert needs == {
+        legacy_signer.public_key,
+        v2_signer.public_key,
+        delegating_signer.public_key,
+    }
+    assert delegate.public_key not in needs
+
+    await assembled.sign_auth_entries(v2_signer, valid_until_ledger_sequence=120)
+    assert assembled.needs_non_invoker_signing_by() == {
+        legacy_signer.public_key,
+        delegating_signer.public_key,
+    }
