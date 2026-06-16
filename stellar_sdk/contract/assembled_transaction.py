@@ -55,10 +55,6 @@ class AssembledTransaction(Generic[T]):
     :param auth_mode: Authorization mode forwarded to every internal simulation
         call. Use :class:`AuthMode.RECORD_ALL_NOROOT <stellar_sdk.soroban_rpc.AuthMode>`
         to opt into non-root authorization in recording mode.
-    :param auth_v2: Whether internal simulation calls should request
-        ``ADDRESS_V2`` credentials in returned auth entries. Set to ``True``
-        when targeting Protocol 27 RPC behavior and V2 auth entries
-        are required.
     """
 
     def __init__(
@@ -70,7 +66,6 @@ class AssembledTransaction(Generic[T]):
         submit_timeout: int = 180,
         addl_resources: ResourceLeeway | None = None,
         auth_mode: AuthMode | None = None,
-        auth_v2: bool = False,
     ):
         self.server = server
         self.submit_timeout = submit_timeout
@@ -83,7 +78,6 @@ class AssembledTransaction(Generic[T]):
 
         self.addl_resources = addl_resources
         self.auth_mode = auth_mode
-        self.auth_v2 = auth_v2
 
         self.simulation: SimulateTransactionResponse | None = None
         self._simulation_result: SimulateHostFunctionResult | None = None
@@ -118,7 +112,6 @@ class AssembledTransaction(Generic[T]):
             built_tx,
             addl_resources=self.addl_resources,
             auth_mode=self.auth_mode,
-            auth_v2=self.auth_v2,
         )
 
         if (
@@ -179,7 +172,6 @@ class AssembledTransaction(Generic[T]):
             simulation_tx,
             addl_resources=self.addl_resources,
             auth_mode=self.auth_mode,
-            auth_v2=self.auth_v2,
         )
         self._simulation_result = None
         self._simulation_transaction_data = None

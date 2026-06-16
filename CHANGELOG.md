@@ -18,7 +18,6 @@ Release History
   - `AssembledTransaction`: `sign_auth_entries` and `needs_non_invoker_signing_by` (and the async variants) handle all address-based credential types; V2 entries previously crashed with `AssertionError`.
   - SEP-45 (`stellar_sdk.sep.stellar_soroban_web_authentication`): challenge parsing and building accept `ADDRESS_V2` entries in addition to the legacy type; delegated entries are rejected.
 - chore: upgrade generated XDR definitions to Protocol 27.
-- feat: add `auth_v2` support to `SorobanServer[Async].simulate_transaction` and contract clients to request `ADDRESS_V2` auth entries. Enable it only when targeting Protocol 27 RPC behavior and callers need V2 auth entries; older RPC servers may silently ignore the flag and return legacy `ADDRESS` credentials.
 
 ### Version 14.1.0
 
