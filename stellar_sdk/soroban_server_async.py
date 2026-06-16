@@ -199,7 +199,6 @@ class SorobanServerAsync:
         transaction_envelope: TransactionEnvelope,
         addl_resources: ResourceLeeway | None = None,
         auth_mode: AuthMode | None = None,
-        auth_v2: bool = False,
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
@@ -212,7 +211,6 @@ class SorobanServerAsync:
             Any provided footprint will be ignored.
         :param addl_resources: Additional resource include in the simulation.
         :param auth_mode: Explicitly allows users to opt-in to non-root authorization in recording mode.
-        :param auth_v2: Request ``ADDRESS_V2`` credentials instead of legacy ``ADDRESS`` credentials in returned auth entries. Set this to ``True`` when targeting Protocol 27 RPC behavior and callers need V2 auth entries. Older RPC servers may silently ignore this flag; inspect the returned credential arm to confirm the response type.
         :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.SimulateTransactionResponse>` object
             contains the cost, footprint, result/auth requirements (if applicable), and error of the transaction.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
@@ -232,10 +230,7 @@ class SorobanServerAsync:
             id=_generate_unique_request_id(),
             method="simulateTransaction",
             params=SimulateTransactionRequest(
-                transaction=xdr,
-                resourceConfig=resource_config,
-                authMode=auth_mode,
-                authV2=auth_v2,
+                transaction=xdr, resourceConfig=resource_config, authMode=auth_mode
             ),
         )
         return await self._post(request, SimulateTransactionResponse)
