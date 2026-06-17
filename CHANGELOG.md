@@ -3,8 +3,12 @@ Release History
 
 ### Pending
 
+### Version 15.0.0-beta0
+
+Released on June 03, 2026
+
 #### Update
-- Add CAP-71 (Protocol 27) Soroban authorization support across the high-level API.
+- Add CAP-71 (Protocol 27) Soroban authorization support across the high-level API. ([#1189](https://github.com/StellarCN/py-stellar-base/pull/1189))
   - New credential types (from the Protocol 27 XDR):
     - `SOROBAN_CREDENTIALS_ADDRESS_V2` (CAP-71-02) — same fields as the legacy `SOROBAN_CREDENTIALS_ADDRESS`, but the signed payload is bound to the signer's address.
     - `SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES` (CAP-71-01) — delegated / multi-party signing via a (possibly nested) tree of delegate signatures.
@@ -17,7 +21,7 @@ Release History
   - New `stellar_sdk.auth.build_with_delegates_entry` / `stellar_sdk.auth.DelegateSignature` wrap an `ADDRESS`/`ADDRESS_V2` entry together with delegate signers (CAP-71-01), sorting each delegates level by address and rejecting duplicates, as the protocol requires.
   - `AssembledTransaction`: `sign_auth_entries` and `needs_non_invoker_signing_by` (and the async variants) handle all address-based credential types; V2 entries previously crashed with `AssertionError`.
   - SEP-45 (`stellar_sdk.sep.stellar_soroban_web_authentication`): challenge parsing and building accept `ADDRESS_V2` entries in addition to the legacy type; delegated entries are rejected.
-- chore: upgrade generated XDR definitions to Protocol 27.
+- chore: upgrade generated XDR definitions to Protocol 27. ([#1186](https://github.com/StellarCN/py-stellar-base/pull/1186))
 
 ### Version 14.1.0
 
