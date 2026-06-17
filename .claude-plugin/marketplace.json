@@ -11,7 +11,7 @@
       "name": "py-stellar-base",
       "source": "./",
       "description": "Teaches AI coding agents how to build Stellar blockchain applications using stellar-sdk: transactions, operations, Horizon API, Soroban smart contracts, XDR/SCVal, async workflows, and SEP protocols.",
-      "version": "14.1.0",
+      "version": "15.0.0-beta.0",
       "author": {
         "name": "overcat"
       },

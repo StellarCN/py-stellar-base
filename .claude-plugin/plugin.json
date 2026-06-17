@@ -1,7 +1,7 @@
 {
   "name": "py-stellar-base",
   "description": "Agent skill that teaches AI coding agents how to build Stellar blockchain applications with the stellar-sdk Python package: transactions, operations, Horizon, Soroban, XDR/SCVal, async, and SEP protocols.",
-  "version": "14.1.0",
+  "version": "15.0.0-beta.0",
   "author": {
     "name": "overcat"
   },
