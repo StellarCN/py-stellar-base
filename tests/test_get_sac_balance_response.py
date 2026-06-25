@@ -19,9 +19,7 @@ def test_from_ledger_entry_result_returns_none_for_non_contract_data():
         ledger_entry_result, latest_ledger=7943
     )
 
-    assert response == GetSACBalanceResponse(
-        latest_ledger=7943, balance_entry=None
-    )
+    assert response == GetSACBalanceResponse(latest_ledger=7943, balance_entry=None)
 
 
 def test_from_ledger_entry_result_returns_balance_entry_for_contract_data():
