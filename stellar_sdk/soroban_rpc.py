@@ -6,6 +6,9 @@ from typing import Any, Generic, TypeVar
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Self
 
+from . import scval
+from . import xdr as stellar_xdr
+
 T = TypeVar("T")
 
 Id = str | int
@@ -532,6 +535,31 @@ class GetSACBalanceResponse(BaseModel):
     balance_entry: SACBalanceEntry | None = Field(
         description="The balance entry for the account. If there is not a valid balance entry, this will be None."
     )
+
+    @classmethod
+    def from_ledger_entry_result(
+        cls,
+        ledger_entry_result: LedgerEntryResult,
+        latest_ledger: int,
+    ) -> Self:
+        entry_data = stellar_xdr.LedgerEntryData.from_xdr(ledger_entry_result.xdr)
+
+        if entry_data.type != stellar_xdr.LedgerEntryType.CONTRACT_DATA:
+            return cls(latest_ledger=latest_ledger, balance_entry=None)
+
+        assert entry_data.contract_data is not None
+        contract_data = scval.to_native(entry_data.contract_data.val)
+        assert isinstance(contract_data, dict)
+        return cls(
+            latest_ledger=latest_ledger,
+            balance_entry=SACBalanceEntry(
+                amount=contract_data["amount"],
+                authorized=contract_data["authorized"],
+                clawback=contract_data["clawback"],
+                last_modified_ledger=ledger_entry_result.last_modified_ledger,
+                live_until_ledger=ledger_entry_result.live_until_ledger,
+            ),
+        )
 
 
 DEFAULT_POLLING_ATTEMPTS: int = 30

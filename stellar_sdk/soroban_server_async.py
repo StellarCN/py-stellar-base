@@ -16,6 +16,7 @@ from .base_soroban_server import (
     ResourceLeeway,
     _assemble_transaction,
     _build_contract_instance_key,
+    _build_sac_balance_ledger_key,
     _generate_unique_request_id,
     _validate_wasm_hash,
 )
@@ -547,42 +548,14 @@ class SorobanServerAsync:
         if network_passphrase is None:
             network_passphrase = (await self.get_network()).passphrase
 
-        sac_id = sac.contract_id(network_passphrase)
-        key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(sac_id)])
-        ledger_key = LedgerKey(
-            LedgerEntryType.CONTRACT_DATA,
-            contract_data=LedgerKeyContractData(
-                contract=Address(sac_id).to_xdr_sc_address(),
-                key=key,
-                durability=ContractDataDurability.PERSISTENT,
-            ),
-        )
+        ledger_key = _build_sac_balance_ledger_key(sac, contract_id, network_passphrase)
         response = await self.get_ledger_entries([ledger_key])
-        if not response.entries:
+        if not response.entries or len(response.entries) != 1:
             return GetSACBalanceResponse(
                 latest_ledger=response.latest_ledger, balance_entry=None
             )
-
-        raw_entry = response.entries[0]
-        entry_data = LedgerEntryData.from_xdr(raw_entry.xdr)
-
-        if entry_data.type != LedgerEntryType.CONTRACT_DATA:
-            return GetSACBalanceResponse(
-                latest_ledger=response.latest_ledger, balance_entry=None
-            )
-
-        assert entry_data.contract_data is not None
-        contract_data = scval.to_native(entry_data.contract_data.val)
-        assert isinstance(contract_data, dict)
-        return GetSACBalanceResponse(
-            latest_ledger=response.latest_ledger,
-            balance_entry=SACBalanceEntry(
-                amount=contract_data["amount"],
-                authorized=contract_data["authorized"],
-                clawback=contract_data["clawback"],
-                last_modified_ledger=raw_entry.last_modified_ledger,
-                live_until_ledger=raw_entry.live_until_ledger,
-            ),
+        return GetSACBalanceResponse.from_ledger_entry_result(
+            response.entries[0], response.latest_ledger
         )
 
     async def prepare_transaction(
