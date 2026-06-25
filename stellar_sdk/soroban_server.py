@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from . import scval
 from . import xdr as stellar_xdr
 from .account import Account
 from .address import Address
@@ -37,13 +36,6 @@ from .sep.contract_meta import ContractMeta
 from .sep.contract_spec import ContractSpec
 from .soroban_rpc import *
 from .strkey import StrKey
-from .xdr import (
-    ContractDataDurability,
-    LedgerEntryData,
-    LedgerEntryType,
-    LedgerKey,
-    LedgerKeyContractData,
-)
 
 if TYPE_CHECKING:
     from .client.base_sync_client import BaseSyncClient
