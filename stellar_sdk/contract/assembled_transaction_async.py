@@ -62,6 +62,11 @@ class AssembledTransactionAsync(Generic[T]):
     :param auth_mode: Authorization mode forwarded to every internal simulation
         call. Use :class:`AuthMode.RECORD_ALL_NOROOT <stellar_sdk.soroban_rpc.AuthMode>`
         to opt into non-root authorization in recording mode.
+    :param use_upgraded_auth: Forwarded to every internal simulation call to opt into
+        recording ``ADDRESS_V2`` ("upgraded") authorization credentials (CAP-71) instead
+        of the legacy ``ADDRESS`` credentials. Best-effort and transitional; requires
+        Stellar RPC v27.1.0 or later. See
+        :meth:`SorobanServerAsync.simulate_transaction <stellar_sdk.SorobanServerAsync.simulate_transaction>`.
     """
 
     def __init__(
@@ -73,6 +78,7 @@ class AssembledTransactionAsync(Generic[T]):
         submit_timeout: int = 180,
         addl_resources: ResourceLeeway | None = None,
         auth_mode: AuthMode | None = None,
+        use_upgraded_auth: bool = False,
     ):
         self.server = server
         self.submit_timeout = submit_timeout
@@ -85,6 +91,7 @@ class AssembledTransactionAsync(Generic[T]):
 
         self.addl_resources = addl_resources
         self.auth_mode = auth_mode
+        self.use_upgraded_auth = use_upgraded_auth
 
         self.simulation: SimulateTransactionResponse | None = None
         self._simulation_result: SimulateHostFunctionResult | None = None
@@ -119,6 +126,7 @@ class AssembledTransactionAsync(Generic[T]):
             built_tx,
             addl_resources=self.addl_resources,
             auth_mode=self.auth_mode,
+            use_upgraded_auth=self.use_upgraded_auth,
         )
 
         if (
@@ -179,6 +187,7 @@ class AssembledTransactionAsync(Generic[T]):
             simulation_tx,
             addl_resources=self.addl_resources,
             auth_mode=self.auth_mode,
+            use_upgraded_auth=self.use_upgraded_auth,
         )
         self._simulation_result = None
         self._simulation_transaction_data = None

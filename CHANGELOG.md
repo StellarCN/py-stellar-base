@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Update
+- feat: add `use_upgraded_auth` to `SorobanServer[Async].simulate_transaction` and the contract clients, mapping to the `useUpgradedAuth` flag from [Stellar RPC v27.1.0](https://github.com/stellar/stellar-rpc/releases/tag/v27.1.0) to opt simulation into recording `ADDRESS_V2` (CAP-71) auth credentials. Best-effort and transitional; older RPC servers ignore it.
+
 ### Version 15.0.0-beta0
 
 Released on June 03, 2026

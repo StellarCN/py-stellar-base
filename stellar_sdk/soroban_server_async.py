@@ -192,6 +192,7 @@ class SorobanServerAsync:
         transaction_envelope: TransactionEnvelope,
         addl_resources: ResourceLeeway | None = None,
         auth_mode: AuthMode | None = None,
+        use_upgraded_auth: bool = False,
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
@@ -204,6 +205,13 @@ class SorobanServerAsync:
             Any provided footprint will be ignored.
         :param addl_resources: Additional resource include in the simulation.
         :param auth_mode: Explicitly allows users to opt-in to non-root authorization in recording mode.
+        :param use_upgraded_auth: Opt simulation into recording ``ADDRESS_V2`` ("upgraded") authorization
+            credentials (CAP-71) instead of the legacy ``ADDRESS`` credentials. This is best-effort: it only
+            affects the recording auth modes and is silently ignored by RPC servers (or protocol versions)
+            whose host cannot emit ``ADDRESS_V2``, so inspect the returned credential arm to confirm the
+            response type. This flag is transitional — once the RPC returns ``ADDRESS_V2`` credentials by
+            default it becomes a no-op, so do not rely on omitting it to keep receiving the legacy ``ADDRESS``
+            format. Requires Stellar RPC v27.1.0 or later.
         :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.SimulateTransactionResponse>` object
             contains the cost, footprint, result/auth requirements (if applicable), and error of the transaction.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
@@ -223,7 +231,10 @@ class SorobanServerAsync:
             id=_generate_unique_request_id(),
             method="simulateTransaction",
             params=SimulateTransactionRequest(
-                transaction=xdr, resourceConfig=resource_config, authMode=auth_mode
+                transaction=xdr,
+                resourceConfig=resource_config,
+                authMode=auth_mode,
+                useUpgradedAuth=use_upgraded_auth,
             ),
         )
         return await self._post(request, SimulateTransactionResponse)
