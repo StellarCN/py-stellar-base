@@ -1009,7 +1009,9 @@ class TestSorobanServer:
             m.post(RPC_URL, payload=data)
             async with SorobanServerAsync(RPC_URL) as client:
                 assert (
-                    await client.simulate_transaction(transaction, use_upgraded_auth=True)
+                    await client.simulate_transaction(
+                        transaction, use_upgraded_auth=True
+                    )
                 ) == SimulateTransactionResponse.model_validate(result)
 
         request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
