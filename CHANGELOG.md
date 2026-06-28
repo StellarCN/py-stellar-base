@@ -3,6 +3,13 @@ Release History
 
 ### Pending
 
+### Version 14.1.1
+
+Released on June 28, 2026
+
+#### Update
+- fix: `SorobanServer[Async].get_sac_balance` now returns the SAC balance held by the *requested contract* instead of the balance the SAC holds of itself. ([#1196](https://github.com/StellarCN/py-stellar-base/pull/1196))
+
 ### Version 14.0.0
 
 Released on June 03, 2026
