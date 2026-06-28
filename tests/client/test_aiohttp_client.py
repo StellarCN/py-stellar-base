@@ -1,5 +1,5 @@
 import pytest
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 
 from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
 from stellar_sdk.exceptions import ConnectionError, ContentSizeLimitExceededError
@@ -85,7 +85,7 @@ class TestAiohttpClient:
         client = AiohttpClient()
         url = "https://example.com/data"
         content = "Hello, World!"
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get(url, body=content)
             resp = await client.get(url, max_content_size=1024)
             assert resp.status_code == 200
@@ -97,7 +97,7 @@ class TestAiohttpClient:
         client = AiohttpClient()
         url = "https://example.com/data"
         content = "x" * 1000
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get(url, body=content)
             with pytest.raises(ContentSizeLimitExceededError) as exc_info:
                 await client.get(url, max_content_size=500)
@@ -111,7 +111,7 @@ class TestAiohttpClient:
         client = AiohttpClient()
         url = "https://example.com/data"
         content = "x" * 10000
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get(url, body=content)
             resp = await client.get(url)
             assert resp.status_code == 200
@@ -123,12 +123,11 @@ class TestAiohttpClient:
         self,
     ):
         """aiohttp.ClientError during streaming read should be wrapped in ConnectionError."""
-        import aiohttp
 
         client = AiohttpClient()
         url = "https://example.com/data"
-        with aioresponses() as m:
-            m.get(url, exception=aiohttp.ClientError("connection reset"))
+        async with aiointercept(mock_external_urls=True) as m:
+            m.get(url, exception=True)
             with pytest.raises(ConnectionError):
                 await client.get(url, max_content_size=1024)
         await client.close()

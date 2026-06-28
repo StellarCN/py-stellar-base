@@ -1,6 +1,6 @@
 import pytest
 import requests_mock
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 
 from stellar_sdk.client.aiohttp_client import AiohttpClient
 from stellar_sdk.exceptions import ContentSizeLimitExceededError
@@ -55,7 +55,7 @@ class TestFederation:
 
     @pytest.mark.asyncio
     async def test_resolve_by_stellar_address_async(self):
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get(
                 "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
             )
@@ -81,7 +81,7 @@ class TestFederation:
 
     @pytest.mark.asyncio
     async def test_resolve_by_stellar_address_federation_not_found_async(self):
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get("https://example.com/.well-known/stellar.toml", body="")
             with pytest.raises(
                 FederationServerNotFoundError,
@@ -109,7 +109,7 @@ class TestFederation:
 
     @pytest.mark.asyncio
     async def test_resolve_by_stellar_address_with_federation_url_async(self):
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get(
                 "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
             )
@@ -144,7 +144,7 @@ class TestFederation:
 
     @pytest.mark.asyncio
     async def test_resolve_by_account_id_with_domain_async(self):
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get(
                 "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
             )
@@ -176,7 +176,7 @@ class TestFederation:
 
     @pytest.mark.asyncio
     async def test_resolve_by_account_id_federation_not_found_async(self):
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get("https://example.com/.well-known/stellar.toml", body="")
             with pytest.raises(
                 FederationServerNotFoundError,
@@ -228,7 +228,7 @@ class TestFederation:
     @pytest.mark.asyncio
     async def test_federation_response_size_limit_exceeded_async(self):
         large_content = "x" * (FEDERATION_RESPONSE_MAX_SIZE + 1)
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get(
                 "https://example.com/.well-known/stellar.toml",
                 body=self.TOML_CONTENT,
