@@ -781,16 +781,33 @@ class TestSorobanServer:
             assert isinstance(SorobanServer(RPC_URL).get_ledgers(), GetLedgersResponse)
 
     def test_get_sac_balance(self):
+        contract_id = "CC25B67T7RG7IBWVQKBFRC6SR4MJDHYFDGMIQYVVI7WE55TPUILMH5YT"
+        sac = Asset.native()
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        sac_id = sac.contract_id(network_passphrase)
+        key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(contract_id)])
+        ledger_key = stellar_xdr.LedgerKey(
+            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+            contract_data=stellar_xdr.LedgerKeyContractData(
+                contract=Address(sac_id).to_xdr_sc_address(),
+                key=key,
+                durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+            ),
+        )
+        expected_key = ledger_key.to_xdr()
+        latest_ledger = 57387047
+        last_modified_ledger = 57386587
+        live_until_ledger = 57904987
         result = {
             "entries": [
                 {
-                    "key": "AAAABgAAAAEltPzYWa7C+mNIQ4xImzw8EMmLbSG+T9PLMMtolT75dwAAABAAAAABAAAAAgAAAA8AAAAHQmFsYW5jZQAAAAASAAAAASW0/NhZrsL6Y0hDjEibPDwQyYttIb5P08swy2iVPvl3AAAAAQ==",
+                    "key": expected_key,
                     "xdr": "AAAABgAAAAAAAAABJbT82FmuwvpjSEOMSJs8PBDJi20hvk/TyzDLaJU++XcAAAAQAAAAAQAAAAIAAAAPAAAAB0JhbGFuY2UAAAAAEgAAAAEltPzYWa7C+mNIQ4xImzw8EMmLbSG+T9PLMMtolT75dwAAAAEAAAARAAAAAQAAAAMAAAAPAAAABmFtb3VudAAAAAAACgAAAAAAAAAAAAAAABFKkyUAAAAPAAAACmF1dGhvcml6ZWQAAAAAAAAAAAABAAAADwAAAAhjbGF3YmFjawAAAAAAAAAA",
-                    "lastModifiedLedgerSeq": 57386587,
-                    "liveUntilLedgerSeq": 57904987,
+                    "lastModifiedLedgerSeq": last_modified_ledger,
+                    "liveUntilLedgerSeq": live_until_ledger,
                 }
             ],
-            "latestLedger": 57387047,
+            "latestLedger": latest_ledger,
         }
         data = {
             "jsonrpc": "2.0",
@@ -798,49 +815,70 @@ class TestSorobanServer:
             "result": result,
         }
         expected_result = GetSACBalanceResponse(
-            latest_ledger=57387047,
+            latest_ledger=latest_ledger,
             balance_entry=SACBalanceEntry(
                 amount=290100005,
                 authorized=True,
                 clawback=False,
-                last_modified_ledger=57386587,
-                live_until_ledger=57904987,
+                last_modified_ledger=last_modified_ledger,
+                live_until_ledger=live_until_ledger,
             ),
         )
         with requests_mock.Mocker() as m:
             m.post(RPC_URL, json=data)
             assert (
                 SorobanServer(RPC_URL).get_sac_balance(
-                    "CC25B67T7RG7IBWVQKBFRC6SR4MJDHYFDGMIQYVVI7WE55TPUILMH5YT",
-                    Asset.native(),
-                    Network.PUBLIC_NETWORK_PASSPHRASE,
+                    contract_id,
+                    sac,
+                    network_passphrase,
                 )
                 == expected_result
             )
 
+        request_data = m.last_request.json()
+        assert request_data["params"]["keys"] == [expected_key]
+
     def test_get_sac_balance_with_empty_balance_entry(self):
-        result = {"entries": [], "latestLedger": 57387178}
+        contract_id = "CDOAW6D7NXAPOCO7TFAWZNJHK62E3IYRGNRVX3VOXNKNVOXCLLPJXQCF"
+        sac = Asset(
+            "yXLM",
+            "GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55",
+        )
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        sac_id = sac.contract_id(network_passphrase)
+        key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(contract_id)])
+        ledger_key = stellar_xdr.LedgerKey(
+            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+            contract_data=stellar_xdr.LedgerKeyContractData(
+                contract=Address(sac_id).to_xdr_sc_address(),
+                key=key,
+                durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+            ),
+        )
+        expected_key = ledger_key.to_xdr()
+        latest_ledger = 57387178
+        result = {"entries": [], "latestLedger": latest_ledger}
         data = {
             "jsonrpc": "2.0",
             "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
             "result": result,
         }
         expected_result = GetSACBalanceResponse(
-            latest_ledger=57387178, balance_entry=None
+            latest_ledger=latest_ledger, balance_entry=None
         )
         with requests_mock.Mocker() as m:
             m.post(RPC_URL, json=data)
             assert (
                 SorobanServer(RPC_URL).get_sac_balance(
-                    "CDOAW6D7NXAPOCO7TFAWZNJHK62E3IYRGNRVX3VOXNKNVOXCLLPJXQCF",
-                    Asset(
-                        "yXLM",
-                        "GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55",
-                    ),
-                    Network.PUBLIC_NETWORK_PASSPHRASE,
+                    contract_id,
+                    sac,
+                    network_passphrase,
                 )
                 == expected_result
             )
+
+        request_data = m.last_request.json()
+        assert request_data["params"]["keys"] == [expected_key]
 
     def test_simulate_transaction(self):
         result = {

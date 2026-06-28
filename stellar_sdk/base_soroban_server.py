@@ -6,8 +6,10 @@ import uuid
 from enum import Enum
 from typing import TYPE_CHECKING
 
+from . import scval
 from . import xdr as stellar_xdr
 from .address import Address
+from .asset import Asset
 from .operation import InvokeHostFunction
 from .soroban_rpc import *
 
@@ -39,6 +41,30 @@ def _build_contract_instance_key(contract_id: str) -> stellar_xdr.LedgerKey:
             key=stellar_xdr.SCVal(
                 stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
             ),
+            durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+        ),
+    )
+
+
+def _build_sac_balance_ledger_key(
+    asset: Asset,
+    contract_id: str,
+    network_passphrase: str,
+) -> stellar_xdr.LedgerKey:
+    """Build the ledger key for an SAC asset balance held by a contract.
+
+    :param asset: The SAC asset whose balance ledger entry should be looked up.
+    :param contract_id: The contract ID that holds the asset balance.
+    :param network_passphrase: The network passphrase used to derive the SAC contract ID.
+    :return: The persistent contract-data ledger key for the balance entry.
+    """
+    sac_id = asset.contract_id(network_passphrase)
+    key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(contract_id)])
+    return stellar_xdr.LedgerKey(
+        stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+        contract_data=stellar_xdr.LedgerKeyContractData(
+            contract=Address(sac_id).to_xdr_sc_address(),
+            key=key,
             durability=stellar_xdr.ContractDataDurability.PERSISTENT,
         ),
     )
