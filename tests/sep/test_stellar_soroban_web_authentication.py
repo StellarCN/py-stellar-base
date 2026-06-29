@@ -1,6 +1,6 @@
-import aioresponses
 import pytest
 import requests_mock
+from aiointercept import aiointercept
 
 from stellar_sdk import Address, Network, SorobanServer, SorobanServerAsync, scval
 from stellar_sdk import xdr as stellar_xdr
@@ -1478,7 +1478,7 @@ async def test_build_challenge_authorization_entries_async():
         },
     }
 
-    with aioresponses.aioresponses() as m:
+    async with aiointercept(mock_external_urls=True) as m:
         m.post(MOCK_RPC_URL, payload=mock_data)
         async with SorobanServerAsync(MOCK_RPC_URL) as soroban_server:
             challenge_authorization_entries = (
@@ -1551,7 +1551,7 @@ async def test_build_challenge_authorization_entries_async_without_client_domain
         },
     }
 
-    with aioresponses.aioresponses() as m:
+    async with aiointercept(mock_external_urls=True) as m:
         m.post(MOCK_RPC_URL, payload=mock_data)
         async with SorobanServerAsync(MOCK_RPC_URL) as soroban_server:
             challenge_authorization_entries = (
@@ -1626,7 +1626,7 @@ async def test_build_challenge_authorization_entries_async_with_custom_nonce():
 
     nonce = "random-nonce"
 
-    with aioresponses.aioresponses() as m:
+    async with aiointercept(mock_external_urls=True) as m:
         m.post(MOCK_RPC_URL, payload=mock_data)
         async with SorobanServerAsync(MOCK_RPC_URL) as soroban_server:
             challenge_authorization_entries = (
@@ -1764,7 +1764,7 @@ async def test_verify_challenge_authorization_entries_async():
         },
     }
     signed_entries = build_valid_entries_with_client_domain()
-    with aioresponses.aioresponses() as m:
+    async with aiointercept(mock_external_urls=True) as m:
         m.post(MOCK_RPC_URL, payload=mock_data)
         async with SorobanServerAsync(MOCK_RPC_URL) as soroban_server:
             resp = await verify_challenge_authorization_entries_async(
@@ -1839,7 +1839,7 @@ async def test_verify_challenge_authorization_entries_async_failed():
     }
 
     signed_entries = build_valid_entries_with_client_domain()
-    with aioresponses.aioresponses() as m:
+    async with aiointercept(mock_external_urls=True) as m:
         m.post(MOCK_RPC_URL, payload=mock_data)
         async with SorobanServerAsync(MOCK_RPC_URL) as soroban_server:
             with pytest.raises(

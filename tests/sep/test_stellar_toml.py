@@ -1,6 +1,6 @@
 import pytest
 import requests_mock
-from aioresponses import aioresponses
+from aiointercept import aiointercept
 
 from stellar_sdk.exceptions import ContentSizeLimitExceededError
 from stellar_sdk.sep.exceptions import StellarTomlNotFoundError
@@ -28,7 +28,7 @@ NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
 
     @pytest.mark.asyncio
     async def test_get_success_async(self):
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get(
                 "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
             )
@@ -59,7 +59,7 @@ NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
     @pytest.mark.asyncio
     async def test_content_size_limit_exceeded_async(self):
         large_content = "a" * (STELLAR_TOML_MAX_SIZE + 1)
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.get("https://example.com/.well-known/stellar.toml", body=large_content)
             with pytest.raises(ContentSizeLimitExceededError):
                 await fetch_stellar_toml_async("example.com")
