@@ -210,6 +210,7 @@ class SimulateTransactionRequest(BaseModel):
     transaction: str
     resource_config: ResourceConfig | None = Field(alias="resourceConfig", default=None)
     auth_mode: AuthMode | None = Field(alias="authMode", default=None)
+    use_upgraded_auth: bool = Field(alias="useUpgradedAuth", default=False)
     model_config = ConfigDict(populate_by_name=True)
 
 

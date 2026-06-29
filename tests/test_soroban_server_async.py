@@ -899,6 +899,7 @@ class TestSorobanServer:
             "transaction": transaction.to_xdr(),
             "resourceConfig": None,
             "authMode": None,
+            "useUpgradedAuth": False,
         }
 
     async def test_simulate_transaction_with_addl_resources(self):
@@ -942,6 +943,7 @@ class TestSorobanServer:
             "transaction": transaction.to_xdr(),
             "resourceConfig": {"instructionLeeway": 1000000},
             "authMode": None,
+            "useUpgradedAuth": False,
         }
 
     async def test_simulate_transaction_with_auth_mode(self):
@@ -993,6 +995,63 @@ class TestSorobanServer:
             "transaction": transaction.to_xdr(),
             "resourceConfig": None,
             "authMode": "record_allow_nonroot",
+            "useUpgradedAuth": False,
+        }
+
+    async def test_simulate_transaction_with_use_upgraded_auth(self):
+        result = {"latestLedger": 1479}
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": result,
+        }
+        transaction = _build_soroban_transaction(None, [])
+        with aioresponses() as m:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
+                assert (
+                    await client.simulate_transaction(
+                        transaction, use_upgraded_auth=True
+                    )
+                ) == SimulateTransactionResponse.model_validate(result)
+
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "simulateTransaction"
+        assert request_data["params"] == {
+            "transaction": transaction.to_xdr(),
+            "resourceConfig": None,
+            "authMode": None,
+            "useUpgradedAuth": True,
+        }
+
+    async def test_simulate_transaction_with_use_upgraded_auth_false(self):
+        result = {"latestLedger": 1479}
+        data = {
+            "jsonrpc": "2.0",
+            "id": "e1fabdcdf0244a2a9adfab94d7748b6c",
+            "result": result,
+        }
+        transaction = _build_soroban_transaction(None, [])
+        with aioresponses() as m:
+            m.post(RPC_URL, payload=data)
+            async with SorobanServerAsync(RPC_URL) as client:
+                assert (
+                    await client.simulate_transaction(
+                        transaction, use_upgraded_auth=False
+                    )
+                ) == SimulateTransactionResponse.model_validate(result)
+
+        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
+        assert len(request_data["id"]) == 32
+        assert request_data["jsonrpc"] == "2.0"
+        assert request_data["method"] == "simulateTransaction"
+        assert request_data["params"] == {
+            "transaction": transaction.to_xdr(),
+            "resourceConfig": None,
+            "authMode": None,
+            "useUpgradedAuth": False,
         }
 
     async def test_prepare_transaction_without_auth_and_soroban_data(self):
