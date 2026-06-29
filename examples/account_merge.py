@@ -1,37 +1,96 @@
 """
-This example shows how to transfer the native balance (the amount of XLM an account holds) to
-another account and removes the source account from the ledger.
+==========================================================
+Example: Account Merge (Transfer XLM + Remove Source Account)
+==========================================================
 
-See: https://developers.stellar.org/docs/start/list-of-operations/#account-merge
+This example demonstrates how to merge a Stellar account into another account
+using the Stellar Python SDK.
+
+What "Account Merge" does:
+- Transfers the *entire remaining XLM balance* from the source account to the destination.
+- Removes (deletes) the source account from the ledger.
+- The source account must have:
+  - No trustlines
+  - No offers
+  - No signers/subentries that prevent removal
+  - Enough XLM to cover fees and minimum requirements until the merge is submitted
+
+Operations performed:
+1. Connect to Stellar Horizon (Testnet).
+2. Load the source account from the network.
+3. Build an `Account Merge` transaction (append_account_merge_op).
+4. Sign the transaction with the source account secret.
+5. Submit the transaction and print the transaction hash.
+
+Official Documentation:
+- Account Merge operation:
+  https://developers.stellar.org/docs/start/list-of-operations/#account-merge
+- Account Merge tutorial/reference:
+  https://developers.stellar.org/docs/learn/encyclopedia/transactions-specialized/account-merge/
+
+IMPORTANT NOTES:
+- After a successful merge, the source account will no longer exist on the ledger.
+- Never hardcode real secret keys in production code.
+  Use environment variables (recommended) or a secrets manager.
 """
+
+# ==============================================================
+# === Installation Guideline ===================================
+# ==============================================================
+# Install the Stellar SDK for Python:
+#
+#     pip install stellar-sdk
+#
+# Save this script as `account_merge.py` and run:
+#
+#     python account_merge.py
+#
+# ==============================================================
+# === Import Required Libraries =================================
+# ==============================================================
 
 from stellar_sdk import Keypair, Network, Server, TransactionBuilder
 
-# Configure StellarSdk to talk to the horizon instance hosted by Stellar.org
-# To use the live network, set the hostname to 'horizon.stellar.org'
+# ==============================================================
+# === 1. Configuration (Network + Horizon) ======================
+# ==============================================================
+
+# Connect to the Stellar Testnet Horizon server
+horizon_url = "https://horizon-testnet.stellar.org/"
 server = Server(horizon_url="https://horizon-testnet.stellar.org")
 
-# The following source key was created by the friendbot at https://laboratory.stellar.org/#account-creator?network=test
-# before running this example create a new account, fund it and then copy and paste the
-# secret key where the current key is.
-source_secret_key = "SC7AUS23UKVZQL5KMIK4ZK3EZJUS6ZVMTQSVLH3VIK42W6RBQAQXOVQX"
+# Choose the network passphrase:
+# - Testnet: Network.TESTNET_NETWORK_PASSPHRASE
+# - Public : Network.PUBLIC_NETWORK_PASSPHRASE
+network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
-# The following obtains the keypair of the source account we will be dealing with.
-source_keypair = Keypair.from_secret(source_secret_key)
-source_public_key = source_keypair.public_key
+# ==============================================================
+# === 2. Define Source and Destination Accounts =================
+# ==============================================================
+
+source_secret_key = "SC7AUS23UKVZQL5KMIK4ZK3EZJUS6ZVMTQSVLH3VIK42W6RBQAQXOVQX"
 
 # This is the public key of another account created by the friendbot. When I wrote this
 # code it was active on the test network, but I would recommened creating a new account
 # the same way the source account was created.
 destination_public_key = "GANXMF6DCQNHZP5ULDONM4VNXBV5YECTDGLGXCESXNT66H6AZSAHLFGK"
 
-# loads the source account from the testnet
+# Build source keypair
+source_keypair = Keypair.from_secret(source_secret_key)
+source_public_key = source_keypair.public_key
+
+# ==============================================================
+# === 3. Load the Source Account from Horizon ===================
+# ==============================================================
+
 source_account = server.load_account(source_public_key)
 
-# builds the transaction that merges the two accounts.
-# The current code uses the testnetwork and if you wanted to use
-# the public network 'Network.TESTNET_NETWORK_PASSPHRASE' would
-# have to be replaced with 'Network.PUBLIC_NETWORK_PASSPHRASE'.
+# ==============================================================
+# === 4. Build Account Merge Transaction ========================
+# ==============================================================
+
+# Base fee is in stroops (100 stroops = 0.00001 XLM) per operation.
+# Account Merge is a single operation.
 transaction = (
     TransactionBuilder(
         source_account=source_account,
@@ -43,9 +102,32 @@ transaction = (
     .build()
 )
 
+# ==============================================================
+# === 5. Sign and Submit Transaction ============================
+# ==============================================================
 
-# source account signs the transaction
 transaction.sign(source_keypair)
 
-# submit the transaction to the server
 response = server.submit_transaction(transaction)
+
+# ==============================================================
+# === 6. Output Result ==========================================
+# ==============================================================
+
+print("Account Merge successful!")
+print(f"Transaction hash: {response['hash']}")
+print(f"Source (removed): {source_public_key}")
+print(f"Destination:      {destination_public_key}")
+
+# ==============================================================
+# === Expected Output ===========================================
+# ==============================================================
+# Account Merge successful!
+# Transaction hash: <some_hash>
+# Source (removed): G...
+# Destination:      G...
+#
+# After success:
+# - The destination receives the remaining XLM balance from the source.
+# - The source account no longer exists on the ledger.
+# --------------------------------------------------------------
