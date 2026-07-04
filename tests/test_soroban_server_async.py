@@ -1006,7 +1006,7 @@ class TestSorobanServer:
             "result": result,
         }
         transaction = _build_soroban_transaction(None, [])
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.post(RPC_URL, payload=data)
             async with SorobanServerAsync(RPC_URL) as client:
                 assert (
@@ -1015,7 +1015,7 @@ class TestSorobanServer:
                     )
                 ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
+        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "simulateTransaction"
@@ -1034,7 +1034,7 @@ class TestSorobanServer:
             "result": result,
         }
         transaction = _build_soroban_transaction(None, [])
-        with aioresponses() as m:
+        async with aiointercept(mock_external_urls=True) as m:
             m.post(RPC_URL, payload=data)
             async with SorobanServerAsync(RPC_URL) as client:
                 assert (
@@ -1043,7 +1043,7 @@ class TestSorobanServer:
                     )
                 ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
+        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
         assert len(request_data["id"]) == 32
         assert request_data["jsonrpc"] == "2.0"
         assert request_data["method"] == "simulateTransaction"
