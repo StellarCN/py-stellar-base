@@ -37,7 +37,6 @@ def test_get_contract_wasm_by_hash(monkeypatch):
     assert server.get_contract_wasm_by_hash(wasm_hash) == wasm
 
 
-@pytest.mark.asyncio
 async def test_get_contract_wasm_by_hash_async(monkeypatch):
     wasm_hash = b"\x01" * 32
     wasm = b"\x00asm\x01\x00\x00\x00"
@@ -81,7 +80,6 @@ def test_get_contract_wasm_handles_sac(monkeypatch):
         server.get_contract_wasm(CONTRACT_ID)
 
 
-@pytest.mark.asyncio
 async def test_get_contract_wasm_handles_sac_async(monkeypatch):
     server = SorobanServerAsync("https://example.com")
 
@@ -117,7 +115,6 @@ def test_get_contract_wasm_uses_instance_hash(monkeypatch):
     assert server.get_contract_wasm(CONTRACT_ID) == wasm
 
 
-@pytest.mark.asyncio
 async def test_get_contract_wasm_uses_instance_hash_async(monkeypatch):
     wasm_hash = b"\x02" * 32
     wasm = b"\x00asm\x01\x00\x00\x00"
@@ -173,7 +170,6 @@ def test_get_contract_wasm_rejects_unknown_executable_kind(monkeypatch):
         server.get_contract_wasm(CONTRACT_ID)
 
 
-@pytest.mark.asyncio
 async def test_get_contract_wasm_rejects_missing_hash_async(monkeypatch):
     server = SorobanServerAsync("https://example.com")
 
@@ -190,7 +186,6 @@ async def test_get_contract_wasm_rejects_missing_hash_async(monkeypatch):
         await server.get_contract_wasm(CONTRACT_ID)
 
 
-@pytest.mark.asyncio
 async def test_get_contract_wasm_rejects_unknown_executable_kind_async(monkeypatch):
     server = SorobanServerAsync("https://example.com")
     instance = stellar_xdr.SCContractInstance(
@@ -224,7 +219,6 @@ def test_get_contract_wasm_by_hash_missing_code(monkeypatch):
         server.get_contract_wasm_by_hash(b"\x01" * 32)
 
 
-@pytest.mark.asyncio
 async def test_get_contract_wasm_by_hash_missing_code_async(monkeypatch):
     server = SorobanServerAsync("https://example.com")
 
@@ -268,7 +262,6 @@ def test_get_contract_wasm_by_hash_rejects_non_code_entry(monkeypatch):
         server.get_contract_wasm_by_hash(b"\x01" * 32)
 
 
-@pytest.mark.asyncio
 async def test_get_contract_wasm_by_hash_rejects_non_code_entry_async(monkeypatch):
     server = SorobanServerAsync("https://example.com")
 
@@ -311,7 +304,6 @@ def test_get_contract_helpers_parse_wasm(monkeypatch):
     assert len(server.get_contract_info(CONTRACT_ID).spec) == 0
 
 
-@pytest.mark.asyncio
 async def test_get_contract_helpers_parse_wasm_async(monkeypatch):
     wasm = b"\x00asm\x01\x00\x00\x00"
     server = SorobanServerAsync("https://example.com")
@@ -375,7 +367,6 @@ def test_get_contract_instance_errors(monkeypatch):
         server._get_contract_instance(CONTRACT_ID)
 
 
-@pytest.mark.asyncio
 async def test_get_contract_instance_errors_async(monkeypatch):
     server = SorobanServerAsync("https://example.com")
 

@@ -77,7 +77,6 @@ class TestFederation:
                 self.FEDERATION_SERVER,
             ]
 
-    @pytest.mark.asyncio
     async def test_resolve_by_stellar_address_async(self):
         async with aiointercept(mock_external_urls=True) as m:
             m.get(
@@ -103,7 +102,6 @@ class TestFederation:
             ):
                 resolve_stellar_address(self.STELLAR_ADDRESS)
 
-    @pytest.mark.asyncio
     async def test_resolve_by_stellar_address_federation_not_found_async(self):
         async with aiointercept(mock_external_urls=True) as m:
             m.get("https://example.com/.well-known/stellar.toml", body="")
@@ -131,7 +129,6 @@ class TestFederation:
             )
             assert record.account_id == self.ACCOUNT_ID
 
-    @pytest.mark.asyncio
     async def test_resolve_by_stellar_address_with_federation_url_async(self):
         async with aiointercept(mock_external_urls=True) as m:
             m.get(
@@ -166,7 +163,6 @@ class TestFederation:
             record = resolve_account_id(self.ACCOUNT_ID, domain=self.DOMAIN)
             assert record == self.FEDERATION_RECORD
 
-    @pytest.mark.asyncio
     async def test_resolve_by_account_id_with_domain_async(self):
         async with aiointercept(mock_external_urls=True) as m:
             m.get(
@@ -198,7 +194,6 @@ class TestFederation:
             ):
                 resolve_account_id(self.ACCOUNT_ID, domain="example.com")
 
-    @pytest.mark.asyncio
     async def test_resolve_by_account_id_federation_not_found_async(self):
         async with aiointercept(mock_external_urls=True) as m:
             m.get("https://example.com/.well-known/stellar.toml", body="")
@@ -249,7 +244,6 @@ class TestFederation:
             with pytest.raises(ContentSizeLimitExceededError):
                 resolve_stellar_address(self.STELLAR_ADDRESS)
 
-    @pytest.mark.asyncio
     async def test_federation_response_size_limit_exceeded_async(self):
         large_content = "x" * (FEDERATION_RESPONSE_MAX_SIZE + 1)
         async with aiointercept(mock_external_urls=True) as m:

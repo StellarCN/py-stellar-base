@@ -439,7 +439,6 @@ class TestAccountMemoRequirements:
             server.submit_transaction(transaction)
         assert err.value.status == 400
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_memo_async(self, httpserver):
         self.__inject_mock_server(httpserver)
         horizon_url = httpserver.url_for("/")
@@ -482,7 +481,6 @@ class TestAccountMemoRequirements:
             transaction.sign(keypair)
             await server.submit_transaction(transaction)
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_payment_skip_check_async(self, httpserver):
         self.__inject_mock_server(httpserver)
         horizon_url = httpserver.url_for("/")
@@ -524,7 +522,6 @@ class TestAccountMemoRequirements:
             transaction.sign(keypair)
             await server.submit_transaction(transaction, True)
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_payment_raise_async(self, httpserver):
         self.__inject_mock_server(httpserver)
         horizon_url = httpserver.url_for("/")
@@ -572,7 +569,6 @@ class TestAccountMemoRequirements:
             assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_A
             assert err.value.operation_index == 0
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_path_payment_strict_receive_raise_async(
         self, httpserver
     ):
@@ -622,7 +618,6 @@ class TestAccountMemoRequirements:
             assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_B
             assert err.value.operation_index == 1
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_path_payment_strict_send_raise_async(
         self, httpserver
     ):
@@ -672,7 +667,6 @@ class TestAccountMemoRequirements:
             assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_C
             assert err.value.operation_index == 2
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_account_merge_raise_async(self, httpserver):
         self.__inject_mock_server(httpserver)
         horizon_url = httpserver.url_for("/")
@@ -720,7 +714,6 @@ class TestAccountMemoRequirements:
             assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D
             assert err.value.operation_index == 3
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_two_operation_with_same_destination_async(
         self, httpserver
     ):
@@ -770,7 +763,6 @@ class TestAccountMemoRequirements:
             assert err.value.account_id == self.DESTINATION_ACCOUNT_MEMO_REQUIRED_D
             assert err.value.operation_index == 3
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_no_destination_operation_async(
         self, httpserver
     ):
@@ -789,7 +781,6 @@ class TestAccountMemoRequirements:
             transaction.sign(keypair)
             await server.submit_transaction(transaction)
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_account_not_found_async(self, httpserver):
         self.__inject_mock_server(httpserver)
         horizon_url = httpserver.url_for("/")
@@ -831,7 +822,6 @@ class TestAccountMemoRequirements:
             transaction.sign(keypair)
             await server.submit_transaction(transaction)
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_fetch_account_error_raise_async(
         self, httpserver
     ):
@@ -917,7 +907,6 @@ class TestAccountMemoRequirements:
         transaction.sign(keypair)
         server.submit_transaction(transaction)
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_memo_muxed_account_async(self, httpserver):
         self.__inject_mock_server(httpserver)
         horizon_url = httpserver.url_for("/")
@@ -996,7 +985,6 @@ class TestAccountMemoRequirements:
         )
         server.submit_transaction(fee_bump_tx)
 
-    @pytest.mark.asyncio
     async def test_check_memo_required_with_fee_bump_transaction_async(
         self, httpserver
     ):

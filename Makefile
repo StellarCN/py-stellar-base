@@ -67,10 +67,10 @@ default: ;
 # Targets for running various levels of tests with coverage.
 # ==============================================================================
 unit-test:
-	$(UV_RUN_CMD) pytest -v -s -rs tests --cov --cov-report=html
+	$(UV_RUN_CMD) pytest -v -rs tests --cov --cov-report=html
 
 integration-test:
-	$(UV_RUN_CMD) pytest -v -s -rs tests --integration --cov=./ --cov-report=xml
+	$(UV_RUN_CMD) pytest -v -rs tests --integration --cov=./ --cov-report=xml
 
 # ==============================================================================
 # Build & Clean Targets

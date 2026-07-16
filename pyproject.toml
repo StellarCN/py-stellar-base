@@ -89,6 +89,15 @@ docs = [
 requires = ["flit_core>=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: marks tests as integration tests (skipped unless --integration is passed)",
+]
+
 [tool.mypy]
 show_error_codes = true
 warn_unused_configs = true

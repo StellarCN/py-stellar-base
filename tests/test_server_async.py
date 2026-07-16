@@ -1,7 +1,5 @@
 from decimal import Decimal
 
-import pytest
-
 from stellar_sdk import (
     AiohttpClient,
     Asset,
@@ -16,7 +14,6 @@ from stellar_sdk.call_builder.call_builder_async import *
 from tests import _horizon_fixtures as hf
 
 
-@pytest.mark.asyncio
 class TestServerAsync:
     async def test_load_acount(self, horizon_mock):
         account_id = "GDV6FVHPY4JH7EEBSJYPQQYZA3OC6TKTM2TAXRHWT4EEL7BJ2BTDQT5D"

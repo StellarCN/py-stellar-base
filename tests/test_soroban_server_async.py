@@ -23,7 +23,6 @@ from stellar_sdk.soroban_server_async import SorobanServerAsync
 RPC_URL = "https://example.com/soroban_rpc"
 
 
-@pytest.mark.asyncio
 class TestSorobanServer:
     async def test_load_account(self):
         result = {

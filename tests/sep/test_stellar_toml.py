@@ -26,7 +26,6 @@ NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
             toml = fetch_stellar_toml("example.com", None)
             assert toml.get("FEDERATION_SERVER") == "https://federation.example.com"
 
-    @pytest.mark.asyncio
     async def test_get_success_async(self):
         async with aiointercept(mock_external_urls=True) as m:
             m.get(
@@ -56,7 +55,6 @@ NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
             with pytest.raises(ContentSizeLimitExceededError):
                 fetch_stellar_toml("example.com")
 
-    @pytest.mark.asyncio
     async def test_content_size_limit_exceeded_async(self):
         large_content = "a" * (STELLAR_TOML_MAX_SIZE + 1)
         async with aiointercept(mock_external_urls=True) as m:

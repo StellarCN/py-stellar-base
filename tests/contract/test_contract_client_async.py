@@ -73,7 +73,6 @@ class TestContractClientAsync:
     def teardown_class(cls):
         "Runs at end of class"
 
-    @pytest.mark.asyncio
     async def test_upload_contract_wasm(self):
         wasm_file = os.path.join(
             os.path.dirname(__file__), "wasm_files", "soroban_hello_world_contract.wasm"
@@ -85,7 +84,6 @@ class TestContractClientAsync:
             assert isinstance(wasm_id, bytes)
             assert len(wasm_id) == 32
 
-    @pytest.mark.asyncio
     async def test_create_contract(self):
         async with SorobanServerAsync(RPC_URL) as client:
             wasm_id = await ContractClientAsync.upload_contract_wasm(
@@ -104,7 +102,6 @@ class TestContractClientAsync:
             assert isinstance(contract_id, str)
             assert len(contract_id) == 56
 
-    @pytest.mark.asyncio
     async def test_create_stellar_asset_contract_from_asset(self):
         async with SorobanServerAsync(RPC_URL) as client:
             asset_code = "".join(choice(ascii_uppercase) for _ in range(8))
@@ -119,7 +116,6 @@ class TestContractClientAsync:
             assert isinstance(contract_id, str)
             assert len(contract_id) == 56
 
-    @pytest.mark.asyncio
     async def test_invoke_hello_world_contract(self):
         assemble_tx = await ContractClientAsync(
             self.hello_world_contract_id, RPC_URL, NETWORK_PASSPHRASE
@@ -139,7 +135,6 @@ class TestContractClientAsync:
         result = await assemble_tx.sign_and_submit(SOURCE, True)
         assert result == ["Hello", "world"]
 
-    @pytest.mark.asyncio
     async def test_invoke_atomic_swap_contract(self):
         alice_kp = Keypair.random()
         bob_kp = Keypair.random()

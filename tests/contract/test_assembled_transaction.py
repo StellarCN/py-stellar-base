@@ -205,7 +205,6 @@ def test_sign_auth_entries_rejects_non_account_contract_address():
         )
 
 
-@pytest.mark.asyncio
 async def test_async_sign_auth_entries_rejects_non_account_contract_address():
     assembled, _, _ = _assembled_async_with_auth(Keypair.random().public_key)
 
@@ -341,7 +340,6 @@ def test_authorize_accepts_keypair_as_first_argument():
     assert assembled._needs_preparation is False
 
 
-@pytest.mark.asyncio
 async def test_async_sign_and_submit_auto_prepares_contract_address_auth(monkeypatch):
     contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
     server = _FakeSorobanServerAsync()
@@ -371,7 +369,6 @@ async def test_async_sign_and_submit_auto_prepares_contract_address_auth(monkeyp
     assert assembled._needs_preparation is False
 
 
-@pytest.mark.asyncio
 async def test_async_prepare_restores_footprint_after_contract_address_auth(
     monkeypatch,
 ):
@@ -440,7 +437,6 @@ def test_sign_auth_entries_signs_v2_entry():
     )
 
 
-@pytest.mark.asyncio
 async def test_async_sign_auth_entries_signs_v2_entry():
     signer = Keypair.random()
     assembled, _, _ = _assembled_async_with_auth(
@@ -523,7 +519,6 @@ def test_needs_non_invoker_signing_by_counts_all_address_credential_types():
     )
 
 
-@pytest.mark.asyncio
 async def test_async_needs_non_invoker_signing_by_counts_all_address_credential_types():
     entries, legacy_signer, v2_signer, delegating_signer, delegate = (
         _mixed_credential_entries()

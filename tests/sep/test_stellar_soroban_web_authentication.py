@@ -1432,7 +1432,6 @@ def test_build_challenge_authorization_entries_with_custom_nonce():
             assert parsed.nonce == nonce
 
 
-@pytest.mark.asyncio
 async def test_build_challenge_authorization_entries_async():
     mock_data = {
         "jsonrpc": "2.0",
@@ -1510,7 +1509,6 @@ async def test_build_challenge_authorization_entries_async():
             assert parsed.client_domain_account == CLIENT_DOMAIN_ACCOUNT
 
 
-@pytest.mark.asyncio
 async def test_build_challenge_authorization_entries_async_without_client_domain():
     """Test building challenge authorization entries without client domain."""
 
@@ -1576,7 +1574,6 @@ async def test_build_challenge_authorization_entries_async_without_client_domain
             assert parsed.client_domain_account is None
 
 
-@pytest.mark.asyncio
 async def test_build_challenge_authorization_entries_async_with_custom_nonce():
     """Test building challenge authorization entries without client domain."""
 
@@ -1716,7 +1713,6 @@ def test_verify_challenge_authorization_entries():
             assert resp.web_auth_contract == WEB_AUTH_CONTRACT
 
 
-@pytest.mark.asyncio
 async def test_verify_challenge_authorization_entries_async():
     mock_data = {
         "jsonrpc": "2.0",
@@ -1819,7 +1815,6 @@ def test_verify_challenge_authorization_entries_failed():
             )
 
 
-@pytest.mark.asyncio
 async def test_verify_challenge_authorization_entries_async_failed():
     mock_data = {
         "jsonrpc": "2.0",

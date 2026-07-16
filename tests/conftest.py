@@ -87,10 +87,6 @@ def pytest_addoption(parser):
     )
 
 
-def pytest_configure(config):
-    config.addinivalue_line("markers", "integration: marks tests as integration tests")
-
-
 def pytest_collection_modifyitems(config, items):
     if config.getoption("--integration"):
         return

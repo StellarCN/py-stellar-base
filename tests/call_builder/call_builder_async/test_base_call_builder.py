@@ -7,7 +7,6 @@ from stellar_sdk.exceptions import BadRequestError, NotFoundError, NotPageableEr
 from tests import _horizon_fixtures as hf
 
 
-@pytest.mark.asyncio
 class TestBaseCallBuilder:
     async def test_get_data(self, httpbin_url):
         url = httpbin_url + "get"

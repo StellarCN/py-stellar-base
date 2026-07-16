@@ -7,7 +7,6 @@ from tests import _horizon_fixtures as hf
 
 
 class TestAiohttpClient:
-    @pytest.mark.asyncio
     async def test_get(self, httpbin_url):
         user_agent = "Hello/Stellar/overcat"
         client = AiohttpClient(pool_size=10, user_agent=user_agent)
@@ -20,7 +19,6 @@ class TestAiohttpClient:
         assert json["headers"]["User-Agent"] == user_agent
         await client.close()
 
-    @pytest.mark.asyncio
     async def test_post(self, httpbin_url):
         client = AiohttpClient()
         url = httpbin_url + "post"
@@ -38,7 +36,6 @@ class TestAiohttpClient:
         assert json["form"] == data
         await client.close()
 
-    @pytest.mark.asyncio
     async def test_stream(self, horizon_mock):
         horizon_mock.expect(
             "/ledgers", body=hf.stream_body(), content_type="text/event-stream"
@@ -51,7 +48,6 @@ class TestAiohttpClient:
             finally:
                 await stream.aclose()
 
-    @pytest.mark.asyncio
     async def test_with(self, httpbin_url):
         async with AiohttpClient() as client:
             url = httpbin_url + "get"
@@ -62,7 +58,6 @@ class TestAiohttpClient:
             assert json["args"] == params
             assert json["headers"]["User-Agent"] == USER_AGENT
 
-    @pytest.mark.asyncio
     async def test_custom_headers(self, httpbin_url):
         user_agent = "Hello/Stellar/overcat"
         custom_headers = {"a": "b", "c": "d"}
@@ -80,7 +75,6 @@ class TestAiohttpClient:
         assert json["headers"]["C"] == custom_headers["c"]
         await client.close()
 
-    @pytest.mark.asyncio
     async def test_get_with_max_content_size_success(self):
         client = AiohttpClient()
         url = "https://example.com/data"
@@ -92,7 +86,6 @@ class TestAiohttpClient:
             assert resp.text == content
         await client.close()
 
-    @pytest.mark.asyncio
     async def test_get_with_max_content_size_exceeded(self):
         client = AiohttpClient()
         url = "https://example.com/data"
@@ -106,7 +99,6 @@ class TestAiohttpClient:
             assert exc_info.value.content_size > 500
         await client.close()
 
-    @pytest.mark.asyncio
     async def test_get_without_max_content_size(self):
         client = AiohttpClient()
         url = "https://example.com/data"
@@ -118,7 +110,6 @@ class TestAiohttpClient:
             assert resp.text == content
         await client.close()
 
-    @pytest.mark.asyncio
     async def test_get_with_max_content_size_network_error_wraps_in_connection_error(
         self,
     ):
