@@ -2,9 +2,22 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import Operation, PathPaymentStrictReceive
-
-from . import *
+from stellar_sdk import (
+    MuxedAccount,
+    Operation,
+    PathPaymentStrictReceive,
+)
+from tests.operation.helpers import (
+    asset1,
+    asset2,
+    asset3,
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+    muxed2,
+    native_asset,
+)
 
 
 class TestPathPaymentStrictReceive:

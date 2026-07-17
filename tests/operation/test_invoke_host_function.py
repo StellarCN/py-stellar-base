@@ -1,9 +1,14 @@
-from stellar_sdk import Operation, scval
+from stellar_sdk import (
+    Operation,
+    scval,
+)
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.address import Address
 from stellar_sdk.operation import InvokeHostFunction
-
-from . import *
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+)
 
 
 class TestInvokeHostFunction:

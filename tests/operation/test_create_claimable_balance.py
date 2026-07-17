@@ -2,10 +2,20 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import Claimant, ClaimPredicate, CreateClaimableBalance, Operation
+from stellar_sdk import (
+    Claimant,
+    ClaimPredicate,
+    CreateClaimableBalance,
+    Operation,
+)
 from stellar_sdk.xdr.claim_predicate import ClaimPredicate as XdrClaimPredicate
-
-from . import *
+from tests.operation.helpers import (
+    asset1,
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+)
 
 
 class TestCreateClaimableBalance:

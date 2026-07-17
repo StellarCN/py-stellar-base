@@ -1,76 +1,21 @@
-import json
-from dataclasses import dataclass
-
 import pytest
-from pytest_httpserver import HTTPServer
-from werkzeug.wrappers import Response
 
-
-def _httpbin_headers(request):
-    return dict(request.headers)
-
-
-def _json_response(payload):
-    return Response(json.dumps(payload), content_type="application/json")
-
-
-def _httpbin_get(request):
-    return _json_response(
-        {
-            "args": request.args.to_dict(flat=True),
-            "headers": _httpbin_headers(request),
-            "url": request.url,
-        }
-    )
-
-
-def _httpbin_post(request):
-    return _json_response(
-        {
-            "form": request.form.to_dict(flat=True),
-            "headers": _httpbin_headers(request),
-            "url": request.url,
-        }
-    )
+from tests.mock_servers import (
+    HorizonMock,
+    httpbin_get_handler,
+    httpbin_post_handler,
+)
 
 
 @pytest.fixture
 def httpbin_url(httpserver):
-    httpserver.expect_request("/get", method="GET").respond_with_handler(_httpbin_get)
+    httpserver.expect_request("/get", method="GET").respond_with_handler(
+        httpbin_get_handler
+    )
     httpserver.expect_request("/post", method="POST").respond_with_handler(
-        _httpbin_post
+        httpbin_post_handler
     )
     return httpserver.url_for("/")
-
-
-@dataclass(frozen=True)
-class HorizonMock:
-    httpserver: HTTPServer
-
-    @property
-    def url(self) -> str:
-        return self.httpserver.url_for("/")
-
-    def expect(
-        self,
-        path: str,
-        *,
-        method: str = "GET",
-        json=None,
-        status: int = 200,
-        query_string: str | None = None,
-        body: str | None = None,
-        content_type: str | None = None,
-    ) -> None:
-        request = self.httpserver.expect_request(
-            path, method=method, query_string=query_string
-        )
-        if body is not None:
-            request.respond_with_response(
-                Response(body, status=status, content_type=content_type or "text/plain")
-            )
-        else:
-            request.respond_with_json(json, status=status)
 
 
 @pytest.fixture

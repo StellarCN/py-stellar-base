@@ -1,8 +1,17 @@
 import pytest
 
-from stellar_sdk import AccountMerge, Operation
-
-from . import *
+from stellar_sdk import (
+    AccountMerge,
+    MuxedAccount,
+    Operation,
+)
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+    muxed2,
+)
 
 
 class TestAccountMerge:

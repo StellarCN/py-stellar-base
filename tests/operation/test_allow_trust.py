@@ -1,8 +1,16 @@
 import pytest
 
-from stellar_sdk import AllowTrust, Operation, TrustLineEntryFlag
-
-from . import *
+from stellar_sdk import (
+    AllowTrust,
+    Operation,
+    TrustLineEntryFlag,
+)
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+)
 
 
 class TestAllowTrust:

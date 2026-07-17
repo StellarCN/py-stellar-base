@@ -3,12 +3,10 @@ from random import choice
 from string import ascii_uppercase
 
 import pytest
-import requests
 
 from stellar_sdk import (
     Asset,
     Keypair,
-    Network,
     SorobanServer,
     TransactionBuilder,
     scval,
@@ -16,15 +14,9 @@ from stellar_sdk import (
 from stellar_sdk.contract import ContractClient
 from stellar_sdk.contract.exceptions import NoSignatureNeededError
 from stellar_sdk.soroban_rpc import GetTransactionStatus
+from tests.integration_utils import NETWORK_PASSPHRASE, RPC_URL, fund_account
 
-RPC_URL = "http://127.0.0.1:8000/rpc"
 SOURCE = Keypair.random()
-NETWORK_PASSPHRASE = Network.STANDALONE_NETWORK_PASSPHRASE
-
-
-def fund_account(account_id: str):
-    resp = requests.get(f"http://127.0.0.1:8000/friendbot?addr={account_id}")
-    resp.raise_for_status()
 
 
 def create_contract_from_file(filename):

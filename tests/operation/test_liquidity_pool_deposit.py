@@ -2,9 +2,20 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import LiquidityPoolDeposit, Operation, Price
-
-from . import *
+from stellar_sdk import (
+    LIQUIDITY_POOL_FEE_V18,
+    LiquidityPoolAsset,
+    LiquidityPoolDeposit,
+    Operation,
+    Price,
+)
+from tests.operation.helpers import (
+    asset1,
+    asset2,
+    check_source,
+    kp1,
+    muxed1,
+)
 
 
 class TestLiquidityPoolDeposit:

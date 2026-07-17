@@ -2,9 +2,17 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import ChangeTrust, Operation
-
-from . import *
+from stellar_sdk import (
+    ChangeTrust,
+    Operation,
+)
+from tests.operation.helpers import (
+    asset1,
+    check_source,
+    kp1,
+    liquidity_pool_asset,
+    muxed1,
+)
 
 
 class TestChangeTrust:

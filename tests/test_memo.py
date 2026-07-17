@@ -1,5 +1,4 @@
 import binascii
-import os
 
 import pytest
 
@@ -81,7 +80,7 @@ class TestMemo:
             MemoInvalidException,
             match=f"The length of HashMemo should be 32 bytes, got {length:d} bytes.",
         ):
-            HashMemo(os.urandom(length))
+            HashMemo(bytes(length))
 
     def test_hash_memo_too_short_raise(self):
         length = 16
@@ -89,7 +88,7 @@ class TestMemo:
             MemoInvalidException,
             match=f"The length of HashMemo should be 32 bytes, got {length:d} bytes.",
         ):
-            HashMemo(os.urandom(length))
+            HashMemo(bytes(length))
 
     def test_return_hash_memo(self):
         hex = "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
@@ -108,7 +107,7 @@ class TestMemo:
             MemoInvalidException,
             match=f"The length of ReturnHashMemo should be 32 bytes, got {length:d} bytes.",
         ):
-            ReturnHashMemo(os.urandom(length))
+            ReturnHashMemo(bytes(length))
 
     def test_return_hash_memo_too_short_raise(self):
         length = 16
@@ -116,7 +115,7 @@ class TestMemo:
             MemoInvalidException,
             match=f"The length of ReturnHashMemo should be 32 bytes, got {length:d} bytes.",
         ):
-            ReturnHashMemo(os.urandom(length))
+            ReturnHashMemo(bytes(length))
 
     @pytest.mark.parametrize(
         ("asset_a", "asset_b", "equal"),

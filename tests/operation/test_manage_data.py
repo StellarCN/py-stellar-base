@@ -1,8 +1,14 @@
 import pytest
 
-from stellar_sdk import ManageData, Operation
-
-from . import *
+from stellar_sdk import (
+    ManageData,
+    Operation,
+)
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+    muxed1,
+)
 
 
 class TestManageData:

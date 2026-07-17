@@ -1,8 +1,15 @@
 import pytest
 
-from stellar_sdk import BeginSponsoringFutureReserves, Operation
-
-from . import *
+from stellar_sdk import (
+    BeginSponsoringFutureReserves,
+    Operation,
+)
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+)
 
 
 class TestBeginSponsoringFutureReserves:

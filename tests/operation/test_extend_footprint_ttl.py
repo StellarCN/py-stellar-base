@@ -1,9 +1,15 @@
 import pytest
 
-from stellar_sdk import Operation
+from stellar_sdk import (
+    MuxedAccount,
+    Operation,
+)
 from stellar_sdk.operation import ExtendFootprintTTL
-
-from . import *
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+    muxed1,
+)
 
 
 class TestExtendFootprintTTL:

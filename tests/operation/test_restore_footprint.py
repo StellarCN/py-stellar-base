@@ -1,9 +1,14 @@
 import pytest
 
-from stellar_sdk import Operation
+from stellar_sdk import (
+    MuxedAccount,
+    Operation,
+)
 from stellar_sdk.operation import RestoreFootprint
-
-from . import *
+from tests.operation.helpers import (
+    check_source,
+    muxed1,
+)
 
 
 class TestRestoreFootprint:
