@@ -1,15 +1,31 @@
 from decimal import Decimal
 
+import pytest
+
 from stellar_sdk import Asset
-from stellar_sdk.call_builder.call_builder_async import StrictSendPathsCallBuilder
-from tests.call_builder.call_builder_async import client, horizon_url
+from stellar_sdk.call_builder.call_builder_async import (
+    StrictSendPathsCallBuilder as StrictSendPathsCallBuilderAsync,
+)
+from stellar_sdk.call_builder.call_builder_sync import StrictSendPathsCallBuilder
+from tests.call_builder import ASYNC_CLIENT, HORIZON_URL, SYNC_CLIENT
+
+
+@pytest.fixture(params=["sync", "async"])
+def builder_factory(request: pytest.FixtureRequest):
+    builder_cls, client = {
+        "sync": (StrictSendPathsCallBuilder, SYNC_CLIENT),
+        "async": (StrictSendPathsCallBuilderAsync, ASYNC_CLIENT),
+    }[request.param]
+
+    def factory(*args, **kwargs):
+        return builder_cls(HORIZON_URL, client, *args, **kwargs)
+
+    return factory
 
 
 class TestStrictSendPathsCallBuilder:
-    def test_init_destination_account(self):
-        builder = StrictSendPathsCallBuilder(
-            horizon_url,
-            client,
+    def test_init_destination_account(self, builder_factory):
+        builder = builder_factory(
             source_asset=Asset(
                 "EUR", "GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46UIGTHVWGWJGQKH3AFNHXHXN"
             ),
@@ -25,10 +41,8 @@ class TestStrictSendPathsCallBuilder:
             "destination_account": "GARSFJNXJIHO6ULUBK3DBYKVSIZE7SC72S5DYBCHU7DKL22UXKVD7MXP",
         }
 
-    def test_destination_source_assets(self):
-        builder = StrictSendPathsCallBuilder(
-            horizon_url,
-            client,
+    def test_destination_source_assets(self, builder_factory):
+        builder = builder_factory(
             source_asset=Asset(
                 "EUR", "GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46UIGTHVWGWJGQKH3AFNHXHXN"
             ),

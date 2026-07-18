@@ -1,59 +1,79 @@
+from collections.abc import AsyncGenerator, AsyncIterator, Callable
+
 import pytest
 
 from stellar_sdk.__version__ import __version__
-from stellar_sdk.call_builder.call_builder_async import BaseCallBuilder
+from stellar_sdk.call_builder.call_builder_async import (
+    BaseCallBuilder as BaseCallBuilderAsync,
+)
+from stellar_sdk.call_builder.call_builder_sync import BaseCallBuilder
 from stellar_sdk.client.aiohttp_client import AiohttpClient
+from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.exceptions import BadRequestError, NotFoundError, NotPageableError
 from tests import _horizon_fixtures as hf
+from tests.helpers import resolve, take
+
+BuilderFactory = Callable[[str], "BaseCallBuilder | BaseCallBuilderAsync"]
+
+
+@pytest.fixture(params=["sync", "async"])
+async def env(
+    request: pytest.FixtureRequest,
+) -> AsyncIterator[tuple[BuilderFactory, str]]:
+    """A ``(make_builder, client_name)`` pair for each client flavor."""
+    if request.param == "sync":
+        with RequestsClient() as client:
+            yield (
+                lambda url: BaseCallBuilder(horizon_url=url, client=client),
+                "RequestsClient",
+            )
+    else:
+        async with AiohttpClient() as client:
+            yield (
+                lambda url: BaseCallBuilderAsync(horizon_url=url, client=client),
+                "AiohttpClient",
+            )
 
 
 class TestBaseCallBuilder:
-    async def test_get_data(self, httpbin_url):
+    async def test_get_data(self, env, httpbin_url):
+        make_builder, client_name = env
         url = httpbin_url + "get"
-        client = AiohttpClient()
-        resp = (
-            await BaseCallBuilder(horizon_url=url, client=client)
-            .cursor(89777)
-            .order(desc=False)
-            .limit(25)
-            .call()
+        resp = await resolve(
+            make_builder(url).limit(10).cursor(10086).order(desc=True).call()
         )
-
-        assert resp["args"] == {"cursor": "89777", "limit": "25", "order": "asc"}
+        assert resp["args"] == {"cursor": "10086", "limit": "10", "order": "desc"}
         assert (
             resp["headers"]["User-Agent"]
-            == f"py-stellar-base/{__version__}/AiohttpClient"
+            == f"py-stellar-base/{__version__}/{client_name}"
         )
         assert resp["headers"]["X-Client-Name"] == "py-stellar-base"
         assert resp["headers"]["X-Client-Version"] == __version__
-        assert resp["url"] == httpbin_url + "get?cursor=89777&order=asc&limit=25"
+        assert resp["url"] == httpbin_url + "get?limit=10&cursor=10086&order=desc"
 
-    async def test_get_stream_data(self, horizon_mock):
+    async def test_stream_data(self, env, horizon_mock):
+        make_builder, _ = env
         url = horizon_mock.url + "ledgers"
         horizon_mock.expect(
             "/ledgers", body=hf.stream_body(), content_type="text/event-stream"
         )
-        async with AiohttpClient() as client:
-            resp = (
-                BaseCallBuilder(horizon_url=url, client=client).cursor("now")._stream()
-            )
-            try:
-                messages = []
-                async for msg in resp:
-                    assert isinstance(msg, dict)
-                    messages.append(msg)
-                    if len(messages) == 2:
-                        break
-            finally:
-                await resp.aclose()
+        stream = make_builder(url).cursor("now")._stream()
+        try:
+            messages = await take(stream, 2)
+            assert len(messages) == 2
+            assert all(isinstance(message, dict) for message in messages)
+        finally:
+            if isinstance(stream, AsyncGenerator):
+                await stream.aclose()
+            else:
+                stream.close()
 
-    async def test_status_400_raise(self, horizon_mock):
+    async def test_status_400_raise(self, env, horizon_mock):
+        make_builder, _ = env
         url = horizon_mock.url + "accounts/BADACCOUNTID"
-        client = AiohttpClient()
         horizon_mock.expect("/accounts/BADACCOUNTID", json=hf.BAD_REQUEST, status=400)
         with pytest.raises(BadRequestError) as err:
-            await BaseCallBuilder(horizon_url=url, client=client).call()
-        await client.close()
+            await resolve(make_builder(url).call())
 
         exception = err.value
         assert exception.status == 400
@@ -65,13 +85,12 @@ class TestBaseCallBuilder:
             "reason": "Account ID must start with `G` and contain 56 alphanum characters",
         }
 
-    async def test_status_404_raise(self, horizon_mock):
+    async def test_status_404_raise(self, env, horizon_mock):
+        make_builder, _ = env
         url = horizon_mock.url + "not_found"
-        client = AiohttpClient()
         horizon_mock.expect("/not_found", json=hf.NOT_FOUND, status=404)
         with pytest.raises(NotFoundError) as err:
-            await BaseCallBuilder(horizon_url=url, client=client).call()
-        await client.close()
+            await resolve(make_builder(url).call())
 
         exception = err.value
         assert exception.status == 404
@@ -85,41 +104,28 @@ class TestBaseCallBuilder:
         )
         assert exception.extras is None
 
-    async def test_get_data_no_link(self, httpbin_url):
+    async def test_get_data_no_link(self, env, httpbin_url):
+        make_builder, _ = env
         url = httpbin_url + "get"
-        client = AiohttpClient()
-        call_builder = (
-            BaseCallBuilder(horizon_url=url, client=client)
-            .limit(10)
-            .cursor(10086)
-            .order(desc=True)
-        )
-        await call_builder.call()
+        call_builder = make_builder(url).limit(10).cursor(10086).order(desc=True)
+        await resolve(call_builder.call())
         assert call_builder.next_href is None
         assert call_builder.prev_href is None
-        await client.close()
 
-    async def test_get_data_not_pageable_raise(self, httpbin_url):
+    async def test_get_data_not_pageable_raise(self, env, httpbin_url):
+        make_builder, _ = env
         url = httpbin_url + "get"
-        client = AiohttpClient()
-        call_builder = (
-            BaseCallBuilder(horizon_url=url, client=client)
-            .limit(10)
-            .cursor(10086)
-            .order(desc=True)
-        )
-        await call_builder.call()
+        call_builder = make_builder(url).limit(10).cursor(10086).order(desc=True)
+        await resolve(call_builder.call())
         with pytest.raises(NotPageableError, match=r"The next page does not exist."):
-            await call_builder.next()
+            await resolve(call_builder.next())
 
         with pytest.raises(NotPageableError, match=r"The prev page does not exist."):
-            await call_builder.prev()
+            await resolve(call_builder.prev())
 
-        await client.close()
-
-    async def test_get_data_page(self, horizon_mock):
+    async def test_get_data_page(self, env, horizon_mock):
+        make_builder, _ = env
         url = horizon_mock.url + "transactions"
-        client = AiohttpClient()
         next_href = horizon_mock.url + "transactions?cursor=next&limit=10&order=desc"
         prev_href = horizon_mock.url + "transactions?cursor=prev&limit=10&order=asc"
         first_page = {
@@ -138,9 +144,7 @@ class TestBaseCallBuilder:
             }
         }
         prev_page = {"_links": {"self": {"href": prev_href}}}
-        call_builder = (
-            BaseCallBuilder(horizon_url=url, client=client).limit(10).order(desc=True)
-        )
+        call_builder = make_builder(url).limit(10).order(desc=True)
         horizon_mock.expect(
             "/transactions", query_string="limit=10&order=desc", json=first_page
         )
@@ -154,7 +158,7 @@ class TestBaseCallBuilder:
             query_string="cursor=prev&limit=10&order=asc",
             json=prev_page,
         )
-        first_resp = await call_builder.call()
+        first_resp = await resolve(call_builder.call())
         assert (
             first_resp["_links"]["self"]["href"]
             == horizon_mock.url + "transactions?cursor=&limit=10&order=desc"
@@ -163,7 +167,7 @@ class TestBaseCallBuilder:
         next_url = first_resp["_links"]["next"]["href"]
         next_url_cursor = next_url.split("cursor=")[1].split("&")[0]
 
-        next_resp = await call_builder.next()
+        next_resp = await resolve(call_builder.next())
         assert (
             next_resp["_links"]["self"]["href"]
             == f"{horizon_mock.url}transactions?cursor={next_url_cursor}&limit=10&order=desc"
@@ -171,22 +175,17 @@ class TestBaseCallBuilder:
 
         prev_url = next_resp["_links"]["prev"]["href"]
         prev_url_cursor = prev_url.split("cursor=")[1].split("&")[0]
-        previous_page = await call_builder.prev()
+        previous_page = await resolve(call_builder.prev())
         assert (
             previous_page["_links"]["self"]["href"]
             == f"{horizon_mock.url}transactions?cursor={prev_url_cursor}&limit=10&order=asc"
         )
-        await client.close()
 
-    async def test_horizon_url_params(self, httpbin_url):
+    async def test_horizon_url_params(self, env, httpbin_url):
+        make_builder, client_name = env
         url = httpbin_url + "get?version=1.2&auth=myPassw0wd"
-        client = AiohttpClient()
-        resp = (
-            await BaseCallBuilder(horizon_url=url, client=client)
-            .limit(10)
-            .cursor(10086)
-            .order(desc=True)
-            .call()
+        resp = await resolve(
+            make_builder(url).limit(10).cursor(10086).order(desc=True).call()
         )
         assert resp["args"] == {
             "auth": "myPassw0wd",
@@ -197,7 +196,7 @@ class TestBaseCallBuilder:
         }
         assert (
             resp["headers"]["User-Agent"]
-            == f"py-stellar-base/{__version__}/AiohttpClient"
+            == f"py-stellar-base/{__version__}/{client_name}"
         )
         assert resp["headers"]["X-Client-Name"] == "py-stellar-base"
         assert resp["headers"]["X-Client-Version"] == __version__
@@ -206,4 +205,3 @@ class TestBaseCallBuilder:
             == httpbin_url
             + "get?version=1.2&auth=myPassw0wd&limit=10&cursor=10086&order=desc"
         )
-        await client.close()
