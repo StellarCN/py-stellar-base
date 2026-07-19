@@ -9,9 +9,12 @@ raw ``httpserver`` fixture; the fixtures that expose them live in
 
 import json
 from dataclasses import dataclass
+from typing import Any
 
 from pytest_httpserver import HTTPServer
 from werkzeug.wrappers import Response
+
+RPC_PATH = "/rpc"
 
 
 def _httpbin_headers(request):
@@ -72,3 +75,49 @@ class HorizonMock:
             )
         else:
             request.respond_with_json(json, status=status)
+
+
+@dataclass(frozen=True)
+class RpcMock:
+    """JSON-RPC mock for Stellar RPC (Soroban) server tests.
+
+    Responses are queued with one-shot handlers, so calling an ``expect_*``
+    method twice serves two sequential RPC calls in FIFO order.
+    """
+
+    httpserver: HTTPServer
+
+    @property
+    def url(self) -> str:
+        return self.httpserver.url_for(RPC_PATH)
+
+    def expect_response(self, data: dict[str, Any], *, status: int = 200) -> None:
+        """Queue one JSON-RPC response envelope, served as-is."""
+        self.httpserver.expect_oneshot_request(
+            RPC_PATH, method="POST"
+        ).respond_with_json(data, status=status)
+
+    def expect_raw(self, body: str, *, status: int = 200) -> None:
+        """Queue one non-JSON response (e.g. a proxy error page)."""
+        self.httpserver.expect_oneshot_request(
+            RPC_PATH, method="POST"
+        ).respond_with_response(
+            Response(body, status=status, content_type="text/plain")
+        )
+
+    @property
+    def requests(self) -> list[dict[str, Any]]:
+        """Parsed JSON bodies of all RPC POSTs received, in order."""
+        return [
+            request.get_json()
+            for request, _ in self.httpserver.log
+            if request.method == "POST"
+        ]
+
+    def assert_request(self, method: str, params: Any, *, index: int = -1) -> None:
+        """Assert the JSON-RPC envelope of the *index*-th request received."""
+        body = self.requests[index]
+        assert len(body["id"]) == 32  # uuid4 hex
+        assert body["jsonrpc"] == "2.0"
+        assert body["method"] == method
+        assert body["params"] == params

@@ -1,10 +1,8 @@
+# pyright: reportAttributeAccessIssue=false
 import copy
-from typing import Any
 
 import pytest
-from aiointercept import aiointercept
 from pydantic import ValidationError
-from yarl import URL
 
 from stellar_sdk import Account, Asset, Keypair, Network, TransactionBuilder, scval
 from stellar_sdk import xdr as stellar_xdr
@@ -18,13 +16,11 @@ from stellar_sdk.exceptions import (
 )
 from stellar_sdk.operation import InvokeHostFunction
 from stellar_sdk.soroban_rpc import *
-from stellar_sdk.soroban_server_async import SorobanServerAsync
-
-RPC_URL = "https://example.com/soroban_rpc"
+from tests.helpers import resolve
 
 
 class TestSorobanServer:
-    async def test_load_account(self):
+    async def test_load_account(self, soroban_server, rpc_mock):
         result = {
             "entries": [
                 {
@@ -42,22 +38,17 @@ class TestSorobanServer:
             "result": result,
         }
         account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
+        rpc_mock.expect_response(data)
+        assert await resolve(soroban_server.load_account(account_id)) == Account(
+            account_id, 3418793967628
+        )
 
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (await client.load_account(account_id)) == Account(
-                    account_id, 3418793967628
-                )
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getLedgerEntries"
-        assert request_data["params"] == {
-            "keys": ["AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA=="]
-        }
+        rpc_mock.assert_request(
+            "getLedgerEntries",
+            {"keys": ["AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA=="]},
+        )
 
-    async def test_load_account_not_found_raise(self):
+    async def test_load_account_not_found_raise(self, soroban_server, rpc_mock):
         result = {"entries": None, "latestLedger": "108023"}
         data = {
             "jsonrpc": "2.0",
@@ -65,24 +56,19 @@ class TestSorobanServer:
             "result": result,
         }
         account_id = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            with pytest.raises(
-                AccountNotFoundException,
-                match=f"Account not found, account_id: {account_id}",
-            ):
-                async with SorobanServerAsync(RPC_URL) as client:
-                    await client.load_account(account_id)
+        rpc_mock.expect_response(data)
+        with pytest.raises(
+            AccountNotFoundException,
+            match=f"Account not found, account_id: {account_id}",
+        ):
+            await resolve(soroban_server.load_account(account_id))
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getLedgerEntries"
-        assert request_data["params"] == {
-            "keys": ["AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA=="]
-        }
+        rpc_mock.assert_request(
+            "getLedgerEntries",
+            {"keys": ["AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA=="]},
+        )
 
-    async def test_get_health(self):
+    async def test_get_health(self, soroban_server, rpc_mock):
         result = {
             "status": "healthy",
             "latestLedger": 50000,
@@ -94,19 +80,14 @@ class TestSorobanServer:
             "id": "198cb1a8-9104-4446-a269-88bf000c2721",
             "result": result,
         }
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert await client.get_health() == GetHealthResponse.model_validate(
-                    result
-                )
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getHealth"
-        assert request_data["params"] is None
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.get_health()
+        ) == GetHealthResponse.model_validate(result)
 
-    async def test_get_network(self):
+        rpc_mock.assert_request("getHealth", None)
+
+    async def test_get_network(self, soroban_server, rpc_mock):
         result = {
             "friendbotUrl": "http://localhost:8000/friendbot",
             "passphrase": "Standalone Network ; February 2017",
@@ -120,20 +101,14 @@ class TestSorobanServer:
         Response[GetNetworkResponse].model_validate(data)
         GetNetworkResponse.model_validate(result)
 
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert await client.get_network() == GetNetworkResponse.model_validate(
-                    result
-                )
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.get_network()
+        ) == GetNetworkResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getNetwork"
-        assert request_data["params"] is None
+        rpc_mock.assert_request("getNetwork", None)
 
-    async def test_version_info(self):
+    async def test_get_version_info(self, soroban_server, rpc_mock):
         result = {
             "version": "21.1.0",
             "commitHash": "fcd2f0523f04279bae4502f3e3fa00ca627e6f6a",
@@ -149,28 +124,21 @@ class TestSorobanServer:
         Response[GetVersionInfoResponse].model_validate(data)
         GetVersionInfoResponse.model_validate(result)
 
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.get_version_info()
-                    == GetVersionInfoResponse.model_validate(result)
-                )
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.get_version_info()
+        ) == GetVersionInfoResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getVersionInfo"
-        assert request_data["params"] is None
+        rpc_mock.assert_request("getVersionInfo", None)
 
-    async def test_get_contract_data(self):
+    async def test_get_contract_data(self, soroban_server, rpc_mock):
         result = {
             "entries": [
                 {
                     "key": "AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB",
                     "xdr": "AAAABgAAAAAAAAABW4oY5QIsrZ3IaDTkGc4LIU4PbHwsXAZ0xjtscLUbtGsAAAAUAAAAAQAAABMAAAAAJEKO7o0EZBi/DpFId2xLI1yGppi+ADrnh9IIE/CfJEcAAAAA",
                     "lastModifiedLedgerSeq": "11715",
-                    "liveUntilLedgerSeq": "12333",
+                    "liveUntilLedgerSeq": "17882",
                 }
             ],
             "latestLedger": "12551",
@@ -183,25 +151,27 @@ class TestSorobanServer:
         }
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                entries = GetLedgerEntriesResponse.model_validate(result).entries
-                assert entries
-                assert (await client.get_contract_data(contract_id, key)) == entries[0]
+        rpc_mock.expect_response(data)
+        entries = GetLedgerEntriesResponse.model_validate(result).entries
+        assert entries
+        assert (
+            await resolve(soroban_server.get_contract_data(contract_id, key))
+            == entries[0]
+        )
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getLedgerEntries"
         assert key == stellar_xdr.SCVal(
             stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
         )
-        assert request_data["params"] == {
-            "keys": ["AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB"]
-        }
+        rpc_mock.assert_request(
+            "getLedgerEntries",
+            {
+                "keys": [
+                    "AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB"
+                ]
+            },
+        )
 
-    async def test_get_contract_data_not_found(self):
+    async def test_get_contract_data_not_found(self, soroban_server, rpc_mock):
         result = {"entries": None, "latestLedger": "296"}
         data = {
             "jsonrpc": "2.0",
@@ -210,23 +180,22 @@ class TestSorobanServer:
         }
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
         key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (await client.get_contract_data(contract_id, key)) is None
+        rpc_mock.expect_response(data)
+        assert await resolve(soroban_server.get_contract_data(contract_id, key)) is None
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getLedgerEntries"
         assert key == stellar_xdr.SCVal(
             stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
         )
-        assert request_data["params"] == {
-            "keys": ["AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB"]
-        }
+        rpc_mock.assert_request(
+            "getLedgerEntries",
+            {
+                "keys": [
+                    "AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB"
+                ]
+            },
+        )
 
-    async def test_get_ledger_entries(self):
+    async def test_get_ledger_entries(self, soroban_server, rpc_mock):
         result = {
             "entries": [
                 {
@@ -239,7 +208,7 @@ class TestSorobanServer:
                     "key": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA==",
                     "xdr": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JAAAABdIcmH6AAAAoQAAAAgAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAAHAkAAAAAZMPQ0g==",
                     "lastModifiedLedgerSeq": "7177",
-                    "liveUntilLedgerSeq": "9872",
+                    "liveUntilLedgerSeq": "8392",
                 },
             ],
             "latestLedger": "7943",
@@ -264,25 +233,22 @@ class TestSorobanServer:
                 account_id=Keypair.from_public_key(account_id1).xdr_account_id(),
             ),
         )
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.get_ledger_entries([key0, key1])
-                ) == GetLedgerEntriesResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.get_ledger_entries([key0, key1])
+        ) == GetLedgerEntriesResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getLedgerEntries"
-        assert request_data["params"] == {
-            "keys": [
-                "AAAAAAAAAACynni6I2ACEzWuORVM1b2y0k1ZDni0W6JlC/Ad/mfCSg==",
-                "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA==",
-            ]
-        }
+        rpc_mock.assert_request(
+            "getLedgerEntries",
+            {
+                "keys": [
+                    "AAAAAAAAAACynni6I2ACEzWuORVM1b2y0k1ZDni0W6JlC/Ad/mfCSg==",
+                    "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA==",
+                ]
+            },
+        )
 
-    async def test_get_transaction(self):
+    async def test_get_transaction(self, soroban_server, rpc_mock):
         result = {
             "status": "SUCCESS",
             "txHash": "06dd9ee70bf93bbfe219e2b31363ab5a0361cc6285328592e4d3d1fed4c9025c",
@@ -337,20 +303,14 @@ class TestSorobanServer:
             "result": result,
         }
         tx_hash = "06dd9ee70bf93bbfe219e2b31363ab5a0361cc6285328592e4d3d1fed4c9025c"
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.get_transaction(tx_hash)
-                ) == GetTransactionResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.get_transaction(tx_hash)
+        ) == GetTransactionResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getTransaction"
-        assert request_data["params"] == {"hash": tx_hash}
+        rpc_mock.assert_request("getTransaction", {"hash": tx_hash})
 
-    async def test_get_events(self):
+    async def test_get_events(self, soroban_server, rpc_mock):
         events = [
             {
                 "type": "contract",
@@ -413,40 +373,39 @@ class TestSorobanServer:
             )
         ]
         events_response = GetEventsResponse.model_validate(result)
-        cursor = "0000054713588387839-0000000000"
         limit = 10
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.get_events(
-                        start_ledger=start_ledger,
-                        end_ledger=end_ledger,
-                        filters=filters,
-                        limit=limit,
-                    )
-                ) == events_response
+        rpc_mock.expect_response(data)
+        assert (
+            await resolve(
+                soroban_server.get_events(
+                    start_ledger=start_ledger,
+                    end_ledger=end_ledger,
+                    filters=filters,
+                    limit=limit,
+                )
+            )
+            == events_response
+        )
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getEvents"
-        assert request_data["params"] == {
-            "filters": [
-                {
-                    "contractIds": [
-                        "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
-                    ],
-                    "topics": [
-                        ["AAAADwAAAAdDT1VOVEVSAA==", "AAAADwAAAAlpbmNyZW1lbnQAAAA="]
-                    ],
-                    "type": "contract",
-                }
-            ],
-            "pagination": {"cursor": None, "limit": 10},
-            "startLedger": 100,
-            "endLedger": 101,
-        }
+        rpc_mock.assert_request(
+            "getEvents",
+            {
+                "filters": [
+                    {
+                        "contractIds": [
+                            "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+                        ],
+                        "topics": [
+                            ["AAAADwAAAAdDT1VOVEVSAA==", "AAAADwAAAAlpbmNyZW1lbnQAAAA="]
+                        ],
+                        "type": "contract",
+                    }
+                ],
+                "pagination": {"cursor": None, "limit": 10},
+                "startLedger": 100,
+                "endLedger": 101,
+            },
+        )
 
         # simulate the advance of one ledger
         cursor = events_response.cursor
@@ -464,35 +423,35 @@ class TestSorobanServer:
             "result": result,
         }
         events_response = GetEventsResponse.model_validate(result)
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.get_events(filters=filters, cursor=cursor, limit=limit)
-                ) == events_response
+        rpc_mock.expect_response(data)
+        assert (
+            await resolve(
+                soroban_server.get_events(filters=filters, cursor=cursor, limit=limit)
+            )
+            == events_response
+        )
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getEvents"
-        assert request_data["params"] == {
-            "filters": [
-                {
-                    "contractIds": [
-                        "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
-                    ],
-                    "topics": [
-                        ["AAAADwAAAAdDT1VOVEVSAA==", "AAAADwAAAAlpbmNyZW1lbnQAAAA="]
-                    ],
-                    "type": "contract",
-                }
-            ],
-            "pagination": {"cursor": "0000054747948126208-0000000000", "limit": 10},
-            "startLedger": None,
-            "endLedger": None,
-        }
+        rpc_mock.assert_request(
+            "getEvents",
+            {
+                "filters": [
+                    {
+                        "contractIds": [
+                            "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+                        ],
+                        "topics": [
+                            ["AAAADwAAAAdDT1VOVEVSAA==", "AAAADwAAAAlpbmNyZW1lbnQAAAA="]
+                        ],
+                        "type": "contract",
+                    }
+                ],
+                "pagination": {"cursor": "0000054747948126208-0000000000", "limit": 10},
+                "startLedger": None,
+                "endLedger": None,
+            },
+        )
 
-    async def test_get_latest_ledger(self):
+    async def test_get_latest_ledger(self, soroban_server, rpc_mock):
         result = {
             "id": "98908807544d6658094c94e00c1cff99e341b96ee1c59abbda39d5f4a3b20cdc",
             "protocolVersion": 25,
@@ -506,20 +465,14 @@ class TestSorobanServer:
             "id": "198cb1a8-9104-4446-a269-88bf000c2721",
             "result": result,
         }
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.get_latest_ledger()
-                ) == GetLatestLedgerResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.get_latest_ledger()
+        ) == GetLatestLedgerResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getLatestLedger"
-        assert request_data["params"] is None
+        rpc_mock.assert_request("getLatestLedger", None)
 
-    async def test_get_fee_stats(self):
+    async def test_get_fee_stats(self, soroban_server, rpc_mock):
         result = {
             "sorobanInclusionFee": {
                 "max": "210",
@@ -565,20 +518,14 @@ class TestSorobanServer:
             "id": "198cb1a8-9104-4446-a269-88bf000c2721",
             "result": result,
         }
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.get_fee_stats()
-                ) == GetFeeStatsResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.get_fee_stats()
+        ) == GetFeeStatsResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getFeeStats"
-        assert request_data["params"] is None
+        rpc_mock.assert_request("getFeeStats", None)
 
-    async def test_get_transactions(self):
+    async def test_get_transactions(self, soroban_server, rpc_mock):
         result = {
             "transactions": [
                 {
@@ -683,25 +630,42 @@ class TestSorobanServer:
         }
 
         start_ledger = 1888539
-        GetTransactionsResponse.model_validate(result)
+        txs_response = GetTransactionsResponse.model_validate(result)
         limit = 5
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.get_transactions(start_ledger, None, limit)
-                ) == GetTransactionsResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert (
+            await resolve(soroban_server.get_transactions(start_ledger, None, limit))
+            == txs_response
+        )
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getTransactions"
-        assert request_data["params"] == {
-            "startLedger": 1888539,
-            "pagination": {"cursor": None, "limit": 5},
+        rpc_mock.assert_request(
+            "getTransactions",
+            {
+                "startLedger": 1888539,
+                "pagination": {"cursor": None, "limit": 5},
+            },
+        )
+
+    async def test_get_transactions_without_args(self, soroban_server, rpc_mock):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": {
+                "transactions": [],
+                "latestLedger": 1888542,
+                "latestLedgerCloseTimestamp": 1717166057,
+                "oldestLedger": 1871263,
+                "oldestLedgerCloseTimestamp": 1717075350,
+                "cursor": "8111217537191937",
+            },
         }
+        # test that all arguments are optional
+        rpc_mock.expect_response(data)
+        assert isinstance(
+            await resolve(soroban_server.get_transactions()), GetTransactionsResponse
+        )
 
-    async def test_get_ledgers(self):
+    async def test_get_ledgers(self, soroban_server, rpc_mock):
         result = {
             "ledgers": [
                 {
@@ -733,25 +697,42 @@ class TestSorobanServer:
         }
 
         start_ledger = 10
-        GetLedgersResponse.model_validate(result)
+        ledgers_response = GetLedgersResponse.model_validate(result)
         limit = 2
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.get_ledgers(start_ledger, None, limit)
-                ) == GetLedgersResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert (
+            await resolve(soroban_server.get_ledgers(start_ledger, None, limit))
+            == ledgers_response
+        )
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "getLedgers"
-        assert request_data["params"] == {
-            "startLedger": start_ledger,
-            "pagination": {"cursor": None, "limit": 2},
+        rpc_mock.assert_request(
+            "getLedgers",
+            {
+                "startLedger": start_ledger,
+                "pagination": {"cursor": None, "limit": 2},
+            },
+        )
+
+    async def test_get_ledgers_without_args(self, soroban_server, rpc_mock):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+            "result": {
+                "ledgers": [],
+                "latestLedger": 113,
+                "latestLedgerCloseTime": 1731554518,
+                "oldestLedger": 8,
+                "oldestLedgerCloseTime": 1731554412,
+                "cursor": "11",
+            },
         }
+        # test that all arguments are optional
+        rpc_mock.expect_response(data)
+        assert isinstance(
+            await resolve(soroban_server.get_ledgers()), GetLedgersResponse
+        )
 
-    async def test_get_sac_balance(self):
+    async def test_get_sac_balance(self, soroban_server, rpc_mock):
         contract_id = "CC25B67T7RG7IBWVQKBFRC6SR4MJDHYFDGMIQYVVI7WE55TPUILMH5YT"
         sac = Asset.native()
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
@@ -795,21 +776,24 @@ class TestSorobanServer:
                 live_until_ledger=live_until_ledger,
             ),
         )
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            assert (
-                await SorobanServerAsync(RPC_URL).get_sac_balance(
+        rpc_mock.expect_response(data)
+        assert (
+            await resolve(
+                soroban_server.get_sac_balance(
                     contract_id,
                     sac,
                     network_passphrase,
                 )
-                == expected_result
             )
+            == expected_result
+        )
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
+        request_data = rpc_mock.requests[-1]
         assert request_data["params"]["keys"] == [expected_key]
 
-    async def test_get_sac_balance_with_empty_balance_entry(self):
+    async def test_get_sac_balance_with_empty_balance_entry(
+        self, soroban_server, rpc_mock
+    ):
         contract_id = "CDOAW6D7NXAPOCO7TFAWZNJHK62E3IYRGNRVX3VOXNKNVOXCLLPJXQCF"
         sac = Asset(
             "yXLM",
@@ -837,21 +821,22 @@ class TestSorobanServer:
         expected_result = GetSACBalanceResponse(
             latest_ledger=latest_ledger, balance_entry=None
         )
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            assert (
-                await SorobanServerAsync(RPC_URL).get_sac_balance(
+        rpc_mock.expect_response(data)
+        assert (
+            await resolve(
+                soroban_server.get_sac_balance(
                     contract_id,
                     sac,
                     network_passphrase,
                 )
-                == expected_result
             )
+            == expected_result
+        )
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
+        request_data = rpc_mock.requests[-1]
         assert request_data["params"]["keys"] == [expected_key]
 
-    async def test_simulate_transaction(self):
+    async def test_simulate_transaction(self, soroban_server, rpc_mock):
         result = {
             "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
             "events": [
@@ -883,25 +868,24 @@ class TestSorobanServer:
             "result": result,
         }
         transaction = _build_soroban_transaction(None, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.simulate_transaction(transaction)
-                ) == SimulateTransactionResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.simulate_transaction(transaction)
+        ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "simulateTransaction"
-        assert request_data["params"] == {
-            "transaction": transaction.to_xdr(),
-            "resourceConfig": None,
-            "authMode": None,
-            "useUpgradedAuth": False,
-        }
+        rpc_mock.assert_request(
+            "simulateTransaction",
+            {
+                "transaction": transaction.to_xdr(),
+                "resourceConfig": None,
+                "authMode": None,
+                "useUpgradedAuth": False,
+            },
+        )
 
-    async def test_simulate_transaction_with_addl_resources(self):
+    async def test_simulate_transaction_with_addl_resources(
+        self, soroban_server, rpc_mock
+    ):
         result = {
             "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
             "events": [
@@ -925,27 +909,22 @@ class TestSorobanServer:
             "result": result,
         }
         transaction = _build_soroban_transaction(None, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.simulate_transaction(
-                        transaction, ResourceLeeway(1000000)
-                    )
-                ) == SimulateTransactionResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.simulate_transaction(transaction, ResourceLeeway(1000000))
+        ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "simulateTransaction"
-        assert request_data["params"] == {
-            "transaction": transaction.to_xdr(),
-            "resourceConfig": {"instructionLeeway": 1000000},
-            "authMode": None,
-            "useUpgradedAuth": False,
-        }
+        rpc_mock.assert_request(
+            "simulateTransaction",
+            {
+                "transaction": transaction.to_xdr(),
+                "resourceConfig": {"instructionLeeway": 1000000},
+                "authMode": None,
+                "useUpgradedAuth": False,
+            },
+        )
 
-    async def test_simulate_transaction_with_auth_mode(self):
+    async def test_simulate_transaction_with_auth_mode(self, soroban_server, rpc_mock):
         result = {
             "transactionData": "AAAAAAAAAAIAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAFAAAAAEAAAAAAAAAB300Hyg0HZG+Qie3zvsxLvugrNtFqd3AIntWy9bg2YvZAAAAAAAAAAEAAAAGAAAAAcWLK/vE8FTnMk9r8gytPgJuQbutGm0gw9fUkY3tFlQRAAAAEAAAAAEAAAACAAAADwAAAAdDb3VudGVyAAAAABIAAAAAAAAAAFi3xKLI8peqjz0kcSgf38zsr+SOVmMxPsGOEqc+ypihAAAAAQAAAAAAFcLDAAAF8AAAAQgAAAMcAAAAAAAAAJw=",
             "events": [
@@ -977,27 +956,26 @@ class TestSorobanServer:
             "result": result,
         }
         transaction = _build_soroban_transaction(None, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.simulate_transaction(
-                        transaction, auth_mode=AuthMode.RECORD_ALL_NOROOT
-                    )
-                ) == SimulateTransactionResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.simulate_transaction(
+                transaction, auth_mode=AuthMode.RECORD_ALL_NOROOT
+            )
+        ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "simulateTransaction"
-        assert request_data["params"] == {
-            "transaction": transaction.to_xdr(),
-            "resourceConfig": None,
-            "authMode": "record_allow_nonroot",
-            "useUpgradedAuth": False,
-        }
+        rpc_mock.assert_request(
+            "simulateTransaction",
+            {
+                "transaction": transaction.to_xdr(),
+                "resourceConfig": None,
+                "authMode": "record_allow_nonroot",
+                "useUpgradedAuth": False,
+            },
+        )
 
-    async def test_simulate_transaction_with_use_upgraded_auth(self):
+    async def test_simulate_transaction_with_use_upgraded_auth(
+        self, soroban_server, rpc_mock
+    ):
         result = {"latestLedger": 1479}
         data = {
             "jsonrpc": "2.0",
@@ -1005,27 +983,24 @@ class TestSorobanServer:
             "result": result,
         }
         transaction = _build_soroban_transaction(None, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.simulate_transaction(
-                        transaction, use_upgraded_auth=True
-                    )
-                ) == SimulateTransactionResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.simulate_transaction(transaction, use_upgraded_auth=True)
+        ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "simulateTransaction"
-        assert request_data["params"] == {
-            "transaction": transaction.to_xdr(),
-            "resourceConfig": None,
-            "authMode": None,
-            "useUpgradedAuth": True,
-        }
+        rpc_mock.assert_request(
+            "simulateTransaction",
+            {
+                "transaction": transaction.to_xdr(),
+                "resourceConfig": None,
+                "authMode": None,
+                "useUpgradedAuth": True,
+            },
+        )
 
-    async def test_simulate_transaction_with_use_upgraded_auth_false(self):
+    async def test_simulate_transaction_with_use_upgraded_auth_false(
+        self, soroban_server, rpc_mock
+    ):
         result = {"latestLedger": 1479}
         data = {
             "jsonrpc": "2.0",
@@ -1033,27 +1008,24 @@ class TestSorobanServer:
             "result": result,
         }
         transaction = _build_soroban_transaction(None, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.simulate_transaction(
-                        transaction, use_upgraded_auth=False
-                    )
-                ) == SimulateTransactionResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.simulate_transaction(transaction, use_upgraded_auth=False)
+        ) == SimulateTransactionResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "simulateTransaction"
-        assert request_data["params"] == {
-            "transaction": transaction.to_xdr(),
-            "resourceConfig": None,
-            "authMode": None,
-            "useUpgradedAuth": False,
-        }
+        rpc_mock.assert_request(
+            "simulateTransaction",
+            {
+                "transaction": transaction.to_xdr(),
+                "resourceConfig": None,
+                "authMode": None,
+                "useUpgradedAuth": False,
+            },
+        )
 
-    async def test_prepare_transaction_without_auth_and_soroban_data(self):
+    async def test_prepare_transaction_without_auth_and_soroban_data(
+        self, soroban_server, rpc_mock
+    ):
         data = {
             "jsonrpc": "2.0",
             "id": "7a469b9d6ed4444893491be530862ce3",
@@ -1077,10 +1049,8 @@ class TestSorobanServer:
         }
 
         transaction = _build_soroban_transaction(None, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                new_transaction = await client.prepare_transaction(transaction)
+        rpc_mock.expect_response(data)
+        new_transaction = await resolve(soroban_server.prepare_transaction(transaction))
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
         expected_transaction.transaction.soroban_data = (
@@ -1089,14 +1059,15 @@ class TestSorobanServer:
             )
         )
         op = expected_transaction.transaction.operations[0]
-        assert isinstance(op, InvokeHostFunction)
         op.auth = [
             stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
             for xdr in data["result"]["results"][0]["auth"]
         ]
         assert new_transaction == expected_transaction
 
-    async def test_prepare_transaction_with_soroban_data(self):
+    async def test_prepare_transaction_with_soroban_data(
+        self, soroban_server, rpc_mock
+    ):
         data = {
             "jsonrpc": "2.0",
             "id": "7a469b9d6ed4444893491be530862ce3",
@@ -1133,10 +1104,8 @@ class TestSorobanServer:
             ),
         )  # soroban_data will be overwritten by the response
         transaction = _build_soroban_transaction(soroban_data, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                new_transaction = await client.prepare_transaction(transaction)
+        rpc_mock.expect_response(data)
+        new_transaction = await resolve(soroban_server.prepare_transaction(transaction))
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee = 50000 + int(
             data["result"]["minResourceFee"]
@@ -1147,14 +1116,13 @@ class TestSorobanServer:
             )
         )
         op = expected_transaction.transaction.operations[0]
-        assert isinstance(op, InvokeHostFunction)
         op.auth = [
             stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
             for xdr in data["result"]["results"][0]["auth"]
         ]
         assert new_transaction == expected_transaction
 
-    async def test_prepare_transaction_with_auth(self):
+    async def test_prepare_transaction_with_auth(self, soroban_server, rpc_mock):
         data = {
             "jsonrpc": "2.0",
             "id": "7a469b9d6ed4444893491be530862ce3",
@@ -1197,10 +1165,8 @@ class TestSorobanServer:
         )
 
         transaction = _build_soroban_transaction(None, [auth])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                new_transaction = await client.prepare_transaction(transaction)
+        rpc_mock.expect_response(data)
+        new_transaction = await resolve(soroban_server.prepare_transaction(transaction))
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
         expected_transaction.transaction.soroban_data = (
@@ -1214,7 +1180,7 @@ class TestSorobanServer:
         assert new_transaction == expected_transaction
 
     async def test_prepare_transaction_error_resp_prepare_transaction_exception_raise(
-        self,
+        self, soroban_server, rpc_mock
     ):
         data = {
             "jsonrpc": "2.0",
@@ -1228,21 +1194,19 @@ class TestSorobanServer:
             },
         }
         transaction = _build_soroban_transaction(None, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            with pytest.raises(
-                PrepareTransactionException,
-                match=r"Simulation transaction failed, the response contains error information.",
-            ) as e:
-                async with SorobanServerAsync(RPC_URL) as client:
-                    await client.prepare_transaction(transaction)
-            assert (
-                e.value.simulate_transaction_response
-                == SimulateTransactionResponse.model_validate(data["result"])
-            )
+        rpc_mock.expect_response(data)
+        with pytest.raises(
+            PrepareTransactionException,
+            match=r"Simulation transaction failed, the response contains error information.",
+        ) as e:
+            await resolve(soroban_server.prepare_transaction(transaction))
+        assert (
+            e.value.simulate_transaction_response
+            == SimulateTransactionResponse.model_validate(data["result"])
+        )
 
     async def test_prepare_transaction_invalid_results_value_raise(
-        self,
+        self, soroban_server, rpc_mock
     ):
         # this error should not happen
         data = {
@@ -1260,16 +1224,14 @@ class TestSorobanServer:
             },
         }
         transaction = _build_soroban_transaction(None, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            with pytest.raises(
-                ValueError,
-                match=r"Simulation results invalid",
-            ):
-                async with SorobanServerAsync(RPC_URL) as client:
-                    await client.prepare_transaction(transaction)
+        rpc_mock.expect_response(data)
+        with pytest.raises(
+            ValueError,
+            match=r"Simulation results invalid",
+        ):
+            await resolve(soroban_server.prepare_transaction(transaction))
 
-    async def test_send_transaction(self):
+    async def test_send_transaction(self, soroban_server, rpc_mock):
         result = {
             "status": "PENDING",
             "hash": "64977cc4bb7f8bf75bdc47570548a994667899d3319b72f95cb2a64e567ad52c",
@@ -1283,21 +1245,17 @@ class TestSorobanServer:
         }
 
         transaction = _build_soroban_transaction(None, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.send_transaction(transaction)
-                ) == SendTransactionResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.send_transaction(transaction)
+        ) == SendTransactionResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "sendTransaction"
-        assert request_data["params"] == {"transaction": transaction.to_xdr()}
+        rpc_mock.assert_request(
+            "sendTransaction", {"transaction": transaction.to_xdr()}
+        )
         assert result["hash"] == transaction.hash_hex()
 
-    async def test_send_transaction_error(self):
+    async def test_send_transaction_error(self, soroban_server, rpc_mock):
         result = {
             "status": "ERROR",
             "errorResultXdr": "AAAAAAAAf67////6AAAAAA==",
@@ -1315,21 +1273,17 @@ class TestSorobanServer:
         }
 
         transaction = _build_soroban_transaction(None, [])
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                assert (
-                    await client.send_transaction(transaction)
-                ) == SendTransactionResponse.model_validate(result)
+        rpc_mock.expect_response(data)
+        assert await resolve(
+            soroban_server.send_transaction(transaction)
+        ) == SendTransactionResponse.model_validate(result)
 
-        request_data: Any = m.requests[("POST", URL(RPC_URL))][0].kwargs["json"]
-        assert len(request_data["id"]) == 32
-        assert request_data["jsonrpc"] == "2.0"
-        assert request_data["method"] == "sendTransaction"
-        assert request_data["params"] == {"transaction": transaction.to_xdr()}
+        rpc_mock.assert_request(
+            "sendTransaction", {"transaction": transaction.to_xdr()}
+        )
         assert result["hash"] == transaction.hash_hex()
 
-    async def test_soroban_rpc_error_response_raise(self):
+    async def test_soroban_rpc_error_response_raise(self, soroban_server, rpc_mock):
         data = {
             "jsonrpc": "2.0",
             "id": "198cb1a8-9104-4446-a269-88bf000c2721",
@@ -1339,38 +1293,42 @@ class TestSorobanServer:
                 "data": "mockTest",
             },
         }
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            with pytest.raises(SorobanRpcErrorResponse) as e:
-                async with SorobanServerAsync(RPC_URL) as client:
-                    await client.get_health()
-            assert e.value.code == -32601
-            assert e.value.message == "method not found"
-            assert e.value.data == "mockTest"
+        rpc_mock.expect_response(data)
+        with pytest.raises(SorobanRpcErrorResponse) as e:
+            await resolve(soroban_server.get_health())
+        assert e.value.code == -32601
+        assert e.value.message == "method not found"
+        assert e.value.data == "mockTest"
 
-    async def test_pagination_start_ledger_and_cursor_raise(self):
+    async def test_pagination_start_ledger_and_cursor_raise(
+        self, soroban_server, rpc_mock
+    ):
         with pytest.raises(ValidationError) as e:
-            async with SorobanServerAsync(RPC_URL) as client:
-                await client.get_transactions(
+            await resolve(
+                soroban_server.get_transactions(
                     start_ledger=67, cursor="8111217537191937", limit=1
                 )
+            )
         assert e.value.error_count() == 1
         val_error = e.value.errors()[0]
         assert val_error["type"] == "value_error"
         assert val_error["msg"].endswith("start_ledger and cursor cannot both be set")
 
-    async def test_pagination_end_ledger_and_cursor_raise(self):
+    async def test_pagination_end_ledger_and_cursor_raise(
+        self, soroban_server, rpc_mock
+    ):
         with pytest.raises(ValidationError) as e:
-            async with SorobanServerAsync(RPC_URL) as client:
-                await client.get_events(
+            await resolve(
+                soroban_server.get_events(
                     end_ledger=68, cursor="8111217537191937", limit=1
                 )
+            )
         assert e.value.error_count() == 1
         val_error = e.value.errors()[0]
         assert val_error["type"] == "value_error"
         assert val_error["msg"].endswith("end_ledger and cursor cannot both be set")
 
-    async def test_get_transactions_with_cursor_only(self):
+    async def test_get_transactions_with_cursor_only(self, soroban_server, rpc_mock):
         # Test for https://github.com/StellarCN/py-stellar-base/issues/1105
         # GetTransactionsRequest does not have end_ledger attribute,
         # PaginationMixin should handle this gracefully
@@ -1387,15 +1345,21 @@ class TestSorobanServer:
             "id": "198cb1a8-9104-4446-a269-88bf000c2721",
             "result": result,
         }
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                response = await client.get_transactions(
-                    cursor="2428679451844609", limit=200
-                )
-                assert isinstance(response, GetTransactionsResponse)
+        rpc_mock.expect_response(data)
+        response = await resolve(
+            soroban_server.get_transactions(cursor="2428679451844609", limit=200)
+        )
+        assert isinstance(response, GetTransactionsResponse)
 
-    async def test_get_ledgers_with_cursor_only(self):
+        rpc_mock.assert_request(
+            "getTransactions",
+            {
+                "startLedger": None,
+                "pagination": {"cursor": "2428679451844609", "limit": 200},
+            },
+        )
+
+    async def test_get_ledgers_with_cursor_only(self, soroban_server, rpc_mock):
         # Test for https://github.com/StellarCN/py-stellar-base/issues/1105
         # GetLedgersRequest does not have end_ledger attribute,
         # PaginationMixin should handle this gracefully
@@ -1412,21 +1376,25 @@ class TestSorobanServer:
             "id": "198cb1a8-9104-4446-a269-88bf000c2721",
             "result": result,
         }
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, payload=data)
-            async with SorobanServerAsync(RPC_URL) as client:
-                response = await client.get_ledgers(
-                    cursor="2428679451844609", limit=200
-                )
-                assert isinstance(response, GetLedgersResponse)
+        rpc_mock.expect_response(data)
+        response = await resolve(
+            soroban_server.get_ledgers(cursor="2428679451844609", limit=200)
+        )
+        assert isinstance(response, GetLedgersResponse)
 
-    async def test_non_json_response(self):
-        async with aiointercept(mock_external_urls=True) as m:
-            m.post(RPC_URL, status=500, body="Cloudflare 500 error")
+        rpc_mock.assert_request(
+            "getLedgers",
+            {
+                "startLedger": None,
+                "pagination": {"cursor": "2428679451844609", "limit": 200},
+            },
+        )
 
-            with pytest.raises(BadResponseError):
-                async with SorobanServerAsync(RPC_URL) as client:
-                    await client.get_health()
+    async def test_non_json_response(self, soroban_server, rpc_mock):
+        rpc_mock.expect_raw("Cloudflare 500 error", status=500)
+
+        with pytest.raises(BadResponseError):
+            await resolve(soroban_server.get_health())
 
 
 def _build_soroban_transaction(
