@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-import requests_mock as requests_mock_lib
 from requests import RequestException
 
 from stellar_sdk.client.requests_client import USER_AGENT, RequestsClient
@@ -71,53 +70,38 @@ class TestRequestsClient:
         assert json["headers"]["A"] == custom_headers["a"]  # httpbin makes it upper
         assert json["headers"]["C"] == custom_headers["c"]
 
-    def test_get_with_max_content_size_success(self):
+    def test_get_with_max_content_size_success(self, httpserver):
         client = RequestsClient()
-        url = "https://example.com/data"
         content = "Hello, World!"
-        with requests_mock_lib.Mocker() as m:
-            m.get(url, text=content)
-            resp = client.get(url, max_content_size=1024)
-            assert resp.status_code == 200
-            assert resp.text == content
+        httpserver.expect_request("/data").respond_with_data(content)
+        resp = client.get(httpserver.url_for("/data"), max_content_size=1024)
+        assert resp.status_code == 200
+        assert resp.text == content
 
-    def test_get_with_max_content_size_exceeded(self):
+    def test_get_with_max_content_size_exceeded(self, httpserver):
         client = RequestsClient()
-        url = "https://example.com/data"
         content = "x" * 1000
-        with requests_mock_lib.Mocker() as m:
-            m.get(url, text=content)
-            with pytest.raises(ContentSizeLimitExceededError) as exc_info:
-                client.get(url, max_content_size=500)
-            assert exc_info.value.limit == 500
-            assert exc_info.value.content_size is not None
-            assert exc_info.value.content_size > 500
+        httpserver.expect_request("/data").respond_with_data(content)
+        with pytest.raises(ContentSizeLimitExceededError) as exc_info:
+            client.get(httpserver.url_for("/data"), max_content_size=500)
+        assert exc_info.value.limit == 500
+        assert exc_info.value.content_size is not None
+        assert exc_info.value.content_size > 500
 
-    def test_get_without_max_content_size(self):
+    def test_get_without_max_content_size(self, httpserver):
         client = RequestsClient()
-        url = "https://example.com/data"
         content = "x" * 10000
-        with requests_mock_lib.Mocker() as m:
-            m.get(url, text=content)
-            resp = client.get(url)
-            assert resp.status_code == 200
-            assert resp.text == content
+        httpserver.expect_request("/data").respond_with_data(content)
+        resp = client.get(httpserver.url_for("/data"))
+        assert resp.status_code == 200
+        assert resp.text == content
 
     def test_get_with_max_content_size_network_error_wraps_in_connection_error(self):
         """RequestException during streaming read should be wrapped in ConnectionError."""
         client = RequestsClient()
-        url = "https://example.com/data"
-        with requests_mock_lib.Mocker() as m:
-            m.get(url, text="some content")
-            with patch.object(
-                client._session,
-                "get",
-                wraps=client._session.get,
-            ) as mock_get:
-                mock_resp = MagicMock()
-                mock_resp.iter_content.side_effect = RequestException(
-                    "connection reset"
-                )
-                mock_get.return_value = mock_resp
-                with pytest.raises(ConnectionError):
-                    client.get(url, max_content_size=1024)
+        with patch.object(client._session, "get") as mock_get:
+            mock_resp = MagicMock()
+            mock_resp.iter_content.side_effect = RequestException("connection reset")
+            mock_get.return_value = mock_resp
+            with pytest.raises(ConnectionError):
+                client.get("https://example.com/data", max_content_size=1024)

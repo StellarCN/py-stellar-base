@@ -70,8 +70,6 @@ dev = [
     "pytest-timeout>=2.4.0",
     "pytest-asyncio>=0.24.0",
     "pytest-httpserver>=1.1.1",
-    "requests-mock>=1.12.1",
-    "aiointercept>=0.1.8",
     "pre-commit>=3.5.0",
     "pyright>=1.1.402",
     "mypy>=1.14.1 ; platform_python_implementation != 'PyPy'",

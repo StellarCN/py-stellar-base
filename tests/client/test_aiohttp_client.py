@@ -1,5 +1,4 @@
 import pytest
-from aiointercept import aiointercept
 
 from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
 from stellar_sdk.exceptions import ConnectionError, ContentSizeLimitExceededError
@@ -75,50 +74,37 @@ class TestAiohttpClient:
         assert json["headers"]["C"] == custom_headers["c"]
         await client.close()
 
-    async def test_get_with_max_content_size_success(self):
-        client = AiohttpClient()
-        url = "https://example.com/data"
+    async def test_get_with_max_content_size_success(self, httpserver):
         content = "Hello, World!"
-        async with aiointercept(mock_external_urls=True) as m:
-            m.get(url, body=content)
-            resp = await client.get(url, max_content_size=1024)
+        httpserver.expect_request("/data").respond_with_data(content)
+        async with AiohttpClient() as client:
+            resp = await client.get(httpserver.url_for("/data"), max_content_size=1024)
             assert resp.status_code == 200
             assert resp.text == content
-        await client.close()
 
-    async def test_get_with_max_content_size_exceeded(self):
-        client = AiohttpClient()
-        url = "https://example.com/data"
+    async def test_get_with_max_content_size_exceeded(self, httpserver):
         content = "x" * 1000
-        async with aiointercept(mock_external_urls=True) as m:
-            m.get(url, body=content)
+        httpserver.expect_request("/data").respond_with_data(content)
+        async with AiohttpClient() as client:
             with pytest.raises(ContentSizeLimitExceededError) as exc_info:
-                await client.get(url, max_content_size=500)
+                await client.get(httpserver.url_for("/data"), max_content_size=500)
             assert exc_info.value.limit == 500
             assert exc_info.value.content_size is not None
             assert exc_info.value.content_size > 500
-        await client.close()
 
-    async def test_get_without_max_content_size(self):
-        client = AiohttpClient()
-        url = "https://example.com/data"
+    async def test_get_without_max_content_size(self, httpserver):
         content = "x" * 10000
-        async with aiointercept(mock_external_urls=True) as m:
-            m.get(url, body=content)
-            resp = await client.get(url)
+        httpserver.expect_request("/data").respond_with_data(content)
+        async with AiohttpClient() as client:
+            resp = await client.get(httpserver.url_for("/data"))
             assert resp.status_code == 200
             assert resp.text == content
-        await client.close()
 
     async def test_get_with_max_content_size_network_error_wraps_in_connection_error(
         self,
     ):
-        """aiohttp.ClientError during streaming read should be wrapped in ConnectionError."""
-
-        client = AiohttpClient()
-        url = "https://example.com/data"
-        async with aiointercept(mock_external_urls=True) as m:
-            m.get(url, exception=True)
+        """aiohttp.ClientError (e.g. connection refused) is wrapped in ConnectionError."""
+        async with AiohttpClient() as client:
             with pytest.raises(ConnectionError):
-                await client.get(url, max_content_size=1024)
-        await client.close()
+                # Port 1 is never listening locally: the connection is refused.
+                await client.get("http://127.0.0.1:1/data", max_content_size=1024)

@@ -170,20 +170,6 @@ wheels = [
 ]
 
 [[package]]
-name = "aiointercept"
-version = "0.1.9"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "aiohttp" },
-    { name = "multidict" },
-    { name = "yarl" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c7/62/f310cd6002a5e4f9993e7b8cd776f90a44254ab8cf2fc0cb5638317573b9/aiointercept-0.1.9.tar.gz", hash = "sha256:4f1996e0d4dc69024f48a408a4c9749e42821022241bc722203c3c84144d44f2", size = 164044, upload-time = "2026-07-08T19:32:10.366Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/63/6e/c6d8fe7160f2a97d313d1a86b6d90575d44d4017dbd5065f9843ac88de6d/aiointercept-0.1.9-py3-none-any.whl", hash = "sha256:ef89ea659e3c6aded2140cf4b66dd1ce2ceb4c3ada4f5df27696d613a1fc175c", size = 19486, upload-time = "2026-07-08T19:32:09.148Z" },
-]
-
-[[package]]
 name = "aiosignal"
 version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1764,18 +1750,6 @@ wheels = [
 ]
 
 [[package]]
-name = "requests-mock"
-version = "1.12.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/92/32/587625f91f9a0a3d84688bf9cfc4b2480a7e8ec327cefd0ff2ac891fd2cf/requests-mock-1.12.1.tar.gz", hash = "sha256:e9e12e333b525156e82a3c852f22016b9158220d2f47454de9cae8a77d371401", size = 60901, upload-time = "2024-03-29T03:54:29.446Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/97/ec/889fbc557727da0c34a33850950310240f2040f3b1955175fdb2b36a8910/requests_mock-1.12.1-py2.py3-none-any.whl", hash = "sha256:b1e37054004cdd5e56c84454cc7df12b25f90f382159087f4b6915aaeef39563", size = 27695, upload-time = "2024-03-29T03:54:27.64Z" },
-]
-
-[[package]]
 name = "requests-sse"
 version = "0.5.3"
 source = { registry = "https://pypi.org/simple" }
@@ -2064,7 +2038,6 @@ shamir = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "aiointercept" },
     { name = "mypy", marker = "platform_python_implementation != 'PyPy'" },
     { name = "pre-commit" },
     { name = "pyright" },
@@ -2073,7 +2046,6 @@ dev = [
     { name = "pytest-cov" },
     { name = "pytest-httpserver" },
     { name = "pytest-timeout" },
-    { name = "requests-mock" },
     { name = "types-requests" },
     { name = "types-toml", marker = "python_full_version < '3.11'" },
 ]
@@ -2106,7 +2078,6 @@ provides-extras = ["aiohttp", "shamir"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "aiointercept", specifier = ">=0.1.8" },
     { name = "mypy", marker = "platform_python_implementation != 'PyPy'", specifier = ">=1.14.1" },
     { name = "pre-commit", specifier = ">=3.5.0" },
     { name = "pyright", specifier = ">=1.1.402" },
@@ -2115,7 +2086,6 @@ dev = [
     { name = "pytest-cov", specifier = ">=5.0.0" },
     { name = "pytest-httpserver", specifier = ">=1.1.1" },
     { name = "pytest-timeout", specifier = ">=2.4.0" },
-    { name = "requests-mock", specifier = ">=1.12.1" },
     { name = "types-requests", specifier = ">=2.32.0.20241016" },
     { name = "types-toml", marker = "python_full_version < '3.11'", specifier = ">=0.10.8.20240310" },
 ]

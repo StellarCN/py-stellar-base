@@ -69,6 +69,24 @@ async def horizon_server(
             yield server
 
 
+def pytest_runtest_teardown(item):
+    """Fail a test that issued a request no handler matched.
+
+    ``requests_mock``/``aioresponses``, which this suite used before
+    standardizing on ``pytest_httpserver``, raised on an unmatched request.
+    ``pytest_httpserver`` instead answers 500 and records the mismatch, which
+    only fails a test if that 500 happens to reach an assertion. Checking here
+    restores the old behavior: a misrouted or unexpected request is an error,
+    not a silent pass.
+
+    This is a hook rather than an autouse fixture so that tests which never
+    touch HTTP do not pull in the server at all.
+    """
+    server = getattr(item, "funcargs", {}).get("httpserver")
+    if server is not None:
+        server.check()
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--integration",

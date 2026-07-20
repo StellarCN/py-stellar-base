@@ -1,63 +1,63 @@
 import pytest
-import requests_mock
-from aiointercept import aiointercept
+from pytest_httpserver import HTTPServer
 
 from stellar_sdk.exceptions import ContentSizeLimitExceededError
 from stellar_sdk.sep.exceptions import StellarTomlNotFoundError
 from stellar_sdk.sep.stellar_toml import (
     STELLAR_TOML_MAX_SIZE,
+    _build_request_url,
     fetch_stellar_toml,
     fetch_stellar_toml_async,
 )
+from tests.helpers import resolve
 
-
-class TestStellarToml:
-    TOML_CONTENT = """FEDERATION_SERVER="https://federation.example.com"
+TOML_CONTENT = """FEDERATION_SERVER="https://federation.example.com"
 WEB_AUTH_ENDPOINT="https://stellar-auth.example.com/auth"
 SIGNING_KEY="GDSDOGLZALK6V6DUTHNTACGTR3GI3OSVXK6OQCHDLSAGWXQRUBQVI2KM"
 NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
 """
 
-    def test_get_success_sync(self):
-        with requests_mock.Mocker() as m:
-            m.get(
-                "https://example.com/.well-known/stellar.toml", text=self.TOML_CONTENT
-            )
-            toml = fetch_stellar_toml("example.com", None)
-            assert toml.get("FEDERATION_SERVER") == "https://federation.example.com"
 
-    async def test_get_success_async(self):
-        async with aiointercept(mock_external_urls=True) as m:
-            m.get(
-                "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
-            )
-            toml = await fetch_stellar_toml_async("example.com")
-            assert toml.get("FEDERATION_SERVER") == "https://federation.example.com"
+@pytest.fixture(params=["sync", "async"])
+def fetch_toml(request: pytest.FixtureRequest):
+    if request.param == "sync":
+        return fetch_stellar_toml
+    return fetch_stellar_toml_async
 
-    def test_get_success_http(self):
-        with requests_mock.Mocker() as m:
-            m.get("http://example.com/.well-known/stellar.toml", text=self.TOML_CONTENT)
-            toml = fetch_stellar_toml("example.com", None, True)
-            assert toml.get("FEDERATION_SERVER") == "https://federation.example.com"
 
-    def test_get_not_found(self):
-        with requests_mock.Mocker() as mocker:
-            mocker.register_uri(
-                "GET", "https://example.com/.well-known/stellar.toml", status_code=404
-            )
-            with pytest.raises(StellarTomlNotFoundError):
-                fetch_stellar_toml("example.com")
+def _local_domain(httpserver: HTTPServer) -> str:
+    return f"{httpserver.host}:{httpserver.port}"
 
-    def test_content_size_limit_exceeded_sync(self):
+
+class TestStellarToml:
+    async def test_get_success(self, fetch_toml, httpserver):
+        httpserver.expect_request("/.well-known/stellar.toml").respond_with_data(
+            TOML_CONTENT
+        )
+        toml = await resolve(fetch_toml(_local_domain(httpserver), use_http=True))
+        assert toml.get("FEDERATION_SERVER") == "https://federation.example.com"
+
+    async def test_get_not_found(self, fetch_toml, httpserver):
+        httpserver.expect_request("/.well-known/stellar.toml").respond_with_data(
+            "", status=404
+        )
+        with pytest.raises(StellarTomlNotFoundError):
+            await resolve(fetch_toml(_local_domain(httpserver), use_http=True))
+
+    async def test_content_size_limit_exceeded(self, fetch_toml, httpserver):
         large_content = "a" * (STELLAR_TOML_MAX_SIZE + 1)
-        with requests_mock.Mocker() as m:
-            m.get("https://example.com/.well-known/stellar.toml", text=large_content)
-            with pytest.raises(ContentSizeLimitExceededError):
-                fetch_stellar_toml("example.com")
+        httpserver.expect_request("/.well-known/stellar.toml").respond_with_data(
+            large_content
+        )
+        with pytest.raises(ContentSizeLimitExceededError):
+            await resolve(fetch_toml(_local_domain(httpserver), use_http=True))
 
-    async def test_content_size_limit_exceeded_async(self):
-        large_content = "a" * (STELLAR_TOML_MAX_SIZE + 1)
-        async with aiointercept(mock_external_urls=True) as m:
-            m.get("https://example.com/.well-known/stellar.toml", body=large_content)
-            with pytest.raises(ContentSizeLimitExceededError):
-                await fetch_stellar_toml_async("example.com")
+    def test_build_request_url(self):
+        assert (
+            _build_request_url("example.com", False)
+            == "https://example.com/.well-known/stellar.toml"
+        )
+        assert (
+            _build_request_url("example.com", True)
+            == "http://example.com/.well-known/stellar.toml"
+        )
