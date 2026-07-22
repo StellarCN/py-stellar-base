@@ -45,6 +45,15 @@ SUCCESS_TRANSACTION_RESPONSE = {
 }
 
 
+def _account_check_requests(httpserver: HTTPServer) -> list[str]:
+    """Paths of the GET /accounts/... memo-requirement checks actually issued."""
+    return [
+        request.path
+        for request, _ in httpserver.log
+        if request.method == "GET" and request.path.startswith("/accounts/")
+    ]
+
+
 def _inject_mock_server(httpserver: HTTPServer) -> None:
     memo_required_response = {"data": {"config.memo_required": "MQ=="}}
     no_memo_required_response: dict[str, dict[str, str]] = {"data": {}}
@@ -107,7 +116,7 @@ def build_transaction(
 
 
 class TestAccountMemoRequirements:
-    async def test_check_memo_required_with_memo(self, memo_server):
+    async def test_check_memo_required_with_memo(self, memo_server, httpserver):
         transaction = build_transaction(
             MEMO_REQUIRED_A,
             MEMO_REQUIRED_B,
@@ -115,13 +124,20 @@ class TestAccountMemoRequirements:
             MEMO_REQUIRED_D,
             memo="hello, world",
         )
-        await resolve(memo_server.submit_transaction(transaction))
+        resp = await resolve(memo_server.submit_transaction(transaction))
+        assert resp["hash"] == SUCCESS_TRANSACTION_RESPONSE["hash"]
+        # A transaction with a memo skips the per-destination account checks.
+        assert _account_check_requests(httpserver) == []
 
-    async def test_check_memo_required_with_payment_skip_check(self, memo_server):
+    async def test_check_memo_required_with_payment_skip_check(
+        self, memo_server, httpserver
+    ):
         transaction = build_transaction(
             MEMO_REQUIRED_A, MEMO_REQUIRED_B, MEMO_REQUIRED_C, MEMO_REQUIRED_D
         )
-        await resolve(memo_server.submit_transaction(transaction, True))
+        resp = await resolve(memo_server.submit_transaction(transaction, True))
+        assert resp["hash"] == SUCCESS_TRANSACTION_RESPONSE["hash"]
+        assert _account_check_requests(httpserver) == []
 
     @pytest.mark.parametrize(
         ("destinations", "expected_account_id", "expected_operation_index"),
@@ -150,12 +166,6 @@ class TestAccountMemoRequirements:
                 3,
                 id="account_merge",
             ),
-            pytest.param(
-                (NO_MEMO_REQUIRED, NO_MEMO_REQUIRED, NO_MEMO_REQUIRED, MEMO_REQUIRED_D),
-                MEMO_REQUIRED_D,
-                3,
-                id="two_operations_with_same_destination",
-            ),
         ],
     )
     async def test_check_memo_required_raise(
@@ -174,18 +184,46 @@ class TestAccountMemoRequirements:
         assert err.value.account_id == expected_account_id
         assert err.value.operation_index == expected_operation_index
 
-    async def test_check_memo_required_with_no_destination_operation(self, memo_server):
+    async def test_check_memo_required_checks_each_destination_once(
+        self, memo_server, httpserver
+    ):
+        """A destination repeated across operations is only fetched once."""
+        transaction = build_transaction(
+            NO_MEMO_REQUIRED, NO_MEMO_REQUIRED, NO_MEMO_REQUIRED, MEMO_REQUIRED_D
+        )
+        with pytest.raises(
+            AccountRequiresMemoError,
+            match=r"Destination account requires a memo in the transaction.",
+        ) as err:
+            await resolve(memo_server.submit_transaction(transaction))
+        assert err.value.account_id == MEMO_REQUIRED_D
+        assert err.value.operation_index == 3
+        assert _account_check_requests(httpserver) == [
+            f"/accounts/{NO_MEMO_REQUIRED}",
+            f"/accounts/{MEMO_REQUIRED_D}",
+        ]
+
+    async def test_check_memo_required_with_no_destination_operation(
+        self, memo_server, httpserver
+    ):
         transaction = (
             TransactionBuilder(Account(KEYPAIR.public_key, 1))
             .append_manage_data_op("Hello", "world")
             .build()
         )
         transaction.sign(KEYPAIR)
-        await resolve(memo_server.submit_transaction(transaction))
+        resp = await resolve(memo_server.submit_transaction(transaction))
+        assert resp["hash"] == SUCCESS_TRANSACTION_RESPONSE["hash"]
+        assert _account_check_requests(httpserver) == []
 
-    async def test_check_memo_required_with_account_not_found(self, memo_server):
+    async def test_check_memo_required_with_account_not_found(
+        self, memo_server, httpserver
+    ):
         transaction = build_transaction(NOT_FOUND, NOT_FOUND, NOT_FOUND, NOT_FOUND)
-        await resolve(memo_server.submit_transaction(transaction))
+        resp = await resolve(memo_server.submit_transaction(transaction))
+        # Unknown destinations are treated as not requiring a memo.
+        assert resp["hash"] == SUCCESS_TRANSACTION_RESPONSE["hash"]
+        assert f"/accounts/{NOT_FOUND}" in _account_check_requests(httpserver)
 
     async def test_check_memo_required_with_fetch_account_error_raise(
         self, memo_server
@@ -205,7 +243,8 @@ class TestAccountMemoRequirements:
             MEMO_REQUIRED_D,
             memo="hello, world",
         )
-        await resolve(memo_server.submit_transaction(transaction))
+        resp = await resolve(memo_server.submit_transaction(transaction))
+        assert resp["hash"] == SUCCESS_TRANSACTION_RESPONSE["hash"]
 
     async def test_check_memo_required_with_fee_bump_transaction(self, memo_server):
         transaction = (
@@ -227,4 +266,5 @@ class TestAccountMemoRequirements:
             inner_transaction_envelope=transaction,
             network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
         )
-        await resolve(memo_server.submit_transaction(fee_bump_tx))
+        resp = await resolve(memo_server.submit_transaction(fee_bump_tx))
+        assert resp["hash"] == SUCCESS_TRANSACTION_RESPONSE["hash"]

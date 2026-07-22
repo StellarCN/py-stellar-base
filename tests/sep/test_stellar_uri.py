@@ -243,8 +243,11 @@ class TestStellarTransactionStellarUri:
 
     def test_invalid_scheme_raise(self):
         uri = "invalid+web+stellar:tx?xdr=AAAAAP%2Byw%2BZEuNg533pUmwlYxfrq6%2FBoMJqiJ8vuQhf6rHWmAAAAZAB8NHAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAYAAAABSFVHAAAAAABAH0wIyY3BJBS2qHdRPAV80M8hF7NBpxRjXyjuT9kEbH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FAAAAAAAAAAA%3D&callback=url%3Ahttps%3A%2F%2FsomeSigningService.com&replace=sourceAccount%3AX%3BX%3Aaccount%20on%20which%20to%20create%20the%20trustline&pubkey=GAU2ZSYYEYO5S5ZQSMMUENJ2TANY4FPXYGGIMU6GMGKTNVDG5QYFW6JS&msg=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=8uiZ2r7KT3gRsO%2BrzmofGHyl%2FLFMfOgNtx5oOddK2rAy8M%2BOgBYOSQpASNbIm%2BIvZVojxv8tKTYuzOkbyhPODA%3D%3D"
-        # TODO: recheck: Stellar URI scheme should be `web+stellar`, but got `invalid+web+stellar`.
-        with pytest.raises(ValueError, match=r"Stellar URI scheme should be"):
+        with pytest.raises(
+            ValueError,
+            match=r"Stellar URI scheme should be `web\+stellar`, "
+            r"but got `invalid\+web\+stellar`\.",
+        ):
             TransactionStellarUri.from_uri(uri, Network.TESTNET_NETWORK_PASSPHRASE)
 
     def test_invalid_path_raise(self):
@@ -254,7 +257,6 @@ class TestStellarTransactionStellarUri:
         ):
             TransactionStellarUri.from_uri(uri, Network.TESTNET_NETWORK_PASSPHRASE)
 
-    # TODO: add more tests
     def test_invalid_replace_raise(self):
         uri = "web+stellar:tx?xdr=AAAAAP%2Byw%2BZEuNg533pUmwlYxfrq6%2FBoMJqiJ8vuQhf6rHWmAAAAZAB8NHAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAYAAAABSFVHAAAAAABAH0wIyY3BJBS2qHdRPAV80M8hF7NBpxRjXyjuT9kEbH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FAAAAAAAAAAA%3D&callback=url%3Ahttps%3A%2F%2FsomeSigningService.com&replace=sourceAccount%3AX%3BY%3Aaccount%20on%20which%20to%20create%20the%20trustline&pubkey=GAU2ZSYYEYO5S5ZQSMMUENJ2TANY4FPXYGGIMU6GMGKTNVDG5QYFW6JS&msg=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=8uiZ2r7KT3gRsO%2BrzmofGHyl%2FLFMfOgNtx5oOddK2rAy8M%2BOgBYOSQpASNbIm%2BIvZVojxv8tKTYuzOkbyhPODA%3D%3D"
         with pytest.raises(ValueError, match=r"Invalid `replace`."):
@@ -522,18 +524,6 @@ class TestPayStellarUri:
                 message=message,
             )
 
-    @pytest.mark.skip(reason="runtime_type_checking_disabled")
-    def test_invalid_memo_raise(self):
-        memo = "invalid memo"
-        with pytest.raises(
-            TypeError,
-            match=r'type of argument "memo" must be one of \(stellar_sdk.memo.Memo, NoneType\); got str instead',
-        ):
-            PayStellarUri(
-                "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",
-                memo=memo,  # pyright: ignore[reportArgumentType]
-            )
-
     def test_equal(self):
         assert PayStellarUri(
             "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO"
@@ -546,8 +536,11 @@ class TestPayStellarUri:
 
     def test_invalid_scheme_raise(self):
         uri = "invalid+web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=120.1234567&asset_code=Hello&asset_issuer=GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF&memo=Hello%20World&memo_type=MEMO_TEXT&callback=url%3Ahttps%3A%2F%2Fexample.com%2Fcallback&msg=pay%20me%20with%20lumens&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=k5cDMVTD2W2lKeEGqakjOTf3aPuPumlr8ObBOvauaa2QiXqa7%2Bw9WRgtmo6NaPXdOoFG5ScUIp9k7PdeuPieCw%3D%3D"
-        # TODO: recheck: Stellar URI scheme should be `web+stellar`, but got `invalid+web+stellar`.
-        with pytest.raises(ValueError, match=r"Stellar URI scheme should be"):
+        with pytest.raises(
+            ValueError,
+            match=r"Stellar URI scheme should be `web\+stellar`, "
+            r"but got `invalid\+web\+stellar`\.",
+        ):
             PayStellarUri.from_uri(uri)
 
     def test_invalid_path_raise(self):

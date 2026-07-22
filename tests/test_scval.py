@@ -941,7 +941,7 @@ def test_uint128_out_of_range_raise(v):
         (
             2**256 - 1,
             "AAAAC///////////////////////////////////////////",
-        ),  # TODO: recheck
+        ),
     ],
 )
 def test_uint256(v, expected_xdr):

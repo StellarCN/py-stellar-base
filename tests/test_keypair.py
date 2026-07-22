@@ -3,6 +3,7 @@ import itertools
 
 import pytest
 import shamir_mnemonic  # type: ignore[import-untyped]
+from mnemonic import Mnemonic
 
 from stellar_sdk import Keypair, StrKey
 from stellar_sdk.exceptions import (
@@ -467,9 +468,10 @@ class TestKeypair:
         ],
     )
     def test_generate_mnemonic_phrase(self, language, strength, length):
-        # TODO: assert language type
         mnemonic_phrase = Keypair.generate_mnemonic_phrase(language, strength)
         assert len(mnemonic_phrase.split(" ")) == length
+        language_name = language.value if isinstance(language, Language) else language
+        assert Mnemonic(language_name).check(mnemonic_phrase)
 
     def test_generate_mnemonic_phrase_unsupported_language_raise(self):
         with pytest.raises(ValueError, match=r"This language is not supported."):
