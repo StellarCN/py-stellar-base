@@ -29,7 +29,10 @@ class FederationApi(NamedTuple):
 
 
 @pytest.fixture(params=["sync", "async"])
-def federation_api(request: pytest.FixtureRequest) -> FederationApi:
+async def federation_api(
+    request: pytest.FixtureRequest,
+    close_internal_aiohttp_clients: None,
+) -> FederationApi:
     if request.param == "sync":
         return FederationApi(resolve_stellar_address, resolve_account_id)
     return FederationApi(resolve_stellar_address_async, resolve_account_id_async)

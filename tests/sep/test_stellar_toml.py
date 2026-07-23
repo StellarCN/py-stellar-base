@@ -19,7 +19,10 @@ NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
 
 
 @pytest.fixture(params=["sync", "async"])
-def fetch_toml(request: pytest.FixtureRequest):
+async def fetch_toml(
+    request: pytest.FixtureRequest,
+    close_internal_aiohttp_clients: None,
+):
     if request.param == "sync":
         return fetch_stellar_toml
     return fetch_stellar_toml_async
