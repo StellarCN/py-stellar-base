@@ -1,3 +1,4 @@
+import re
 from typing import Any, NamedTuple
 
 import pytest
@@ -79,7 +80,7 @@ class TestFederation:
         _expect_toml(httpserver, body="")
         with pytest.raises(
             FederationServerNotFoundError,
-            match=r"Unable to find federation server",
+            match=rf"Unable to find federation server at {re.escape(_local_domain(httpserver))}\.",
         ):
             await resolve(
                 federation_api.resolve_stellar_address(stellar_address, use_http=True)
@@ -143,7 +144,7 @@ class TestFederation:
         _expect_toml(httpserver, body="")
         with pytest.raises(
             FederationServerNotFoundError,
-            match=r"Unable to find federation server",
+            match=rf"Unable to find federation server at {re.escape(_local_domain(httpserver))}\.",
         ):
             await resolve(
                 federation_api.resolve_account_id(
