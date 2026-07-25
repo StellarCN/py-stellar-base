@@ -1,3 +1,6 @@
+from unittest.mock import patch
+
+import aiohttp
 import pytest
 
 from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
@@ -103,8 +106,16 @@ class TestAiohttpClient:
     async def test_get_with_max_content_size_network_error_wraps_in_connection_error(
         self,
     ):
-        """aiohttp.ClientError (e.g. connection refused) is wrapped in ConnectionError."""
+        """aiohttp.ClientError (e.g. connection reset) is wrapped in ConnectionError."""
         async with AiohttpClient() as client:
-            with pytest.raises(ConnectionError):
-                # Port 1 is never listening locally: the connection is refused.
-                await client.get("http://127.0.0.1:1/data", max_content_size=1024)
+            with (
+                patch.object(
+                    aiohttp.ClientSession,
+                    "get",
+                    side_effect=aiohttp.ClientError("connection reset"),
+                ),
+                pytest.raises(ConnectionError),
+            ):
+                # `.invalid` never resolves (RFC 2606), so should the patch ever
+                # stop applying this cannot silently turn into a real request.
+                await client.get("https://mock.invalid/data", max_content_size=1024)
