@@ -36,20 +36,32 @@ async def env(
 
 
 class TestBaseCallBuilder:
-    async def test_get_data(self, env, httpbin_url):
+    @pytest.mark.parametrize(
+        ("order_kwargs", "expected_order"),
+        [({"desc": True}, "desc"), ({"desc": False}, "asc"), ({}, "desc")],
+        ids=["desc", "asc", "default"],
+    )
+    async def test_get_data(self, env, httpbin_url, order_kwargs, expected_order):
         make_builder, client_name = env
         url = httpbin_url + "get"
         resp = await resolve(
-            make_builder(url).limit(10).cursor(10086).order(desc=True).call()
+            make_builder(url).limit(10).cursor(10086).order(**order_kwargs).call()
         )
-        assert resp["args"] == {"cursor": "10086", "limit": "10", "order": "desc"}
+        assert resp["args"] == {
+            "cursor": "10086",
+            "limit": "10",
+            "order": expected_order,
+        }
         assert (
             resp["headers"]["User-Agent"]
             == f"py-stellar-base/{__version__}/{client_name}"
         )
         assert resp["headers"]["X-Client-Name"] == "py-stellar-base"
         assert resp["headers"]["X-Client-Version"] == __version__
-        assert resp["url"] == httpbin_url + "get?limit=10&cursor=10086&order=desc"
+        assert (
+            resp["url"]
+            == httpbin_url + f"get?limit=10&cursor=10086&order={expected_order}"
+        )
 
     async def test_stream_data(self, env, horizon_mock):
         make_builder, _ = env

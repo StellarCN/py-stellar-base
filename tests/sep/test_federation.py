@@ -1,9 +1,13 @@
 import re
+from collections.abc import AsyncIterator, Callable
 from typing import Any, NamedTuple
+from unittest import mock
 
 import pytest
 from pytest_httpserver import HTTPServer
 
+from stellar_sdk.client.aiohttp_client import AiohttpClient
+from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.exceptions import ContentSizeLimitExceededError
 from stellar_sdk.sep.exceptions import (
     BadFederationResponseError,
@@ -27,16 +31,41 @@ ACCOUNT_ID = "GAWCQ74PIJO2NH6F3KZ4AMX27UAKBXWC7KG3FLYJOFIMRQF3RSZHCOVN"
 class FederationApi(NamedTuple):
     resolve_stellar_address: Any
     resolve_account_id: Any
+    make_spy_client: Callable[[], Any]
 
 
 @pytest.fixture(params=["sync", "async"])
 async def federation_api(
     request: pytest.FixtureRequest,
     close_internal_aiohttp_clients: None,
-) -> FederationApi:
+) -> AsyncIterator[FederationApi]:
+    """The federation API of one flavor, plus a factory for spy clients.
+
+    ``make_spy_client`` returns a ``Mock`` wrapping a real client of the same
+    flavor, so tests can assert how many requests the *injected* client served.
+    Passing a plain client would prove nothing: it is exactly what the SDK
+    builds when ``client=None``, so an implementation that ignored the argument
+    would behave identically.
+    """
+    clients: list[RequestsClient | AiohttpClient] = []
+
+    def make_spy_client() -> Any:
+        client: RequestsClient | AiohttpClient = (
+            RequestsClient() if request.param == "sync" else AiohttpClient()
+        )
+        clients.append(client)
+        return mock.Mock(wraps=client)
+
     if request.param == "sync":
-        return FederationApi(resolve_stellar_address, resolve_account_id)
-    return FederationApi(resolve_stellar_address_async, resolve_account_id_async)
+        yield FederationApi(
+            resolve_stellar_address, resolve_account_id, make_spy_client
+        )
+    else:
+        yield FederationApi(
+            resolve_stellar_address_async, resolve_account_id_async, make_spy_client
+        )
+    for client in clients:
+        await resolve(client.close())
 
 
 def _local_domain(httpserver: HTTPServer) -> str:
@@ -106,6 +135,31 @@ class TestFederation:
         )
         assert record.account_id == ACCOUNT_ID
 
+    async def test_resolve_by_stellar_address_uses_supplied_client(
+        self, federation_api, httpserver
+    ):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        _expect_toml(httpserver)
+        httpserver.expect_request(
+            "/federation", query_string={"type": "name", "q": stellar_address}
+        ).respond_with_json(
+            {
+                "account_id": ACCOUNT_ID,
+                "memo_type": "text",
+                "memo": "Nice to meet you :-)",
+            }
+        )
+        client = federation_api.make_spy_client()
+        record = await resolve(
+            federation_api.resolve_stellar_address(
+                stellar_address, client=client, use_http=True
+            )
+        )
+        assert record.account_id == ACCOUNT_ID
+        # Both the stellar.toml lookup and the federation request go through the
+        # injected client.
+        assert client.get.call_count == 2
+
     async def test_resolve_by_account_id_with_domain(self, federation_api, httpserver):
         stellar_address = f"hello*{_local_domain(httpserver)}"
         _expect_toml(httpserver)
@@ -129,6 +183,34 @@ class TestFederation:
             memo_type="text",
             memo="Nice to meet you :-)",
         )
+
+    async def test_resolve_by_account_id_uses_supplied_client(
+        self, federation_api, httpserver
+    ):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        _expect_toml(httpserver)
+        httpserver.expect_request(
+            "/federation", query_string={"type": "id", "q": ACCOUNT_ID}
+        ).respond_with_json(
+            {
+                "stellar_address": stellar_address,
+                "memo_type": "text",
+                "memo": "Nice to meet you :-)",
+            }
+        )
+        client = federation_api.make_spy_client()
+        record = await resolve(
+            federation_api.resolve_account_id(
+                ACCOUNT_ID,
+                domain=_local_domain(httpserver),
+                client=client,
+                use_http=True,
+            )
+        )
+        assert record.stellar_address == stellar_address
+        # Both the stellar.toml lookup and the federation request go through the
+        # injected client.
+        assert client.get.call_count == 2
 
     async def test_resolve_by_account_id_without_domain_and_federation_url(
         self, federation_api
