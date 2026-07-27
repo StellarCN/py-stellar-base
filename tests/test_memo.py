@@ -31,6 +31,11 @@ class TestMemo:
         assert isinstance(base_memo, TextMemo)
         assert base_memo.to_xdr_object().to_xdr() == xdr
 
+    def test_text_memo_max_length_allowed(self):
+        """28 bytes is the boundary and must still be accepted."""
+        memo = TextMemo("a" * 28)
+        assert memo.memo_text == b"a" * 28
+
     def test_text_memo_too_long_raise(self):
         invalid_value = "a" * 29
         with pytest.raises(

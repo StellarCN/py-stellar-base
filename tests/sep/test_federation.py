@@ -260,6 +260,22 @@ class TestFederation:
                 federation_api.resolve_stellar_address(stellar_address, use_http=True)
             )
 
+    @pytest.mark.parametrize(
+        "field", ["account_id", "stellar_address", "memo_type", "memo"]
+    )
+    def test_federation_record_differing_in_one_field_is_not_equal(self, field):
+        # The tests above assert `record == FederationRecord(...)`, which is only
+        # meaningful if every field takes part in the comparison.
+        fields = {
+            "account_id": ACCOUNT_ID,
+            "stellar_address": "hello*example.com",
+            "memo_type": "text",
+            "memo": "Nice to meet you :-)",
+        }
+        assert FederationRecord(**fields) != FederationRecord(
+            **{**fields, field: "different"}
+        )
+
     def test_split_address(self):
         assert _split_stellar_address("hello*example.com") == {
             "name": "hello",
