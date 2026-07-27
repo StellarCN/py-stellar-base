@@ -99,9 +99,9 @@ def resolve_stellar_address(
     parts = _split_stellar_address(stellar_address)
     domain = parts["domain"]
     if federation_url is None:
-        federation_url = fetch_stellar_toml(domain, use_http=use_http).get(
-            FEDERATION_SERVER_KEY
-        )
+        federation_url = fetch_stellar_toml(
+            domain, client=client, use_http=use_http
+        ).get(FEDERATION_SERVER_KEY)
     if federation_url is None:
         raise FederationServerNotFoundError(
             f"Unable to find federation server at {domain}."

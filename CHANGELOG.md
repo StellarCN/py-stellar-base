@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Fixes
+- Forward the supplied `client` to the `stellar.toml` lookup in `federation.resolve_stellar_address`; it previously used a default `RequestsClient` for that request.
+
 ### Version 15.0.0
 
 Released on July 04, 2026

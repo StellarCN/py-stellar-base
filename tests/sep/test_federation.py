@@ -1,8 +1,11 @@
+from unittest import mock
+
 import pytest
 import requests_mock
 from aiointercept import aiointercept
 
 from stellar_sdk.client.aiohttp_client import AiohttpClient
+from stellar_sdk.client.requests_client import RequestsClient
 from stellar_sdk.exceptions import ContentSizeLimitExceededError
 from stellar_sdk.sep.exceptions import (
     BadFederationResponseError,
@@ -52,6 +55,27 @@ class TestFederation:
             )
             record = resolve_stellar_address(self.STELLAR_ADDRESS)
             assert record == self.FEDERATION_RECORD
+
+    def test_resolve_by_stellar_address_uses_supplied_client_sync(self):
+        with requests_mock.Mocker() as m:
+            m.get(
+                "https://example.com/.well-known/stellar.toml", text=self.TOML_CONTENT
+            )
+            m.get(
+                "https://federation.example.com/?type=name&q=hello%2Aexample.com",
+                json={
+                    "account_id": self.ACCOUNT_ID,
+                    "memo_type": "text",
+                    "memo": "Nice to meet you :-)",
+                },
+            )
+            client = mock.Mock(wraps=RequestsClient())
+            record = resolve_stellar_address(self.STELLAR_ADDRESS, client=client)
+            assert record == self.FEDERATION_RECORD
+            assert [c.args[0] for c in client.get.call_args_list] == [
+                "https://example.com/.well-known/stellar.toml",
+                self.FEDERATION_SERVER,
+            ]
 
     @pytest.mark.asyncio
     async def test_resolve_by_stellar_address_async(self):
