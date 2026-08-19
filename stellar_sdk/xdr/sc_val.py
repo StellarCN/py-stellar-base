@@ -97,6 +97,9 @@ class SCVal:
             void;
         case SCV_LEDGER_KEY_NONCE:
             SCNonceKey nonce_key;
+
+        case SCV_EXECUTABLE_TAG:
+            SCString executable_tag;
         };
     """
 
@@ -123,6 +126,7 @@ class SCVal:
         address: SCAddress | None = None,
         instance: SCContractInstance | None = None,
         nonce_key: SCNonceKey | None = None,
+        executable_tag: SCString | None = None,
     ) -> None:
         self.type = type
         self.b = b
@@ -145,6 +149,7 @@ class SCVal:
         self.address = address
         self.instance = instance
         self.nonce_key = nonce_key
+        self.executable_tag = executable_tag
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -259,6 +264,11 @@ class SCVal:
             if self.nonce_key is None:
                 raise ValueError("nonce_key should not be None.")
             self.nonce_key.pack(packer)
+            return
+        if self.type == SCValType.SCV_EXECUTABLE_TAG:
+            if self.executable_tag is None:
+                raise ValueError("executable_tag should not be None.")
+            self.executable_tag.pack(packer)
             return
         raise ValueError("Invalid type.")
 
@@ -379,6 +389,11 @@ class SCVal:
 
             nonce_key = SCNonceKey.unpack(unpacker, depth_limit - 1)
             return cls(type=type, nonce_key=nonce_key)
+        if type == SCValType.SCV_EXECUTABLE_TAG:
+            from .sc_string import SCString
+
+            executable_tag = SCString.unpack(unpacker, depth_limit - 1)
+            return cls(type=type, executable_tag=executable_tag)
         raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
@@ -476,6 +491,9 @@ class SCVal:
         if self.type == SCValType.SCV_LEDGER_KEY_NONCE:
             assert self.nonce_key is not None
             return {"ledger_key_nonce": self.nonce_key.to_json_dict()}
+        if self.type == SCValType.SCV_EXECUTABLE_TAG:
+            assert self.executable_tag is not None
+            return {"executable_tag": self.executable_tag.to_json_dict()}
         raise ValueError(f"Unknown type in SCVal: {self.type}")
 
     @classmethod
@@ -596,6 +614,11 @@ class SCVal:
 
             nonce_key = SCNonceKey.from_json_dict(json_value["ledger_key_nonce"])
             return cls(type=type, nonce_key=nonce_key)
+        if key == "executable_tag":
+            from .sc_string import SCString
+
+            executable_tag = SCString.from_json_dict(json_value["executable_tag"])
+            return cls(type=type, executable_tag=executable_tag)
         raise ValueError(f"Unknown key '{key}' for SCVal")
 
     def __hash__(self):
@@ -622,6 +645,7 @@ class SCVal:
                 self.address,
                 self.instance,
                 self.nonce_key,
+                self.executable_tag,
             )
         )
 
@@ -650,6 +674,7 @@ class SCVal:
             and self.address == other.address
             and self.instance == other.instance
             and self.nonce_key == other.nonce_key
+            and self.executable_tag == other.executable_tag
         )
 
     def __repr__(self):
@@ -695,4 +720,6 @@ class SCVal:
             out.append(f"instance={self.instance}")
         if self.nonce_key is not None:
             out.append(f"nonce_key={self.nonce_key}")
+        if self.executable_tag is not None:
+            out.append(f"executable_tag={self.executable_tag}")
         return f"<SCVal [{', '.join(out)}]>"

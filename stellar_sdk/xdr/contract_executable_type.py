@@ -8,8 +8,12 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-_CONTRACT_EXECUTABLE_TYPE_MAP = {0: "wasm", 1: "stellar_asset"}
-_CONTRACT_EXECUTABLE_TYPE_REVERSE_MAP = {"wasm": 0, "stellar_asset": 1}
+_CONTRACT_EXECUTABLE_TYPE_MAP = {0: "wasm", 1: "stellar_asset", 2: "external_ref"}
+_CONTRACT_EXECUTABLE_TYPE_REVERSE_MAP = {
+    "wasm": 0,
+    "stellar_asset": 1,
+    "external_ref": 2,
+}
 __all__ = ["ContractExecutableType"]
 
 
@@ -20,12 +24,14 @@ class ContractExecutableType(IntEnum):
         enum ContractExecutableType
         {
             CONTRACT_EXECUTABLE_WASM = 0,
-            CONTRACT_EXECUTABLE_STELLAR_ASSET = 1
+            CONTRACT_EXECUTABLE_STELLAR_ASSET = 1,
+            CONTRACT_EXECUTABLE_EXTERNAL_REF = 2
         };
     """
 
     CONTRACT_EXECUTABLE_WASM = 0
     CONTRACT_EXECUTABLE_STELLAR_ASSET = 1
+    CONTRACT_EXECUTABLE_EXTERNAL_REF = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

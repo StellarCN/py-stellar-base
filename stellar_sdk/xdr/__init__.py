@@ -96,6 +96,7 @@ from .contract_event_body import *
 from .contract_event_type import *
 from .contract_event_v0 import *
 from .contract_executable import *
+from .contract_executable_external_ref import *
 from .contract_executable_type import *
 from .contract_id import *
 from .contract_id_preimage import *
@@ -398,6 +399,7 @@ from .state_archival_settings import *
 from .stellar_message import *
 from .stellar_value import *
 from .stellar_value_ext import *
+from .stellar_value_proposed_value import *
 from .stellar_value_type import *
 from .stored_debug_transaction_set import *
 from .stored_transaction_set import *

@@ -8,8 +8,8 @@ from enum import IntEnum
 
 from xdrlib3 import Packer, Unpacker
 
-_STELLAR_VALUE_TYPE_MAP = {0: "basic", 1: "signed"}
-_STELLAR_VALUE_TYPE_REVERSE_MAP = {"basic": 0, "signed": 1}
+_STELLAR_VALUE_TYPE_MAP = {0: "basic", 1: "signed", 2: "empty_tx_set"}
+_STELLAR_VALUE_TYPE_REVERSE_MAP = {"basic": 0, "signed": 1, "empty_tx_set": 2}
 __all__ = ["StellarValueType"]
 
 
@@ -20,12 +20,14 @@ class StellarValueType(IntEnum):
         enum StellarValueType
         {
             STELLAR_VALUE_BASIC = 0,
-            STELLAR_VALUE_SIGNED = 1
+            STELLAR_VALUE_SIGNED = 1,
+            STELLAR_VALUE_EMPTY_TX_SET = 2
         };
     """
 
     STELLAR_VALUE_BASIC = 0
     STELLAR_VALUE_SIGNED = 1
+    STELLAR_VALUE_EMPTY_TX_SET = 2
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
