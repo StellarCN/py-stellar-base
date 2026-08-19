@@ -31,6 +31,7 @@ _SC_VAL_TYPE_MAP = {
     19: "contract_instance",
     20: "ledger_key_contract_instance",
     21: "ledger_key_nonce",
+    22: "executable_tag",
 }
 _SC_VAL_TYPE_REVERSE_MAP = {
     "bool": 0,
@@ -55,6 +56,7 @@ _SC_VAL_TYPE_REVERSE_MAP = {
     "contract_instance": 19,
     "ledger_key_contract_instance": 20,
     "ledger_key_nonce": 21,
+    "executable_tag": 22,
 }
 __all__ = ["SCValType"]
 
@@ -115,7 +117,9 @@ class SCValType(IntEnum):
             // symbolic SCVals used as the key for ledger entries for a contract's
             // instance and an address' nonce, respectively.
             SCV_LEDGER_KEY_CONTRACT_INSTANCE = 20,
-            SCV_LEDGER_KEY_NONCE = 21
+            SCV_LEDGER_KEY_NONCE = 21,
+
+            SCV_EXECUTABLE_TAG = 22
         };
     """
 
@@ -141,6 +145,7 @@ class SCValType(IntEnum):
     SCV_CONTRACT_INSTANCE = 19
     SCV_LEDGER_KEY_CONTRACT_INSTANCE = 20
     SCV_LEDGER_KEY_NONCE = 21
+    SCV_EXECUTABLE_TAG = 22
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)

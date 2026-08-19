@@ -8,6 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .base import DEFAULT_XDR_MAX_DEPTH
+from .contract_executable_external_ref import ContractExecutableExternalRef
 from .contract_executable_type import ContractExecutableType
 from .hash import Hash
 
@@ -24,6 +25,8 @@ class ContractExecutable:
             Hash wasm_hash;
         case CONTRACT_EXECUTABLE_STELLAR_ASSET:
             void;
+        case CONTRACT_EXECUTABLE_EXTERNAL_REF:
+            ContractExecutableExternalRef external_ref;
         };
     """
 
@@ -31,9 +34,11 @@ class ContractExecutable:
         self,
         type: ContractExecutableType,
         wasm_hash: Hash | None = None,
+        external_ref: ContractExecutableExternalRef | None = None,
     ) -> None:
         self.type = type
         self.wasm_hash = wasm_hash
+        self.external_ref = external_ref
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -43,6 +48,11 @@ class ContractExecutable:
             self.wasm_hash.pack(packer)
             return
         if self.type == ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET:
+            return
+        if self.type == ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF:
+            if self.external_ref is None:
+                raise ValueError("external_ref should not be None.")
+            self.external_ref.pack(packer)
             return
         raise ValueError("Invalid type.")
 
@@ -58,6 +68,11 @@ class ContractExecutable:
             return cls(type=type, wasm_hash=wasm_hash)
         if type == ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET:
             return cls(type=type)
+        if type == ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF:
+            external_ref = ContractExecutableExternalRef.unpack(
+                unpacker, depth_limit - 1
+            )
+            return cls(type=type, external_ref=external_ref)
         raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
@@ -96,6 +111,9 @@ class ContractExecutable:
             return {"wasm": self.wasm_hash.to_json_dict()}
         if self.type == ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET:
             return "stellar_asset"
+        if self.type == ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF:
+            assert self.external_ref is not None
+            return {"external_ref": self.external_ref.to_json_dict()}
         raise ValueError(f"Unknown type in ContractExecutable: {self.type}")
 
     @classmethod
@@ -116,6 +134,11 @@ class ContractExecutable:
         if key == "wasm":
             wasm_hash = Hash.from_json_dict(json_value["wasm"])
             return cls(type=type, wasm_hash=wasm_hash)
+        if key == "external_ref":
+            external_ref = ContractExecutableExternalRef.from_json_dict(
+                json_value["external_ref"]
+            )
+            return cls(type=type, external_ref=external_ref)
         raise ValueError(f"Unknown key '{key}' for ContractExecutable")
 
     def __hash__(self):
@@ -123,17 +146,24 @@ class ContractExecutable:
             (
                 self.type,
                 self.wasm_hash,
+                self.external_ref,
             )
         )
 
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.type == other.type and self.wasm_hash == other.wasm_hash
+        return (
+            self.type == other.type
+            and self.wasm_hash == other.wasm_hash
+            and self.external_ref == other.external_ref
+        )
 
     def __repr__(self):
         out = []
         out.append(f"type={self.type}")
         if self.wasm_hash is not None:
             out.append(f"wasm_hash={self.wasm_hash}")
+        if self.external_ref is not None:
+            out.append(f"external_ref={self.external_ref}")
         return f"<ContractExecutable [{', '.join(out)}]>"
