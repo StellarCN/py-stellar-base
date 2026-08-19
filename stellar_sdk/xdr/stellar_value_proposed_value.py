@@ -4,15 +4,17 @@ from __future__ import annotations
 
 import base64
 import json
-from enum import IntEnum
-from typing import TYPE_CHECKING
-from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH
 
+from xdrlib3 import Packer, Unpacker
+
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
-from .uint32 import Uint32
 from .ledger_close_value_signature import LedgerCloseValueSignature
-__all__ = ['StellarValueProposedValue']
+from .uint32 import Uint32
+
+__all__ = ["StellarValueProposedValue"]
+
+
 class StellarValueProposedValue:
     """
     XDR Source Code::
@@ -25,6 +27,7 @@ class StellarValueProposedValue:
                     LedgerCloseValueSignature lcValueSignature;
                 }
     """
+
     def __init__(
         self,
         tx_set_hash: Hash,
@@ -36,13 +39,17 @@ class StellarValueProposedValue:
         self.previous_ledger_hash = previous_ledger_hash
         self.previous_ledger_version = previous_ledger_version
         self.lc_value_signature = lc_value_signature
+
     def pack(self, packer: Packer) -> None:
         self.tx_set_hash.pack(packer)
         self.previous_ledger_hash.pack(packer)
         self.previous_ledger_version.pack(packer)
         self.lc_value_signature.pack(packer)
+
     @classmethod
-    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> StellarValueProposedValue:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> StellarValueProposedValue:
         if depth_limit <= 0:
             raise ValueError("Maximum decoding depth reached")
         tx_set_hash = Hash.unpack(unpacker, depth_limit - 1)
@@ -55,6 +62,7 @@ class StellarValueProposedValue:
             previous_ledger_version=previous_ledger_version,
             lc_value_signature=lc_value_signature,
         )
+
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
         self.pack(packer)
@@ -84,6 +92,7 @@ class StellarValueProposedValue:
     @classmethod
     def from_json(cls, json_str: str) -> StellarValueProposedValue:
         return cls.from_json_dict(json.loads(json_str))
+
     def to_json_dict(self) -> dict:
         return {
             "tx_set_hash": self.tx_set_hash.to_json_dict(),
@@ -91,29 +100,49 @@ class StellarValueProposedValue:
             "previous_ledger_version": self.previous_ledger_version.to_json_dict(),
             "lc_value_signature": self.lc_value_signature.to_json_dict(),
         }
+
     @classmethod
     def from_json_dict(cls, json_dict: dict) -> StellarValueProposedValue:
         tx_set_hash = Hash.from_json_dict(json_dict["tx_set_hash"])
         previous_ledger_hash = Hash.from_json_dict(json_dict["previous_ledger_hash"])
-        previous_ledger_version = Uint32.from_json_dict(json_dict["previous_ledger_version"])
-        lc_value_signature = LedgerCloseValueSignature.from_json_dict(json_dict["lc_value_signature"])
+        previous_ledger_version = Uint32.from_json_dict(
+            json_dict["previous_ledger_version"]
+        )
+        lc_value_signature = LedgerCloseValueSignature.from_json_dict(
+            json_dict["lc_value_signature"]
+        )
         return cls(
             tx_set_hash=tx_set_hash,
             previous_ledger_hash=previous_ledger_hash,
             previous_ledger_version=previous_ledger_version,
             lc_value_signature=lc_value_signature,
         )
+
     def __hash__(self):
-        return hash((self.tx_set_hash, self.previous_ledger_hash, self.previous_ledger_version, self.lc_value_signature,))
+        return hash(
+            (
+                self.tx_set_hash,
+                self.previous_ledger_hash,
+                self.previous_ledger_version,
+                self.lc_value_signature,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.tx_set_hash == other.tx_set_hash and self.previous_ledger_hash == other.previous_ledger_hash and self.previous_ledger_version == other.previous_ledger_version and self.lc_value_signature == other.lc_value_signature
+        return (
+            self.tx_set_hash == other.tx_set_hash
+            and self.previous_ledger_hash == other.previous_ledger_hash
+            and self.previous_ledger_version == other.previous_ledger_version
+            and self.lc_value_signature == other.lc_value_signature
+        )
+
     def __repr__(self):
         out = [
-            f'tx_set_hash={self.tx_set_hash}',
-            f'previous_ledger_hash={self.previous_ledger_hash}',
-            f'previous_ledger_version={self.previous_ledger_version}',
-            f'lc_value_signature={self.lc_value_signature}',
+            f"tx_set_hash={self.tx_set_hash}",
+            f"previous_ledger_hash={self.previous_ledger_hash}",
+            f"previous_ledger_version={self.previous_ledger_version}",
+            f"lc_value_signature={self.lc_value_signature}",
         ]
         return f"<StellarValueProposedValue [{', '.join(out)}]>"

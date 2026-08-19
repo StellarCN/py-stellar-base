@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import base64
 import json
-from enum import IntEnum
-from typing import TYPE_CHECKING
-from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH
 
+from xdrlib3 import Packer, Unpacker
+
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .sc_address import SCAddress
 from .sc_string import SCString
-__all__ = ['ContractExecutableExternalRef']
+
+__all__ = ["ContractExecutableExternalRef"]
+
+
 class ContractExecutableExternalRef:
     """
     XDR Source Code::
@@ -21,6 +23,7 @@ class ContractExecutableExternalRef:
             SCString tag;
         };
     """
+
     def __init__(
         self,
         executable_owner: SCAddress,
@@ -28,11 +31,15 @@ class ContractExecutableExternalRef:
     ) -> None:
         self.executable_owner = executable_owner
         self.tag = tag
+
     def pack(self, packer: Packer) -> None:
         self.executable_owner.pack(packer)
         self.tag.pack(packer)
+
     @classmethod
-    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> ContractExecutableExternalRef:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> ContractExecutableExternalRef:
         if depth_limit <= 0:
             raise ValueError("Maximum decoding depth reached")
         executable_owner = SCAddress.unpack(unpacker, depth_limit - 1)
@@ -41,6 +48,7 @@ class ContractExecutableExternalRef:
             executable_owner=executable_owner,
             tag=tag,
         )
+
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
         self.pack(packer)
@@ -70,11 +78,13 @@ class ContractExecutableExternalRef:
     @classmethod
     def from_json(cls, json_str: str) -> ContractExecutableExternalRef:
         return cls.from_json_dict(json.loads(json_str))
+
     def to_json_dict(self) -> dict:
         return {
             "executable_owner": self.executable_owner.to_json_dict(),
             "tag": self.tag.to_json_dict(),
         }
+
     @classmethod
     def from_json_dict(cls, json_dict: dict) -> ContractExecutableExternalRef:
         executable_owner = SCAddress.from_json_dict(json_dict["executable_owner"])
@@ -83,15 +93,23 @@ class ContractExecutableExternalRef:
             executable_owner=executable_owner,
             tag=tag,
         )
+
     def __hash__(self):
-        return hash((self.executable_owner, self.tag,))
+        return hash(
+            (
+                self.executable_owner,
+                self.tag,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.executable_owner == other.executable_owner and self.tag == other.tag
+
     def __repr__(self):
         out = [
-            f'executable_owner={self.executable_owner}',
-            f'tag={self.tag}',
+            f"executable_owner={self.executable_owner}",
+            f"tag={self.tag}",
         ]
         return f"<ContractExecutableExternalRef [{', '.join(out)}]>"
