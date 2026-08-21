@@ -10,12 +10,14 @@ from stellar_sdk.exceptions import (
     ContractCodeNotFoundError,
     ContractInstanceNotFoundError,
     ContractWasmRetrievalError,
+    ExternalRefNotFoundError,
     SACHasNoWasmError,
 )
-from stellar_sdk.soroban_server import SorobanServer
+from stellar_sdk.soroban_server import Durability, SorobanServer
 from stellar_sdk.soroban_server_async import SorobanServerAsync
 
 CONTRACT_ID = "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSC4"
+ACCOUNT_ID = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF"
 
 
 def test_get_contract_wasm_by_hash(monkeypatch):
@@ -138,6 +140,354 @@ async def test_get_contract_wasm_uses_instance_hash_async(monkeypatch):
     )
 
     assert await server.get_contract_wasm(CONTRACT_ID) == wasm
+
+
+def test_get_external_ref_wasm_hash(monkeypatch):
+    tag = b"release"
+    wasm_hash = b"\x03" * 32
+    external_ref = _external_ref_xdr(CONTRACT_ID, tag)
+    server = SorobanServer("https://example.com")
+
+    def get_contract_data(self, contract_id, key, durability):
+        assert contract_id == CONTRACT_ID
+        assert key.type == stellar_xdr.SCValType.SCV_EXECUTABLE_TAG
+        assert key.executable_tag is not None
+        assert key.executable_tag.sc_string == tag
+        assert durability == Durability.PERSISTENT
+        return SimpleNamespace(
+            xdr=_contract_data_xdr(CONTRACT_ID, _bytes_xdr(wasm_hash), key=key)
+        )
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(get_contract_data, server),
+    )
+
+    assert server.get_external_ref_wasm_hash(external_ref) == wasm_hash
+
+
+async def test_get_external_ref_wasm_hash_async(monkeypatch):
+    tag = b"release"
+    wasm_hash = b"\x03" * 32
+    external_ref = _external_ref_xdr(CONTRACT_ID, tag)
+    server = SorobanServerAsync("https://example.com")
+
+    async def get_contract_data(self, contract_id, key, durability):
+        assert contract_id == CONTRACT_ID
+        assert key.type == stellar_xdr.SCValType.SCV_EXECUTABLE_TAG
+        assert key.executable_tag is not None
+        assert key.executable_tag.sc_string == tag
+        assert durability == Durability.PERSISTENT
+        return SimpleNamespace(
+            xdr=_contract_data_xdr(CONTRACT_ID, _bytes_xdr(wasm_hash), key=key)
+        )
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(get_contract_data, server),
+    )
+
+    assert await server.get_external_ref_wasm_hash(external_ref) == wasm_hash
+
+
+def test_get_external_ref_wasm_hash_preserves_binary_tag(monkeypatch):
+    tag = b"\xff\x00\xfe"
+    wasm_hash = b"\x04" * 32
+    external_ref = _external_ref_xdr(CONTRACT_ID, tag)
+    server = SorobanServer("https://example.com")
+
+    def get_contract_data(self, contract_id, key, durability):
+        assert key.executable_tag is not None
+        assert key.executable_tag.sc_string == tag
+        return SimpleNamespace(
+            xdr=_contract_data_xdr(contract_id, _bytes_xdr(wasm_hash), key=key)
+        )
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(get_contract_data, server),
+    )
+
+    assert server.get_external_ref_wasm_hash(external_ref) == wasm_hash
+
+
+async def test_get_external_ref_wasm_hash_preserves_binary_tag_async(monkeypatch):
+    tag = b"\xff\x00\xfe"
+    wasm_hash = b"\x04" * 32
+    external_ref = _external_ref_xdr(CONTRACT_ID, tag)
+    server = SorobanServerAsync("https://example.com")
+
+    async def get_contract_data(self, contract_id, key, durability):
+        assert key.executable_tag is not None
+        assert key.executable_tag.sc_string == tag
+        return SimpleNamespace(
+            xdr=_contract_data_xdr(contract_id, _bytes_xdr(wasm_hash), key=key)
+        )
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(get_contract_data, server),
+    )
+
+    assert await server.get_external_ref_wasm_hash(external_ref) == wasm_hash
+
+
+def test_get_external_ref_wasm_hash_rejects_non_contract_owner():
+    external_ref = _external_ref_xdr(ACCOUNT_ID, b"release")
+    server = SorobanServer("https://example.com")
+
+    with pytest.raises(ValueError, match="is not a contract"):
+        server.get_external_ref_wasm_hash(external_ref)
+
+
+async def test_get_external_ref_wasm_hash_rejects_non_contract_owner_async():
+    external_ref = _external_ref_xdr(ACCOUNT_ID, b"release")
+    server = SorobanServerAsync("https://example.com")
+
+    with pytest.raises(ValueError, match="is not a contract"):
+        await server.get_external_ref_wasm_hash(external_ref)
+
+
+def test_get_external_ref_wasm_hash_missing_tag(monkeypatch):
+    external_ref = _external_ref_xdr(CONTRACT_ID, b"missing")
+    server = SorobanServer("https://example.com")
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(lambda self, contract_id, key, durability: None, server),
+    )
+
+    with pytest.raises(ExternalRefNotFoundError, match="not found or is archived"):
+        server.get_external_ref_wasm_hash(external_ref)
+
+
+async def test_get_external_ref_wasm_hash_missing_tag_async(monkeypatch):
+    external_ref = _external_ref_xdr(CONTRACT_ID, b"missing")
+    server = SorobanServerAsync("https://example.com")
+
+    async def get_contract_data(self, contract_id, key, durability):
+        return None
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(get_contract_data, server),
+    )
+
+    with pytest.raises(ExternalRefNotFoundError, match="not found or is archived"):
+        await server.get_external_ref_wasm_hash(external_ref)
+
+
+def test_get_external_ref_wasm_hash_rejects_non_contract_data(monkeypatch):
+    external_ref = _external_ref_xdr(CONTRACT_ID, b"release")
+    server = SorobanServer("https://example.com")
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(
+            lambda self, contract_id, key, durability: SimpleNamespace(
+                xdr=_contract_code_xdr(b"\x05" * 32, b"")
+            ),
+            server,
+        ),
+    )
+
+    with pytest.raises(ContractWasmRetrievalError, match="contract data"):
+        server.get_external_ref_wasm_hash(external_ref)
+
+
+async def test_get_external_ref_wasm_hash_rejects_non_contract_data_async(
+    monkeypatch,
+):
+    external_ref = _external_ref_xdr(CONTRACT_ID, b"release")
+    server = SorobanServerAsync("https://example.com")
+
+    async def get_contract_data(self, contract_id, key, durability):
+        return SimpleNamespace(xdr=_contract_code_xdr(b"\x05" * 32, b""))
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(get_contract_data, server),
+    )
+
+    with pytest.raises(ContractWasmRetrievalError, match="contract data"):
+        await server.get_external_ref_wasm_hash(external_ref)
+
+
+def test_get_external_ref_wasm_hash_rejects_invalid_hash_values(monkeypatch):
+    tag = b"release"
+    external_ref = _external_ref_xdr(CONTRACT_ID, tag)
+    invalid_values = iter(
+        [
+            stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VOID),
+            _bytes_xdr(b"\x06" * 31),
+            _bytes_xdr(b"\x00" * 32),
+        ]
+    )
+    server = SorobanServer("https://example.com")
+
+    def get_contract_data(self, contract_id, key, durability):
+        return SimpleNamespace(
+            xdr=_contract_data_xdr(contract_id, next(invalid_values), key=key)
+        )
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(get_contract_data, server),
+    )
+
+    for _ in range(3):
+        with pytest.raises(
+            ContractWasmRetrievalError,
+            match="does not hold a valid 32-byte Wasm hash",
+        ):
+            server.get_external_ref_wasm_hash(external_ref)
+
+
+async def test_get_external_ref_wasm_hash_rejects_invalid_hash_values_async(
+    monkeypatch,
+):
+    tag = b"release"
+    external_ref = _external_ref_xdr(CONTRACT_ID, tag)
+    invalid_values = iter(
+        [
+            stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VOID),
+            _bytes_xdr(b"\x06" * 31),
+            _bytes_xdr(b"\x00" * 32),
+        ]
+    )
+    server = SorobanServerAsync("https://example.com")
+
+    async def get_contract_data(self, contract_id, key, durability):
+        return SimpleNamespace(
+            xdr=_contract_data_xdr(contract_id, next(invalid_values), key=key)
+        )
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(get_contract_data, server),
+    )
+
+    for _ in range(3):
+        with pytest.raises(
+            ContractWasmRetrievalError,
+            match="does not hold a valid 32-byte Wasm hash",
+        ):
+            await server.get_external_ref_wasm_hash(external_ref)
+
+
+def test_get_contract_wasm_uses_external_ref(monkeypatch):
+    tag = b"release"
+    wasm_hash = b"\x07" * 32
+    wasm = b"\x00asm\x01\x00\x00\x00"
+    external_ref = _external_ref_xdr(CONTRACT_ID, tag)
+    server = SorobanServer("https://example.com")
+
+    monkeypatch.setattr(
+        server,
+        "_get_contract_instance",
+        MethodType(
+            lambda self, contract_id: _external_ref_instance(external_ref),
+            server,
+        ),
+    )
+
+    def get_contract_data(self, contract_id, key, durability):
+        return SimpleNamespace(
+            xdr=_contract_data_xdr(contract_id, _bytes_xdr(wasm_hash), key=key)
+        )
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(get_contract_data, server),
+    )
+    monkeypatch.setattr(
+        server,
+        "get_contract_wasm_by_hash",
+        MethodType(lambda self, hash: wasm if hash == wasm_hash else b"", server),
+    )
+
+    assert server.get_contract_wasm(CONTRACT_ID) == wasm
+
+
+async def test_get_contract_wasm_uses_external_ref_async(monkeypatch):
+    tag = b"release"
+    wasm_hash = b"\x07" * 32
+    wasm = b"\x00asm\x01\x00\x00\x00"
+    external_ref = _external_ref_xdr(CONTRACT_ID, tag)
+    server = SorobanServerAsync("https://example.com")
+
+    async def get_contract_instance(self, contract_id):
+        return _external_ref_instance(external_ref)
+
+    async def get_contract_data(self, contract_id, key, durability):
+        return SimpleNamespace(
+            xdr=_contract_data_xdr(contract_id, _bytes_xdr(wasm_hash), key=key)
+        )
+
+    async def get_contract_wasm_by_hash(self, hash):
+        return wasm if hash == wasm_hash else b""
+
+    monkeypatch.setattr(
+        server,
+        "_get_contract_instance",
+        MethodType(get_contract_instance, server),
+    )
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(get_contract_data, server),
+    )
+    monkeypatch.setattr(
+        server,
+        "get_contract_wasm_by_hash",
+        MethodType(get_contract_wasm_by_hash, server),
+    )
+
+    assert await server.get_contract_wasm(CONTRACT_ID) == wasm
+
+
+def test_get_contract_wasm_rejects_missing_external_ref(monkeypatch):
+    server = SorobanServer("https://example.com")
+
+    monkeypatch.setattr(
+        server,
+        "_get_contract_instance",
+        MethodType(lambda self, contract_id: _external_ref_instance(None), server),
+    )
+
+    with pytest.raises(
+        ContractWasmRetrievalError, match="missing its external reference"
+    ):
+        server.get_contract_wasm(CONTRACT_ID)
+
+
+async def test_get_contract_wasm_rejects_missing_external_ref_async(monkeypatch):
+    server = SorobanServerAsync("https://example.com")
+
+    async def get_contract_instance(self, contract_id):
+        return _external_ref_instance(None)
+
+    monkeypatch.setattr(
+        server,
+        "_get_contract_instance",
+        MethodType(get_contract_instance, server),
+    )
+
+    with pytest.raises(
+        ContractWasmRetrievalError, match="missing its external reference"
+    ):
+        await server.get_contract_wasm(CONTRACT_ID)
 
 
 def test_get_contract_wasm_rejects_missing_hash(monkeypatch):
@@ -426,19 +776,39 @@ def _contract_code_xdr(wasm_hash: bytes, code: bytes) -> str:
     ).to_xdr()
 
 
-def _contract_data_xdr(contract_id: str, val: stellar_xdr.SCVal) -> str:
+def _contract_data_xdr(
+    contract_id: str,
+    val: stellar_xdr.SCVal,
+    key: stellar_xdr.SCVal | None = None,
+) -> str:
+    if key is None:
+        key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
     return stellar_xdr.LedgerEntryData(
         stellar_xdr.LedgerEntryType.CONTRACT_DATA,
         contract_data=stellar_xdr.ContractDataEntry(
             ext=stellar_xdr.ExtensionPoint(0),
             contract=Address(contract_id).to_xdr_sc_address(),
-            key=stellar_xdr.SCVal(
-                stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
-            ),
+            key=key,
             durability=stellar_xdr.ContractDataDurability.PERSISTENT,
             val=val,
         ),
     ).to_xdr()
+
+
+def _bytes_xdr(value: bytes) -> stellar_xdr.SCVal:
+    return stellar_xdr.SCVal(
+        stellar_xdr.SCValType.SCV_BYTES,
+        bytes=stellar_xdr.SCBytes(value),
+    )
+
+
+def _external_ref_xdr(
+    owner: str, tag: bytes
+) -> stellar_xdr.ContractExecutableExternalRef:
+    return stellar_xdr.ContractExecutableExternalRef(
+        executable_owner=Address(owner).to_xdr_sc_address(),
+        tag=stellar_xdr.SCString(tag),
+    )
 
 
 def _wasm_instance(wasm_hash: bytes | None) -> stellar_xdr.SCContractInstance:
@@ -446,6 +816,18 @@ def _wasm_instance(wasm_hash: bytes | None) -> stellar_xdr.SCContractInstance:
         executable=stellar_xdr.ContractExecutable(
             stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
             wasm_hash=stellar_xdr.Hash(wasm_hash) if wasm_hash is not None else None,
+        ),
+        storage=None,
+    )
+
+
+def _external_ref_instance(
+    external_ref: stellar_xdr.ContractExecutableExternalRef | None,
+) -> stellar_xdr.SCContractInstance:
+    return stellar_xdr.SCContractInstance(
+        executable=stellar_xdr.ContractExecutable(
+            stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF,
+            external_ref=external_ref,
         ),
         storage=None,
     )

@@ -29,7 +29,11 @@ from .soroban_data_builder import SorobanDataBuilder
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope
-from .utils import hex_to_bytes, is_valid_hash
+from .utils import (
+    build_contract_executable_external_ref,
+    hex_to_bytes,
+    is_valid_hash,
+)
 
 __all__ = ["TransactionBuilder"]
 
@@ -1350,6 +1354,70 @@ class TransactionBuilder:
             executable=stellar_xdr.ContractExecutable(
                 stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
                 stellar_xdr.Hash(wasm_id),
+            ),
+            constructor_args=(
+                list(constructor_args) if constructor_args is not None else []
+            ),
+        )
+
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2,
+            create_contract_v2=create_contract,
+        )
+
+        op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
+        return self.append_operation(op)
+
+    def append_create_contract_from_external_ref_op(
+        self,
+        owner: str | Address,
+        tag: str | bytes,
+        address: str | Address,
+        constructor_args: Sequence[stellar_xdr.SCVal] | None = None,
+        salt: bytes | None = None,
+        auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] | None = None,
+        source: MuxedAccount | str | None = None,
+    ) -> "TransactionBuilder":
+        """Append an :class:`InvokeHostFunction <stellar_sdk.operation.InvokeHostFunction>` operation to the list of operations.
+
+        You can use this method to create a contract from a `CAP-85 <https://stellar.org/protocol/cap-85>`_
+        external executable reference instead of from an uploaded Wasm hash. The reference
+        names an owner contract and a tag; the owner publishes the Wasm hash under that tag,
+        and the created contract follows it, so the owner can upgrade every contract that
+        references the tag at once.
+
+        :param owner: The contract that owns the executable. Only a contract can hold the
+            persistent tag entry that names the Wasm, so this must be a contract address.
+        :param tag: The owner-scoped tag naming the executable. The tag is an unbounded
+            ``SCString`` and may be binary, so raw bytes are passed through undecoded.
+        :param address: The address using to derive the contract ID.
+        :param constructor_args: The optional parameters to pass to the constructor of this contract.
+        :param salt: The 32-byte salt to use to derive the contract ID.
+        :param auth: The authorizations required to execute the host function.
+        :param source: The source account for the operation. Defaults to the
+            transaction's source account.
+        :return: This builder instance.
+        """
+        if salt is None:
+            salt = os.urandom(32)
+        else:
+            if len(salt) != 32:
+                raise ValueError("`salt` must be 32 bytes long")
+
+        if isinstance(address, str):
+            address = Address(address)
+
+        create_contract = stellar_xdr.CreateContractArgsV2(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage(
+                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
+                from_address=stellar_xdr.ContractIDPreimageFromAddress(
+                    address=address.to_xdr_sc_address(),
+                    salt=stellar_xdr.Uint256(salt),
+                ),
+            ),
+            executable=stellar_xdr.ContractExecutable(
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF,
+                external_ref=build_contract_executable_external_ref(owner, tag),
             ),
             constructor_args=(
                 list(constructor_args) if constructor_args is not None else []

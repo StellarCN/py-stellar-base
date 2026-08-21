@@ -3,6 +3,17 @@ Release History
 
 ### Pending
 
+#### Update
+- Add CAP-85 (Protocol 28) external executable reference support across the high-level API. A contract created from an external executable reference carries no Wasm hash of its own: the reference names an owner contract and an owner-scoped tag, and the contract follows whatever Wasm hash the owner publishes under that tag. Updating the tag therefore upgrades every contract following it at once.
+  - New `TransactionBuilder.append_create_contract_from_external_ref_op` builds the creation operation. `owner` must be a contract address, since only a contract can hold the persistent tag entry that names the Wasm; `tag` is an unbounded `SCString`, so a binary tag is passed through undecoded.
+  - New `ContractClient[Async].create_contract_from_external_ref` wraps that operation, mirroring `create_contract`.
+  - New `SorobanServer[Async].get_external_ref_wasm_hash` returns the Wasm hash a reference currently names by reading the owner's persistent tag entry. The owner contract is not invoked.
+  - `SorobanServer[Async].get_contract_wasm` — and so `get_contract_meta`, `get_contract_spec` and `get_contract_info` — resolves external references instead of rejecting them as an unsupported executable kind.
+  - New `ExternalRefNotFoundError` (a `ContractWasmRetrievalError`) reports a tag entry that is missing or archived.
+  - `stellar_sdk.scval.to_native` converts `SCV_EXECUTABLE_TAG` the way it converts `SCV_STRING`: to `str`, or to the raw `bytes` when the tag is not valid UTF-8.
+  - The SCVal comparator behind `stellar_sdk.scval.to_map` key ordering handles the new variants; it previously raised `ValueError` for `SCV_EXECUTABLE_TAG` and treated every non-Wasm executable as equal.
+- chore: upgrade generated XDR definitions to Protocol 28. ([#1209](https://github.com/StellarCN/py-stellar-base/pull/1209))
+
 #### Fixes
 - Forward the supplied `client` to the `stellar.toml` lookup in `federation.resolve_stellar_address`; it previously used a default `RequestsClient` for that request.
 

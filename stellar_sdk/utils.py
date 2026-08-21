@@ -9,6 +9,8 @@ from decimal import ROUND_FLOOR, Context, Decimal, Inexact
 from typing import TYPE_CHECKING
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
+from . import xdr as stellar_xdr
+from .address import Address, AddressType
 from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
 from .strkey import StrKey
 
@@ -125,6 +127,41 @@ def raise_if_not_valid_balance_id(value: str, argument_name: str) -> None:
         raise ValueError(
             f'Value of argument "{argument_name}" is not a valid balance id: {value}'
         )
+
+
+def build_contract_executable_external_ref(
+    owner: Address | str, tag: str | bytes
+) -> stellar_xdr.ContractExecutableExternalRef:
+    """Build a CAP-85 external executable reference from an owner address and a tag.
+
+    Only a contract can hold the persistent tag entry that names the Wasm, so any
+    other kind of owner is rejected here rather than on-chain.
+    """
+    if isinstance(owner, str):
+        owner = Address(owner)
+    if owner.type != AddressType.CONTRACT:
+        raise ValueError(
+            f'Value of argument "owner" must be a contract address: {owner.address}'
+        )
+    if isinstance(tag, str):
+        tag = tag.encode("utf-8")
+    return stellar_xdr.ContractExecutableExternalRef(
+        executable_owner=owner.to_xdr_sc_address(),
+        tag=stellar_xdr.SCString(tag),
+    )
+
+
+def external_ref_owner_address(
+    external_ref: stellar_xdr.ContractExecutableExternalRef,
+) -> Address:
+    """Return the owner of a CAP-85 external executable reference, rejecting a non-contract owner."""
+    owner = Address.from_xdr_sc_address(external_ref.executable_owner)
+    if owner.type != AddressType.CONTRACT:
+        raise ValueError(
+            f"External executable owner {owner.address} is not a contract, "
+            f"so it cannot hold the tag entry that names the Wasm."
+        )
+    return owner
 
 
 def to_xdr_amount(value: str | Decimal) -> int:

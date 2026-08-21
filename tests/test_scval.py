@@ -70,6 +70,20 @@ from stellar_sdk.scval import (
             stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE),
             stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE),
         ),
+        (
+            stellar_xdr.SCVal(
+                stellar_xdr.SCValType.SCV_EXECUTABLE_TAG,
+                executable_tag=stellar_xdr.SCString(b"v1"),
+            ),
+            "v1",
+        ),
+        (
+            stellar_xdr.SCVal(
+                stellar_xdr.SCValType.SCV_EXECUTABLE_TAG,
+                executable_tag=stellar_xdr.SCString(b"\t\xd0Y\x17Ap}\x96\xces"),
+            ),
+            b"\t\xd0Y\x17Ap}\x96\xces",
+        ),
         ("AAAADP//////////////////////////////////////////", -1),
     ],
 )
@@ -729,6 +743,85 @@ class TestCompareScVal:
             type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
         )
         assert _compare_contract_executable(a, a) == 0
+
+    @staticmethod
+    def _external_ref_executable(
+        owner: bytes, tag: bytes
+    ) -> stellar_xdr.ContractExecutable:
+        return stellar_xdr.ContractExecutable(
+            type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF,
+            external_ref=stellar_xdr.ContractExecutableExternalRef(
+                executable_owner=TestCompareScVal._contract_address(owner),
+                tag=stellar_xdr.SCString(tag),
+            ),
+        )
+
+    def test_executable_external_ref_after_stellar_asset(self):
+        asset = stellar_xdr.ContractExecutable(
+            type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
+        )
+        external_ref = self._external_ref_executable(b"\x00" * 32, b"v1")
+        assert _compare_contract_executable(asset, external_ref) < 0
+        assert _compare_contract_executable(external_ref, asset) > 0
+
+    def test_executable_external_ref_by_owner_then_tag(self):
+        a = self._external_ref_executable(b"\x00" * 32, b"v2")
+        b = self._external_ref_executable(b"\x00" * 31 + b"\x01", b"v1")
+        assert _compare_contract_executable(a, b) < 0
+        assert _compare_contract_executable(b, a) > 0
+
+    def test_executable_external_ref_by_tag(self):
+        a = self._external_ref_executable(b"\x00" * 32, b"v1")
+        b = self._external_ref_executable(b"\x00" * 32, b"v2")
+        assert _compare_contract_executable(a, b) < 0
+        assert _compare_contract_executable(b, a) > 0
+        assert _compare_contract_executable(a, a) == 0
+
+    @staticmethod
+    def _executable_tag(tag: bytes) -> stellar_xdr.SCVal:
+        return stellar_xdr.SCVal(
+            stellar_xdr.SCValType.SCV_EXECUTABLE_TAG,
+            executable_tag=stellar_xdr.SCString(tag),
+        )
+
+    def test_executable_tag(self):
+        a, b, c = (
+            self._executable_tag(b"abc"),
+            self._executable_tag(b"abd"),
+            self._executable_tag(b"ab"),
+        )
+        assert _compare_sc_val(a, b) < 0
+        assert _compare_sc_val(c, a) < 0
+        assert _compare_sc_val(a, a) == 0
+
+    def test_executable_tag_is_the_highest_discriminant(self):
+        # SCV_LEDGER_KEY_NONCE(21) < SCV_EXECUTABLE_TAG(22)
+        nonce = stellar_xdr.SCVal(
+            stellar_xdr.SCValType.SCV_LEDGER_KEY_NONCE,
+            nonce_key=stellar_xdr.SCNonceKey(stellar_xdr.Int64(0)),
+        )
+        tag = self._executable_tag(b"v1")
+        assert _compare_sc_val(nonce, tag) < 0
+        assert _compare_sc_val(tag, nonce) > 0
+
+    def test_instance_by_external_ref(self):
+        a = stellar_xdr.SCVal(
+            stellar_xdr.SCValType.SCV_CONTRACT_INSTANCE,
+            instance=stellar_xdr.SCContractInstance(
+                executable=self._external_ref_executable(b"\x00" * 32, b"v1"),
+                storage=None,
+            ),
+        )
+        b = stellar_xdr.SCVal(
+            stellar_xdr.SCValType.SCV_CONTRACT_INSTANCE,
+            instance=stellar_xdr.SCContractInstance(
+                executable=self._external_ref_executable(b"\x00" * 32, b"v2"),
+                storage=None,
+            ),
+        )
+        assert _compare_sc_val(a, b) < 0
+        assert _compare_sc_val(b, a) > 0
+        assert _compare_sc_val(a, a) == 0
 
     def test_optional_map_none_none(self):
         assert _compare_optional_sc_map(None, None) == 0
