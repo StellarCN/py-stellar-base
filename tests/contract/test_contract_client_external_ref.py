@@ -5,7 +5,7 @@ from typing import Any, ClassVar, Generic, TypeVar
 
 import pytest
 
-from stellar_sdk import Network
+from stellar_sdk import Network, scval
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.address import Address
 from stellar_sdk.contract import contract_client, contract_client_async
@@ -25,20 +25,35 @@ T = TypeVar("T")
 
 
 class _FakeAssembledTransaction(Generic[T]):
-    """Stands in for AssembledTransaction so no RPC round trip is needed."""
+    """Stands in for AssembledTransaction so no RPC round trip is needed.
+
+    Everything the client hands the constructor is captured, and
+    ``sign_and_submit`` runs the client's own ``parse_result_xdr_fn`` over a real
+    result :class:`SCVal`, so the returned contract ID exercises that wiring
+    instead of being echoed back from here.
+    """
 
     captured: ClassVar[dict[str, Any]] = {}
 
     def __init__(self, builder, soroban_server, signer, parse_result_xdr_fn, timeout):
-        type(self).captured["builder"] = builder
+        captured = type(self).captured
+        captured["builder"] = builder
+        captured["server"] = soroban_server
+        captured["signer"] = signer
+        captured["parse_result_xdr_fn"] = parse_result_xdr_fn
+        captured["submit_timeout"] = timeout
+
+    def _submit(self, force: bool):
+        captured = type(self).captured
+        captured["force"] = force
+        return captured["parse_result_xdr_fn"](scval.to_address(CONTRACT_ID))
 
     def simulate(self, restore: bool = True):
         type(self).captured["restore"] = restore
         return self
 
     def sign_and_submit(self, force: bool = False):
-        type(self).captured["force"] = force
-        return CONTRACT_ID
+        return self._submit(force)
 
 
 class _FakeAssembledTransactionAsync(_FakeAssembledTransaction[T]):
@@ -47,8 +62,7 @@ class _FakeAssembledTransactionAsync(_FakeAssembledTransaction[T]):
         return self
 
     async def sign_and_submit(self, force: bool = False):  # type: ignore[override]
-        type(self).captured["force"] = force
-        return CONTRACT_ID
+        return self._submit(force)
 
 
 def _external_ref_of(
@@ -91,10 +105,15 @@ def test_create_contract_from_external_ref(monkeypatch):
         SOURCE_KP,
         server,
         salt=SALT,
+        submit_timeout=77,
         restore=False,
     )
 
+    # The ID came back through the client's own result parser, not from the fake.
     assert contract_id == CONTRACT_ID
+    assert captured["server"] is server
+    assert captured["signer"] is SOURCE_KP
+    assert captured["submit_timeout"] == 77
     assert captured["restore"] is False
     assert captured["force"] is True
     external_ref = _external_ref_of(captured)
@@ -124,10 +143,15 @@ async def test_create_contract_from_external_ref_async(monkeypatch):
         SOURCE_KP,
         server,
         salt=SALT,
+        submit_timeout=77,
         restore=False,
     )
 
+    # The ID came back through the client's own result parser, not from the fake.
     assert contract_id == CONTRACT_ID
+    assert captured["server"] is server
+    assert captured["signer"] is SOURCE_KP
+    assert captured["submit_timeout"] == 77
     assert captured["restore"] is False
     assert captured["force"] is True
     external_ref = _external_ref_of(captured)
