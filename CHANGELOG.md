@@ -3,13 +3,17 @@ Release History
 
 ### Pending
 
+### Version 16.0.0
+
+Released on Aug 28, 2026
+
 #### Breaking changes
-- CAP-71 authorization now defaults to the address-bound `ADDRESS_V2` credentials, with a legacy opt-out on each end:
+- CAP-71 authorization now defaults to the address-bound `ADDRESS_V2` credentials, with a legacy opt-out on each end: ([#1213](https://github.com/StellarCN/py-stellar-base/pull/1213))
   - `stellar_sdk.auth.authorize_invocation` builds `SOROBAN_CREDENTIALS_ADDRESS_V2` entries; pass `credentials_type=SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS` for the legacy format.
   - `SorobanServer[Async].simulate_transaction` sends `useUpgradedAuth: true`, so simulation records `ADDRESS_V2` credentials; pass `use_upgraded_auth=False` for the legacy format. `AssembledTransaction[Async]` and `ContractClient[Async].invoke` follow the same default, and `SorobanServer[Async].prepare_transaction` gains a `use_upgraded_auth` parameter it forwards to simulation.
 
 #### Update
-- Add CAP-85 (Protocol 28) external executable reference support across the high-level API. A contract created from an external executable reference carries no Wasm hash of its own: the reference names an owner contract and an owner-scoped tag, and the contract follows whatever Wasm hash the owner publishes under that tag. Updating the tag therefore upgrades every contract following it at once.
+- Add CAP-85 (Protocol 28) external executable reference support across the high-level API. A contract created from an external executable reference carries no Wasm hash of its own: the reference names an owner contract and an owner-scoped tag, and the contract follows whatever Wasm hash the owner publishes under that tag. Updating the tag therefore upgrades every contract following it at once. ([#1211](https://github.com/StellarCN/py-stellar-base/pull/1211))
   - New `TransactionBuilder.append_create_contract_from_external_ref_op` builds the creation operation. `owner` must be a contract address, since only a contract can hold the persistent tag entry that names the Wasm; `tag` is an unbounded `SCString`, so a binary tag is passed through undecoded.
   - New `ContractClient[Async].create_contract_from_external_ref` wraps that operation, mirroring `create_contract`.
   - New `SorobanServer[Async].get_external_ref_wasm_hash` returns the Wasm hash a reference currently names by reading the owner's persistent tag entry. The owner contract is not invoked.
