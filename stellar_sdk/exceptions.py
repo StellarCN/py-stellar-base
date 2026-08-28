@@ -19,6 +19,7 @@ __all__ = [
     "ContractWasmRetrievalError",
     "Ed25519PublicKeyInvalidError",
     "Ed25519SecretSeedInvalidError",
+    "ExternalRefNotFoundError",
     "FeatureNotEnabledError",
     "MemoInvalidException",
     "MissingEd25519SecretSeedError",
@@ -208,6 +209,11 @@ class SACHasNoWasmError(ContractWasmRetrievalError):
 
 class ContractCodeNotFoundError(ContractWasmRetrievalError):
     """Raised when a contract code ledger entry cannot be found."""
+
+
+class ExternalRefNotFoundError(ContractWasmRetrievalError):
+    """Raised when the `CAP-85 <https://stellar.org/protocol/cap-85>`_ tag entry that an
+    external executable reference points at cannot be found."""
 
 
 class ContentSizeLimitExceededError(BaseRequestError):

@@ -79,6 +79,7 @@ def to_native(
       - SCV_SYMBOL -> `str`
       - SCV_STRING -> `str` if the underlying buffer can be decoded as UTF-8, `bytes` of the raw contents in any error case
       - SCV_ADDRESS -> :class:`stellar_sdk.address.Address`
+      - SCV_EXECUTABLE_TAG -> `str` or `bytes`, decoded like SCV_STRING
 
     If no viable conversion can be determined, this function returns the original :class:`stellar_xdr.SCVal` object.
 
@@ -114,11 +115,7 @@ def to_native(
     if sc_val.type == stellar_xdr.SCValType.SCV_BYTES:
         return from_bytes(sc_val)
     if sc_val.type == stellar_xdr.SCValType.SCV_STRING:
-        s = from_string(sc_val)
-        try:
-            return s.decode("utf-8")
-        except UnicodeDecodeError:
-            return s
+        return _decode_utf8_or_bytes(from_string(sc_val))
     if sc_val.type == stellar_xdr.SCValType.SCV_SYMBOL:
         return from_symbol(sc_val)
     if sc_val.type == stellar_xdr.SCValType.SCV_VEC:
@@ -131,6 +128,11 @@ def to_native(
         }
     if sc_val.type == stellar_xdr.SCValType.SCV_ADDRESS:
         return from_address(sc_val)
+    if sc_val.type == stellar_xdr.SCValType.SCV_EXECUTABLE_TAG:
+        # A CAP-85 executable tag is an unbounded SCString, so it gets the same
+        # best-effort decode as SCV_STRING; a binary tag comes back as raw bytes.
+        assert sc_val.executable_tag is not None
+        return _decode_utf8_or_bytes(sc_val.executable_tag.sc_string)
     return sc_val
 
 
@@ -861,6 +863,16 @@ def _compare_contract_executable(
         assert b.wasm_hash is not None
         ah, bh = a.wasm_hash.hash, b.wasm_hash.hash
         return (ah > bh) - (ah < bh)
+    if a.type == stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF:
+        assert a.external_ref is not None
+        assert b.external_ref is not None
+        c = _compare_sc_address(
+            a.external_ref.executable_owner, b.external_ref.executable_owner
+        )
+        if c != 0:
+            return c
+        at, bt = a.external_ref.tag.sc_string, b.external_ref.tag.sc_string
+        return (at > bt) - (at < bt)
     return 0
 
 
@@ -893,7 +905,7 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
     Comparison rules:
 
     1. **Cross-type**: compare by ``SCValType`` discriminant value
-       (``SCV_BOOL=0 < SCV_VOID=1 < … < SCV_LEDGER_KEY_NONCE=21``).
+       (``SCV_BOOL=0 < SCV_VOID=1 < … < SCV_EXECUTABLE_TAG=22``).
     2. **Same-type** (by variant):
 
        - ``SCV_BOOL``: ``False (0) < True (1)``
@@ -904,7 +916,7 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
        - ``SCV_I128``: tuple comparison ``(hi, lo)`` (hi signed, lo unsigned)
        - ``SCV_U256``: tuple comparison ``(hi_hi, hi_lo, lo_hi, lo_lo)`` (all unsigned)
        - ``SCV_I256``: tuple comparison ``(hi_hi, hi_lo, lo_hi, lo_lo)`` (hi_hi signed)
-       - ``SCV_BYTES / STRING / SYMBOL``: lexicographic byte comparison
+       - ``SCV_BYTES / STRING / SYMBOL / EXECUTABLE_TAG``: lexicographic byte comparison
        - ``SCV_VEC``: element-by-element, shorter < longer
        - ``SCV_MAP``: entry-by-entry (key first, then val), shorter < longer
        - ``SCV_ADDRESS``: by address type discriminant
@@ -916,7 +928,8 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
          ``CLAIMABLE_BALANCE``: by claimable balance ID XDR bytes;
          ``LIQUIDITY_POOL``: by pool hash bytes
        - ``SCV_ERROR``: by error type discriminant, then contract_code or error code
-       - ``SCV_CONTRACT_INSTANCE``: by executable type, then wasm_hash, then storage
+       - ``SCV_CONTRACT_INSTANCE``: by executable type, then wasm_hash or
+         external ref (owner, then tag), then storage
        - ``SCV_LEDGER_KEY_NONCE``: signed numeric comparison of nonce
     """
     # Cross-type: compare by discriminant value
@@ -1102,7 +1115,21 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
         av, bv = a.nonce_key.nonce.int64, b.nonce_key.nonce.int64
         return (av > bv) - (av < bv)
 
+    if t == stellar_xdr.SCValType.SCV_EXECUTABLE_TAG:
+        assert a.executable_tag is not None
+        assert b.executable_tag is not None
+        ab, bb = a.executable_tag.sc_string, b.executable_tag.sc_string
+        return (ab > bb) - (ab < bb)
+
     raise ValueError(f"Unsupported SCVal type: {t}")
+
+
+def _decode_utf8_or_bytes(data: bytes) -> str | bytes:
+    """Decode *data* as UTF-8, falling back to the raw bytes for binary content."""
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data
 
 
 def _parse_sc_val(sc_val: stellar_xdr.SCVal | bytes | str) -> stellar_xdr.SCVal:

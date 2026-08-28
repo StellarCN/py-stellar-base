@@ -873,6 +873,74 @@ class TestTransaction:
         assert tx.build().transaction.operations[0] == expected_op
         check_from_xdr(tx)
 
+    def test_append_create_contract_from_external_ref_op(self):
+        salt = b"V2\x1c\x18\xecF\xea-\x83\x90\xdc\x96\xe0\xdd\x8e\x9a}\x96\x88\xc7\x13\xaa\xa5\xef\xc5az\xa3\xf8\xb0F_"
+        owner = "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+        constructor_args = [scval.to_uint32(123)]
+        tx = get_tx_builder().append_create_contract_from_external_ref_op(
+            owner, "v1", kp2.public_key, constructor_args, salt, None, kp2.public_key
+        )
+        create_contract = stellar_xdr.CreateContractArgsV2(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage(
+                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
+                from_address=stellar_xdr.ContractIDPreimageFromAddress(
+                    address=Address(kp2.public_key).to_xdr_sc_address(),
+                    salt=stellar_xdr.Uint256(salt),
+                ),
+            ),
+            executable=stellar_xdr.ContractExecutable(
+                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF,
+                external_ref=stellar_xdr.ContractExecutableExternalRef(
+                    executable_owner=Address(owner).to_xdr_sc_address(),
+                    tag=stellar_xdr.SCString(b"v1"),
+                ),
+            ),
+            constructor_args=constructor_args,
+        )
+
+        host_function = stellar_xdr.HostFunction(
+            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2,
+            create_contract_v2=create_contract,
+        )
+        expected_op = InvokeHostFunction(
+            host_function=host_function, auth=[], source=kp2.public_key
+        )
+        assert tx.build().transaction.operations[0] == expected_op
+        check_from_xdr(tx)
+
+    def test_append_create_contract_from_external_ref_op_with_binary_tag(self):
+        owner = Address("CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA")
+        tag = b"\xff\xfe\x00\x01"
+        tx = get_tx_builder().append_create_contract_from_external_ref_op(
+            owner, tag, kp2.public_key, salt=bytes(32)
+        )
+        op = tx.build().transaction.operations[0]
+        assert isinstance(op, InvokeHostFunction)
+        create_contract = op.host_function.create_contract_v2
+        assert create_contract is not None
+        external_ref = create_contract.executable.external_ref
+        assert external_ref is not None
+        assert external_ref.tag.sc_string == tag
+        assert external_ref.executable_owner == owner.to_xdr_sc_address()
+        check_from_xdr(tx)
+
+    def test_append_create_contract_from_external_ref_op_rejects_non_contract_owner(
+        self,
+    ):
+        with pytest.raises(ValueError, match="must be a contract address"):
+            get_tx_builder().append_create_contract_from_external_ref_op(
+                kp2.public_key, "v1", kp2.public_key
+            )
+
+    def test_append_create_contract_from_external_ref_op_rejects_bad_salt(self):
+        with pytest.raises(ValueError, match="`salt` must be 32 bytes long"):
+            get_tx_builder().append_create_contract_from_external_ref_op(
+                "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA",
+                "v1",
+                kp2.public_key,
+                salt=b"\x00",
+            )
+
     def test_append_create_stellar_asset_contract_from_asset_op(self):
         asset = Asset.native()
         tx = get_tx_builder().append_create_stellar_asset_contract_from_asset_op(

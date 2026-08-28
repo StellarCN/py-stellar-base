@@ -1325,6 +1325,10 @@ ContractExecutable
 ------------------
 .. autoclass:: stellar_sdk.xdr.contract_executable.ContractExecutable
 
+ContractExecutableExternalRef
+-----------------------------
+.. autoclass:: stellar_sdk.xdr.contract_executable_external_ref.ContractExecutableExternalRef
+
 ContractExecutableType
 ----------------------
 .. autoclass:: stellar_sdk.xdr.contract_executable_type.ContractExecutableType
@@ -2552,6 +2556,10 @@ StellarValue
 StellarValueExt
 ---------------
 .. autoclass:: stellar_sdk.xdr.stellar_value_ext.StellarValueExt
+
+StellarValueProposedValue
+-------------------------
+.. autoclass:: stellar_sdk.xdr.stellar_value_proposed_value.StellarValueProposedValue
 
 StellarValueType
 ----------------

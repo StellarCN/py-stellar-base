@@ -24,6 +24,11 @@ from stellar_sdk.xdr.base import (
 )
 from stellar_sdk.xdr.claimable_balance_id import ClaimableBalanceID
 from stellar_sdk.xdr.claimable_balance_id_type import ClaimableBalanceIDType
+from stellar_sdk.xdr.contract_executable import ContractExecutable
+from stellar_sdk.xdr.contract_executable_external_ref import (
+    ContractExecutableExternalRef,
+)
+from stellar_sdk.xdr.contract_executable_type import ContractExecutableType
 from stellar_sdk.xdr.contract_id import ContractID
 from stellar_sdk.xdr.crypto_key_type import CryptoKeyType
 from stellar_sdk.xdr.data_value import DataValue
@@ -78,6 +83,19 @@ def _make_public_key(raw: bytes = _KEY_BYTES) -> PublicKey:
 
 def _make_account_id(raw: bytes = _KEY_BYTES) -> AccountID:
     return AccountID(_make_public_key(raw))
+
+
+def _make_external_ref_executable(tag: bytes) -> ContractExecutable:
+    return ContractExecutable(
+        type=ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF,
+        external_ref=ContractExecutableExternalRef(
+            executable_owner=SCAddress(
+                type=SCAddressType.SC_ADDRESS_TYPE_CONTRACT,
+                contract_id=ContractID(Hash(_KEY_BYTES)),
+            ),
+            tag=SCString(tag),
+        ),
+    )
 
 
 class TestBaseTypes:
@@ -530,6 +548,41 @@ class TestUnion:
         with pytest.raises(ValueError):
             SCVal.from_json_dict({"u32": 1, "i32": 2})
 
+    def test_contract_executable_void_arm(self):
+        e = ContractExecutable(
+            type=ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET
+        )
+        assert e.to_json_dict() == "stellar_asset"
+        assert ContractExecutable.from_json_dict("stellar_asset") == e
+
+    def test_contract_executable_wasm_arm(self):
+        e = ContractExecutable(
+            type=ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
+            wasm_hash=Hash(_KEY_BYTES),
+        )
+        d = e.to_json_dict()
+        assert d == {"wasm": _KEY_BYTES.hex()}
+        assert ContractExecutable.from_json_dict(d) == e
+
+    def test_contract_executable_external_ref_arm(self):
+        e = _make_external_ref_executable(b"v1")
+        d = e.to_json_dict()
+        assert isinstance(d, dict)
+        ref = d["external_ref"]
+        assert isinstance(ref, dict)
+        assert ref["executable_owner"].startswith("C")
+        assert ref["tag"] == "v1"
+        assert ContractExecutable.from_json_dict(d) == e
+
+    def test_contract_executable_external_ref_binary_tag(self):
+        e = _make_external_ref_executable(b"\xff\xfe")
+        d = e.to_json_dict()
+        assert isinstance(d, dict)
+        ref = d["external_ref"]
+        assert isinstance(ref, dict)
+        assert ref["tag"] == "\\xff\\xfe"
+        assert ContractExecutable.from_json_dict(d) == e
+
 
 class TestSCVal:
     """Tests for all SCVal union arms through to_json_dict/from_json_dict."""
@@ -738,6 +791,20 @@ class TestSCVal:
         v = SCVal(type=SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
         assert v.to_json_dict() == "ledger_key_contract_instance"
         assert SCVal.from_json_dict("ledger_key_contract_instance") == v
+
+    def test_executable_tag(self):
+        v = SCVal(type=SCValType.SCV_EXECUTABLE_TAG, executable_tag=SCString(b"v1"))
+        d = v.to_json_dict()
+        assert d == {"executable_tag": "v1"}
+        assert SCVal.from_json_dict(d) == v
+
+    def test_executable_tag_binary(self):
+        v = SCVal(
+            type=SCValType.SCV_EXECUTABLE_TAG, executable_tag=SCString(b"\xff\xfe")
+        )
+        d = v.to_json_dict()
+        assert d == {"executable_tag": "\\xff\\xfe"}
+        assert SCVal.from_json_dict(d) == v
 
 
 class TestStellarSpecificTypes:
