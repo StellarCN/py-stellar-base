@@ -8,6 +8,7 @@ from stellar_sdk import (
     Address,
     Keypair,
     Network,
+    SorobanDataBuilder,
     TransactionBuilder,
     scval,
 )
@@ -79,40 +80,60 @@ def _sample_auth_entry(
 class _FakeSorobanServer:
     def __init__(self, restore_preambles: list[Any] | None = None) -> None:
         self.simulated_transactions: list[Any] = []
+        self.use_upgraded_auth_values: list[bool] = []
         self.restore_preambles = restore_preambles or []
 
     def get_latest_ledger(self) -> SimpleNamespace:
         return SimpleNamespace(sequence=100)
 
+    def load_account(self, account_id) -> SimpleNamespace:
+        return SimpleNamespace(sequence=1)
+
     def simulate_transaction(
-        self, transaction, addl_resources=None, auth_mode=None, use_upgraded_auth=False
+        self, transaction, addl_resources=None, auth_mode=None, use_upgraded_auth=True
     ) -> SimpleNamespace:
         self.simulated_transactions.append(transaction)
+        self.use_upgraded_auth_values.append(use_upgraded_auth)
         restore_preamble = (
             self.restore_preambles.pop(0) if self.restore_preambles else None
         )
         return SimpleNamespace(
-            error=None, restore_preamble=restore_preamble, latest_ledger=101
+            error=None,
+            restore_preamble=restore_preamble,
+            latest_ledger=101,
+            min_resource_fee=100,
+            transaction_data=SorobanDataBuilder().build().to_xdr(),
+            results=[SimpleNamespace(auth=[], xdr=scval.to_uint32(1).to_xdr())],
         )
 
 
 class _FakeSorobanServerAsync:
     def __init__(self, restore_preambles: list[Any] | None = None) -> None:
         self.simulated_transactions: list[Any] = []
+        self.use_upgraded_auth_values: list[bool] = []
         self.restore_preambles = restore_preambles or []
 
     async def get_latest_ledger(self) -> SimpleNamespace:
         return SimpleNamespace(sequence=100)
 
+    async def load_account(self, account_id) -> SimpleNamespace:
+        return SimpleNamespace(sequence=1)
+
     async def simulate_transaction(
-        self, transaction, addl_resources=None, auth_mode=None, use_upgraded_auth=False
+        self, transaction, addl_resources=None, auth_mode=None, use_upgraded_auth=True
     ) -> SimpleNamespace:
         self.simulated_transactions.append(transaction)
+        self.use_upgraded_auth_values.append(use_upgraded_auth)
         restore_preamble = (
             self.restore_preambles.pop(0) if self.restore_preambles else None
         )
         return SimpleNamespace(
-            error=None, restore_preamble=restore_preamble, latest_ledger=101
+            error=None,
+            restore_preamble=restore_preamble,
+            latest_ledger=101,
+            min_resource_fee=100,
+            transaction_data=SorobanDataBuilder().build().to_xdr(),
+            results=[SimpleNamespace(auth=[], xdr=scval.to_uint32(1).to_xdr())],
         )
 
 
@@ -230,6 +251,33 @@ def test_async_sign_requires_unsigned_contract_account_auth_entry():
 
     with pytest.raises(NeedsMoreSignaturesError, match=contract_id):
         assembled.sign(transaction_signer=Keypair.random(), force=True)
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "expected"), [({}, True), ({"use_upgraded_auth": False}, False)]
+)
+def test_simulate_forwards_use_upgraded_auth(kwargs, expected):
+    source = Keypair.random()
+    server = _FakeSorobanServer()
+    builder = (
+        TransactionBuilder(
+            Account(source.public_key, 1),
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        .set_timeout(300)
+        .append_invoke_contract_function_op(
+            contract_id="CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
+            function_name="increment",
+            parameters=[],
+        )
+    )
+    assembled: AssembledTransaction[Any] = AssembledTransaction(
+        builder, cast(Any, server), source, **kwargs
+    )
+    assembled.simulate(restore=False)
+
+    assert server.use_upgraded_auth_values == [expected]
 
 
 def test_sign_and_submit_auto_prepares_contract_address_auth(monkeypatch):

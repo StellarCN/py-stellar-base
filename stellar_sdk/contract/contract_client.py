@@ -58,7 +58,7 @@ class ContractClient:
         restore: bool = True,
         addl_resources: ResourceLeeway | None = None,
         auth_mode: AuthMode | None = None,
-        use_upgraded_auth: bool = False,
+        use_upgraded_auth: bool = True,
     ) -> AssembledTransaction[T]:
         """Build an :py:class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>` to invoke a contract function.
 
@@ -74,7 +74,7 @@ class ContractClient:
         :param restore: Whether to restore the transaction, only valid when simulate is True, and the signer is provided.
         :param addl_resources: Additional resource leeway forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>`.
         :param auth_mode: Authorization mode forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>`.
-        :param use_upgraded_auth: Forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>` to opt into recording ``ADDRESS_V2`` ("upgraded") authorization credentials (CAP-71) instead of the legacy ``ADDRESS`` credentials. Best-effort and transitional; requires Stellar RPC v27.1.0 or later.
+        :param use_upgraded_auth: Forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>`. Whether simulation records ``ADDRESS_V2`` ("upgraded") authorization credentials (CAP-71) instead of the legacy ``ADDRESS`` credentials. Defaults to ``True``; pass ``False`` to ask for the legacy format. Best-effort and transitional; requires Stellar RPC v27.1.0 or later.
         :return:
         """
         builder = (

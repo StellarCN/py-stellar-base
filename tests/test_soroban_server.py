@@ -879,7 +879,7 @@ class TestSorobanServer:
                 "transaction": transaction.to_xdr(),
                 "resourceConfig": None,
                 "authMode": None,
-                "useUpgradedAuth": False,
+                "useUpgradedAuth": True,
             },
         )
 
@@ -920,7 +920,7 @@ class TestSorobanServer:
                 "transaction": transaction.to_xdr(),
                 "resourceConfig": {"instructionLeeway": 1000000},
                 "authMode": None,
-                "useUpgradedAuth": False,
+                "useUpgradedAuth": True,
             },
         )
 
@@ -969,7 +969,7 @@ class TestSorobanServer:
                 "transaction": transaction.to_xdr(),
                 "resourceConfig": None,
                 "authMode": "record_allow_nonroot",
-                "useUpgradedAuth": False,
+                "useUpgradedAuth": True,
             },
         )
 
@@ -1064,6 +1064,39 @@ class TestSorobanServer:
             for xdr in data["result"]["results"][0]["auth"]
         ]
         assert new_transaction == expected_transaction
+
+    @pytest.mark.parametrize(
+        ("kwargs", "expected"),
+        [({}, True), ({"use_upgraded_auth": False}, False)],
+    )
+    async def test_prepare_transaction_forwards_use_upgraded_auth(
+        self, soroban_server, rpc_mock, kwargs, expected
+    ):
+        data = {
+            "jsonrpc": "2.0",
+            "id": "7a469b9d6ed4444893491be530862ce3",
+            "result": {
+                "transactionData": "AAAAAAAAAAIAAAAGAAAAAem354u9STQWq5b3Ed1j9tOemvL7xV0NPwhn4gXg0AP8AAAAFAAAAAEAAAAH8dTe2OoI0BnhlDbH0fWvXmvprkBvBAgKIcL9busuuMEAAAABAAAABgAAAAHpt+eLvUk0FquW9xHdY/bTnpry+8VdDT8IZ+IF4NAD/AAAABAAAAABAAAAAgAAAA8AAAAHQ291bnRlcgAAAAASAAAAAAAAAABYt8SiyPKXqo89JHEoH9/M7K/kjlZjMT7BjhKnPsqYoQAAAAEAHifGAAAFlAAAAIgAAAAAAAAAAg==",
+                "minResourceFee": "58181",
+                "events": [],
+                "results": [{"auth": [], "xdr": "AAAAAwAAABQ="}],
+                "latestLedger": "14245",
+            },
+        }
+        transaction = _build_soroban_transaction(None, [])
+        rpc_mock.expect_response(data)
+
+        await resolve(soroban_server.prepare_transaction(transaction, **kwargs))
+
+        rpc_mock.assert_request(
+            "simulateTransaction",
+            {
+                "transaction": transaction.to_xdr(),
+                "resourceConfig": None,
+                "authMode": None,
+                "useUpgradedAuth": expected,
+            },
+        )
 
     async def test_prepare_transaction_with_soroban_data(
         self, soroban_server, rpc_mock
