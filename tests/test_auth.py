@@ -481,7 +481,12 @@ class TestAuth:
         )
 
         signed_entry = authorize_invocation(
-            signer, None, valid_until_ledger_sequence, invocation, network_passphrase
+            signer,
+            None,
+            valid_until_ledger_sequence,
+            invocation,
+            network_passphrase,
+            credentials_type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
         )
 
         assert signed_entry.root_invocation == invocation
@@ -532,6 +537,7 @@ class TestAuth:
             valid_until_ledger_sequence,
             invocation,
             network_passphrase,
+            credentials_type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
         )
 
         assert signed_entry.root_invocation == invocation
@@ -810,6 +816,7 @@ class TestAuth:
             valid_until_ledger_sequence,
             invocation,
             network_passphrase,
+            credentials_type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
         )
 
         assert signed_entry.credentials.address is not None
@@ -839,6 +846,7 @@ class TestAuth:
             654656,
             invocation,
             Network.TESTNET_NETWORK_PASSPHRASE,
+            credentials_type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
         )
 
         assert signed_entry.credentials.address is not None
@@ -1210,10 +1218,9 @@ class TestCap71Auth:
             != second.credentials.address_v2.signature
         )
 
-    def test_authorize_invocation_defaults_to_address(self):
-        # ADDRESS_V2 is only valid on Protocol 27+ networks, so the default
-        # stays on the legacy, universally valid ADDRESS credentials; V2 is
-        # opt-in via credentials_type.
+    def test_authorize_invocation_defaults_to_address_v2(self):
+        # CAP-71 address-bound credentials are the default; the legacy ADDRESS
+        # arm is reachable through credentials_type.
         signer = Keypair.random()
 
         entry = authorize_invocation(
@@ -1222,25 +1229,6 @@ class TestCap71Auth:
             654656,
             _sample_invocation(),
             Network.TESTNET_NETWORK_PASSPHRASE,
-        )
-
-        assert (
-            entry.credentials.type
-            == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
-        )
-        assert entry.credentials.address is not None
-        assert entry.credentials.address.signature.type == stellar_xdr.SCValType.SCV_VEC
-
-    def test_authorize_invocation_v2_opt_in(self):
-        signer = Keypair.random()
-
-        entry = authorize_invocation(
-            signer,
-            None,
-            654656,
-            _sample_invocation(),
-            Network.TESTNET_NETWORK_PASSPHRASE,
-            credentials_type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
         )
 
         assert (
@@ -1257,6 +1245,46 @@ class TestCap71Auth:
         )
         assert credentials.signature.vec is not None
         signature_map = credentials.signature.vec.sc_vec[0].map
+        assert signature_map is not None
+        signature_bytes = signature_map.sc_map[1].val.bytes
+        assert signature_bytes is not None
+        signer.verify(authorization_payload_hash(preimage), signature_bytes.sc_bytes)
+
+    def test_authorize_invocation_legacy_opt_out(self):
+        signer = Keypair.random()
+
+        entry = authorize_invocation(
+            signer,
+            None,
+            654656,
+            _sample_invocation(),
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            credentials_type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+        )
+
+        assert (
+            entry.credentials.type
+            == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
+        )
+        assert entry.credentials.address is not None
+        assert (
+            entry.credentials.address.address
+            == Address(signer.public_key).to_xdr_sc_address()
+        )
+        assert (
+            entry.credentials.address.signature_expiration_ledger
+            == stellar_xdr.Uint32(654656)
+        )
+        # the signature verifies against the legacy, non-address-bound payload
+        preimage = build_authorization_preimage(
+            entry, 654656, Network.TESTNET_NETWORK_PASSPHRASE
+        )
+        assert (
+            preimage.type
+            == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION
+        )
+        assert entry.credentials.address.signature.vec is not None
+        signature_map = entry.credentials.address.signature.vec.sc_vec[0].map
         assert signature_map is not None
         signature_bytes = signature_map.sc_map[1].val.bytes
         assert signature_bytes is not None

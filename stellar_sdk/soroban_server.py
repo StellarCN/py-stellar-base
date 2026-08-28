@@ -194,7 +194,7 @@ class SorobanServer:
         transaction_envelope: TransactionEnvelope,
         addl_resources: ResourceLeeway | None = None,
         auth_mode: AuthMode | None = None,
-        use_upgraded_auth: bool = False,
+        use_upgraded_auth: bool = True,
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
@@ -207,13 +207,14 @@ class SorobanServer:
             Any provided footprint will be ignored.
         :param addl_resources: Additional resource include in the simulation.
         :param auth_mode: Explicitly allows users to opt-in to non-root authorization in recording mode.
-        :param use_upgraded_auth: Opt simulation into recording ``ADDRESS_V2`` ("upgraded") authorization
-            credentials (CAP-71) instead of the legacy ``ADDRESS`` credentials. This is best-effort: it only
-            affects the recording auth modes and is silently ignored by RPC servers (or protocol versions)
-            whose host cannot emit ``ADDRESS_V2``, so inspect the returned credential arm to confirm the
-            response type. This flag is transitional — once the RPC returns ``ADDRESS_V2`` credentials by
-            default it becomes a no-op, so do not rely on omitting it to keep receiving the legacy ``ADDRESS``
-            format. Requires Stellar RPC v27.1.0 or later.
+        :param use_upgraded_auth: Whether simulation records ``ADDRESS_V2`` ("upgraded") authorization
+            credentials (CAP-71) instead of the legacy ``ADDRESS`` credentials. Defaults to ``True``; pass
+            ``False`` to ask for the legacy format. This is best-effort: it only affects the recording auth
+            modes and is silently ignored by RPC servers (or protocol versions) whose host cannot emit
+            ``ADDRESS_V2``, so inspect the returned credential arm to confirm the response type. This flag is
+            transitional — once the RPC returns ``ADDRESS_V2`` credentials unconditionally it becomes a no-op,
+            so do not rely on passing ``False`` to keep receiving the legacy ``ADDRESS`` format. Requires
+            Stellar RPC v27.1.0 or later.
         :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.SimulateTransactionResponse>` object
             contains the cost, footprint, result/auth requirements (if applicable), and error of the transaction.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
@@ -635,6 +636,7 @@ class SorobanServer:
         self,
         transaction_envelope: TransactionEnvelope,
         simulate_transaction_response: SimulateTransactionResponse | None = None,
+        use_upgraded_auth: bool = True,
     ) -> TransactionEnvelope:
         """Submit a trial contract invocation, first run a simulation of the contract
         invocation as defined on the incoming transaction, and apply the results to
@@ -663,6 +665,10 @@ class SorobanServer:
             as normal.
         :param simulate_transaction_response: The response of the simulation of the transaction,
             typically you don't need to pass this parameter, it will be automatically called if you don't pass it.
+        :param use_upgraded_auth: Whether the underlying simulation records ``ADDRESS_V2``
+            ("upgraded") authorization credentials (CAP-71) instead of the legacy ``ADDRESS``
+            credentials. Defaults to ``True``; pass ``False`` to ask for the legacy format.
+            See :meth:`simulate_transaction` for the full caveats.
         :return: A copy of the :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
             with the expected authorizations (in the case of invocation) and ledger footprint added.
             The transaction fee will also automatically be padded with the contract's minimum resource fees
@@ -670,7 +676,7 @@ class SorobanServer:
         """
         if not simulate_transaction_response:
             simulate_transaction_response = self.simulate_transaction(
-                transaction_envelope
+                transaction_envelope, use_upgraded_auth=use_upgraded_auth
             )
         if simulate_transaction_response.error:
             raise PrepareTransactionException(

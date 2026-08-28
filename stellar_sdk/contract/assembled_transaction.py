@@ -55,10 +55,11 @@ class AssembledTransaction(Generic[T]):
     :param auth_mode: Authorization mode forwarded to every internal simulation
         call. Use :class:`AuthMode.RECORD_ALL_NOROOT <stellar_sdk.soroban_rpc.AuthMode>`
         to opt into non-root authorization in recording mode.
-    :param use_upgraded_auth: Forwarded to every internal simulation call to opt into
-        recording ``ADDRESS_V2`` ("upgraded") authorization credentials (CAP-71) instead
-        of the legacy ``ADDRESS`` credentials. Best-effort and transitional; requires
-        Stellar RPC v27.1.0 or later. See
+    :param use_upgraded_auth: Forwarded to every internal simulation call. Whether
+        simulation records ``ADDRESS_V2`` ("upgraded") authorization credentials (CAP-71)
+        instead of the legacy ``ADDRESS`` credentials. Defaults to ``True``; pass ``False``
+        to ask for the legacy format. Best-effort and transitional; requires Stellar RPC
+        v27.1.0 or later. See
         :meth:`SorobanServer.simulate_transaction <stellar_sdk.SorobanServer.simulate_transaction>`.
     """
 
@@ -71,7 +72,7 @@ class AssembledTransaction(Generic[T]):
         submit_timeout: int = 180,
         addl_resources: ResourceLeeway | None = None,
         auth_mode: AuthMode | None = None,
-        use_upgraded_auth: bool = False,
+        use_upgraded_auth: bool = True,
     ):
         self.server = server
         self.submit_timeout = submit_timeout

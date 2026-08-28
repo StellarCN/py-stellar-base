@@ -354,7 +354,7 @@ def authorize_invocation(
     invocation: stellar_xdr.SorobanAuthorizedInvocation,
     network_passphrase: str,
     *,
-    credentials_type: stellar_xdr.SorobanCredentialsType = stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+    credentials_type: stellar_xdr.SorobanCredentialsType = stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
 ) -> stellar_xdr.SorobanAuthorizationEntry:
     """Build a fresh Soroban authorization entry from scratch and sign it.
 
@@ -371,14 +371,10 @@ def authorize_invocation(
     This is the "build" counterpart of :func:`authorize_entry`, which signs an
     existing entry "in place".
 
-    By default the entry uses the legacy ``SOROBAN_CREDENTIALS_ADDRESS``
-    credentials, which are valid on every network. Pass
-    ``credentials_type=SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2``
-    to opt in to the address-bound credentials (CAP-71-02), which bind the
-    signature to ``address`` but require the network to run Protocol 27 or
-    later — emitting them before a network upgrades fails submission. This
-    default is expected to flip to ``SOROBAN_CREDENTIALS_ADDRESS_V2`` once a
-    later protocol makes the address-bound payload mandatory.
+    By default the entry uses the address-bound ``SOROBAN_CREDENTIALS_ADDRESS_V2``
+    credentials (CAP-71-02), which bind the signature to ``address``. Pass
+    ``credentials_type=SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS`` to
+    build the legacy credentials instead.
 
     :param signer: Either a :class:`Keypair` or an :data:`AuthorizationSigner`
         callable. See :func:`authorize_entry` for details.
@@ -392,9 +388,9 @@ def authorize_invocation(
     :param invocation: Invocation tree being authorized (typically from
         transaction simulation).
     :param network_passphrase: Network passphrase incorporated into the signature.
-    :param credentials_type: The credential type for the new entry, either the
-        legacy ``SOROBAN_CREDENTIALS_ADDRESS`` (default) or
-        ``SOROBAN_CREDENTIALS_ADDRESS_V2`` (Protocol 27+). To build a
+    :param credentials_type: The credential type for the new entry, either
+        ``SOROBAN_CREDENTIALS_ADDRESS_V2`` (default) or the legacy
+        ``SOROBAN_CREDENTIALS_ADDRESS``. To build a
         ``SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES`` entry, use
         :func:`build_with_delegates_entry` instead.
     :return: A signed Soroban authorization entry.

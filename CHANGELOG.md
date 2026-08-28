@@ -3,6 +3,11 @@ Release History
 
 ### Pending
 
+#### Breaking changes
+- CAP-71 authorization now defaults to the address-bound `ADDRESS_V2` credentials, with a legacy opt-out on each end:
+  - `stellar_sdk.auth.authorize_invocation` builds `SOROBAN_CREDENTIALS_ADDRESS_V2` entries; pass `credentials_type=SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS` for the legacy format.
+  - `SorobanServer[Async].simulate_transaction` sends `useUpgradedAuth: true`, so simulation records `ADDRESS_V2` credentials; pass `use_upgraded_auth=False` for the legacy format. `AssembledTransaction[Async]` and `ContractClient[Async].invoke` follow the same default, and `SorobanServer[Async].prepare_transaction` gains a `use_upgraded_auth` parameter it forwards to simulation.
+
 #### Update
 - Add CAP-85 (Protocol 28) external executable reference support across the high-level API. A contract created from an external executable reference carries no Wasm hash of its own: the reference names an owner contract and an owner-scoped tag, and the contract follows whatever Wasm hash the owner publishes under that tag. Updating the tag therefore upgrades every contract following it at once.
   - New `TransactionBuilder.append_create_contract_from_external_ref_op` builds the creation operation. `owner` must be a contract address, since only a contract can hold the persistent tag entry that names the Wasm; `tag` is an unbounded `SCString`, so a binary tag is passed through undecoded.
