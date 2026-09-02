@@ -72,6 +72,7 @@ See `soroban.md` for the full lifecycle; these are the builder entry points:
 | `append_invoke_contract_function_op(contract_id, function_name, parameters)` | Call a contract function |
 | `append_upload_contract_wasm_op(contract)` | Upload Wasm bytecode |
 | `append_create_contract_op(...)` | Instantiate a contract |
+| `append_create_contract_from_external_ref_op(owner, tag, address, ...)` | Instantiate a contract from a CAP-85 external executable reference (owner contract + tag) instead of a Wasm hash |
 | `append_create_stellar_asset_contract_from_asset_op(asset)` | Deploy the SAC for a classic asset |
 | `append_extend_footprint_ttl_op(...)` | Extend ledger entry TTL |
 | `append_restore_footprint_op(...)` | Restore archived state |

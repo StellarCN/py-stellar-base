@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
+from . import scval
 from . import xdr as stellar_xdr
 from .account import Account
 from .address import Address
@@ -454,21 +455,16 @@ class SorobanServer:
         :raises: :exc:`ContractWasmRetrievalError <stellar_sdk.exceptions.ContractWasmRetrievalError>` - If the tag entry does not hold a valid 32-byte Wasm hash.
         """
         owner = external_ref_owner_address(external_ref)
+        tag = external_ref.tag.sc_string
         # The tag is an unbounded SCString and may be binary, so it is reused as-is
         # rather than decoded; a lenient decode would build the key of a different entry.
         entry = self.get_contract_data(
             owner.address,
-            stellar_xdr.SCVal(
-                stellar_xdr.SCValType.SCV_EXECUTABLE_TAG,
-                executable_tag=external_ref.tag,
-            ),
+            scval.to_executable_tag(tag),
             Durability.PERSISTENT,
         )
         if entry is None:
-            raise ExternalRefNotFoundError(
-                f"External executable tag entry on {owner.address} was not found or is archived. "
-                f"Restoring the tag entry footprint may be required."
-            )
+            raise ExternalRefNotFoundError(owner.address, tag)
         data = stellar_xdr.LedgerEntryData.from_xdr(entry.xdr)
         if data.contract_data is None:
             raise ContractWasmRetrievalError(
@@ -495,6 +491,7 @@ class SorobanServer:
         :raises: :exc:`SACHasNoWasmError <stellar_sdk.exceptions.SACHasNoWasmError>` - If the contract is a Stellar Asset Contract.
         :raises: :exc:`ExternalRefNotFoundError <stellar_sdk.exceptions.ExternalRefNotFoundError>` - If the contract follows a CAP-85 external executable reference whose tag entry is not found or archived.
         :raises: :exc:`ContractCodeNotFoundError <stellar_sdk.exceptions.ContractCodeNotFoundError>` - If the contract code ledger entry is not found or archived.
+        :raises ValueError: If the ledger entry is structurally unusable, such as a CAP-85 external executable reference whose owner is not a contract.
         :raises: :exc:`ContractWasmRetrievalError <stellar_sdk.exceptions.ContractWasmRetrievalError>` - If the executable kind is not supported.
         """
         instance = self._get_contract_instance(contract_id)

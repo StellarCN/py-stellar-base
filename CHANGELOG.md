@@ -3,6 +3,17 @@ Release History
 
 ### Pending
 
+#### Update
+- Round out the CAP-85 (Protocol 28) external executable reference support added in 16.0.0:
+  - New `stellar_sdk.scval.to_executable_tag` / `from_executable_tag` build and read an `SCV_EXECUTABLE_TAG` value — the pair that was missing for the one `SCVal` variant CAP-85 introduced. Wrapped in that value, a tag is the key of the persistent contract data entry on the owner contract that holds the Wasm hash, so `to_executable_tag` is what you pass to `SorobanServer[Async].get_contract_data` to read a tag entry directly. It encodes a `str` as UTF-8 and passes `bytes` through undecoded; `from_executable_tag` returns the raw bytes, since a lenient decode would render two distinct tags identically.
+  - `ExternalRefNotFoundError` now carries the `owner` and `tag` it looked up and names them in its message, showing the tag as `bytes` rather than lenient-decoded text. Its constructor takes those two values in place of a message string — a source-incompatible change to a class introduced in 16.0.0, although the SDK raises it and nothing is expected to construct it.
+  - `SorobanServer[Async].get_contract_wasm` now documents the `ValueError` it raises for a ledger entry that is structurally unusable, such as an external executable reference whose owner is not a contract. Behavior is unchanged.
+  - Document the `ContractWasmRetrievalError` family in the API reference, where none of it appeared, and cover CAP-85 in the `py-stellar-base` agent skill, which had no mention of it.
+- Add a `use_upgraded_auth` opt-out to `sep.stellar_soroban_web_authentication.build_challenge_authorization_entries[_async]`, defaulting to `True`. A SEP-45 challenge is made of the entries simulation records, so 16.0.0's `useUpgradedAuth` flip also flipped challenges to `ADDRESS_V2` — with no way to decline, even though it is the remote client, not the anchor, that has to sign them. Pass `use_upgraded_auth=False` to keep issuing legacy challenges.
+
+#### Fixes
+- `AssembledTransaction[Async].restore_footprint` now simulates the restore transaction with the caller's `use_upgraded_auth` instead of the default. The restore itself is unaffected — a `RestoreFootprint` operation records no authorization entries — but an explicit opt-out is no longer silently dropped.
+
 ### Version 16.0.0
 
 Released on Aug 28, 2026

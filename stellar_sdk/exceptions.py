@@ -213,7 +213,23 @@ class ContractCodeNotFoundError(ContractWasmRetrievalError):
 
 class ExternalRefNotFoundError(ContractWasmRetrievalError):
     """Raised when the `CAP-85 <https://stellar.org/protocol/cap-85>`_ tag entry that an
-    external executable reference points at cannot be found."""
+    external executable reference points at cannot be found.
+
+    The entry may have been archived; restoring the tag entry footprint may be required.
+
+    :param owner: The contract that owns the executable, encoded as a Stellar contract address.
+    :param tag: The owner-scoped tag that was looked up.
+    """
+
+    def __init__(self, owner: str, tag: bytes) -> None:
+        # The tag is shown as bytes: it need not be valid UTF-8, and it is half of what
+        # identifies the code, so a lenient decode would render two distinct tags alike.
+        super().__init__(
+            f"External executable tag entry on {owner} was not found or is archived. "
+            f"Restoring the tag entry footprint may be required. tag: {tag!r}"
+        )
+        self.owner = owner
+        self.tag = tag
 
 
 class ContentSizeLimitExceededError(BaseRequestError):

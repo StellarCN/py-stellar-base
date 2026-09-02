@@ -272,6 +272,68 @@ async def test_build_challenge_authorization_entries_client_domain_account_witho
         )
 
 
+@pytest.mark.parametrize(
+    ("kwargs", "expected"), [({}, True), ({"use_upgraded_auth": False}, False)]
+)
+async def test_build_challenge_forwards_use_upgraded_auth(
+    soroban_server, rpc_mock, kwargs, expected
+):
+    """The anchor can choose the credential arm its clients are asked to sign.
+
+    Unlike the other simulating APIs, the challenge entries are signed by a remote client
+    rather than by the caller, so an anchor serving clients whose SDK predates CAP-71 must
+    be able to keep issuing legacy challenges.
+    """
+
+    def unsigned_entry(address: str) -> stellar_xdr.SorobanAuthorizationEntry:
+        return stellar_xdr.SorobanAuthorizationEntry(
+            credentials=stellar_xdr.SorobanCredentials(
+                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+                address=stellar_xdr.SorobanAddressCredentials(
+                    address=Address(address).to_xdr_sc_address(),
+                    nonce=stellar_xdr.Int64(1),
+                    signature_expiration_ledger=stellar_xdr.Uint32(0),
+                    signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
+                ),
+            ),
+            root_invocation=build_root_invocation(
+                args=build_args(client_domain=None, client_domain_account=None)
+            ),
+        )
+
+    rpc_mock.expect_response(
+        {
+            "jsonrpc": "2.0",
+            "id": "4b0a1d2c3e4f5a6b7c8d9e0f1a2b3c4d",
+            "result": {
+                "results": [
+                    {
+                        "auth": [
+                            unsigned_entry(CLIENT_CONTRACT_ACCOUNT).to_xdr(),
+                            unsigned_entry(SERVER_ACCOUNT).to_xdr(),
+                        ],
+                        "xdr": "AAAAAQ==",
+                    }
+                ],
+                "latestLedger": 82106,
+            },
+        }
+    )
+
+    await _build_entries(
+        soroban_server=soroban_server,
+        web_auth_contract=WEB_AUTH_CONTRACT,
+        server_secret=SERVER_SECRET,
+        client_account_id=CLIENT_CONTRACT_ACCOUNT,
+        home_domain=HOME_DOMAIN,
+        web_auth_domain=WEB_AUTH_DOMAIN,
+        network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+        **kwargs,
+    )
+
+    assert rpc_mock.requests[-1]["params"]["useUpgradedAuth"] is expected
+
+
 async def test_build_challenge_signs_v2_entries(soroban_server, rpc_mock):
     """build_challenge signs server entries that use ADDRESS_V2 credentials."""
 

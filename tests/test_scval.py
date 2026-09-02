@@ -938,6 +938,42 @@ def test_string(v):
     assert from_string(scval.to_xdr_bytes()) == v
 
 
+@pytest.mark.parametrize("v", ["release", b"\xff\xfe\x00A"])
+def test_executable_tag(v):
+    sc_val = to_executable_tag(v)
+
+    if isinstance(v, str):
+        v = v.encode("utf-8")
+    expected_scval = xdr.SCVal(
+        stellar_xdr.SCValType.SCV_EXECUTABLE_TAG, executable_tag=xdr.SCString(v)
+    )
+    assert sc_val == expected_scval
+    assert from_executable_tag(sc_val) == v
+    assert from_executable_tag(sc_val.to_xdr()) == v
+    assert from_executable_tag(sc_val.to_xdr_bytes()) == v
+
+
+def test_executable_tag_encodes_str_as_utf8():
+    assert to_executable_tag("你好👋") == to_executable_tag("你好👋".encode())
+
+
+def test_executable_tag_empty():
+    assert from_executable_tag(to_executable_tag(b"")) == b""
+
+
+def test_executable_tag_is_not_a_string():
+    # A tag is its own SCVal variant, so it must not be interchangeable with SCV_STRING;
+    # the two are distinct ledger keys even when they carry the same bytes.
+    assert to_executable_tag("release") != to_string("release")
+    with pytest.raises(ValueError, match="must be SCV_STRING"):
+        from_string(to_executable_tag("release"))
+
+
+def test_from_executable_tag_rejects_other_type():
+    with pytest.raises(ValueError, match="must be SCV_EXECUTABLE_TAG"):
+        from_executable_tag(to_string("release"))
+
+
 def test_symbol():
     v = "increment"
     scval = to_symbol(v)

@@ -26,6 +26,20 @@ Soroban / contract:
 - `AccountNotFoundException` — account does not exist on the network.
 - contract errors live in `stellar_sdk.contract.exceptions` (e.g. `AssembledTransactionError`).
 
+Contract introspection (all subclass `ContractWasmRetrievalError`) — raised by the
+`SorobanServer` methods that read a contract's Wasm, and so by `get_contract_meta`,
+`get_contract_spec` and `get_contract_info`:
+- `ContractInstanceNotFoundError` — the contract instance ledger entry does not exist.
+- `ContractCodeNotFoundError` — the contract code entry is missing or archived.
+- `SACHasNoWasmError` — the contract is a SAC, which has no Wasm on-chain.
+- `ExternalRefNotFoundError` — the CAP-85 tag entry that an external executable reference
+  points at is missing or archived; `.owner` and `.tag` say which entry was looked up.
+- `ContractWasmRetrievalError` itself — the RPC response held unexpected ledger entry data.
+
+Ledger data that is structurally unusable — an all-zero Wasm hash, an external executable
+reference whose owner is not a contract — raises `ValueError` from these methods rather than
+a member of that family.
+
 ```python
 from stellar_sdk.exceptions import NotFoundError, BadRequestError, PrepareTransactionException
 
