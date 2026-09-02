@@ -342,6 +342,7 @@ def build_challenge_authorization_entries(
     client_domain: str | None = None,
     client_domain_account: str | None = None,
     simulate_tx_account: str = NULL_ACCOUNT,
+    use_upgraded_auth: bool = True,
 ) -> str:
     """Returns a valid `SEP-0045 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0045.md>`_
     challenge which you can use for Stellar Soroban Web Authentication.
@@ -360,6 +361,12 @@ def build_challenge_authorization_entries(
     :param client_domain: The domain of the client application requesting authentication.
     :param client_domain_account: The Stellar account listed as the SIGNING_KEY on the client domain's TOML file.
     :param simulate_tx_account: The account to use for simulating the transaction (default is NULL_ACCOUNT).
+    :param use_upgraded_auth: Whether the challenge carries address-bound ``ADDRESS_V2`` (CAP-71)
+        credentials instead of the legacy ``ADDRESS`` credentials. Defaults to ``True``. Unlike the
+        other simulating APIs, the entries are signed by a remote client rather than by the caller,
+        and SEP-45 does not specify a credential format: pass ``False`` to keep issuing legacy
+        challenges to clients whose SDK cannot sign the address-bound payload. Transitional; once
+        the network returns ``ADDRESS_V2`` credentials by default (protocol 28) it becomes a no-op.
     :return: A base64 encoded XDR string of SorobanAuthorizationEntries.
     :raises ValueError: If client_domain is provided without client_domain_account, or if simulation fails.
     """
@@ -375,7 +382,10 @@ def build_challenge_authorization_entries(
         client_domain_account,
         simulate_tx_account,
     )
-    resp = soroban_server.simulate_transaction(tx)
+    # Simulation records the auth entries the challenge is made of, so this flag decides
+    # which credential arm the remote client is asked to sign. Parsing accepts both arms,
+    # see _ALLOWED_CREDENTIAL_TYPES.
+    resp = soroban_server.simulate_transaction(tx, use_upgraded_auth=use_upgraded_auth)
     return _process_build_challenge_response(
         resp, server_kp, expire_in_ledgers, network_passphrase
     )
@@ -394,6 +404,7 @@ async def build_challenge_authorization_entries_async(
     client_domain: str | None = None,
     client_domain_account: str | None = None,
     simulate_tx_account: str = NULL_ACCOUNT,
+    use_upgraded_auth: bool = True,
 ) -> str:
     """Returns a valid `SEP-0045 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0045.md>`_
     challenge which you can use for Stellar Soroban Web Authentication.
@@ -414,6 +425,12 @@ async def build_challenge_authorization_entries_async(
     :param client_domain: The domain of the client application requesting authentication.
     :param client_domain_account: The Stellar account listed as the SIGNING_KEY on the client domain's TOML file.
     :param simulate_tx_account: The account to use for simulating the transaction (default is NULL_ACCOUNT).
+    :param use_upgraded_auth: Whether the challenge carries address-bound ``ADDRESS_V2`` (CAP-71)
+        credentials instead of the legacy ``ADDRESS`` credentials. Defaults to ``True``. Unlike the
+        other simulating APIs, the entries are signed by a remote client rather than by the caller,
+        and SEP-45 does not specify a credential format: pass ``False`` to keep issuing legacy
+        challenges to clients whose SDK cannot sign the address-bound payload. Transitional; once
+        the network returns ``ADDRESS_V2`` credentials by default (protocol 28) it becomes a no-op.
     :return: A base64 encoded XDR string of SorobanAuthorizationEntries.
     :raises ValueError: If client_domain is provided without client_domain_account, or if simulation fails.
     """
@@ -429,7 +446,12 @@ async def build_challenge_authorization_entries_async(
         client_domain_account,
         simulate_tx_account,
     )
-    resp = await soroban_server.simulate_transaction(tx)
+    # Simulation records the auth entries the challenge is made of, so this flag decides
+    # which credential arm the remote client is asked to sign. Parsing accepts both arms,
+    # see _ALLOWED_CREDENTIAL_TYPES.
+    resp = await soroban_server.simulate_transaction(
+        tx, use_upgraded_auth=use_upgraded_auth
+    )
     return _process_build_challenge_response(
         resp, server_kp, expire_in_ledgers, network_passphrase
     )
@@ -476,6 +498,9 @@ def verify_challenge_authorization_entries(
     tx = _build_verify_tx(
         parsed_challenge, web_auth_contract, network_passphrase, simulate_tx_account
     )
+    # No use_upgraded_auth choice is needed here: the transaction already carries the
+    # client's signed auth entries, so RPC simulates in enforce mode, where the flag has no
+    # effect. Both credential arms verify the same way.
     resp = soroban_server.simulate_transaction(tx)
     _check_verify_response(resp)
     return parsed_challenge
@@ -524,6 +549,9 @@ async def verify_challenge_authorization_entries_async(
     tx = _build_verify_tx(
         parsed_challenge, web_auth_contract, network_passphrase, simulate_tx_account
     )
+    # No use_upgraded_auth choice is needed here: the transaction already carries the
+    # client's signed auth entries, so RPC simulates in enforce mode, where the flag has no
+    # effect. Both credential arms verify the same way.
     resp = await soroban_server.simulate_transaction(tx)
     _check_verify_response(resp)
     return parsed_challenge

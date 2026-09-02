@@ -611,12 +611,16 @@ class AssembledTransaction(Generic[T]):
             )
             .add_time_bounds(0, 0)
         )
+        # The restore transaction records no authorization entries of its own, so the
+        # choice does not change the restore; it keeps the derived transaction consistent
+        # with the one it is restoring state for.
         restore_assembled: AssembledTransaction = AssembledTransaction(
             restore_tx,
             self.server,
             self.transaction_signer,
             None,
             submit_timeout=self.submit_timeout,
+            use_upgraded_auth=self.use_upgraded_auth,
         )
         restore_assembled.simulate(restore=False).sign(force=True)._submit()
 

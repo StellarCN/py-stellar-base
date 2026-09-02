@@ -29,10 +29,44 @@ server.get_contract_data(contract_id, key)
 server.get_contract_info(contract_id)
 server.get_contract_meta(contract_id) # SEP-46
 server.get_contract_spec(contract_id) # SEP-48
+server.get_contract_wasm(contract_id) # raw Wasm; follows a CAP-85 external ref
+server.get_contract_wasm_by_hash(wasm_hash)
+server.get_external_ref_wasm_hash(ref) # CAP-85: resolve a reference to a Wasm hash
 ```
 
 `simulate_transaction` accepts a `ResourceLeeway` to pad resource estimates; both it and
 `prepare_transaction` accept an `AuthMode`.
+
+### CAP-85 external executable references
+
+A contract's instance can hold a `CONTRACT_EXECUTABLE_EXTERNAL_REF` executable instead of
+its own Wasm hash: an owner contract plus an owner-scoped tag. The owner publishes the Wasm
+hash in a *persistent* contract data entry keyed by `scval.to_executable_tag(tag)`, so it
+can upgrade every contract referencing that tag at once.
+
+Every Wasm-reading method above resolves the reference for you (one extra
+`get_ledger_entries` call). To resolve one by hand:
+
+```python
+from stellar_sdk import xdr as stellar_xdr
+
+executable = instance.executable
+if executable.type == stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF:
+    wasm_hash = server.get_external_ref_wasm_hash(executable.external_ref)
+    wasm = server.get_contract_wasm_by_hash(wasm_hash)
+```
+
+Deploy one with `TransactionBuilder.append_create_contract_from_external_ref_op(owner, tag,
+address, constructor_args=None, salt=None)`, or
+`ContractClient.create_contract_from_external_ref(owner, tag, source, signer, server)`.
+
+A tag is an unbounded `SCString` and need not be valid UTF-8. Keep it as `bytes`;
+`scval.to_native` returns a `str` only when it decodes and the raw `bytes` otherwise. Never
+decode it leniently — the tag is half of what identifies the code, so two distinct tags
+would render alike. The owner must be a contract address; the SDK rejects anything else
+before making a request, raising `ValueError` — the same way structurally unusable ledger
+data is reported elsewhere on these paths. `ExternalRefNotFoundError` (carrying `.owner` and
+`.tag`) means the tag entry is missing or archived.
 
 ### Manual submit loop
 
@@ -91,6 +125,7 @@ parse_result_xdr_fn=None, ...)` returns an `AssembledTransaction` (already simul
 default).
 
 Also: `ContractClient.upload_contract_wasm(...)`, `create_contract(...)`,
+`create_contract_from_external_ref(...)` (CAP-85),
 `create_stellar_asset_contract_from_asset(...)`.
 
 ### Read-only call

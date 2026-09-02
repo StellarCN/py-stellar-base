@@ -19,6 +19,7 @@ scval.to_uint256(7); scval.to_int256(-7)
 scval.to_timepoint(1700000000); scval.to_duration(3600)
 scval.to_bytes(b"\x01\x02")
 scval.to_string("hello"); scval.to_symbol("increment")
+scval.to_executable_tag("v1")     # CAP-85 tag; pass bytes for a binary tag
 scval.to_address("G...")          # account or contract address
 scval.to_vec([scval.to_uint32(1), scval.to_uint32(2)])
 scval.to_map({scval.to_symbol("k"): scval.to_uint32(1)})
@@ -31,6 +32,7 @@ scval.to_tuple_struct([scval.to_uint32(1), scval.to_symbol("x")])
 # From SCVal (parsing results)
 scval.from_uint32(v); scval.from_int128(v)
 scval.from_string(v)   # -> bytes; .decode() for str
+scval.from_executable_tag(v)  # -> bytes; never lenient-decode a CAP-85 tag
 scval.from_symbol(v); scval.from_address(v)
 scval.from_vec(v); scval.from_map(v); scval.from_struct(v)
 scval.to_native(v)     # recursive best-effort conversion to Python types

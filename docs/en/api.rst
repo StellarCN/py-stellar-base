@@ -452,6 +452,36 @@ FeatureNotEnabledError
 .. autoclass:: stellar_sdk.exceptions.FeatureNotEnabledError
    :members:
 
+ContractWasmRetrievalError
+--------------------------
+
+.. autoclass:: stellar_sdk.exceptions.ContractWasmRetrievalError
+   :members:
+
+ContractInstanceNotFoundError
+-----------------------------
+
+.. autoclass:: stellar_sdk.exceptions.ContractInstanceNotFoundError
+   :members:
+
+SACHasNoWasmError
+-----------------
+
+.. autoclass:: stellar_sdk.exceptions.SACHasNoWasmError
+   :members:
+
+ContractCodeNotFoundError
+-------------------------
+
+.. autoclass:: stellar_sdk.exceptions.ContractCodeNotFoundError
+   :members:
+
+ExternalRefNotFoundError
+------------------------
+
+.. autoclass:: stellar_sdk.exceptions.ExternalRefNotFoundError
+   :members:
+
 Keypair
 ^^^^^^^
 
@@ -825,6 +855,8 @@ scval
 .. autofunction:: stellar_sdk.scval.from_bytes
 .. autofunction:: stellar_sdk.scval.to_duration
 .. autofunction:: stellar_sdk.scval.from_duration
+.. autofunction:: stellar_sdk.scval.to_executable_tag
+.. autofunction:: stellar_sdk.scval.from_executable_tag
 .. autofunction:: stellar_sdk.scval.to_int32
 .. autofunction:: stellar_sdk.scval.from_int32
 .. autofunction:: stellar_sdk.scval.to_int64

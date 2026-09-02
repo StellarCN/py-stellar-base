@@ -457,6 +457,79 @@ async def test_get_contract_wasm_uses_external_ref_async(monkeypatch):
     assert await server.get_contract_wasm(CONTRACT_ID) == wasm
 
 
+def test_get_contract_wasm_rejects_non_contract_external_ref_owner(monkeypatch):
+    # Structurally unusable ledger data surfaces as ValueError here, the same way an
+    # all-zero Wasm hash does on the CONTRACT_EXECUTABLE_WASM path.
+    external_ref = _external_ref_xdr(ACCOUNT_ID, b"release")
+    server = SorobanServer("https://example.com")
+
+    monkeypatch.setattr(
+        server,
+        "_get_contract_instance",
+        MethodType(
+            lambda self, contract_id: _external_ref_instance(external_ref), server
+        ),
+    )
+
+    with pytest.raises(ValueError, match="is not a contract"):
+        server.get_contract_wasm(CONTRACT_ID)
+
+
+async def test_get_contract_wasm_rejects_non_contract_external_ref_owner_async(
+    monkeypatch,
+):
+    external_ref = _external_ref_xdr(ACCOUNT_ID, b"release")
+    server = SorobanServerAsync("https://example.com")
+
+    async def get_contract_instance(self, contract_id):
+        return _external_ref_instance(external_ref)
+
+    monkeypatch.setattr(
+        server,
+        "_get_contract_instance",
+        MethodType(get_contract_instance, server),
+    )
+
+    with pytest.raises(ValueError, match="is not a contract"):
+        await server.get_contract_wasm(CONTRACT_ID)
+
+
+def test_external_ref_not_found_error_carries_owner_and_tag(monkeypatch):
+    tag = b"release"
+    server = SorobanServer("https://example.com")
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(lambda self, contract_id, key, durability: None, server),
+    )
+
+    with pytest.raises(ExternalRefNotFoundError) as exc_info:
+        server.get_external_ref_wasm_hash(_external_ref_xdr(CONTRACT_ID, tag))
+    assert exc_info.value.owner == CONTRACT_ID
+    assert exc_info.value.tag == tag
+    assert CONTRACT_ID in str(exc_info.value)
+    assert "release" in str(exc_info.value)
+
+
+def test_external_ref_not_found_error_does_not_decode_a_binary_tag(monkeypatch):
+    # A tag is half of what identifies the code, so a binary one is shown as bytes rather
+    # than lenient-decoded into text that no longer identifies it.
+    tag = b"\xff\xfe"
+    server = SorobanServer("https://example.com")
+
+    monkeypatch.setattr(
+        server,
+        "get_contract_data",
+        MethodType(lambda self, contract_id, key, durability: None, server),
+    )
+
+    with pytest.raises(ExternalRefNotFoundError) as exc_info:
+        server.get_external_ref_wasm_hash(_external_ref_xdr(CONTRACT_ID, tag))
+    assert exc_info.value.tag == tag
+    assert repr(tag) in str(exc_info.value)
+
+
 def test_get_contract_wasm_rejects_missing_external_ref(monkeypatch):
     server = SorobanServer("https://example.com")
 

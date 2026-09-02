@@ -280,6 +280,82 @@ def test_simulate_forwards_use_upgraded_auth(kwargs, expected):
     assert server.use_upgraded_auth_values == [expected]
 
 
+def _restore_builder(source: Keypair) -> TransactionBuilder:
+    return (
+        TransactionBuilder(
+            Account(source.public_key, 1),
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        .set_timeout(300)
+        .append_invoke_contract_function_op(
+            contract_id="CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
+            function_name="increment",
+            parameters=[],
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "expected"), [({}, True), ({"use_upgraded_auth": False}, False)]
+)
+def test_restore_footprint_inherits_use_upgraded_auth(monkeypatch, kwargs, expected):
+    # The derived restore transaction must simulate with the caller's choice rather than
+    # falling back to the default.
+    source = Keypair.random()
+    server = _FakeSorobanServer()
+    assembled: AssembledTransaction[Any] = AssembledTransaction(
+        _restore_builder(source), cast(Any, server), source, **kwargs
+    )
+    submitted: list[Any] = []
+    monkeypatch.setattr(
+        assembled_transaction_module.AssembledTransaction,
+        "_submit",
+        lambda self: submitted.append(self),
+    )
+
+    assembled.restore_footprint(
+        cast(
+            Any, SimpleNamespace(transaction_data=SorobanDataBuilder().build().to_xdr())
+        )
+    )
+
+    assert len(submitted) == 1
+    assert server.use_upgraded_auth_values == [expected]
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "expected"), [({}, True), ({"use_upgraded_auth": False}, False)]
+)
+async def test_restore_footprint_inherits_use_upgraded_auth_async(
+    monkeypatch, kwargs, expected
+):
+    source = Keypair.random()
+    server = _FakeSorobanServerAsync()
+    assembled: AssembledTransactionAsync[Any] = AssembledTransactionAsync(
+        _restore_builder(source), cast(Any, server), source, **kwargs
+    )
+    submitted: list[Any] = []
+
+    async def fake_submit(self):
+        submitted.append(self)
+
+    monkeypatch.setattr(
+        assembled_transaction_async_module.AssembledTransactionAsync,
+        "_submit",
+        fake_submit,
+    )
+
+    await assembled.restore_footprint(
+        cast(
+            Any, SimpleNamespace(transaction_data=SorobanDataBuilder().build().to_xdr())
+        )
+    )
+
+    assert len(submitted) == 1
+    assert server.use_upgraded_auth_values == [expected]
+
+
 def test_sign_and_submit_auto_prepares_contract_address_auth(monkeypatch):
     contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
     server = _FakeSorobanServer()

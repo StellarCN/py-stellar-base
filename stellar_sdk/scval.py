@@ -11,6 +11,7 @@ __all__ = [
     "from_bytes",
     "from_duration",
     "from_enum",
+    "from_executable_tag",
     "from_int32",
     "from_int64",
     "from_int128",
@@ -32,6 +33,7 @@ __all__ = [
     "to_bytes",
     "to_duration",
     "to_enum",
+    "to_executable_tag",
     "to_int32",
     "to_int64",
     "to_int128",
@@ -131,8 +133,7 @@ def to_native(
     if sc_val.type == stellar_xdr.SCValType.SCV_EXECUTABLE_TAG:
         # A CAP-85 executable tag is an unbounded SCString, so it gets the same
         # best-effort decode as SCV_STRING; a binary tag comes back as raw bytes.
-        assert sc_val.executable_tag is not None
-        return _decode_utf8_or_bytes(sc_val.executable_tag.sc_string)
+        return _decode_utf8_or_bytes(from_executable_tag(sc_val))
     return sc_val
 
 
@@ -264,6 +265,53 @@ def from_duration(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
         )
     assert sc_val.duration is not None
     return sc_val.duration.duration.uint64
+
+
+def to_executable_tag(data: str | bytes) -> stellar_xdr.SCVal:
+    """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a
+    `CAP-85 <https://stellar.org/protocol/cap-85>`_ executable tag.
+
+    A tag is the owner-scoped name of an executable. Wrapped in an
+    ``SCV_EXECUTABLE_TAG`` value, it is the key of the persistent contract data entry
+    on the owner contract that holds the Wasm hash the tag currently names, so this is
+    what you pass to :meth:`SorobanServer.get_contract_data <stellar_sdk.SorobanServer.get_contract_data>`
+    to read that entry.
+
+    :param data: The tag to convert. A :class:`str` is encoded as UTF-8; a tag is an
+        unbounded ``SCString`` and need not be valid UTF-8, so :class:`bytes` are
+        passed through undecoded.
+    :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_EXECUTABLE_TAG`.
+    """
+    if isinstance(data, str):
+        data = data.encode("utf-8")
+    return stellar_xdr.SCVal(
+        stellar_xdr.SCValType.SCV_EXECUTABLE_TAG,
+        executable_tag=stellar_xdr.SCString(data),
+    )
+
+
+def from_executable_tag(sc_val: stellar_xdr.SCVal | bytes | str) -> bytes:
+    """Creates a `CAP-85 <https://stellar.org/protocol/cap-85>`_ executable tag from a
+    :class:`stellar_sdk.xdr.SCVal` XDR object.
+
+    The raw bytes are returned rather than a decoded string: a tag is an unbounded
+    ``SCString`` that need not be valid UTF-8, and it is half of what identifies the
+    code being deployed, so a lenient decode would render two distinct tags
+    identically. Use :func:`to_native` for a best-effort ``str`` that falls back to
+    these bytes.
+
+    :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
+        It can also be an :class:`stellar_sdk.xdr.SCVal` expressed in base64 or bytes.
+    :return: The tag value in bytes.
+    :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_EXECUTABLE_TAG`.
+    """
+    sc_val = _parse_sc_val(sc_val)
+    if sc_val.type != stellar_xdr.SCValType.SCV_EXECUTABLE_TAG:
+        raise ValueError(
+            f"Invalid sc_val type, must be SCV_EXECUTABLE_TAG, got {sc_val.type}"
+        )
+    assert sc_val.executable_tag is not None
+    return sc_val.executable_tag.sc_string
 
 
 def to_int32(data: int) -> stellar_xdr.SCVal:
