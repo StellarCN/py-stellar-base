@@ -251,11 +251,16 @@ def authorize_entry(
     and ``SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES`` (CAP-71, Protocol 27+)
     credentials. Source-account credentials are returned unchanged.
 
-    The signed payload commits to ``valid_until_ledger_sequence``, and for a
-    delegates entry the top-level account and every (nested) delegate sign the
-    same payload — so every signer of one entry must use the same
-    ``valid_until_ledger_sequence``, otherwise earlier signatures are
-    invalidated.
+    The signed payload commits to ``valid_until_ledger_sequence``, and a
+    delegates entry stores a single expiration ledger that the top-level
+    account and every (nested) delegate sign over — so every signer of one
+    entry must use the same ``valid_until_ledger_sequence``. If another node
+    of the entry already carries a signature (any value other than the
+    ``scvVoid`` placeholder) and ``valid_until_ledger_sequence`` differs from
+    the stored expiration ledger, :exc:`ValueError` is raised instead of
+    returning an entry whose earlier signatures no longer verify. Changing the
+    expiration is fine as long as every signature the entry carries sits on a
+    targeted node, e.g. when re-signing the only delegate that has signed.
 
     Default account example::
 
@@ -292,8 +297,10 @@ def authorize_entry(
     :return: A signed Soroban authorization entry.
     :raises:
         :exc:`ValueError`: if the entry's credential address is not a classic
-        account (``G...``) or contract (``C...``) address, or if ``for_address``
-        matches no credential node in the entry.
+        account (``G...``) or contract (``C...``) address, if ``for_address``
+        matches no credential node in the entry, or if
+        ``valid_until_ledger_sequence`` differs from the expiration ledger a
+        signature on another node of the entry already commits to.
     """
     if isinstance(entry, str):
         entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr(entry)
@@ -312,6 +319,46 @@ def authorize_entry(
             f"Unsupported SorobanCredentialsType: {entry.credentials.type}."
         )
 
+    # CAP-71-01: the payload is shared across the top-level address and every
+    # (possibly nested) delegate, so the signature can be written to whichever
+    # credential node(s) carry `for_address`.
+    nodes = _collect_signature_nodes(entry.credentials)
+    targets: list[
+        stellar_xdr.SorobanAddressCredentials | stellar_xdr.SorobanDelegateSignature
+    ]
+    if for_address is None:
+        targets = [addr_auth]
+    else:
+        resolved = _resolve_account_or_contract_address(for_address)
+        targets = [
+            node
+            for node in nodes
+            if Address.from_xdr_sc_address(node.address).address == resolved.address
+        ]
+        if not targets:
+            raise ValueError(
+                "The authorization entry has no credential node for address "
+                f"{resolved.address}."
+            )
+
+    # The entry stores one expiration ledger and every signature on it commits
+    # to that value, so re-stamping it would invalidate any signature already
+    # collected on a node that is not about to be replaced. Signature values
+    # are opaque to the SDK: anything but the `scvVoid` placeholder counts.
+    stored_expiration = addr_auth.signature_expiration_ledger.uint32
+    if stored_expiration != valid_until_ledger_sequence and any(
+        node.signature.type != stellar_xdr.SCValType.SCV_VOID
+        for node in nodes
+        if not any(node is target for target in targets)
+    ):
+        raise ValueError(
+            "This authorization entry already carries a signature committed to "
+            f"signature_expiration_ledger={stored_expiration}; pass that same "
+            f"`valid_until_ledger_sequence` to add another signature (got "
+            f"{valid_until_ledger_sequence}), or start from an entry whose "
+            "other nodes are unsigned."
+        )
+
     # Set the expiration before building the preimage, so the signed payload
     # commits to the same expiration ledger stored in the credentials.
     addr_auth.signature_expiration_ledger = stellar_xdr.Uint32(
@@ -322,26 +369,6 @@ def authorize_entry(
         entry, valid_until_ledger_sequence, network_passphrase
     )
     signature = _sign_authorization(signer, preimage)
-
-    # CAP-71-01: the payload is shared across the top-level address and every
-    # (possibly nested) delegate, so the signature can be written to whichever
-    # credential node(s) carry `for_address`.
-    if for_address is None:
-        targets: list[
-            stellar_xdr.SorobanAddressCredentials | stellar_xdr.SorobanDelegateSignature
-        ] = [addr_auth]
-    else:
-        resolved = _resolve_account_or_contract_address(for_address)
-        targets = [
-            node
-            for node in _collect_signature_nodes(entry.credentials)
-            if Address.from_xdr_sc_address(node.address).address == resolved.address
-        ]
-        if not targets:
-            raise ValueError(
-                "The authorization entry has no credential node for address "
-                f"{resolved.address}."
-            )
     for node in targets:
         node.signature = signature
     return entry
@@ -525,7 +552,12 @@ def build_with_delegates_entry(
     :param delegates: The delegate signers to attach.
     :param signature: The top-level account's signature. Defaults to
         ``scvVoid``, which is valid for accounts that authorize purely via
-        delegated signers.
+        delegated signers. A signature already present on ``entry`` is not
+        carried over. One made over an ``ADDRESS_V2`` entry with this same
+        ``valid_until_ledger_sequence`` covers the returned entry too and may
+        be passed here; a legacy ``ADDRESS`` signature was made over a
+        different payload, so sign the returned entry with
+        :func:`authorize_entry` instead.
     :return: A new ``SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES`` authorization
         entry; the input entry is not modified.
     :raises:
