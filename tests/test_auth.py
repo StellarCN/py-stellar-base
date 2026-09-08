@@ -956,6 +956,27 @@ def _unsigned_entry(
     )
 
 
+def _delegates_entry(
+    top_address: str,
+    delegate_addresses: list[str],
+    valid_until_ledger_sequence: int = 0,
+) -> stellar_xdr.SorobanAuthorizationEntry:
+    return build_with_delegates_entry(
+        _unsigned_entry(
+            top_address,
+            stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+        ),
+        valid_until_ledger_sequence,
+        [DelegateSignature(address) for address in delegate_addresses],
+    )
+
+
+def _stored_expiration(entry: stellar_xdr.SorobanAuthorizationEntry) -> int:
+    assert entry.credentials.address_with_delegates is not None
+    credentials = entry.credentials.address_with_delegates.address_credentials
+    return credentials.signature_expiration_ledger.uint32
+
+
 class TestCap71Auth:
     """CAP-71: address-bound credentials (ADDRESS_V2) and delegated signers."""
 
@@ -1196,6 +1217,167 @@ class TestCap71Auth:
                 Network.TESTNET_NETWORK_PASSPHRASE,
                 for_address=Keypair.random().public_key,
             )
+
+    def test_authorize_entry_rejects_expiration_change_after_delegate_signed(self):
+        # Regression for #1215: one expiration ledger is shared by the whole
+        # entry, so signing a second delegate with a different one used to
+        # silently invalidate the first delegate's signature.
+        top = Keypair.random()
+        delegate1 = Keypair.random()
+        delegate2 = Keypair.random()
+        entry = _delegates_entry(
+            top.public_key, [delegate1.public_key, delegate2.public_key]
+        )
+        signed = authorize_entry(
+            entry,
+            delegate1,
+            1000,
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            for_address=delegate1.public_key,
+        )
+
+        with pytest.raises(
+            ValueError, match=r"already carries a signature committed to"
+        ):
+            authorize_entry(
+                signed,
+                delegate2,
+                2000,
+                Network.TESTNET_NETWORK_PASSPHRASE,
+                for_address=delegate2.public_key,
+            )
+
+        assert _stored_expiration(signed) == 1000
+
+    def test_authorize_entry_rejects_expiration_change_for_nested_delegate(self):
+        top = Keypair.random()
+        delegate = Keypair.random()
+        nested = Keypair.random()
+        entry = build_with_delegates_entry(
+            _unsigned_entry(
+                top.public_key,
+                stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+            ),
+            0,
+            [
+                DelegateSignature(
+                    delegate.public_key,
+                    nested_delegates=[DelegateSignature(nested.public_key)],
+                )
+            ],
+        )
+        signed = authorize_entry(
+            entry,
+            nested,
+            1000,
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            for_address=nested.public_key,
+        )
+
+        with pytest.raises(ValueError, match=r"signature_expiration_ledger=1000"):
+            authorize_entry(
+                signed,
+                delegate,
+                2000,
+                Network.TESTNET_NETWORK_PASSPHRASE,
+                for_address=delegate.public_key,
+            )
+
+    def test_authorize_entry_signs_every_node_at_one_expiration(self):
+        # The supported flow: the same valid_until_ledger_sequence everywhere.
+        top = Keypair.random()
+        delegate = Keypair.random()
+        nested = Keypair.random()
+        entry = build_with_delegates_entry(
+            _unsigned_entry(
+                top.public_key,
+                stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+            ),
+            0,
+            [
+                DelegateSignature(
+                    delegate.public_key,
+                    nested_delegates=[DelegateSignature(nested.public_key)],
+                )
+            ],
+        )
+
+        for signer in (delegate, nested):
+            entry = authorize_entry(
+                entry,
+                signer,
+                654656,
+                Network.TESTNET_NETWORK_PASSPHRASE,
+                for_address=signer.public_key,
+            )
+        entry = authorize_entry(entry, top, 654656, Network.TESTNET_NETWORK_PASSPHRASE)
+
+        assert _stored_expiration(entry) == 654656
+        with_delegates = entry.credentials.address_with_delegates
+        assert with_delegates is not None
+        delegate_node = with_delegates.delegates[0]
+        for node in (
+            with_delegates.address_credentials,
+            delegate_node,
+            delegate_node.nested_delegates[0],
+        ):
+            assert node.signature.type == stellar_xdr.SCValType.SCV_VEC
+
+    def test_authorize_entry_allows_resigning_the_same_delegate_node(self):
+        # Replacing the only signature on the entry invalidates nothing.
+        top = Keypair.random()
+        delegate = Keypair.random()
+        entry = _delegates_entry(top.public_key, [delegate.public_key])
+        signed = authorize_entry(
+            entry,
+            delegate,
+            1000,
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            for_address=delegate.public_key,
+        )
+
+        resigned = authorize_entry(
+            signed,
+            delegate,
+            2000,
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            for_address=delegate.public_key,
+        )
+
+        assert _stored_expiration(resigned) == 2000
+        assert resigned.credentials.address_with_delegates is not None
+        delegate_node = resigned.credentials.address_with_delegates.delegates[0]
+        assert delegate_node.signature.type == stellar_xdr.SCValType.SCV_VEC
+
+    @pytest.mark.parametrize(
+        "credentials_type",
+        [
+            stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+            stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+        ],
+    )
+    def test_authorize_entry_allows_resigning_plain_credentials(self, credentials_type):
+        # ADDRESS / ADDRESS_V2 entries carry a single node, which is always the
+        # one being signed, so the guard never fires for them.
+        signer = Keypair.random()
+        entry = _unsigned_entry(signer.public_key, credentials_type)
+        signed = authorize_entry(
+            entry, signer, 1000, Network.TESTNET_NETWORK_PASSPHRASE
+        )
+
+        resigned = authorize_entry(
+            signed, signer, 2000, Network.TESTNET_NETWORK_PASSPHRASE
+        )
+
+        credentials = (
+            resigned.credentials.address
+            if credentials_type
+            == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
+            else resigned.credentials.address_v2
+        )
+        assert credentials is not None
+        assert credentials.signature_expiration_ledger == stellar_xdr.Uint32(2000)
+        assert credentials.signature.type == stellar_xdr.SCValType.SCV_VEC
 
     def test_expiration_committed_into_signed_payload(self):
         signer = Keypair.random()

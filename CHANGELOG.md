@@ -3,6 +3,10 @@ Release History
 
 ### Pending
 
+#### Fixes
+- `auth.authorize_entry` now raises `ValueError` instead of silently invalidating signatures already on the entry. A CAP-71-01 (`SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES`) entry stores one `signature_expiration_ledger`, and every signature on it — the top-level account's and each (nested) delegate's — commits to that value. Signing one node with a different `valid_until_ledger_sequence` re-stamped it and left the other signatures unverifiable, with nothing raised until the host rejected the entry. The error names the stored expiration ledger; pass that value to add a signature, or start from an entry whose other nodes are unsigned. Re-signing only the targeted node(s), and refreshing a plain `ADDRESS` / `ADDRESS_V2` entry, still work as before. ([#1215](https://github.com/StellarCN/py-stellar-base/issues/1215))
+  - `AssembledTransaction[Async].authorize` / `sign_auth_entries` sign only the top-level node, but the expiration they stamp (`latest_ledger + 100` by default) is the shared one, so they reach the same guard: signing the top level of an entry whose delegates already signed now raises unless their `valid_until_ledger_sequence` is passed explicitly. A rejected entry now leaves the transaction untouched; previously entries signed earlier in the same call were kept.
+
 ### Version 16.1.0
 
 Released on September 02, 2026

@@ -407,7 +407,7 @@ class AssembledTransaction(Generic[T]):
         op = self.built_transaction.transaction.operations[0]
         assert isinstance(op, InvokeHostFunction)
 
-        signed_any = False
+        signed: list[tuple[int, xdr.SorobanAuthorizationEntry]] = []
         for i, e in enumerate(op.auth):
             addr_auth = _get_address_credentials(e.credentials)
             if addr_auth is None:
@@ -415,15 +415,24 @@ class AssembledTransaction(Generic[T]):
             entry_address = Address.from_xdr_sc_address(addr_auth.address).address
             if entry_address != target_address.address:
                 continue
-            op.auth[i] = authorize_entry(
-                e,
-                signer,
-                valid_until_ledger_sequence,
-                self.built_transaction.network_passphrase,
+            signed.append(
+                (
+                    i,
+                    authorize_entry(
+                        e,
+                        signer,
+                        valid_until_ledger_sequence,
+                        self.built_transaction.network_passphrase,
+                    ),
+                )
             )
-            signed_any = True
+        # Write back only once every matching entry has signed, so an entry
+        # that `authorize_entry` rejects (e.g. an expiration ledger another
+        # signature already commits to) leaves the transaction untouched.
+        for i, entry in signed:
+            op.auth[i] = entry
 
-        if signed_any and self._authorization_requires_preparation(target_address):
+        if signed and self._authorization_requires_preparation(target_address):
             self._mark_needs_preparation(
                 "Authorization entries changed in a way that may affect Soroban "
                 "resources; call prepare() before signing or exporting XDR."

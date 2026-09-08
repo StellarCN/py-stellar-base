@@ -13,7 +13,11 @@ from stellar_sdk import (
     scval,
 )
 from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.auth import DelegateSignature, build_with_delegates_entry
+from stellar_sdk.auth import (
+    DelegateSignature,
+    authorize_entry,
+    build_with_delegates_entry,
+)
 from stellar_sdk.contract import (
     AssembledTransaction,
     AssembledTransactionAsync,
@@ -665,3 +669,116 @@ async def test_async_needs_non_invoker_signing_by_counts_all_address_credential_
         legacy_signer.public_key,
         delegating_signer.public_key,
     }
+
+
+def _pre_signed_delegates_entry(top: Keypair, delegate: Keypair, valid_until: int):
+    """A delegates entry whose delegate has already signed at ``valid_until``."""
+    entry = build_with_delegates_entry(
+        _sample_auth_entry(
+            top.public_key,
+            stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+        ),
+        0,
+        [DelegateSignature(delegate.public_key)],
+    )
+    return authorize_entry(
+        entry,
+        delegate,
+        valid_until,
+        Network.TESTNET_NETWORK_PASSPHRASE,
+        for_address=delegate.public_key,
+    )
+
+
+def _invoke_op(assembled) -> InvokeHostFunction:
+    assert assembled.built_transaction is not None
+    op = assembled.built_transaction.transaction.operations[0]
+    assert isinstance(op, InvokeHostFunction)
+    return op
+
+
+def _with_delegates_of(
+    entry: stellar_xdr.SorobanAuthorizationEntry,
+) -> stellar_xdr.SorobanAddressCredentialsWithDelegates:
+    with_delegates = entry.credentials.address_with_delegates
+    assert with_delegates is not None
+    return with_delegates
+
+
+def _assert_top_level_signed_at(assembled, delegate_signature, valid_until: int):
+    with_delegates = _with_delegates_of(_invoke_op(assembled).auth[0])
+    assert (
+        with_delegates.address_credentials.signature.type
+        == stellar_xdr.SCValType.SCV_VEC
+    )
+    assert with_delegates.address_credentials.signature_expiration_ledger == (
+        stellar_xdr.Uint32(valid_until)
+    )
+    # the delegate's signature is still the one it produced
+    assert with_delegates.delegates[0].signature == delegate_signature
+
+
+def test_authorize_rejects_expiration_change_on_pre_signed_delegates_entry():
+    # authorize() can only sign the top-level node of a delegates entry, but the
+    # expiration ledger it stamps is shared with the delegates. Re-stamping it
+    # with the library default used to silently invalidate their signatures.
+    top = Keypair.random()
+    delegate = Keypair.random()
+    entry = _pre_signed_delegates_entry(top, delegate, 1000)
+    delegate_signature = _with_delegates_of(entry).delegates[0].signature
+    assembled, _, _ = _assembled_with_auth(top.public_key, entries=[entry])
+
+    with pytest.raises(ValueError, match=r"signature_expiration_ledger=1000"):
+        assembled.authorize(top)
+    assert assembled.needs_non_invoker_signing_by() == {top.public_key}
+
+    # passing the delegate's expiration through signs the top level for real
+    assembled.authorize(top, valid_until_ledger_sequence=1000)
+    _assert_top_level_signed_at(assembled, delegate_signature, 1000)
+    assert assembled.needs_non_invoker_signing_by() == set()
+
+
+def test_authorize_leaves_every_entry_untouched_when_one_is_rejected():
+    # Two entries for the same address: a plain one that signs fine, and a
+    # delegates one the guard rejects. Nothing is written back.
+    top = Keypair.random()
+    delegate = Keypair.random()
+    plain = _sample_auth_entry(
+        top.public_key,
+        stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+    )
+    delegated = _pre_signed_delegates_entry(top, delegate, 1000)
+    assembled, _, _ = _assembled_with_auth(top.public_key, entries=[plain, delegated])
+    before = [e.to_xdr() for e in _invoke_op(assembled).auth]
+
+    with pytest.raises(ValueError, match=r"signature_expiration_ledger=1000"):
+        assembled.authorize(top)
+
+    assert [e.to_xdr() for e in _invoke_op(assembled).auth] == before
+
+    assembled.authorize(top, valid_until_ledger_sequence=1000)
+    for e in _invoke_op(assembled).auth:
+        addr_auth = (
+            e.credentials.address_v2 or _with_delegates_of(e).address_credentials
+        )
+        assert addr_auth.signature.type == stellar_xdr.SCValType.SCV_VEC
+        assert addr_auth.signature_expiration_ledger == stellar_xdr.Uint32(1000)
+
+
+async def test_async_authorize_leaves_every_entry_untouched_when_one_is_rejected():
+    top = Keypair.random()
+    delegate = Keypair.random()
+    plain = _sample_auth_entry(
+        top.public_key,
+        stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+    )
+    delegated = _pre_signed_delegates_entry(top, delegate, 1000)
+    assembled, _, _ = _assembled_async_with_auth(
+        top.public_key, entries=[plain, delegated]
+    )
+    before = [e.to_xdr() for e in _invoke_op(assembled).auth]
+
+    with pytest.raises(ValueError, match=r"signature_expiration_ledger=1000"):
+        await assembled.authorize(top)
+
+    assert [e.to_xdr() for e in _invoke_op(assembled).auth] == before
