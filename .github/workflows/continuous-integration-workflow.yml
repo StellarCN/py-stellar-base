@@ -19,6 +19,7 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6.0.2
       - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
@@ -30,6 +31,7 @@ jobs:
 
   type-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6.0.2
       - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
@@ -68,6 +70,7 @@ jobs:
             { os: "windows-latest", python-version: "3.15" },
           ]
     runs-on: ${{ matrix.platform.os }}
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6.0.2
       - name: Install uv and Python ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
@@ -79,6 +82,7 @@ jobs:
 
   integration:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     services:
       rpc:
         image: stellar/quickstart:latest
@@ -113,6 +117,7 @@ jobs:
   deploy:
     needs: [lint, type-check, test, integration]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.event_name == 'release' && github.event.action == 'created'
     permissions:
       id-token: write
@@ -131,6 +136,7 @@ jobs:
     if: always()
     needs: [lint, type-check, test, integration, deploy]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: exit 1
