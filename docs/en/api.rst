@@ -1973,6 +1973,10 @@ MuxedAccountMed25519
 --------------------
 .. autoclass:: stellar_sdk.xdr.muxed_account_med25519.MuxedAccountMed25519
 
+MuxedContract
+-------------
+.. autoclass:: stellar_sdk.xdr.muxed_contract.MuxedContract
+
 MuxedEd25519Account
 -------------------
 .. autoclass:: stellar_sdk.xdr.muxed_ed25519_account.MuxedEd25519Account
@@ -2589,9 +2593,17 @@ StellarValueExt
 ---------------
 .. autoclass:: stellar_sdk.xdr.stellar_value_ext.StellarValueExt
 
+StellarValueProposedMsValue
+---------------------------
+.. autoclass:: stellar_sdk.xdr.stellar_value_proposed_ms_value.StellarValueProposedMsValue
+
 StellarValueProposedValue
 -------------------------
 .. autoclass:: stellar_sdk.xdr.stellar_value_proposed_value.StellarValueProposedValue
+
+StellarValueSignedMsValue
+-------------------------
+.. autoclass:: stellar_sdk.xdr.stellar_value_signed_ms_value.StellarValueSignedMsValue
 
 StellarValueType
 ----------------
@@ -2656,6 +2668,10 @@ TimeBounds
 TimePoint
 ---------
 .. autoclass:: stellar_sdk.xdr.time_point.TimePoint
+
+TimePointMs
+-----------
+.. autoclass:: stellar_sdk.xdr.time_point_ms.TimePointMs
 
 TimeSlicedNodeData
 ------------------
@@ -2922,5 +2938,6 @@ Constants
 .. autodata:: stellar_sdk.xdr.constants.MAX_SIGNERS
 .. autodata:: stellar_sdk.xdr.constants.SCSYMBOL_LIMIT
 .. autodata:: stellar_sdk.xdr.constants.SC_SPEC_DOC_LIMIT
+.. autodata:: stellar_sdk.xdr.constants.SC_SPEC_TYPE_NAME_LIMIT
 .. autodata:: stellar_sdk.xdr.constants.TX_ADVERT_VECTOR_MAX_SIZE
 .. autodata:: stellar_sdk.xdr.constants.TX_DEMAND_VECTOR_MAX_SIZE
