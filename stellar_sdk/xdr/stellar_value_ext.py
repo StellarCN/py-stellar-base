@@ -9,7 +9,9 @@ from xdrlib3 import Packer, Unpacker
 
 from .base import DEFAULT_XDR_MAX_DEPTH
 from .ledger_close_value_signature import LedgerCloseValueSignature
+from .stellar_value_proposed_ms_value import StellarValueProposedMsValue
 from .stellar_value_proposed_value import StellarValueProposedValue
+from .stellar_value_signed_ms_value import StellarValueSignedMsValue
 from .stellar_value_type import StellarValueType
 
 __all__ = ["StellarValueExt"]
@@ -33,6 +35,21 @@ class StellarValueExt:
                     uint32 previousLedgerVersion;
                     LedgerCloseValueSignature lcValueSignature;
                 } proposedValue;
+            case STELLAR_VALUE_SIGNED_MS:
+                struct
+                {
+                    TimePointMs closeTimeMs; // closeTime == closeTimeMs / 1000
+                    LedgerCloseValueSignature lcValueSignature;
+                } signedMsValue;
+            case STELLAR_VALUE_EMPTY_TX_SET_MS:
+                struct
+                {
+                    TimePointMs closeTimeMs; // closeTime == closeTimeMs / 1000
+                    Hash txSetHash;
+                    Hash previousLedgerHash;
+                    uint32 previousLedgerVersion;
+                    LedgerCloseValueSignature lcValueSignature;
+                } proposedMsValue;
             }
     """
 
@@ -41,10 +58,14 @@ class StellarValueExt:
         v: StellarValueType,
         lc_value_signature: LedgerCloseValueSignature | None = None,
         proposed_value: StellarValueProposedValue | None = None,
+        signed_ms_value: StellarValueSignedMsValue | None = None,
+        proposed_ms_value: StellarValueProposedMsValue | None = None,
     ) -> None:
         self.v = v
         self.lc_value_signature = lc_value_signature
         self.proposed_value = proposed_value
+        self.signed_ms_value = signed_ms_value
+        self.proposed_ms_value = proposed_ms_value
 
     def pack(self, packer: Packer) -> None:
         self.v.pack(packer)
@@ -59,6 +80,16 @@ class StellarValueExt:
             if self.proposed_value is None:
                 raise ValueError("proposed_value should not be None.")
             self.proposed_value.pack(packer)
+            return
+        if self.v == StellarValueType.STELLAR_VALUE_SIGNED_MS:
+            if self.signed_ms_value is None:
+                raise ValueError("signed_ms_value should not be None.")
+            self.signed_ms_value.pack(packer)
+            return
+        if self.v == StellarValueType.STELLAR_VALUE_EMPTY_TX_SET_MS:
+            if self.proposed_ms_value is None:
+                raise ValueError("proposed_ms_value should not be None.")
+            self.proposed_ms_value.pack(packer)
             return
         raise ValueError("Invalid v.")
 
@@ -79,6 +110,16 @@ class StellarValueExt:
         if v == StellarValueType.STELLAR_VALUE_EMPTY_TX_SET:
             proposed_value = StellarValueProposedValue.unpack(unpacker, depth_limit - 1)
             return cls(v=v, proposed_value=proposed_value)
+        if v == StellarValueType.STELLAR_VALUE_SIGNED_MS:
+            signed_ms_value = StellarValueSignedMsValue.unpack(
+                unpacker, depth_limit - 1
+            )
+            return cls(v=v, signed_ms_value=signed_ms_value)
+        if v == StellarValueType.STELLAR_VALUE_EMPTY_TX_SET_MS:
+            proposed_ms_value = StellarValueProposedMsValue.unpack(
+                unpacker, depth_limit - 1
+            )
+            return cls(v=v, proposed_ms_value=proposed_ms_value)
         raise ValueError("Invalid v.")
 
     def to_xdr_bytes(self) -> bytes:
@@ -120,6 +161,12 @@ class StellarValueExt:
         if self.v == StellarValueType.STELLAR_VALUE_EMPTY_TX_SET:
             assert self.proposed_value is not None
             return {"empty_tx_set": self.proposed_value.to_json_dict()}
+        if self.v == StellarValueType.STELLAR_VALUE_SIGNED_MS:
+            assert self.signed_ms_value is not None
+            return {"signed_ms": self.signed_ms_value.to_json_dict()}
+        if self.v == StellarValueType.STELLAR_VALUE_EMPTY_TX_SET_MS:
+            assert self.proposed_ms_value is not None
+            return {"empty_tx_set_ms": self.proposed_ms_value.to_json_dict()}
         raise ValueError(f"Unknown v in StellarValueExt: {self.v}")
 
     @classmethod
@@ -147,6 +194,16 @@ class StellarValueExt:
                 json_value["empty_tx_set"]
             )
             return cls(v=v, proposed_value=proposed_value)
+        if key == "signed_ms":
+            signed_ms_value = StellarValueSignedMsValue.from_json_dict(
+                json_value["signed_ms"]
+            )
+            return cls(v=v, signed_ms_value=signed_ms_value)
+        if key == "empty_tx_set_ms":
+            proposed_ms_value = StellarValueProposedMsValue.from_json_dict(
+                json_value["empty_tx_set_ms"]
+            )
+            return cls(v=v, proposed_ms_value=proposed_ms_value)
         raise ValueError(f"Unknown key '{key}' for StellarValueExt")
 
     def __hash__(self):
@@ -155,6 +212,8 @@ class StellarValueExt:
                 self.v,
                 self.lc_value_signature,
                 self.proposed_value,
+                self.signed_ms_value,
+                self.proposed_ms_value,
             )
         )
 
@@ -165,6 +224,8 @@ class StellarValueExt:
             self.v == other.v
             and self.lc_value_signature == other.lc_value_signature
             and self.proposed_value == other.proposed_value
+            and self.signed_ms_value == other.signed_ms_value
+            and self.proposed_ms_value == other.proposed_ms_value
         )
 
     def __repr__(self):
@@ -174,4 +235,8 @@ class StellarValueExt:
             out.append(f"lc_value_signature={self.lc_value_signature}")
         if self.proposed_value is not None:
             out.append(f"proposed_value={self.proposed_value}")
+        if self.signed_ms_value is not None:
+            out.append(f"signed_ms_value={self.signed_ms_value}")
+        if self.proposed_ms_value is not None:
+            out.append(f"proposed_ms_value={self.proposed_ms_value}")
         return f"<StellarValueExt [{', '.join(out)}]>"

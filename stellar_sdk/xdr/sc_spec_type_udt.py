@@ -8,6 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .base import DEFAULT_XDR_MAX_DEPTH, String
+from .constants import SC_SPEC_TYPE_NAME_LIMIT
 
 __all__ = ["SCSpecTypeUDT"]
 
@@ -18,7 +19,7 @@ class SCSpecTypeUDT:
 
         struct SCSpecTypeUDT
         {
-            string name<60>;
+            string name<SC_SPEC_TYPE_NAME_LIMIT>;
         };
     """
 
@@ -26,7 +27,7 @@ class SCSpecTypeUDT:
         self,
         name: bytes,
     ) -> None:
-        _expect_max_length = 60
+        _expect_max_length = SC_SPEC_TYPE_NAME_LIMIT
         if name and len(name) > _expect_max_length:
             raise ValueError(
                 f"The maximum length of `name` should be {_expect_max_length}, but got {len(name)}."
@@ -34,7 +35,7 @@ class SCSpecTypeUDT:
         self.name = name
 
     def pack(self, packer: Packer) -> None:
-        String(self.name, 60).pack(packer)
+        String(self.name, SC_SPEC_TYPE_NAME_LIMIT).pack(packer)
 
     @classmethod
     def unpack(
@@ -42,7 +43,7 @@ class SCSpecTypeUDT:
     ) -> SCSpecTypeUDT:
         if depth_limit <= 0:
             raise ValueError("Maximum decoding depth reached")
-        name = String.unpack(unpacker, 60)
+        name = String.unpack(unpacker, SC_SPEC_TYPE_NAME_LIMIT)
         return cls(
             name=name,
         )

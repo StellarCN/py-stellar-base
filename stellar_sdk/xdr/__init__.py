@@ -246,6 +246,7 @@ from .memo_type import *
 from .message_type import *
 from .muxed_account import *
 from .muxed_account_med25519 import *
+from .muxed_contract import *
 from .muxed_ed25519_account import *
 from .node_id import *
 from .offer_entry import *
@@ -399,7 +400,9 @@ from .state_archival_settings import *
 from .stellar_message import *
 from .stellar_value import *
 from .stellar_value_ext import *
+from .stellar_value_proposed_ms_value import *
 from .stellar_value_proposed_value import *
+from .stellar_value_signed_ms_value import *
 from .stellar_value_type import *
 from .stored_debug_transaction_set import *
 from .stored_transaction_set import *
@@ -414,6 +417,7 @@ from .threshold_indexes import *
 from .thresholds import *
 from .time_bounds import *
 from .time_point import *
+from .time_point_ms import *
 from .time_sliced_node_data import *
 from .time_sliced_peer_data import *
 from .time_sliced_peer_data_list import *

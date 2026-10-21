@@ -95,6 +95,15 @@ _CONTRACT_COST_TYPE_MAP = {
     83: "bn254frpow",
     84: "bn254frinv",
     85: "bn254g1msm",
+    86: "mldsa44decodeverifyingkey",
+    87: "mldsa65decodeverifyingkey",
+    88: "mldsa87decodeverifyingkey",
+    89: "mldsa44decodesignature",
+    90: "mldsa65decodesignature",
+    91: "mldsa87decodesignature",
+    92: "verifymldsa44sig",
+    93: "verifymldsa65sig",
+    94: "verifymldsa87sig",
 }
 _CONTRACT_COST_TYPE_REVERSE_MAP = {
     "wasminsnexec": 0,
@@ -183,6 +192,15 @@ _CONTRACT_COST_TYPE_REVERSE_MAP = {
     "bn254frpow": 83,
     "bn254frinv": 84,
     "bn254g1msm": 85,
+    "mldsa44decodeverifyingkey": 86,
+    "mldsa65decodeverifyingkey": 87,
+    "mldsa87decodeverifyingkey": 88,
+    "mldsa44decodesignature": 89,
+    "mldsa65decodesignature": 90,
+    "mldsa87decodesignature": 91,
+    "verifymldsa44sig": 92,
+    "verifymldsa65sig": 93,
+    "verifymldsa87sig": 94,
 }
 __all__ = ["ContractCostType"]
 
@@ -374,7 +392,25 @@ class ContractCostType(IntEnum):
              // Cost of performing BN254 scalar element inversion
             Bn254FrInv = 84,
             // Cost of performing BN254 G1 multi-scalar multiplication (MSM)
-            Bn254G1Msm = 85
+            Bn254G1Msm = 85,
+            // Cost of decoding and expanding an ML-DSA-44 verifying key
+            MlDsa44DecodeVerifyingKey = 86,
+            // Cost of decoding and expanding an ML-DSA-65 verifying key
+            MlDsa65DecodeVerifyingKey = 87,
+            // Cost of decoding and expanding an ML-DSA-87 verifying key
+            MlDsa87DecodeVerifyingKey = 88,
+            // Cost of decoding an ML-DSA-44 signature
+            MlDsa44DecodeSignature = 89,
+            // Cost of decoding an ML-DSA-65 signature
+            MlDsa65DecodeSignature = 90,
+            // Cost of decoding an ML-DSA-87 signature
+            MlDsa87DecodeSignature = 91,
+            // Cost of verifying an ML-DSA-44 signature, linear in message + context length
+            VerifyMlDsa44Sig = 92,
+            // Cost of verifying an ML-DSA-65 signature, linear in message + context length
+            VerifyMlDsa65Sig = 93,
+            // Cost of verifying an ML-DSA-87 signature, linear in message + context length
+            VerifyMlDsa87Sig = 94
         };
     """
 
@@ -464,6 +500,15 @@ class ContractCostType(IntEnum):
     Bn254FrPow = 83
     Bn254FrInv = 84
     Bn254G1Msm = 85
+    MlDsa44DecodeVerifyingKey = 86
+    MlDsa65DecodeVerifyingKey = 87
+    MlDsa87DecodeVerifyingKey = 88
+    MlDsa44DecodeSignature = 89
+    MlDsa65DecodeSignature = 90
+    MlDsa87DecodeSignature = 91
+    VerifyMlDsa44Sig = 92
+    VerifyMlDsa65Sig = 93
+    VerifyMlDsa87Sig = 94
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
