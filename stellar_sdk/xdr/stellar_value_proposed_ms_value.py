@@ -4,16 +4,18 @@ from __future__ import annotations
 
 import base64
 import json
-from enum import IntEnum
-from typing import TYPE_CHECKING
-from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH
 
-from .time_point_ms import TimePointMs
+from xdrlib3 import Packer, Unpacker
+
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .hash import Hash
-from .uint32 import Uint32
 from .ledger_close_value_signature import LedgerCloseValueSignature
-__all__ = ['StellarValueProposedMsValue']
+from .time_point_ms import TimePointMs
+from .uint32 import Uint32
+
+__all__ = ["StellarValueProposedMsValue"]
+
+
 class StellarValueProposedMsValue:
     """
     XDR Source Code::
@@ -27,6 +29,7 @@ class StellarValueProposedMsValue:
                     LedgerCloseValueSignature lcValueSignature;
                 }
     """
+
     def __init__(
         self,
         close_time_ms: TimePointMs,
@@ -40,14 +43,18 @@ class StellarValueProposedMsValue:
         self.previous_ledger_hash = previous_ledger_hash
         self.previous_ledger_version = previous_ledger_version
         self.lc_value_signature = lc_value_signature
+
     def pack(self, packer: Packer) -> None:
         self.close_time_ms.pack(packer)
         self.tx_set_hash.pack(packer)
         self.previous_ledger_hash.pack(packer)
         self.previous_ledger_version.pack(packer)
         self.lc_value_signature.pack(packer)
+
     @classmethod
-    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> StellarValueProposedMsValue:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> StellarValueProposedMsValue:
         if depth_limit <= 0:
             raise ValueError("Maximum decoding depth reached")
         close_time_ms = TimePointMs.unpack(unpacker, depth_limit - 1)
@@ -62,6 +69,7 @@ class StellarValueProposedMsValue:
             previous_ledger_version=previous_ledger_version,
             lc_value_signature=lc_value_signature,
         )
+
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
         self.pack(packer)
@@ -91,6 +99,7 @@ class StellarValueProposedMsValue:
     @classmethod
     def from_json(cls, json_str: str) -> StellarValueProposedMsValue:
         return cls.from_json_dict(json.loads(json_str))
+
     def to_json_dict(self) -> dict:
         return {
             "close_time_ms": self.close_time_ms.to_json_dict(),
@@ -99,13 +108,18 @@ class StellarValueProposedMsValue:
             "previous_ledger_version": self.previous_ledger_version.to_json_dict(),
             "lc_value_signature": self.lc_value_signature.to_json_dict(),
         }
+
     @classmethod
     def from_json_dict(cls, json_dict: dict) -> StellarValueProposedMsValue:
         close_time_ms = TimePointMs.from_json_dict(json_dict["close_time_ms"])
         tx_set_hash = Hash.from_json_dict(json_dict["tx_set_hash"])
         previous_ledger_hash = Hash.from_json_dict(json_dict["previous_ledger_hash"])
-        previous_ledger_version = Uint32.from_json_dict(json_dict["previous_ledger_version"])
-        lc_value_signature = LedgerCloseValueSignature.from_json_dict(json_dict["lc_value_signature"])
+        previous_ledger_version = Uint32.from_json_dict(
+            json_dict["previous_ledger_version"]
+        )
+        lc_value_signature = LedgerCloseValueSignature.from_json_dict(
+            json_dict["lc_value_signature"]
+        )
         return cls(
             close_time_ms=close_time_ms,
             tx_set_hash=tx_set_hash,
@@ -113,18 +127,35 @@ class StellarValueProposedMsValue:
             previous_ledger_version=previous_ledger_version,
             lc_value_signature=lc_value_signature,
         )
+
     def __hash__(self):
-        return hash((self.close_time_ms, self.tx_set_hash, self.previous_ledger_hash, self.previous_ledger_version, self.lc_value_signature,))
+        return hash(
+            (
+                self.close_time_ms,
+                self.tx_set_hash,
+                self.previous_ledger_hash,
+                self.previous_ledger_version,
+                self.lc_value_signature,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
-        return self.close_time_ms == other.close_time_ms and self.tx_set_hash == other.tx_set_hash and self.previous_ledger_hash == other.previous_ledger_hash and self.previous_ledger_version == other.previous_ledger_version and self.lc_value_signature == other.lc_value_signature
+        return (
+            self.close_time_ms == other.close_time_ms
+            and self.tx_set_hash == other.tx_set_hash
+            and self.previous_ledger_hash == other.previous_ledger_hash
+            and self.previous_ledger_version == other.previous_ledger_version
+            and self.lc_value_signature == other.lc_value_signature
+        )
+
     def __repr__(self):
         out = [
-            f'close_time_ms={self.close_time_ms}',
-            f'tx_set_hash={self.tx_set_hash}',
-            f'previous_ledger_hash={self.previous_ledger_hash}',
-            f'previous_ledger_version={self.previous_ledger_version}',
-            f'lc_value_signature={self.lc_value_signature}',
+            f"close_time_ms={self.close_time_ms}",
+            f"tx_set_hash={self.tx_set_hash}",
+            f"previous_ledger_hash={self.previous_ledger_hash}",
+            f"previous_ledger_version={self.previous_ledger_version}",
+            f"lc_value_signature={self.lc_value_signature}",
         ]
         return f"<StellarValueProposedMsValue [{', '.join(out)}]>"

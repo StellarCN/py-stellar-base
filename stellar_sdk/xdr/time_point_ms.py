@@ -4,29 +4,37 @@ from __future__ import annotations
 
 import base64
 import json
-from enum import IntEnum
-from typing import TYPE_CHECKING
-from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH
 
+from xdrlib3 import Packer, Unpacker
+
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .uint64 import Uint64
-__all__ = ['TimePointMs']
+
+__all__ = ["TimePointMs"]
+
+
 class TimePointMs:
     """
     XDR Source Code::
 
         typedef uint64 TimePointMs;
     """
+
     def __init__(self, time_point_ms: Uint64) -> None:
         self.time_point_ms = time_point_ms
+
     def pack(self, packer: Packer) -> None:
         self.time_point_ms.pack(packer)
+
     @classmethod
-    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> TimePointMs:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> TimePointMs:
         if depth_limit <= 0:
             raise ValueError("Maximum decoding depth reached")
         time_point_ms = Uint64.unpack(unpacker, depth_limit - 1)
         return cls(time_point_ms)
+
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
         self.pack(packer)
@@ -56,16 +64,21 @@ class TimePointMs:
     @classmethod
     def from_json(cls, json_str: str) -> TimePointMs:
         return cls.from_json_dict(json.loads(json_str))
+
     def to_json_dict(self):
         return self.time_point_ms.to_json_dict()
+
     @classmethod
     def from_json_dict(cls, json_value: str) -> TimePointMs:
         return cls(Uint64.from_json_dict(json_value))
+
     def __hash__(self):
         return hash((self.time_point_ms,))
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.time_point_ms == other.time_point_ms
+
     def __repr__(self):
         return f"<TimePointMs [time_point_ms={self.time_point_ms}]>"

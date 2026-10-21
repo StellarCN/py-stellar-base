@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import base64
 import json
-from enum import IntEnum
-from typing import TYPE_CHECKING
-from xdrlib3 import Packer, Unpacker
-from .base import DEFAULT_XDR_MAX_DEPTH
 
-from .uint64 import Uint64
+from xdrlib3 import Packer, Unpacker
+
+from .base import DEFAULT_XDR_MAX_DEPTH
 from .contract_id import ContractID
-__all__ = ['MuxedContract']
+from .uint64 import Uint64
+
+__all__ = ["MuxedContract"]
+
+
 class MuxedContract:
     """
     XDR Source Code::
@@ -22,6 +24,7 @@ class MuxedContract:
             ContractID contractId;
         };
     """
+
     def __init__(
         self,
         id: Uint64,
@@ -29,11 +32,15 @@ class MuxedContract:
     ) -> None:
         self.id = id
         self.contract_id = contract_id
+
     def pack(self, packer: Packer) -> None:
         self.id.pack(packer)
         self.contract_id.pack(packer)
+
     @classmethod
-    def unpack(cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH) -> MuxedContract:
+    def unpack(
+        cls, unpacker: Unpacker, depth_limit: int = DEFAULT_XDR_MAX_DEPTH
+    ) -> MuxedContract:
         if depth_limit <= 0:
             raise ValueError("Maximum decoding depth reached")
         id = Uint64.unpack(unpacker, depth_limit - 1)
@@ -42,6 +49,7 @@ class MuxedContract:
             id=id,
             contract_id=contract_id,
         )
+
     def to_xdr_bytes(self) -> bytes:
         packer = Packer()
         self.pack(packer)
@@ -71,11 +79,13 @@ class MuxedContract:
     @classmethod
     def from_json(cls, json_str: str) -> MuxedContract:
         return cls.from_json_dict(json.loads(json_str))
+
     def to_json_dict(self) -> dict:
         return {
             "id": self.id.to_json_dict(),
             "contract_id": self.contract_id.to_json_dict(),
         }
+
     @classmethod
     def from_json_dict(cls, json_dict: dict) -> MuxedContract:
         id = Uint64.from_json_dict(json_dict["id"])
@@ -84,15 +94,23 @@ class MuxedContract:
             id=id,
             contract_id=contract_id,
         )
+
     def __hash__(self):
-        return hash((self.id, self.contract_id,))
+        return hash(
+            (
+                self.id,
+                self.contract_id,
+            )
+        )
+
     def __eq__(self, other: object):
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.id == other.id and self.contract_id == other.contract_id
+
     def __repr__(self):
         out = [
-            f'id={self.id}',
-            f'contract_id={self.contract_id}',
+            f"id={self.id}",
+            f"contract_id={self.contract_id}",
         ]
         return f"<MuxedContract [{', '.join(out)}]>"
