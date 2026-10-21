@@ -8,7 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .base import DEFAULT_XDR_MAX_DEPTH, String
-from .constants import SC_SPEC_DOC_LIMIT
+from .constants import SC_SPEC_DOC_LIMIT, SC_SPEC_TYPE_NAME_LIMIT
 from .sc_spec_udt_enum_case_v0 import SCSpecUDTEnumCaseV0
 
 __all__ = ["SCSpecUDTEnumV0"]
@@ -22,7 +22,7 @@ class SCSpecUDTEnumV0:
         {
             string doc<SC_SPEC_DOC_LIMIT>;
             string lib<80>;
-            string name<60>;
+            string name<SC_SPEC_TYPE_NAME_LIMIT>;
             SCSpecUDTEnumCaseV0 cases<>;
         };
     """
@@ -44,7 +44,7 @@ class SCSpecUDTEnumV0:
             raise ValueError(
                 f"The maximum length of `lib` should be {_expect_max_length}, but got {len(lib)}."
             )
-        _expect_max_length = 60
+        _expect_max_length = SC_SPEC_TYPE_NAME_LIMIT
         if name and len(name) > _expect_max_length:
             raise ValueError(
                 f"The maximum length of `name` should be {_expect_max_length}, but got {len(name)}."
@@ -62,7 +62,7 @@ class SCSpecUDTEnumV0:
     def pack(self, packer: Packer) -> None:
         String(self.doc, SC_SPEC_DOC_LIMIT).pack(packer)
         String(self.lib, 80).pack(packer)
-        String(self.name, 60).pack(packer)
+        String(self.name, SC_SPEC_TYPE_NAME_LIMIT).pack(packer)
         packer.pack_uint(len(self.cases))
         for cases_item in self.cases:
             cases_item.pack(packer)
@@ -75,7 +75,7 @@ class SCSpecUDTEnumV0:
             raise ValueError("Maximum decoding depth reached")
         doc = String.unpack(unpacker, SC_SPEC_DOC_LIMIT)
         lib = String.unpack(unpacker, 80)
-        name = String.unpack(unpacker, 60)
+        name = String.unpack(unpacker, SC_SPEC_TYPE_NAME_LIMIT)
         length = unpacker.unpack_uint()
         _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
         if _remaining < length:

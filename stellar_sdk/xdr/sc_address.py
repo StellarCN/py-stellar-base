@@ -11,6 +11,7 @@ from .account_id import AccountID
 from .base import DEFAULT_XDR_MAX_DEPTH
 from .claimable_balance_id import ClaimableBalanceID
 from .contract_id import ContractID
+from .muxed_contract import MuxedContract
 from .muxed_ed25519_account import MuxedEd25519Account
 from .pool_id import PoolID
 from .sc_address_type import SCAddressType
@@ -34,6 +35,8 @@ class SCAddress:
             ClaimableBalanceID claimableBalanceId;
         case SC_ADDRESS_TYPE_LIQUIDITY_POOL:
             PoolID liquidityPoolId;
+        case SC_ADDRESS_TYPE_MUXED_CONTRACT:
+            MuxedContract muxedContract;
         };
     """
 
@@ -45,6 +48,7 @@ class SCAddress:
         muxed_account: MuxedEd25519Account | None = None,
         claimable_balance_id: ClaimableBalanceID | None = None,
         liquidity_pool_id: PoolID | None = None,
+        muxed_contract: MuxedContract | None = None,
     ) -> None:
         self.type = type
         self.account_id = account_id
@@ -52,6 +56,7 @@ class SCAddress:
         self.muxed_account = muxed_account
         self.claimable_balance_id = claimable_balance_id
         self.liquidity_pool_id = liquidity_pool_id
+        self.muxed_contract = muxed_contract
 
     def pack(self, packer: Packer) -> None:
         self.type.pack(packer)
@@ -80,6 +85,11 @@ class SCAddress:
                 raise ValueError("liquidity_pool_id should not be None.")
             self.liquidity_pool_id.pack(packer)
             return
+        if self.type == SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT:
+            if self.muxed_contract is None:
+                raise ValueError("muxed_contract should not be None.")
+            self.muxed_contract.pack(packer)
+            return
         raise ValueError("Invalid type.")
 
     @classmethod
@@ -104,6 +114,9 @@ class SCAddress:
         if type == SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL:
             liquidity_pool_id = PoolID.unpack(unpacker, depth_limit - 1)
             return cls(type=type, liquidity_pool_id=liquidity_pool_id)
+        if type == SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT:
+            muxed_contract = MuxedContract.unpack(unpacker, depth_limit - 1)
+            return cls(type=type, muxed_contract=muxed_contract)
         raise ValueError("Invalid type.")
 
     def to_xdr_bytes(self) -> bytes:
@@ -223,6 +236,7 @@ class SCAddress:
                 self.muxed_account,
                 self.claimable_balance_id,
                 self.liquidity_pool_id,
+                self.muxed_contract,
             )
         )
 
@@ -236,6 +250,7 @@ class SCAddress:
             and self.muxed_account == other.muxed_account
             and self.claimable_balance_id == other.claimable_balance_id
             and self.liquidity_pool_id == other.liquidity_pool_id
+            and self.muxed_contract == other.muxed_contract
         )
 
     def __repr__(self):
@@ -251,4 +266,6 @@ class SCAddress:
             out.append(f"claimable_balance_id={self.claimable_balance_id}")
         if self.liquidity_pool_id is not None:
             out.append(f"liquidity_pool_id={self.liquidity_pool_id}")
+        if self.muxed_contract is not None:
+            out.append(f"muxed_contract={self.muxed_contract}")
         return f"<SCAddress [{', '.join(out)}]>"

@@ -8,7 +8,7 @@ import json
 from xdrlib3 import Packer, Unpacker
 
 from .base import DEFAULT_XDR_MAX_DEPTH, String
-from .constants import SC_SPEC_DOC_LIMIT
+from .constants import SC_SPEC_DOC_LIMIT, SC_SPEC_TYPE_NAME_LIMIT
 from .sc_spec_event_data_format import SCSpecEventDataFormat
 from .sc_spec_event_param_v0 import SCSpecEventParamV0
 from .sc_symbol import SCSymbol
@@ -24,7 +24,7 @@ class SCSpecEventV0:
         {
             string doc<SC_SPEC_DOC_LIMIT>;
             string lib<80>;
-            SCSymbol name;
+            string name<SC_SPEC_TYPE_NAME_LIMIT>;
             SCSymbol prefixTopics<2>;
             SCSpecEventParamV0 params<>;
             SCSpecEventDataFormat dataFormat;
@@ -35,7 +35,7 @@ class SCSpecEventV0:
         self,
         doc: bytes,
         lib: bytes,
-        name: SCSymbol,
+        name: bytes,
         prefix_topics: list[SCSymbol],
         params: list[SCSpecEventParamV0],
         data_format: SCSpecEventDataFormat,
@@ -49,6 +49,11 @@ class SCSpecEventV0:
         if lib and len(lib) > _expect_max_length:
             raise ValueError(
                 f"The maximum length of `lib` should be {_expect_max_length}, but got {len(lib)}."
+            )
+        _expect_max_length = SC_SPEC_TYPE_NAME_LIMIT
+        if name and len(name) > _expect_max_length:
+            raise ValueError(
+                f"The maximum length of `name` should be {_expect_max_length}, but got {len(name)}."
             )
         _expect_max_length = 2
         if prefix_topics and len(prefix_topics) > _expect_max_length:
@@ -70,7 +75,7 @@ class SCSpecEventV0:
     def pack(self, packer: Packer) -> None:
         String(self.doc, SC_SPEC_DOC_LIMIT).pack(packer)
         String(self.lib, 80).pack(packer)
-        self.name.pack(packer)
+        String(self.name, SC_SPEC_TYPE_NAME_LIMIT).pack(packer)
         packer.pack_uint(len(self.prefix_topics))
         for prefix_topics_item in self.prefix_topics:
             prefix_topics_item.pack(packer)
@@ -87,7 +92,7 @@ class SCSpecEventV0:
             raise ValueError("Maximum decoding depth reached")
         doc = String.unpack(unpacker, SC_SPEC_DOC_LIMIT)
         lib = String.unpack(unpacker, 80)
-        name = SCSymbol.unpack(unpacker, depth_limit - 1)
+        name = String.unpack(unpacker, SC_SPEC_TYPE_NAME_LIMIT)
         length = unpacker.unpack_uint()
         _remaining = len(unpacker.get_buffer()) - unpacker.get_position()
         if _remaining < length:
@@ -150,7 +155,7 @@ class SCSpecEventV0:
         return {
             "doc": String.to_json_dict(self.doc),
             "lib": String.to_json_dict(self.lib),
-            "name": self.name.to_json_dict(),
+            "name": String.to_json_dict(self.name),
             "prefix_topics": [item.to_json_dict() for item in self.prefix_topics],
             "params": [item.to_json_dict() for item in self.params],
             "data_format": self.data_format.to_json_dict(),
@@ -160,7 +165,7 @@ class SCSpecEventV0:
     def from_json_dict(cls, json_dict: dict) -> SCSpecEventV0:
         doc = String.from_json_dict(json_dict["doc"])
         lib = String.from_json_dict(json_dict["lib"])
-        name = SCSymbol.from_json_dict(json_dict["name"])
+        name = String.from_json_dict(json_dict["name"])
         prefix_topics = [
             SCSymbol.from_json_dict(item) for item in json_dict["prefix_topics"]
         ]

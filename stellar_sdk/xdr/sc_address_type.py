@@ -14,6 +14,7 @@ _SC_ADDRESS_TYPE_MAP = {
     2: "muxed_account",
     3: "claimable_balance",
     4: "liquidity_pool",
+    5: "muxed_contract",
 }
 _SC_ADDRESS_TYPE_REVERSE_MAP = {
     "account": 0,
@@ -21,6 +22,7 @@ _SC_ADDRESS_TYPE_REVERSE_MAP = {
     "muxed_account": 2,
     "claimable_balance": 3,
     "liquidity_pool": 4,
+    "muxed_contract": 5,
 }
 __all__ = ["SCAddressType"]
 
@@ -35,7 +37,8 @@ class SCAddressType(IntEnum):
             SC_ADDRESS_TYPE_CONTRACT = 1,
             SC_ADDRESS_TYPE_MUXED_ACCOUNT = 2,
             SC_ADDRESS_TYPE_CLAIMABLE_BALANCE = 3,
-            SC_ADDRESS_TYPE_LIQUIDITY_POOL = 4
+            SC_ADDRESS_TYPE_LIQUIDITY_POOL = 4,
+            SC_ADDRESS_TYPE_MUXED_CONTRACT = 5
         };
     """
 
@@ -44,6 +47,7 @@ class SCAddressType(IntEnum):
     SC_ADDRESS_TYPE_MUXED_ACCOUNT = 2
     SC_ADDRESS_TYPE_CLAIMABLE_BALANCE = 3
     SC_ADDRESS_TYPE_LIQUIDITY_POOL = 4
+    SC_ADDRESS_TYPE_MUXED_CONTRACT = 5
 
     def pack(self, packer: Packer) -> None:
         packer.pack_int(self.value)
