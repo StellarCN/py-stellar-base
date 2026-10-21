@@ -19,11 +19,11 @@ from stellar_sdk import (
     Network,
     Preconditions,
     RestoreFootprint,
-    Server,
     SignedPayloadSigner,
     Signer,
     SignerKey,
     SorobanDataBuilder,
+    SorobanServer,
     TimeBounds,
     TransactionBuilder,
     TransactionEnvelope,
@@ -1032,7 +1032,7 @@ class TestTransaction:
         kp = Keypair.random()
         integration_utils.fund_account(kp.public_key)
         integration_utils.create_asset_contract(asset, kp)
-        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        server = SorobanServer(integration_utils.RPC_URL)
         amount1 = "100.125"
         amount2 = "120.7891"
         destination = integration_utils.get_random_contract_id(kp)
@@ -1049,7 +1049,7 @@ class TestTransaction:
             .build()
         )
         tx1.sign(kp)
-        server.submit_transaction(tx1)
+        integration_utils.submit_transaction(server, tx1)
         assert (
             integration_utils.get_balance_for_contract(
                 destination, asset, kp.public_key
@@ -1068,7 +1068,7 @@ class TestTransaction:
             .build()
         )
         tx2.sign(kp)
-        server.submit_transaction(tx2)
+        integration_utils.submit_transaction(server, tx2)
         assert (
             integration_utils.get_balance_for_contract(
                 destination, asset, kp.public_key
@@ -1088,7 +1088,7 @@ class TestTransaction:
             .build()
         )
         tx3.sign(kp)
-        server.submit_transaction(tx3)
+        integration_utils.submit_transaction(server, tx3)
 
         server.close()
 
@@ -1107,7 +1107,7 @@ class TestTransaction:
         integration_utils.create_asset_contract(asset, kp)
         destination = integration_utils.get_random_contract_id(kp)
 
-        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        server = SorobanServer(integration_utils.RPC_URL)
         source = server.load_account(kp.public_key)
         tx1 = (
             TransactionBuilder(
@@ -1120,7 +1120,7 @@ class TestTransaction:
             .build()
         )
         tx1.sign(kp)
-        server.submit_transaction(tx1)
+        integration_utils.submit_transaction(server, tx1)
         assert (
             integration_utils.get_balance_for_contract(
                 destination, asset, kp.public_key
@@ -1139,7 +1139,7 @@ class TestTransaction:
             .build()
         )
         tx2.sign(kp)
-        server.submit_transaction(tx2)
+        integration_utils.submit_transaction(server, tx2)
         assert (
             integration_utils.get_balance_for_contract(
                 destination, asset, kp.public_key
@@ -1158,7 +1158,7 @@ class TestTransaction:
             .build()
         )
         tx3.sign(kp)
-        server.submit_transaction(tx3)
+        integration_utils.submit_transaction(server, tx3)
 
         server.close()
 
@@ -1176,7 +1176,7 @@ class TestTransaction:
         integration_utils.issue_asset(asset.code, issuer_kp, kp, "1000")
         integration_utils.create_asset_contract(asset, kp)
         destination = integration_utils.get_random_contract_id(kp)
-        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        server = SorobanServer(integration_utils.RPC_URL)
         source = server.load_account(kp.public_key)
         tx1 = (
             TransactionBuilder(
@@ -1189,7 +1189,7 @@ class TestTransaction:
             .build()
         )
         tx1.sign(kp)
-        server.submit_transaction(tx1)
+        integration_utils.submit_transaction(server, tx1)
         assert (
             integration_utils.get_balance_for_contract(
                 destination, asset, kp.public_key
@@ -1208,7 +1208,7 @@ class TestTransaction:
             .build()
         )
         tx2.sign(kp)
-        server.submit_transaction(tx2)
+        integration_utils.submit_transaction(server, tx2)
         assert (
             integration_utils.get_balance_for_contract(
                 destination, asset, kp.public_key
@@ -1227,7 +1227,7 @@ class TestTransaction:
             .build()
         )
         tx3.sign(kp)
-        server.submit_transaction(tx3)
+        integration_utils.submit_transaction(server, tx3)
 
         server.close()
 
@@ -1239,7 +1239,7 @@ class TestTransaction:
         integration_utils.fund_account(kp.public_key)
         integration_utils.fund_account(op_kp.public_key)
         integration_utils.create_asset_contract(asset, kp)
-        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        server = SorobanServer(integration_utils.RPC_URL)
         amount1 = "100.125"
         amount2 = "120.7891"
         destination = integration_utils.get_random_contract_id(kp)
@@ -1259,7 +1259,7 @@ class TestTransaction:
         )
         tx1.sign(kp)
         tx1.sign(op_kp)
-        server.submit_transaction(tx1)
+        integration_utils.submit_transaction(server, tx1)
         assert (
             integration_utils.get_balance_for_contract(
                 destination, asset, kp.public_key
@@ -1281,7 +1281,7 @@ class TestTransaction:
         )
         tx2.sign(kp)
         tx2.sign(op_kp)
-        server.submit_transaction(tx2)
+        integration_utils.submit_transaction(server, tx2)
         assert (
             integration_utils.get_balance_for_contract(
                 destination, asset, kp.public_key
@@ -1304,7 +1304,7 @@ class TestTransaction:
         )
         tx3.sign(kp)
         tx3.sign(op_kp)
-        server.submit_transaction(tx3)
+        integration_utils.submit_transaction(server, tx3)
 
         server.close()
 
@@ -1320,7 +1320,7 @@ class TestTransaction:
         integration_utils.create_asset_contract(asset, kp)
         destination = integration_utils.get_random_contract_id(kp)
 
-        server = Server(horizon_url=integration_utils.HORIZON_URL)
+        server = SorobanServer(integration_utils.RPC_URL)
         source = server.load_account(kp.public_key)
         tx1 = (
             TransactionBuilder(
@@ -1333,7 +1333,7 @@ class TestTransaction:
             .build()
         )
         tx1.sign(kp)
-        server.submit_transaction(tx1)
+        integration_utils.submit_transaction(server, tx1)
         assert (
             integration_utils.get_balance_for_contract(
                 destination, asset, kp.public_key
@@ -1352,7 +1352,7 @@ class TestTransaction:
             .build()
         )
         tx2.sign(kp)
-        server.submit_transaction(tx2)
+        integration_utils.submit_transaction(server, tx2)
         assert (
             integration_utils.get_balance_for_contract(
                 destination, asset, kp.public_key
@@ -1371,7 +1371,7 @@ class TestTransaction:
             .build()
         )
         tx3.sign(kp)
-        server.submit_transaction(tx3)
+        integration_utils.submit_transaction(server, tx3)
 
         server.close()
 
