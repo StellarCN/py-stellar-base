@@ -95,7 +95,7 @@ def print_spec(spec: ContractSpec) -> None:
         print("  events:")
         for event in spec.events:
             params = _format_event_params(event.params)
-            print(f"    {_symbol(event.name)}({params})")
+            print(f"    {_text(event.name)}({params})")
 
     udt_names = [
         *[_text(struct.name) for struct in spec.structs],

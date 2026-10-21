@@ -155,7 +155,7 @@ class ContractSpec:
         :raises InvalidWasmError: If an event name is not UTF-8.
         """
         for event in self.events:
-            if _decode_symbol(event.name) == name:
+            if _decode_string(event.name) == name:
                 return event
         return None
 

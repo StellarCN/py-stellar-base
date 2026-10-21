@@ -30,7 +30,7 @@ def test_contract_spec_classifies_and_finds_entries():
     event = stellar_xdr.SCSpecEventV0(
         doc=b"",
         lib=b"",
-        name=stellar_xdr.SCSymbol(b"transfer"),
+        name=b"transfer",
         prefix_topics=[],
         params=[],
         data_format=stellar_xdr.SCSpecEventDataFormat.SC_SPEC_EVENT_DATA_FORMAT_MAP,
