@@ -322,7 +322,7 @@ class BaseServer:
             )
         return base_fee
 
-    def close(self) -> None | Coroutine[Any, Any, None]:
+    def close(self) -> Coroutine[Any, Any, None] | None:
         """Close underlying connector.
 
         Release all acquired resources.

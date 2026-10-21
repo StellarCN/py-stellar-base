@@ -2,8 +2,10 @@ exclude: ^xdr-generator/
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.13
+    rev: v0.17.1
     hooks:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
+        # ruff-pre-commit v0.17 added markdown here; keep code blocks in docs untouched.
+        types_or: [python, pyi, jupyter]
