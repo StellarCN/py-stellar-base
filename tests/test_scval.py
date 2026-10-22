@@ -463,6 +463,18 @@ class TestCompareScVal:
             ),
         )
 
+    @staticmethod
+    def _muxed_contract_address(
+        id_val: int, hash_bytes: bytes
+    ) -> stellar_xdr.SCAddress:
+        return stellar_xdr.SCAddress(
+            type=stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT,
+            muxed_contract=stellar_xdr.MuxedContract(
+                id=stellar_xdr.Uint64(id_val),
+                contract_id=stellar_xdr.ContractID(stellar_xdr.Hash(hash_bytes)),
+            ),
+        )
+
     def test_cross_type(self):
         assert _compare_sc_val(to_bool(True), to_uint32(0)) < 0  # 0 < 3
         assert _compare_sc_val(to_uint32(0), to_bool(True)) > 0
@@ -704,14 +716,31 @@ class TestCompareScVal:
         assert _compare_sc_address(b, a) > 0
         assert _compare_sc_address(a, a) == 0
 
+    def test_address_muxed_contract_by_id(self):
+        a = self._muxed_contract_address(1, b"\xff" * 32)
+        b = self._muxed_contract_address(2, b"\x00" * 32)
+        assert _compare_sc_address(a, b) < 0  # id compared first
+        assert _compare_sc_address(b, a) > 0
+
+    def test_address_muxed_contract_by_contract_id(self):
+        a = self._muxed_contract_address(1, b"\x00" * 32)
+        b = self._muxed_contract_address(1, b"\x00" * 31 + b"\x01")
+        assert _compare_sc_address(a, b) < 0
+        assert _compare_sc_address(b, a) > 0
+
+    def test_address_muxed_contract_equal(self):
+        a = self._muxed_contract_address(5, b"\xab" * 32)
+        assert _compare_sc_address(a, a) == 0
+
     def test_address_all_types_ordering(self):
-        """All 5 address types ordered by discriminant: account(0) < contract(1) < muxed(2) < claimable(3) < pool(4)."""
+        """All 6 address types ordered by discriminant: account(0) < contract(1) < muxed(2) < claimable(3) < pool(4) < muxed contract(5)."""
         addrs = [
             self._account_address(b"\x00" * 32),
             self._contract_address(b"\x00" * 32),
             self._muxed_address(0, b"\x00" * 32),
             self._claimable_balance_address(b"\x00" * 32),
             self._liquidity_pool_address(b"\x00" * 32),
+            self._muxed_contract_address(0, b"\x00" * 32),
         ]
         for i in range(len(addrs) - 1):
             assert _compare_sc_address(addrs[i], addrs[i + 1]) < 0

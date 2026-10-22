@@ -355,3 +355,91 @@ class TestStrKey:
     def test_decode_claimable_balance_raise(self, key):
         with pytest.raises(ValueError, match=f"Invalid Claimable Balance Key: {key}"):
             StrKey.decode_claimable_balance(key)
+
+    # Test vectors from SEP-23.
+    @pytest.mark.parametrize(
+        ("key", "muxed_id"),
+        [
+            (
+                "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAWWC",
+                0,
+            ),
+            (
+                "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVAAAAAAAAAAAACWJY",
+                9223372036854775808,
+            ),
+        ],
+    )
+    def test_decode_muxed_contract(self, key, muxed_id):
+        decoded = StrKey.decode_muxed_contract(key)
+        assert len(decoded) == 40
+        assert (
+            StrKey.encode_contract(decoded[:32])
+            == "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+        )
+        assert int.from_bytes(decoded[32:], "big") == muxed_id
+
+    @pytest.mark.parametrize(
+        ("key", "muxed_id"),
+        [
+            (
+                "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAWWC",
+                0,
+            ),
+            (
+                "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVAAAAAAAAAAAACWJY",
+                9223372036854775808,
+            ),
+        ],
+    )
+    def test_encode_muxed_contract(self, key, muxed_id):
+        data = StrKey.decode_contract(
+            "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
+        ) + muxed_id.to_bytes(8, "big")
+        assert StrKey.encode_muxed_contract(data) == key
+
+    # Invalid test vectors from SEP-23, plus keys of other types.
+    @pytest.mark.parametrize(
+        "key",
+        [
+            # unused trailing bit is not zero
+            "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAWWD",
+            # length congruent to 6 mod 8
+            "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAWWCA",
+            # decodes to 44 bytes instead of 43
+            "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAAIOUI",
+            # low 3 bits of the version byte are 7
+            "W47QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAADXHW",
+            # invalid checksum
+            "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAWWA",
+            "",
+            "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA",
+            "MA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAACJUQ",
+        ],
+    )
+    def test_decode_muxed_contract_raise(self, key):
+        with pytest.raises(ValueError, match=f"Invalid Muxed Contract Key: {key}"):
+            StrKey.decode_muxed_contract(key)
+
+    @pytest.mark.parametrize(
+        ("key", "valid"),
+        [
+            (
+                "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAWWC",
+                True,
+            ),
+            (
+                "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAWWA",
+                False,
+            ),
+            ("CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA", False),
+            ("", False),
+        ],
+    )
+    def test_is_valid_muxed_contract(self, key, valid):
+        assert StrKey.is_valid_muxed_contract(key) is valid
+
+    def test_muxed_contract_is_not_other_types(self):
+        key = "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAWWC"
+        assert StrKey.is_valid_contract(key) is False
+        assert StrKey.is_valid_med25519_public_key(key) is False

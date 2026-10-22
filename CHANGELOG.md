@@ -3,6 +3,12 @@ Release History
 
 ### Pending
 
+#### Update
+- Support CAP-84 (Protocol 30) muxed contract addresses (`W...`, SEP-23 `STRKEY_MUXED_CONTRACT`), a contract ID plus a 64-bit muxed ID that can be the destination of a SAC `transfer` or `mint`:
+  - New `StrKey.encode_muxed_contract` / `decode_muxed_contract` / `is_valid_muxed_contract`. The raw data is 40 bytes: the 32-byte contract ID followed by the big-endian 8-byte muxed ID, the same layout as a muxed account (`M...`).
+  - `Address` accepts `W...` addresses as the new `AddressType.MUXED_CONTRACT`, converts them to and from `SC_ADDRESS_TYPE_MUXED_CONTRACT`, and gains `Address.from_raw_muxed_contract`. `scval.to_address` / `from_address` handle them through `Address`.
+  - `scval.to_map` sorts muxed contract address keys like the Soroban host, by `(id, contract ID)`.
+
 #### Breaking changes
 - Remove the deprecated `EventInfo.in_successful_contract_call`. Stellar RPC v30 no longer returns `inSuccessfulContractCall`, and since 16.1.1 the field was `None` for its responses. Responses from older RPC servers that still include it parse as before; the value is ignored.
 

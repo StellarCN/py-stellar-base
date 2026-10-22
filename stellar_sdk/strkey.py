@@ -21,6 +21,7 @@ class _VersionByte(Enum):
     CONTRACT = binascii.a2b_hex("10")  # C 16 2 << 3
     LIQUIDITY_POOL = binascii.a2b_hex("58")  # L 88 11 << 3
     CLAIMABLE_BALANCE = binascii.a2b_hex("08")  # B 8 1 << 3
+    MUXED_CONTRACT = binascii.a2b_hex("b0")  # W 176 22 << 3
 
 
 class StrKey:
@@ -336,6 +337,40 @@ class StrKey:
         """
         return _is_valid(_VersionByte.CLAIMABLE_BALANCE, claimable_balance)
 
+    @staticmethod
+    def encode_muxed_contract(data: bytes) -> str:
+        """Encodes data to encoded muxed contract strkey (W...).
+
+        :param data: data to encode, should be 40 bytes long (32 bytes for contract ID + 8 bytes for muxed ID)
+        :return: encoded muxed contract strkey
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+        """
+        return _encode_check(_VersionByte.MUXED_CONTRACT, data)
+
+    @staticmethod
+    def decode_muxed_contract(data: str) -> bytes:
+        """Decodes encoded muxed contract strkey (W...) to raw data.
+
+        :param data: encoded muxed contract strkey
+        :return: raw bytes, 32 bytes for contract ID + 8 bytes for muxed ID
+        :raises:
+            :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
+        """
+        try:
+            return _decode_check(_VersionByte.MUXED_CONTRACT, data)
+        except Exception as e:
+            raise ValueError(f"Invalid Muxed Contract Key: {data}") from e
+
+    @staticmethod
+    def is_valid_muxed_contract(muxed_contract: str) -> bool:
+        """Returns ``True`` if the given `muxed_contract` is a valid encoded muxed contract strkey (W...).
+
+        :param muxed_contract: encoded muxed contract strkey
+        :return: ``True`` if the given key is valid
+        """
+        return _is_valid(_VersionByte.MUXED_CONTRACT, muxed_contract)
+
 
 def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     encoded_data = encoded.encode("ascii")
@@ -362,7 +397,10 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
     if version_byte == _VersionByte.ED25519_SIGNED_PAYLOAD:
         if len(data) < 32 + 4 + 4 or len(data) > 32 + 4 + 64:
             raise ValueError(f"Invalid length: {encoded}")
-    elif version_byte == _VersionByte.MED25519_PUBLIC_KEY:
+    elif version_byte in (
+        _VersionByte.MED25519_PUBLIC_KEY,
+        _VersionByte.MUXED_CONTRACT,
+    ):
         if len(data) != 32 + 8:
             raise ValueError(f"Invalid length: {encoded}")
     elif version_byte == _VersionByte.CLAIMABLE_BALANCE:
