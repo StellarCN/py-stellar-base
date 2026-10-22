@@ -58,7 +58,6 @@ def to_native(
     sc_val: stellar_xdr.SCVal | bytes | str,
 ) -> (
     bool
-    | None
     | int
     | str
     | bytes
@@ -66,6 +65,7 @@ def to_native(
     | stellar_xdr.SCVal
     | list[Any]
     | dict[Any, Any]
+    | None
 ):
     """Given a :class:`stellar_xdr.SCVal` value, attempt to convert it to a native Python type.
 
