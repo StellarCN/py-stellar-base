@@ -28,6 +28,9 @@ from stellar_sdk import StrKey
 
 StrKey.is_valid_ed25519_public_key("GD2J...HPYU")   # -> bool
 StrKey.is_valid_ed25519_secret_seed("S...")          # -> bool
+StrKey.is_valid_contract("C...")                     # -> bool
+StrKey.is_valid_med25519_public_key("M...")          # muxed account
+StrKey.is_valid_muxed_contract("W...")               # muxed contract (CAP-84)
 ```
 
 ## Network passphrase
