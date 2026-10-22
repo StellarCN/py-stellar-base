@@ -193,3 +193,46 @@ class TestAddress:
         contract = "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
         assert sc_val.address == contract
         assert sc_val.type == AddressType.CONTRACT
+
+    # SEP-23 test vectors; the XDR is SCAddress type 5 followed by the
+    # big-endian uint64 id and the 32-byte contract ID.
+    @pytest.mark.parametrize(
+        ("muxed_contract_id", "xdr"),
+        [
+            (
+                "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAWWC",
+                "AAAABQAAAAAAAAAAPww0v5OtDZlx0EzMkPcFURyDiq2XNKSi+w16A/x/6Jo=",
+            ),
+            (
+                "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVAAAAAAAAAAAACWJY",
+                "AAAABYAAAAAAAAAAPww0v5OtDZlx0EzMkPcFURyDiq2XNKSi+w16A/x/6Jo=",
+            ),
+        ],
+    )
+    def test_muxed_contract(self, muxed_contract_id, xdr):
+        address = Address(muxed_contract_id)
+        assert address.type == AddressType.MUXED_CONTRACT
+        assert address.address == muxed_contract_id
+        assert address.to_xdr_sc_address().to_xdr() == xdr
+
+        from_xdr = Address.from_xdr_sc_address(stellar_xdr.SCAddress.from_xdr(xdr))
+        assert from_xdr.type == AddressType.MUXED_CONTRACT
+        assert from_xdr.address == muxed_contract_id
+        assert from_xdr == address
+
+    def test_from_muxed_contract_byte(self):
+        muxed_contract_id = (
+            "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVAAAAAAAAAAAACWJY"
+        )
+        raw = StrKey.decode_muxed_contract(muxed_contract_id)
+        address = Address.from_raw_muxed_contract(raw)
+        assert address.type == AddressType.MUXED_CONTRACT
+        assert address.address == muxed_contract_id
+        assert Address.from_raw_muxed_contract(raw.hex()) == address
+
+    def test_muxed_contract_differs_from_contract(self):
+        contract = Address("CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA")
+        muxed_contract = Address(
+            "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAAWWC"
+        )
+        assert contract != muxed_contract

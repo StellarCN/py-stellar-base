@@ -25,12 +25,15 @@ class AddressType(IntEnum):
     LIQUIDITY_POOL = 4
     """A liquidity pool address, address looks like ``LA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJU...``."""
 
+    MUXED_CONTRACT = 5
+    """A muxed contract address, address looks like ``WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAA...``."""
+
 
 class Address:
     """Represents a single address in the Stellar network.
     An address can represent an account or a contract.
 
-    :param address: ID of the account, contract, muxed account, claimable balance, or liquidity pool.
+    :param address: ID of the account, contract, muxed account, claimable balance, liquidity pool, or muxed contract.
     """
 
     def __init__(self, address: str):
@@ -49,6 +52,9 @@ class Address:
         elif StrKey.is_valid_liquidity_pool(address):
             self.type = AddressType.LIQUIDITY_POOL
             self.key = StrKey.decode_liquidity_pool(address)
+        elif StrKey.is_valid_muxed_contract(address):
+            self.type = AddressType.MUXED_CONTRACT
+            self.key = StrKey.decode_muxed_contract(address)
         else:
             raise ValueError("Unsupported address type.")
 
@@ -68,6 +74,8 @@ class Address:
             return StrKey.encode_claimable_balance(self.key)
         elif self.type == AddressType.LIQUIDITY_POOL:
             return StrKey.encode_liquidity_pool(self.key)
+        elif self.type == AddressType.MUXED_CONTRACT:
+            return StrKey.encode_muxed_contract(self.key)
         else:
             raise ValueError("Unsupported address type.")
 
@@ -126,6 +134,17 @@ class Address:
             liquidity_pool = binascii.unhexlify(liquidity_pool)
         return Address(StrKey.encode_liquidity_pool(liquidity_pool))
 
+    @staticmethod
+    def from_raw_muxed_contract(muxed_contract: bytes | str) -> "Address":
+        """Creates a new muxed contract Address object from raw bytes.
+
+        :param muxed_contract: The raw bytes of the muxed contract, 32 bytes for the contract ID followed by 8 bytes for the muxed ID.
+        :return: A new Address object.
+        """
+        if isinstance(muxed_contract, str):
+            muxed_contract = binascii.unhexlify(muxed_contract)
+        return Address(StrKey.encode_muxed_contract(muxed_contract))
+
     def to_xdr_sc_address(self) -> stellar_xdr.SCAddress:
         """Converts the Address object to a :class:`stellar_sdk.xdr.SCAddress` XDR object.
 
@@ -175,6 +194,15 @@ class Address:
                 stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL,
                 liquidity_pool_id=liquidity_pool_id,
             )
+        elif self.type == AddressType.MUXED_CONTRACT:
+            muxed_contract = stellar_xdr.MuxedContract(
+                id=stellar_xdr.Uint64.from_xdr_bytes(self.key[-8:]),
+                contract_id=stellar_xdr.ContractID.from_xdr_bytes(self.key[:-8]),
+            )
+            return stellar_xdr.SCAddress(
+                stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT,
+                muxed_contract=muxed_contract,
+            )
         else:
             raise ValueError("Unsupported address type.")
 
@@ -222,6 +250,14 @@ class Address:
             assert sc_address.liquidity_pool_id is not None
             return cls.from_raw_liquidity_pool(
                 sc_address.liquidity_pool_id.to_xdr_bytes()
+            )
+        elif (
+            sc_address.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT
+        ):
+            assert sc_address.muxed_contract is not None
+            return cls.from_raw_muxed_contract(
+                sc_address.muxed_contract.contract_id.to_xdr_bytes()
+                + sc_address.muxed_contract.id.to_xdr_bytes()
             )
         else:
             raise ValueError("Unsupported address type.")

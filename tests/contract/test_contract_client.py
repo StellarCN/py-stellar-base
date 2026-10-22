@@ -5,12 +5,15 @@ from string import ascii_uppercase
 import pytest
 
 from stellar_sdk import (
+    Address,
     Asset,
     Keypair,
     SorobanServer,
+    StrKey,
     TransactionBuilder,
     scval,
 )
+from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.contract import ContractClient
 from stellar_sdk.contract.exceptions import NoSignatureNeededError
 from stellar_sdk.soroban_rpc import GetTransactionStatus
@@ -178,3 +181,51 @@ class TestContractClient:
         assert assemble_tx.needs_non_invoker_signing_by() == set()
         result = assemble_tx.sign_and_submit()
         assert result == scval.to_void()
+
+    def test_transfer_to_muxed_contract(self):
+        # CAP-84: a SAC transfer to a muxed contract address (W...) credits the
+        # underlying contract and reports the muxed id in the transfer event.
+        native_contract_id = create_contract_from_asset(Asset.native())
+        muxed_id = 1234
+        destination = Address.from_raw_muxed_contract(
+            StrKey.decode_contract(self.hello_world_contract_id)
+            + muxed_id.to_bytes(8, "big")
+        )
+        assert destination.address.startswith("W")
+
+        client = ContractClient(native_contract_id, RPC_URL, NETWORK_PASSPHRASE)
+        assemble_tx = client.invoke(
+            "transfer",
+            [
+                scval.to_address(SOURCE.public_key),
+                scval.to_address(destination),
+                scval.to_int128(100),
+            ],
+            SOURCE.public_key,
+            SOURCE,
+        )
+        assemble_tx.sign_and_submit()
+
+        balance = client.invoke(
+            "balance",
+            [scval.to_address(self.hello_world_contract_id)],
+            SOURCE.public_key,
+            parse_result_xdr_fn=scval.from_int128,
+        ).result()
+        assert balance == 100
+
+        response = assemble_tx.get_transaction_response
+        assert response is not None
+        assert response.events is not None
+        assert response.events.contract_events_xdr is not None
+        transfer_events = []
+        for event_xdr in response.events.contract_events_xdr[0]:
+            body = stellar_xdr.ContractEvent.from_xdr(event_xdr).body.v0
+            assert body is not None
+            if scval.to_native(body.topics[0]) == "transfer":
+                transfer_events.append(body)
+        assert len(transfer_events) == 1
+        assert scval.to_native(transfer_events[0].data) == {
+            "amount": 100,
+            "to_muxed_id": muxed_id,
+        }

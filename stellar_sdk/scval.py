@@ -897,6 +897,18 @@ def _compare_sc_address(a: stellar_xdr.SCAddress, b: stellar_xdr.SCAddress) -> i
             b.liquidity_pool_id.to_xdr_bytes(),
         )
         return (ax > bx) - (ax < bx)
+    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT:
+        assert a.muxed_contract is not None
+        assert b.muxed_contract is not None
+        at = (
+            a.muxed_contract.id.uint64,
+            a.muxed_contract.contract_id.contract_id.hash,
+        )
+        bt = (
+            b.muxed_contract.id.uint64,
+            b.muxed_contract.contract_id.contract_id.hash,
+        )
+        return (at > bt) - (at < bt)
     raise ValueError(f"Unsupported SCAddress type: {a.type}")
 
 
@@ -968,13 +980,14 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
        - ``SCV_VEC``: element-by-element, shorter < longer
        - ``SCV_MAP``: entry-by-entry (key first, then val), shorter < longer
        - ``SCV_ADDRESS``: by address type discriminant
-         (``ACCOUNT=0 < CONTRACT=1 < MUXED_ACCOUNT=2 < CLAIMABLE_BALANCE=3 < LIQUIDITY_POOL=4``),
+         (``ACCOUNT=0 < CONTRACT=1 < MUXED_ACCOUNT=2 < CLAIMABLE_BALANCE=3 < LIQUIDITY_POOL=4 < MUXED_CONTRACT=5``),
          then structurally per variant:
          ``ACCOUNT``: by ed25519 public key bytes;
          ``CONTRACT``: by contract hash bytes;
          ``MUXED_ACCOUNT``: by ``(id, ed25519)`` tuple;
          ``CLAIMABLE_BALANCE``: by claimable balance ID XDR bytes;
-         ``LIQUIDITY_POOL``: by pool hash bytes
+         ``LIQUIDITY_POOL``: by pool hash bytes;
+         ``MUXED_CONTRACT``: by ``(id, contract hash)`` tuple
        - ``SCV_ERROR``: by error type discriminant, then contract_code or error code
        - ``SCV_CONTRACT_INSTANCE``: by executable type, then wasm_hash or
          external ref (owner, then tag), then storage
