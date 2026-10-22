@@ -92,7 +92,7 @@ jobs:
           ENABLE_LOGS: true
           NETWORK: local
           ENABLE: core,rpc
-          PROTOCOL_VERSION: 29
+          PROTOCOL_VERSION: 30
         options: >-
           --health-cmd "curl --no-progress-meter -X POST \"http://localhost:8000/rpc\" -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":8675309,\"method\":\"getHealth\"}' | grep '\"status\":\"healthy\"' && curl --no-progress-meter \"http://localhost:8000/friendbot\" | grep '\"invalid_field\": \"addr\"'"
           --health-interval 10s
