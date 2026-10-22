@@ -321,7 +321,6 @@ class TestSorobanServer:
                 "operationIndex": 0,
                 "transactionIndex": 0,
                 "txHash": "4ea7a85ab79ed1a0bd2ae13c477d737986c275008ec27248e84b652dd3b02240",
-                "inSuccessfulContractCall": True,
                 "topic": [
                     "AAAADwAAAANmZWUA",
                     "AAAAEgAAAAAAAAAAjzKVBtmN+VkKUfjbl3IERicBzxUm/hHTbRY5Ap/rXZ0=",
@@ -337,7 +336,6 @@ class TestSorobanServer:
                 "operationIndex": 0,
                 "transactionIndex": 0,
                 "txHash": "bdfe344060decbfd77ce0022538633de63947d85774434be8573b14fc870ce21",
-                "inSuccessfulContractCall": True,
                 "topic": [
                     "AAAADwAAAANmZWUA",
                     "AAAAEgAAAAAAAAAAaVEz1z7zd/vL9gpfuqg15Q6kOpLaLnYaMEojDQaoWZ4=",
@@ -451,10 +449,8 @@ class TestSorobanServer:
             },
         )
 
-    async def test_get_events_without_in_successful_contract_call(
-        self, soroban_server, rpc_mock
-    ):
-        # Stellar RPC v30 no longer returns `inSuccessfulContractCall`.
+    async def test_get_events_before_rpc_v30(self, soroban_server, rpc_mock):
+        # Stellar RPC before v30 also returns the deprecated `inSuccessfulContractCall`.
         result = {
             "events": [
                 {
@@ -466,6 +462,7 @@ class TestSorobanServer:
                     "operationIndex": 0,
                     "transactionIndex": 0,
                     "txHash": "4ea7a85ab79ed1a0bd2ae13c477d737986c275008ec27248e84b652dd3b02240",
+                    "inSuccessfulContractCall": True,
                     "topic": ["AAAADwAAAANmZWUA"],
                     "value": "AAAACgAAAAAAAAAAAAAAAAAAAMg=",
                 }
@@ -485,8 +482,7 @@ class TestSorobanServer:
         )
         events_response = await resolve(soroban_server.get_events(start_ledger=100))
         assert events_response == GetEventsResponse.model_validate(result)
-        with pytest.deprecated_call():
-            assert events_response.events[0].in_successful_contract_call is None
+        assert not hasattr(events_response.events[0], "in_successful_contract_call")
 
     async def test_get_latest_ledger(self, soroban_server, rpc_mock):
         result = {
