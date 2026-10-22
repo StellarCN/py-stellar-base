@@ -451,6 +451,43 @@ class TestSorobanServer:
             },
         )
 
+    async def test_get_events_without_in_successful_contract_call(
+        self, soroban_server, rpc_mock
+    ):
+        # Stellar RPC v30 no longer returns `inSuccessfulContractCall`.
+        result = {
+            "events": [
+                {
+                    "type": "contract",
+                    "ledger": 318983,
+                    "ledgerClosedAt": "2025-07-07T04:50:04Z",
+                    "contractId": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+                    "id": "0001370021552979968-0000000000",
+                    "operationIndex": 0,
+                    "transactionIndex": 0,
+                    "txHash": "4ea7a85ab79ed1a0bd2ae13c477d737986c275008ec27248e84b652dd3b02240",
+                    "topic": ["AAAADwAAAANmZWUA"],
+                    "value": "AAAACgAAAAAAAAAAAAAAAAAAAMg=",
+                }
+            ],
+            "cursor": "0000054747948126208-0000000000",
+            "latestLedger": 318987,
+            "oldestLedger": 317964,
+            "latestLedgerCloseTime": "1751863824",
+            "oldestLedgerCloseTime": "1751858705",
+        }
+        rpc_mock.expect_response(
+            {
+                "jsonrpc": "2.0",
+                "id": "198cb1a8-9104-4446-a269-88bf000c2721",
+                "result": result,
+            }
+        )
+        events_response = await resolve(soroban_server.get_events(start_ledger=100))
+        assert events_response == GetEventsResponse.model_validate(result)
+        with pytest.deprecated_call():
+            assert events_response.events[0].in_successful_contract_call is None
+
     async def test_get_latest_ledger(self, soroban_server, rpc_mock):
         result = {
             "id": "98908807544d6658094c94e00c1cff99e341b96ee1c59abbda39d5f4a3b20cdc",
