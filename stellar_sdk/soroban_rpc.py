@@ -67,10 +67,13 @@ class EventInfo(BaseModel):
     id: str = Field(alias="id")
     topic: list[str] = Field(alias="topic")
     value: str = Field(alias="value")
-    in_successful_contract_call: bool = Field(
+    # Stellar RPC v30 no longer returns this field. It will be removed in the next major release.
+    in_successful_contract_call: bool | None = Field(
+        default=None,
         alias="inSuccessfulContractCall",
         deprecated=True,
-        description="This field is deprecated and will be removed in the future.",
+        description="This field is deprecated and will be removed in the next major release. "
+        "Stellar RPC v30 and later no longer return it, so it is `None` for their responses.",
     )
     operation_index: int = Field(alias="operationIndex")
     transaction_index: int = Field(alias="transactionIndex")
