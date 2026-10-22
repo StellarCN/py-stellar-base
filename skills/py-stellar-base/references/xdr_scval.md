@@ -20,7 +20,7 @@ scval.to_timepoint(1700000000); scval.to_duration(3600)
 scval.to_bytes(b"\x01\x02")
 scval.to_string("hello"); scval.to_symbol("increment")
 scval.to_executable_tag("v1")     # CAP-85 tag; pass bytes for a binary tag
-scval.to_address("G...")          # account or contract address
+scval.to_address("G...")          # G/C/M/W... address, see "Addresses"
 scval.to_vec([scval.to_uint32(1), scval.to_uint32(2)])
 scval.to_map({scval.to_symbol("k"): scval.to_uint32(1)})
 scval.to_struct({"field": scval.to_uint32(1)})
@@ -43,10 +43,44 @@ scval.to_native(v)     # recursive best-effort conversion to Python types
 ```python
 from stellar_sdk import Address
 
-addr = Address("G...")           # account or "C..." contract
+addr = Address("G...")           # G account, C contract, M muxed account, W muxed contract
+addr.type                        # AddressType.ACCOUNT / CONTRACT / MUXED_ACCOUNT / MUXED_CONTRACT / ...
 sc_val = addr.to_xdr_sc_val()    # SCVal for contract args
 back = Address.from_xdr_sc_val(sc_val)
 ```
+
+### Muxed contract addresses (`W...`, CAP-84, Protocol 30)
+
+A `W...` address is a contract (`C...`) plus a 64-bit muxed ID: the contract counterpart of
+a muxed account (`M...`). Use it as the destination of a SAC `transfer` or `mint`. The
+balance is credited to the underlying contract, and the ID is reported as `to_muxed_id` in
+the transfer event, so one contract account can tell its depositors apart.
+
+```python
+from stellar_sdk import Address, StrKey, scval
+
+muxed_id = 1234
+w = Address.from_raw_muxed_contract(
+    StrKey.decode_contract("C...") + muxed_id.to_bytes(8, "big")
+)
+raw = StrKey.decode_muxed_contract(w.address)  # 32-byte contract ID + 8-byte big-endian ID
+contract_id = StrKey.encode_contract(raw[:32])
+muxed_id = int.from_bytes(raw[32:], "big")
+
+# SAC transfer to the muxed contract (client = ContractClient for the asset's SAC)
+client.invoke(
+    "transfer",
+    [scval.to_address(kp.public_key), scval.to_address(w), scval.to_int128(amount)],
+    source=kp.public_key,
+    signer=kp,
+).sign_and_submit()
+```
+
+- It is only a destination. It cannot authorize and cannot key contract storage, so read
+  balances and other state with the underlying `C...` address.
+- A contract parameter typed `Address` rejects it; one typed `MuxedAddress` accepts both
+  `C...` and `W...`.
+- It needs a Protocol 30 network.
 
 ## Transaction XDR
 

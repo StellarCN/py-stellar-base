@@ -10,7 +10,7 @@ Stellar Ecosystem Proposals supported by the SDK. Modules live under `stellar_sd
 | SEP-07 | URI scheme (pay / tx) | `stellar_sdk.sep.stellar_uri` |
 | SEP-10 | Web authentication | `stellar_sdk.sep.stellar_web_authentication` |
 | SEP-11 | TxRep | `stellar_sdk.sep.txrep` (see `xdr_scval.md`) |
-| SEP-23 | Muxed accounts | `stellar_sdk.muxed_account` (`MuxedAccount`) |
+| SEP-23 | Muxed accounts (`M...`) and muxed contracts (`W...`) | `stellar_sdk.muxed_account` (`MuxedAccount`); `Address` / `StrKey.*_muxed_contract` for `W...` (see `xdr_scval.md`) |
 | SEP-29 | Memo-required check | submission helpers / `AccountRequiresMemoError` |
 | SEP-35 | Operation IDs (TOID) | `stellar_sdk.sep.toid` (`TOID`) |
 | SEP-45 | Soroban web auth | `stellar_sdk.sep.stellar_soroban_web_authentication` |

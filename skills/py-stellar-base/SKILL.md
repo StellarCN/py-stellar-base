@@ -163,7 +163,7 @@ Load on demand:
 - `references/horizon.md` — Horizon clients, call builders, pagination, streaming, errors.
 - `references/async.md` — async clients and patterns (`stellar-sdk[aiohttp]`).
 - `references/soroban.md` — Soroban RPC client + `ContractClient`/`AssembledTransaction`.
-- `references/xdr_scval.md` — SCVal conversion, `Address`, XDR encode/decode, TxRep.
+- `references/xdr_scval.md` — SCVal conversion, `Address` (incl. muxed `M...`/`W...`), XDR encode/decode, TxRep.
 - `references/sep.md` — SEP support matrix and common flows (SEP-01/10/45/...).
 - `references/security.md` — key handling, validation, signing-safety rules.
 - `references/troubleshooting.md` — exception hierarchy and common failures.
