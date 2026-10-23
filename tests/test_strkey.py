@@ -350,11 +350,16 @@ class TestStrKey:
             "",
             "SBCVMMCBEDB64TVJZFYJOJAERZC4YVVUOE6SYR2Y76CBTENGUSGWRRVO",
             "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26",
+            # SEP-23: the unused trailing 2-bits must be zero
+            "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4TV",
+            # SEP-23: invalid claimable balance type (first byte is not 0)
+            "BAAT6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGXACA",
         ],
     )
     def test_decode_claimable_balance_raise(self, key):
         with pytest.raises(ValueError, match=f"Invalid Claimable Balance Key: {key}"):
             StrKey.decode_claimable_balance(key)
+        assert StrKey.is_valid_claimable_balance(key) is False
 
     # Test vectors from SEP-23.
     @pytest.mark.parametrize(

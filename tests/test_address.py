@@ -45,6 +45,14 @@ class TestAddress:
         with pytest.raises(ValueError, match=r"Unsupported address type."):
             Address(account_id)
 
+    def test_constructor_claimable_balance_with_invalid_type_throws(self):
+        # SEP-23: the first byte of a claimable balance key must be 0 (V0).
+        claimable_balance_id = (
+            "BAAT6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGXACA"
+        )
+        with pytest.raises(ValueError, match=r"Unsupported address type."):
+            Address(claimable_balance_id)
+
     def test_constructor_secret_throws(self):
         secret = "SBUIAXRYKAEJWBSJZYE6P4N4X4ATXP5GAFK5TZ6SKKQ6TS4MLX6G6E4M"
         with pytest.raises(ValueError, match=r"Unsupported address type."):
