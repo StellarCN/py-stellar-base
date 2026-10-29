@@ -408,6 +408,8 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
         # 1-byte value indicating the type of claimable balance, where 0x00 maps to V0, and a 32-byte SHA256 hash.
         if len(data) != 32 + 1:
             raise ValueError(f"Invalid length: {encoded}")
+        if data[0] != 0:
+            raise ValueError(f"Invalid claimable balance type: {encoded}")
     else:
         if len(data) != 32:
             raise ValueError(f"Invalid length: {encoded}")

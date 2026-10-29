@@ -12,6 +12,9 @@ Release History
 #### Breaking changes
 - Remove the deprecated `EventInfo.in_successful_contract_call`. Stellar RPC v30 no longer returns `inSuccessfulContractCall`, and since 16.1.1 the field was `None` for its responses. Responses from older RPC servers that still include it parse as before; the value is ignored.
 
+#### Fixes
+- `StrKey.decode_claimable_balance` / `is_valid_claimable_balance` now reject a claimable balance strkey (`B...`) whose type byte is not 0, as SEP-23 requires; `CLAIMABLE_BALANCE_ID_TYPE_V0` is the only type. Such a key used to be accepted, so `Address(...)` took it and the error only surfaced in `Address.to_xdr_sc_address`. `Address(...)` now raises `ValueError` up front.
+
 ### Version 16.1.1
 
 Released on October 22, 2026
