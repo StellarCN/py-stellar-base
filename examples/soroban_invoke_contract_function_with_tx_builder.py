@@ -21,7 +21,7 @@ from stellar_sdk.soroban_rpc import GetTransactionStatus, SendTransactionStatus
 # TODO: You need to replace the following parameters according to the actual situation
 secret = "SAAPYAPTTRZMCUZFPG3G66V4ZMHTK4TWA6NS7U4F7Z3IMUD52EK4DDEV"
 rpc_server_url = "https://soroban-testnet.stellar.org:443"
-contract_id = "CDJO3KQKJFHFEZY2ZSWS4CTZEAZUO2SZNRWO2Y7QQS4X3UWSOLFJHSS3"
+contract_id = "CDSMG6PNJYIPIWFIDQVLCOXMQPZU73FSBCTMBDGBGFLF7WPLJMASODYX"
 network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
 kp = Keypair.from_secret(secret)
@@ -35,7 +35,7 @@ tx = (
     .append_invoke_contract_function_op(
         contract_id=contract_id,
         function_name="hello",
-        parameters=[scval.to_symbol("world")],
+        parameters=[scval.to_string("world")],
     )
     .build()
 )
@@ -68,8 +68,16 @@ if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     transaction_meta = stellar_xdr.TransactionMeta.from_xdr(
         get_transaction_data.result_meta_xdr
     )
-    result = transaction_meta.v3.soroban_meta.return_value  # type: ignore[union-attr]
-    output = [x.sym.sc_symbol.decode() for x in result.vec.sc_vec]  # type: ignore
+    # Protocol 23+ networks return TransactionMetaV4.
+    body = (
+        transaction_meta.v4 if transaction_meta.v4 is not None else transaction_meta.v3
+    )
+    assert body is not None and body.soroban_meta is not None
+    assert body.soroban_meta.return_value is not None
+    output = [
+        scval.from_string(s).decode()
+        for s in scval.from_vec(body.soroban_meta.return_value)
+    ]
     print(f"transaction result: {output}")
 else:
     print(f"Transaction failed: {get_transaction_data.result_xdr}")
