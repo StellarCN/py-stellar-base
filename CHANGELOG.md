@@ -8,6 +8,11 @@ Release History
   - New `StrKey.encode_muxed_contract` / `decode_muxed_contract` / `is_valid_muxed_contract`. The raw data is 40 bytes: the 32-byte contract ID followed by the big-endian 8-byte muxed ID, the same layout as a muxed account (`M...`).
   - `Address` accepts `W...` addresses as the new `AddressType.MUXED_CONTRACT`, converts them to and from `SC_ADDRESS_TYPE_MUXED_CONTRACT`, and gains `Address.from_raw_muxed_contract`. `scval.to_address` / `from_address` handle them through `Address`.
   - `scval.to_map` sorts muxed contract address keys like the Soroban host, by `(id, contract ID)`.
+  - A muxed contract address is only valid where a muxed account (`M...`) is, such as the `to` parameter of the SAC `transfer`. The SDK now applies the Soroban host's rules up front and raises `ValueError` instead of building ledger keys that can never match an entry:
+    - `SorobanServer[Async].get_contract_data` requires a contract address (`C...`) and rejects a `key` that contains a muxed address (`M...` or `W...`) anywhere, since the host never stores such keys.
+    - `SorobanServer[Async].get_contract_wasm`, and so `get_contract_meta`, `get_contract_spec` and `get_contract_info`, require a contract address (`C...`).
+    - `TransactionBuilder.append_restore_asset_balance_entry_op` requires `balance_owner` to be a contract address (`C...`). Only contracts hold SAC balances in contract data; an account's balance lives in its trustline.
+    - `auth.build_with_delegates_entry` requires the credential address of the entry it wraps to be an account (`G...`) or a contract (`C...`), as the host requires and as the other `auth` helpers already enforce. It used to check only the delegate addresses.
 
 #### Breaking changes
 - Remove the deprecated `EventInfo.in_successful_contract_call`. Stellar RPC v30 no longer returns `inSuccessfulContractCall`, and since 16.1.1 the field was `None` for its responses. Responses from older RPC servers that still include it parse as before; the value is ignored.

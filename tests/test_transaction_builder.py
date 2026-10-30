@@ -24,6 +24,7 @@ from stellar_sdk import (
     SignerKey,
     SorobanDataBuilder,
     SorobanServer,
+    StrKey,
     TimeBounds,
     TransactionBuilder,
     TransactionEnvelope,
@@ -1389,3 +1390,63 @@ class TestTransaction:
             ValueError, match=r"`destination` is not a valid contract address."
         ):
             builder.append_payment_to_contract_op(destination.public_key, asset, amount)
+
+    def test_append_restore_asset_balance_entry_op(self):
+        kp = Keypair.random()
+        asset = Asset.native()
+        balance_owner = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+        tx = (
+            TransactionBuilder(
+                source_account=Account(kp.public_key, 1),
+                network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+                base_fee=100,
+            )
+            .append_restore_asset_balance_entry_op(balance_owner, asset)
+            .set_timeout(30)
+            .build()
+        )
+        assert isinstance(tx.transaction.operations[0], RestoreFootprint)
+        assert tx.transaction.soroban_data is not None
+        assert tx.transaction.soroban_data.resources.footprint.read_write == [
+            stellar_xdr.LedgerKey(
+                type=stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+                contract_data=stellar_xdr.LedgerKeyContractData(
+                    contract=Address(
+                        asset.contract_id(Network.TESTNET_NETWORK_PASSPHRASE)
+                    ).to_xdr_sc_address(),
+                    key=scval.to_vec(
+                        [scval.to_symbol("Balance"), scval.to_address(balance_owner)]
+                    ),
+                    durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+                ),
+            )
+        ]
+
+    @pytest.mark.parametrize(
+        "balance_owner",
+        [
+            "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY",
+            "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26",
+            StrKey.encode_muxed_contract(
+                StrKey.decode_contract(
+                    "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+                )
+                + (1).to_bytes(8, "big")
+            ),
+        ],
+        ids=["account", "muxed_account", "muxed_contract"],
+    )
+    def test_append_restore_asset_balance_entry_op_rejects_non_contract_owner(
+        self, balance_owner
+    ):
+        kp = Keypair.random()
+        builder = TransactionBuilder(
+            source_account=Account(kp.public_key, 1),
+            network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        with pytest.raises(
+            ValueError, match=r"`balance_owner` is not a valid contract address."
+        ):
+            builder.append_restore_asset_balance_entry_op(balance_owner, Asset.native())
+        assert builder.operations == []

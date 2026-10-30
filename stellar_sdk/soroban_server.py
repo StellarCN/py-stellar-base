@@ -9,15 +9,16 @@ from pydantic import BaseModel
 from . import scval
 from . import xdr as stellar_xdr
 from .account import Account
-from .address import Address
 from .asset import Asset
 from .base_soroban_server import (
     Durability,
     ResourceLeeway,
     _assemble_transaction,
+    _build_contract_data_key,
     _build_contract_instance_key,
     _build_sac_balance_ledger_key,
     _generate_unique_request_id,
+    _validate_contract_id,
     _validate_wasm_hash,
 )
 from .client.requests_client import RequestsClient
@@ -37,7 +38,6 @@ from .sep.contract_info import ContractInfo
 from .sep.contract_meta import ContractMeta
 from .sep.contract_spec import ContractSpec
 from .soroban_rpc import *
-from .strkey import StrKey
 from .utils import external_ref_owner_address
 
 if TYPE_CHECKING:
@@ -411,23 +411,12 @@ class SorobanServer:
         :param durability: The "durability keyspace" that this ledger key belongs to, which is either
             :class:`Durability.TEMPORARY` or :class:`Durability.PERSISTENT`. Defaults to :class:`Durability.PERSISTENT`.
         :return: A :class:`LedgerEntryResult <stellar_sdk.soroban_rpc.LedgerEntryResult>` object contains the ledger entry result or ``None`` if not found.
+        :raises ValueError: If ``contract_id`` is not a contract address (``C...``), or if ``key``
+            contains a muxed address (``M...`` or ``W...``), which the host never stores.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
-        sc_address = Address(contract_id).to_xdr_sc_address()
-        xdr_durability = (
-            stellar_xdr.ContractDataDurability.PERSISTENT
-            if durability == Durability.PERSISTENT
-            else stellar_xdr.ContractDataDurability.TEMPORARY
-        )
-        contract_key = stellar_xdr.LedgerKey(
-            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-            contract_data=stellar_xdr.LedgerKeyContractData(
-                contract=sc_address,
-                key=key,
-                durability=xdr_durability,
-            ),
-        )
+        contract_key = _build_contract_data_key(contract_id, key, durability)
         resp = self.get_ledger_entries([contract_key])
         entries = resp.entries
         if not entries:
@@ -491,7 +480,7 @@ class SorobanServer:
         :raises: :exc:`SACHasNoWasmError <stellar_sdk.exceptions.SACHasNoWasmError>` - If the contract is a Stellar Asset Contract.
         :raises: :exc:`ExternalRefNotFoundError <stellar_sdk.exceptions.ExternalRefNotFoundError>` - If the contract follows a CAP-85 external executable reference whose tag entry is not found or archived.
         :raises: :exc:`ContractCodeNotFoundError <stellar_sdk.exceptions.ContractCodeNotFoundError>` - If the contract code ledger entry is not found or archived.
-        :raises ValueError: If the ledger entry is structurally unusable, such as a CAP-85 external executable reference whose owner is not a contract.
+        :raises ValueError: If ``contract_id`` is not a contract address (``C...``), or if the ledger entry is structurally unusable, such as a CAP-85 external executable reference whose owner is not a contract.
         :raises: :exc:`ContractWasmRetrievalError <stellar_sdk.exceptions.ContractWasmRetrievalError>` - If the executable kind is not supported.
         """
         instance = self._get_contract_instance(contract_id)
@@ -613,8 +602,7 @@ class SorobanServer:
         :return: A :class:`GetSACBalanceResponse <stellar_sdk.soroban_rpc.GetSACBalanceResponse>` which will contain the balance entry details if and only if the request returned a valid balance ledger
             entry. If it doesn't, the `balance_entry` field will not exist.
         """
-        if not StrKey.is_valid_contract(contract_id):
-            raise ValueError(f"Invalid contract ID: {contract_id}")
+        _validate_contract_id(contract_id)
 
         if network_passphrase is None:
             network_passphrase = self.get_network().passphrase

@@ -1678,7 +1678,7 @@ class TransactionBuilder:
 
         This method is designed to be used in conjunction with the :func:`append_payment_to_contract_op` method.
 
-        :param balance_owner: The owner of the asset, it should be the same as the `destination` address in the :func:`append_payment_to_contract_op` method.
+        :param balance_owner: The contract address (``C...``) that owns the asset, it should be the same as the `destination` address in the :func:`append_payment_to_contract_op` method.
         :param asset: The asset
         :param disk_read_bytes: The disk read bytes required to execute the function.
         :param write_bytes: The write bytes required to execute the function.
@@ -1687,7 +1687,12 @@ class TransactionBuilder:
         :param source: The source account for the operation. Defaults to the
             transaction's source account.
         :return: This builder instance.
+        :raises ValueError: If ``balance_owner`` is not a contract address (``C...``).
         """
+        # Only contracts hold SAC balances in contract data; an account's balance is its
+        # trustline, and a muxed contract (W...) is credited to its base contract.
+        if not StrKey.is_valid_contract(balance_owner):
+            raise ValueError("`balance_owner` is not a valid contract address.")
 
         contract_id = asset.contract_id(self.network_passphrase)
         balance_ledger_key = stellar_xdr.LedgerKey(
