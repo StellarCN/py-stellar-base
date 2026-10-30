@@ -3,22 +3,30 @@ Release History
 
 ### Pending
 
-#### Update
-- Support CAP-84 (Protocol 30) muxed contract addresses (`W...`, SEP-23 `STRKEY_MUXED_CONTRACT`), a contract ID plus a 64-bit muxed ID that can be the destination of a SAC `transfer` or `mint`:
-  - New `StrKey.encode_muxed_contract` / `decode_muxed_contract` / `is_valid_muxed_contract`. The raw data is 40 bytes: the 32-byte contract ID followed by the big-endian 8-byte muxed ID, the same layout as a muxed account (`M...`).
-  - `Address` accepts `W...` addresses as the new `AddressType.MUXED_CONTRACT`, converts them to and from `SC_ADDRESS_TYPE_MUXED_CONTRACT`, and gains `Address.from_raw_muxed_contract`. `scval.to_address` / `from_address` handle them through `Address`.
-  - `scval.to_map` sorts muxed contract address keys like the Soroban host, by `(id, contract ID)`.
-  - A muxed contract address is only valid where a muxed account (`M...`) is, such as the `to` parameter of the SAC `transfer`. The SDK now applies the Soroban host's rules up front and raises `ValueError` instead of building ledger keys that can never match an entry:
-    - `SorobanServer[Async].get_contract_data` requires a contract address (`C...`) and rejects a `key` that contains a muxed address (`M...` or `W...`) anywhere, since the host never stores such keys.
-    - `SorobanServer[Async].get_contract_wasm`, and so `get_contract_meta`, `get_contract_spec` and `get_contract_info`, require a contract address (`C...`).
-    - `TransactionBuilder.append_restore_asset_balance_entry_op` requires `balance_owner` to be a contract address (`C...`). Only contracts hold SAC balances in contract data; an account's balance lives in its trustline.
-    - `auth.build_with_delegates_entry` requires the credential address of the entry it wraps to be an account (`G...`) or a contract (`C...`), as the host requires and as the other `auth` helpers already enforce. It used to check only the delegate addresses.
+### Version 17.0.0
+
+Released on October 30, 2026
+
+**This release adds support for Protocol 30.**
 
 #### Breaking changes
-- Remove the deprecated `EventInfo.in_successful_contract_call`. Stellar RPC v30 no longer returns `inSuccessfulContractCall`, and since 16.1.1 the field was `None` for its responses. Responses from older RPC servers that still include it parse as before; the value is ignored.
+- Remove the deprecated `EventInfo.in_successful_contract_call`. Stellar RPC v30 no longer returns `inSuccessfulContractCall`, and since 16.1.1 the field was `None` for its responses. Responses from older RPC servers that still include it parse as before; the value is ignored. ([#1237](https://github.com/StellarCN/py-stellar-base/pull/1237))
+- Several APIs now raise `ValueError` up front for addresses the Soroban host never accepts there. They used to build a ledger key that matches no entry, or an entry the host can never authorize, so the mistake only showed up later as a missing result or a failed simulation. ([#1244](https://github.com/StellarCN/py-stellar-base/pull/1244))
+  - `SorobanServer[Async].get_contract_data` requires a contract address (`C...`), and rejects a `key` that contains a muxed address (`M...` or `W...`) anywhere, since the host never stores such keys.
+  - `SorobanServer[Async].get_contract_wasm`, and so `get_contract_meta`, `get_contract_spec` and `get_contract_info`, require a contract address (`C...`).
+  - `TransactionBuilder.append_restore_asset_balance_entry_op` requires `balance_owner` to be a contract address (`C...`). Only contracts hold SAC balances in contract data; an account's balance lives in its trustline.
+  - `auth.build_with_delegates_entry` requires the address of the entry it wraps to be an account (`G...`) or a contract (`C...`), as the other `auth` helpers already do. It used to check only the delegate addresses.
+
+#### Update
+- Upgrade the generated XDR definitions to Protocol 30 ([stellar-xdr v30.0](https://github.com/stellar/stellar-xdr/releases/tag/v30.0)). ([#1228](https://github.com/StellarCN/py-stellar-base/pull/1228))
+- Support CAP-84 muxed contract addresses (`W...`, SEP-23 `STRKEY_MUXED_CONTRACT`): a contract ID plus a 64-bit muxed ID. Like a muxed account (`M...`), it is only valid as a payment destination, such as the `to` of a SAC `transfer` or `mint`. ([#1238](https://github.com/StellarCN/py-stellar-base/pull/1238))
+  - New `StrKey.encode_muxed_contract` / `decode_muxed_contract` / `is_valid_muxed_contract`. The raw data is 40 bytes: the 32-byte contract ID followed by the big-endian 8-byte muxed ID, the same layout as a muxed account.
+  - `Address` accepts `W...` addresses as the new `AddressType.MUXED_CONTRACT`, converts them to and from `SC_ADDRESS_TYPE_MUXED_CONTRACT`, and gains `Address.from_raw_muxed_contract`. `scval.to_address` / `from_address` handle them through `Address`, so contract return values and events that hold a muxed contract address now decode.
+  - `scval.to_map` sorts muxed contract address keys like the Soroban host, by `(id, contract ID)`.
+  - Cover CAP-84 in the `py-stellar-base` agent skill. ([#1239](https://github.com/StellarCN/py-stellar-base/pull/1239))
 
 #### Fixes
-- `StrKey.decode_claimable_balance` / `is_valid_claimable_balance` now reject a claimable balance strkey (`B...`) whose type byte is not 0, as SEP-23 requires; `CLAIMABLE_BALANCE_ID_TYPE_V0` is the only type. Such a key used to be accepted, so `Address(...)` took it and the error only surfaced in `Address.to_xdr_sc_address`. `Address(...)` now raises `ValueError` up front.
+- `StrKey.decode_claimable_balance` / `is_valid_claimable_balance` now reject a claimable balance strkey (`B...`) whose type byte is not 0, as SEP-23 requires; `CLAIMABLE_BALANCE_ID_TYPE_V0` is the only type. Such a key used to be accepted, so `Address(...)` took it and the error only surfaced in `Address.to_xdr_sc_address`. `Address(...)` now raises `ValueError` up front. ([#1241](https://github.com/StellarCN/py-stellar-base/pull/1241))
 
 ### Version 16.1.1
 
