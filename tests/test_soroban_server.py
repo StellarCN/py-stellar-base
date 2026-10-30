@@ -4,10 +4,18 @@ import copy
 import pytest
 from pydantic import ValidationError
 
-from stellar_sdk import Account, Asset, Keypair, Network, TransactionBuilder, scval
+from stellar_sdk import (
+    Account,
+    Asset,
+    Keypair,
+    Network,
+    StrKey,
+    TransactionBuilder,
+    scval,
+)
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.address import Address
-from stellar_sdk.base_soroban_server import ResourceLeeway
+from stellar_sdk.base_soroban_server import Durability, ResourceLeeway
 from stellar_sdk.exceptions import (
     AccountNotFoundException,
     BadResponseError,
@@ -17,6 +25,20 @@ from stellar_sdk.exceptions import (
 from stellar_sdk.operation import InvokeHostFunction
 from stellar_sdk.soroban_rpc import *
 from tests.helpers import resolve
+
+_CONTRACT_ID = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+_ACCOUNT_ID = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+_MUXED_ACCOUNT_ID = (
+    "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
+)
+_MUXED_CONTRACT_ID = StrKey.encode_muxed_contract(
+    StrKey.decode_contract(_CONTRACT_ID) + (1).to_bytes(8, "big")
+)
+_NON_CONTRACT_IDS = pytest.mark.parametrize(
+    "contract_id",
+    [_ACCOUNT_ID, _MUXED_ACCOUNT_ID, _MUXED_CONTRACT_ID],
+    ids=["account", "muxed_account", "muxed_contract"],
+)
 
 
 class TestSorobanServer:
@@ -194,6 +216,117 @@ class TestSorobanServer:
                 ]
             },
         )
+
+    @_NON_CONTRACT_IDS
+    async def test_get_contract_data_rejects_non_contract_id(
+        self, soroban_server, rpc_mock, contract_id
+    ):
+        with pytest.raises(ValueError, match=f"Invalid contract ID: {contract_id}"):
+            await resolve(
+                soroban_server.get_contract_data(
+                    contract_id, scval.to_symbol("counter")
+                )
+            )
+        assert rpc_mock.requests == []
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            scval.to_address(_MUXED_ACCOUNT_ID),
+            scval.to_address(_MUXED_CONTRACT_ID),
+            scval.to_vec(
+                [scval.to_symbol("Balance"), scval.to_address(_MUXED_CONTRACT_ID)]
+            ),
+            scval.to_map({scval.to_address(_MUXED_ACCOUNT_ID): scval.to_uint32(1)}),
+            scval.to_map(
+                {
+                    scval.to_symbol("owners"): scval.to_vec(
+                        [scval.to_address(_MUXED_CONTRACT_ID)]
+                    )
+                }
+            ),
+        ],
+        ids=[
+            "muxed_account",
+            "muxed_contract",
+            "in_vec",
+            "in_map_key",
+            "nested_in_map_val",
+        ],
+    )
+    async def test_get_contract_data_rejects_muxed_address_in_key(
+        self, soroban_server, rpc_mock, key
+    ):
+        with pytest.raises(
+            ValueError,
+            match=r"Contract data keys cannot contain muxed addresses \(M\.\.\. or W\.\.\.\)\.",
+        ):
+            await resolve(soroban_server.get_contract_data(_CONTRACT_ID, key))
+        assert rpc_mock.requests == []
+
+    async def test_get_contract_data_accepts_unmuxed_addresses_in_key(
+        self, soroban_server, rpc_mock
+    ):
+        key = scval.to_map(
+            {
+                scval.to_symbol("owners"): scval.to_vec(
+                    [scval.to_address(_ACCOUNT_ID), scval.to_address(_CONTRACT_ID)]
+                )
+            }
+        )
+        expected_key = stellar_xdr.LedgerKey(
+            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
+            contract_data=stellar_xdr.LedgerKeyContractData(
+                contract=Address(_CONTRACT_ID).to_xdr_sc_address(),
+                key=key,
+                durability=stellar_xdr.ContractDataDurability.TEMPORARY,
+            ),
+        )
+        rpc_mock.expect_response(
+            {
+                "jsonrpc": "2.0",
+                "id": "839c6c921d40456db5ba8a1c4e1a0e70",
+                "result": {"entries": None, "latestLedger": "296"},
+            }
+        )
+        assert (
+            await resolve(
+                soroban_server.get_contract_data(
+                    _CONTRACT_ID, key, Durability.TEMPORARY
+                )
+            )
+            is None
+        )
+        rpc_mock.assert_request("getLedgerEntries", {"keys": [expected_key.to_xdr()]})
+
+    @pytest.mark.parametrize(
+        "method",
+        [
+            "get_contract_wasm",
+            "get_contract_meta",
+            "get_contract_spec",
+            "get_contract_info",
+        ],
+    )
+    @_NON_CONTRACT_IDS
+    async def test_get_contract_wasm_rejects_non_contract_id(
+        self, soroban_server, rpc_mock, method, contract_id
+    ):
+        with pytest.raises(ValueError, match=f"Invalid contract ID: {contract_id}"):
+            await resolve(getattr(soroban_server, method)(contract_id))
+        assert rpc_mock.requests == []
+
+    @_NON_CONTRACT_IDS
+    async def test_get_sac_balance_rejects_non_contract_id(
+        self, soroban_server, rpc_mock, contract_id
+    ):
+        with pytest.raises(ValueError, match=f"Invalid contract ID: {contract_id}"):
+            await resolve(
+                soroban_server.get_sac_balance(
+                    contract_id, Asset.native(), Network.TESTNET_NETWORK_PASSPHRASE
+                )
+            )
+        assert rpc_mock.requests == []
 
     async def test_get_ledger_entries(self, soroban_server, rpc_mock):
         result = {

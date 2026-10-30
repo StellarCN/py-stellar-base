@@ -12,6 +12,7 @@ from .address import Address
 from .asset import Asset
 from .operation import InvokeHostFunction
 from .soroban_rpc import *
+from .strkey import StrKey
 
 if TYPE_CHECKING:
     from .transaction_envelope import TransactionEnvelope
@@ -33,16 +34,65 @@ def _generate_unique_request_id() -> str:
     return uuid.uuid4().hex
 
 
-def _build_contract_instance_key(contract_id: str) -> stellar_xdr.LedgerKey:
+_MUXED_SC_ADDRESS_TYPES = (
+    stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT,
+    stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT,
+)
+
+
+def _validate_contract_id(contract_id: str) -> None:
+    # Only a contract (C...) owns contract data; a muxed contract (W...) is just a
+    # payment destination and has no storage of its own.
+    if not StrKey.is_valid_contract(contract_id):
+        raise ValueError(f"Invalid contract ID: {contract_id}")
+
+
+def _contains_muxed_address(val: stellar_xdr.SCVal) -> bool:
+    if val.type == stellar_xdr.SCValType.SCV_ADDRESS:
+        assert val.address is not None
+        return val.address.type in _MUXED_SC_ADDRESS_TYPES
+    if val.type == stellar_xdr.SCValType.SCV_VEC:
+        return val.vec is not None and any(
+            _contains_muxed_address(item) for item in val.vec.sc_vec
+        )
+    if val.type == stellar_xdr.SCValType.SCV_MAP:
+        return val.map is not None and any(
+            _contains_muxed_address(entry.key) or _contains_muxed_address(entry.val)
+            for entry in val.map.sc_map
+        )
+    return False
+
+
+def _build_contract_data_key(
+    contract_id: str, key: stellar_xdr.SCVal, durability: Durability
+) -> stellar_xdr.LedgerKey:
+    _validate_contract_id(contract_id)
+    # The host rejects muxed addresses (M... or W...) anywhere in a storage key,
+    # so no entry under such a key can exist.
+    if _contains_muxed_address(key):
+        raise ValueError(
+            "Contract data keys cannot contain muxed addresses (M... or W...)."
+        )
+    xdr_durability = (
+        stellar_xdr.ContractDataDurability.PERSISTENT
+        if durability == Durability.PERSISTENT
+        else stellar_xdr.ContractDataDurability.TEMPORARY
+    )
     return stellar_xdr.LedgerKey(
         stellar_xdr.LedgerEntryType.CONTRACT_DATA,
         contract_data=stellar_xdr.LedgerKeyContractData(
             contract=Address(contract_id).to_xdr_sc_address(),
-            key=stellar_xdr.SCVal(
-                stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
-            ),
-            durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+            key=key,
+            durability=xdr_durability,
         ),
+    )
+
+
+def _build_contract_instance_key(contract_id: str) -> stellar_xdr.LedgerKey:
+    return _build_contract_data_key(
+        contract_id,
+        stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE),
+        Durability.PERSISTENT,
     )
 
 
