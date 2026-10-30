@@ -12,6 +12,7 @@ Release History
     - `SorobanServer[Async].get_contract_data` requires a contract address (`C...`) and rejects a `key` that contains a muxed address (`M...` or `W...`) anywhere, since the host never stores such keys.
     - `SorobanServer[Async].get_contract_wasm`, and so `get_contract_meta`, `get_contract_spec` and `get_contract_info`, require a contract address (`C...`).
     - `TransactionBuilder.append_restore_asset_balance_entry_op` requires `balance_owner` to be a contract address (`C...`). Only contracts hold SAC balances in contract data; an account's balance lives in its trustline.
+    - `auth.build_with_delegates_entry` requires the credential address of the entry it wraps to be an account (`G...`) or a contract (`C...`), as the host requires and as the other `auth` helpers already enforce. It used to check only the delegate addresses.
 
 #### Breaking changes
 - Remove the deprecated `EventInfo.in_successful_contract_call`. Stellar RPC v30 no longer returns `inSuccessfulContractCall`, and since 16.1.1 the field was `None` for its responses. Responses from older RPC servers that still include it parse as before; the value is ignored.

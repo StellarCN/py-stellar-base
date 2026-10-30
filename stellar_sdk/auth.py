@@ -563,8 +563,8 @@ def build_with_delegates_entry(
     :raises:
         :exc:`ValueError`: if ``entry`` does not carry ``ADDRESS`` /
         ``ADDRESS_V2`` credentials, if any delegates array contains a duplicate
-        address, or if any delegate address is not a classic account (``G...``)
-        or contract (``C...``) address.
+        address, or if the credential address or any delegate address is not a
+        classic account (``G...``) or contract (``C...``) address.
     """
     if isinstance(entry, str):
         entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr(entry)
@@ -581,6 +581,7 @@ def build_with_delegates_entry(
         )
     addr_auth = _get_address_credentials(entry.credentials)
     assert addr_auth is not None
+    _ensure_authorization_sc_address(addr_auth.address)
 
     return stellar_xdr.SorobanAuthorizationEntry(
         credentials=stellar_xdr.SorobanCredentials(
