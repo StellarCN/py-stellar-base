@@ -1,5 +1,6 @@
 from . import xdr as stellar_xdr
 from .asset import Asset
+from .strkey import StrKey
 from .utils import sha256
 
 __all__ = ["LIQUIDITY_POOL_FEE_V18", "LiquidityPoolAsset"]
@@ -50,7 +51,7 @@ class LiquidityPoolAsset:
 
         1. First compare the type (eg. native before alphanum4 before alphanum12).
         2. If the types are equal, compare the assets codes.
-        3. If the asset codes are equal, compare the issuers.
+        3. If the asset codes are equal, compare the issuers' raw ed25519 public key bytes.
 
         :param asset_a: The first asset in the lexicographic order.
         :param asset_b: The second asset in the lexicographic order.
@@ -78,10 +79,12 @@ class LiquidityPoolAsset:
             assert asset_b.code is not None
             return asset_a.code < asset_b.code
 
-        # Compare asset issuer.
+        # Compare asset issuers by raw key bytes, as stellar-core does.
         assert asset_a.issuer is not None
         assert asset_b.issuer is not None
-        return asset_a.issuer < asset_b.issuer
+        return StrKey.decode_ed25519_public_key(
+            asset_a.issuer
+        ) < StrKey.decode_ed25519_public_key(asset_b.issuer)
 
     def to_change_trust_asset_xdr_object(self) -> stellar_xdr.ChangeTrustAsset:
         """Returns the xdr object for this ChangeTrustAsset object.

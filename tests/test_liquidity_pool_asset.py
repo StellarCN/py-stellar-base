@@ -132,6 +132,14 @@ class TestLiquidityPoolAsset:
         "ARST", "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
     )
 
+    # Issuers whose strkey string order differs from their key byte order.
+    asset_issuer_letter = Asset(
+        "USD", "GDRQL6EF772CANMYX55HXMU463OLAX46ZRCPCWS4KVL66ZS4BYA7OYDL"
+    )
+    asset_issuer_digit = Asset(
+        "USD", "GD32JQHFWLIROCNQ564GLCB2M7T4GMQAP5UKHMVT64OQISWL2LHYK2HO"
+    )
+
     @pytest.mark.parametrize(
         ("asset_a", "asset_b", "result"),
         [
@@ -139,9 +147,30 @@ class TestLiquidityPoolAsset:
             (asset_issuer_a, asset_issuer_a, False),
             (asset_issuer_b, asset_issuer_a, False),
             (asset_issuer_b, asset_issuer_b, False),
+            (asset_issuer_letter, asset_issuer_digit, True),
+            (asset_issuer_digit, asset_issuer_letter, False),
         ],
     )
     def test_is_valid_lexicographic_order_asset_issuer(self, asset_a, asset_b, result):
         assert (
             LiquidityPoolAsset.is_valid_lexicographic_order(asset_a, asset_b) == result
         )
+
+    def test_init_issuers_ordered_by_key_bytes(self):
+        pool = LiquidityPoolAsset(self.asset_issuer_letter, self.asset_issuer_digit)
+        assert pool.asset_a == self.asset_issuer_letter
+        assert pool.asset_b == self.asset_issuer_digit
+        assert (
+            pool.liquidity_pool_id
+            == "c2a730127d006897b021d6fcb279da68b4f65f9b6a408c74eb2cdd85ea862d5e"
+        )
+
+        with pytest.raises(
+            ValueError, match=r"Assets are not in lexicographic order\."
+        ):
+            LiquidityPoolAsset(self.asset_issuer_digit, self.asset_issuer_letter)
+
+    def test_from_xdr_issuers_ordered_by_key_bytes(self):
+        pool = LiquidityPoolAsset(self.asset_issuer_letter, self.asset_issuer_digit)
+        xdr_object = pool.to_change_trust_asset_xdr_object()
+        assert LiquidityPoolAsset.from_xdr_object(xdr_object) == pool
