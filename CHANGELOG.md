@@ -3,6 +3,13 @@ Release History
 
 ### Pending
 
+### Version 17.0.1
+
+Released on November 9, 2026
+
+#### Fixes
+- `LiquidityPoolAsset` now orders same-code assets by their issuers' raw key bytes, as stellar-core does, instead of by strkey string. ([#1247](https://github.com/StellarCN/py-stellar-base/pull/1247))
+
 ### Version 17.0.0
 
 Released on October 30, 2026
