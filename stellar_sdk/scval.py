@@ -1,5 +1,5 @@
 import functools
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from typing import Any
 
 from . import xdr as stellar_xdr
@@ -88,6 +88,9 @@ def to_native(
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
         It can also be an :class:`stellar_sdk.xdr.SCVal` expressed in base64 or bytes.
     :return: The native Python type.
+    :raises: :exc:`ValueError` if two keys of an SCV_MAP convert to equal Python keys, such as the
+        string ``"1"`` and the symbol ``"1"``, or the u32 ``1`` and the i64 ``1``. A dict cannot hold both,
+        so converting would silently drop an entry.
     """
     sc_val = _parse_sc_val(sc_val)
     if sc_val.type == stellar_xdr.SCValType.SCV_BOOL:
@@ -125,9 +128,9 @@ def to_native(
         return [to_native(val) for val in sc_val.vec.sc_vec]
     if sc_val.type == stellar_xdr.SCValType.SCV_MAP:
         assert sc_val.map is not None
-        return {
-            to_native(entry.key): to_native(entry.val) for entry in sc_val.map.sc_map
-        }
+        return _dict_from_unique_keys(
+            (to_native(entry.key), to_native(entry.val)) for entry in sc_val.map.sc_map
+        )
     if sc_val.type == stellar_xdr.SCValType.SCV_ADDRESS:
         return from_address(sc_val)
     if sc_val.type == stellar_xdr.SCValType.SCV_EXECUTABLE_TAG:
@@ -482,13 +485,14 @@ def from_map(
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
         It can also be an :class:`stellar_sdk.xdr.SCVal` expressed in base64 or bytes.
     :return: The map value.
-    :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_MAP`.
+    :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_MAP`,
+        or if the map has the same key twice.
     """
     sc_val = _parse_sc_val(sc_val)
     if sc_val.type != stellar_xdr.SCValType.SCV_MAP:
         raise ValueError(f"Invalid sc_val type, must be SCV_MAP, got {sc_val.type}")
     assert sc_val.map is not None
-    return {entry.key: entry.val for entry in sc_val.map.sc_map}
+    return _dict_from_unique_keys((entry.key, entry.val) for entry in sc_val.map.sc_map)
 
 
 def to_string(data: str | bytes) -> stellar_xdr.SCVal:
@@ -856,9 +860,24 @@ def from_struct(
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
         It can also be an :class:`stellar_sdk.xdr.SCVal` expressed in base64 or bytes.
     :return: A dict corresponding to the Struct in the Rust SDK.
+    :raises: :exc:`ValueError` if two fields have the same name.
     """
     v = from_map(sc_val)
-    return {from_symbol(key): val for key, val in v.items()}
+    return _dict_from_unique_keys((from_symbol(key), val) for key, val in v.items())
+
+
+def _dict_from_unique_keys(items: Iterable[tuple[Any, Any]]) -> dict[Any, Any]:
+    """Builds a dict from ``(key, value)`` pairs, raising instead of letting a later key overwrite an
+    equal earlier one, which would silently drop an entry."""
+    result: dict[Any, Any] = {}
+    for key, val in items:
+        if key in result:
+            raise ValueError(
+                f"Map key {key!r} is equal to an earlier key after conversion, "
+                "so the dict would drop an entry"
+            )
+        result[key] = val
+    return result
 
 
 def _compare_sc_address(a: stellar_xdr.SCAddress, b: stellar_xdr.SCAddress) -> int:

@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Fixes
+- `scval.to_native` now raises `ValueError` when two keys of an `SCV_MAP` convert to equal Python keys, such as the string `"1"` and the symbol `"1"`, or the u32 `1` and the i64 `1`. It used to keep only the last of them and drop the others without an error. `scval.from_map` and `scval.from_struct` raise the same way when a key repeats. ([#1250](https://github.com/StellarCN/py-stellar-base/issues/1250))
+
 ### Version 17.0.1
 
 Released on November 9, 2026
