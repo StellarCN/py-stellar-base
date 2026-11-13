@@ -72,6 +72,22 @@ class TestMuxedAccount:
                 "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
             )
 
+    @pytest.mark.parametrize("account_muxed_id", [2**64, 2**64 + 7])
+    def test_account_muxed_id_too_large_raise(self, account_muxed_id):
+        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        with pytest.raises(
+            ValueError,
+            match=r"`account_muxed_id` must be at most 2\*\*64 - 1 if provided.",
+        ):
+            MuxedAccount(account_id, account_muxed_id)
+
+    def test_account_muxed_id_max(self):
+        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        muxed_account = MuxedAccount(account_id, 2**64 - 1)
+        restored = MuxedAccount.from_xdr_object(muxed_account.to_xdr_object())
+        assert restored.account_muxed_id == 2**64 - 1
+        assert MuxedAccount.from_account(muxed_account.account_muxed) == muxed_account
+
     def test_account_muxed_id_is_negative_raise(self):
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
         account_id_id = -1

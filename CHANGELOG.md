@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Fixes
+- `ManageSellOffer` and `ManageBuyOffer` raise `ValueError` for an `offer_id` outside `0` to `2**63 - 1`, and `MuxedAccount` raises for an `account_muxed_id` above `2**64 - 1`, instead of writing the value modulo `2**64`. Operations read from XDR keep their offer ID as it is. ([#1251](https://github.com/StellarCN/py-stellar-base/issues/1251))
+
 ### Version 17.0.1
 
 Released on November 9, 2026
