@@ -91,6 +91,47 @@ def test_sc_val_to_native(sc_val, native):
     assert to_native(sc_val) == native
 
 
+def _sc_map(*pairs):
+    return xdr.SCVal(
+        stellar_xdr.SCValType.SCV_MAP,
+        map=xdr.SCMap([xdr.SCMapEntry(k, v) for k, v in pairs]),
+    )
+
+
+@pytest.mark.parametrize(
+    "sc_val",
+    [
+        _sc_map((to_string("1"), to_uint32(10)), (to_symbol("1"), to_uint32(20))),
+        _sc_map((to_uint32(1), to_uint32(10)), (to_int64(1), to_uint32(20))),
+        _sc_map((to_bool(True), to_uint32(10)), (to_uint32(1), to_uint32(20))),
+        _sc_map(
+            (
+                to_symbol("outer"),
+                _sc_map((to_string("a"), to_void()), (to_symbol("a"), to_void())),
+            )
+        ),
+    ],
+)
+def test_sc_val_to_native_map_keys_collide_raises(sc_val):
+    with pytest.raises(ValueError, match="equal to an earlier key"):
+        to_native(sc_val)
+    with pytest.raises(ValueError, match="equal to an earlier key"):
+        to_native(sc_val.to_xdr())
+
+
+def test_sc_val_to_native_map_keeps_distinct_keys():
+    sc_val = _sc_map((to_uint32(1), to_uint32(10)), (to_symbol("1"), to_uint32(20)))
+    assert to_native(sc_val) == {1: 10, "1": 20}
+
+
+def test_from_map_duplicate_key_raises():
+    sc_val = _sc_map((to_symbol("a"), to_uint32(10)), (to_symbol("a"), to_uint32(20)))
+    with pytest.raises(ValueError, match="equal to an earlier key"):
+        from_map(sc_val)
+    with pytest.raises(ValueError, match="equal to an earlier key"):
+        from_struct(sc_val)
+
+
 def test_address():
     addr = Address("GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX")
     scval = to_address(addr)
