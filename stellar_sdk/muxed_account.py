@@ -32,13 +32,17 @@ class MuxedAccount:
     :param account_id: ed25519 account id, for example: ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``.
         It should be a string starting with ``G``. If you want to build a MuxedAccount
         object using an address starting with ``M``, please use :func:`stellar_sdk.MuxedAccount.from_account`.
-    :param account_muxed_id: account multiplexing id, can be ``None`` or a non-negative integer. (ex. ``1234``)
+    :param account_muxed_id: account multiplexing id, can be ``None`` or an integer between ``0`` and ``2**64 - 1``. (ex. ``1234``)
     """
 
     def __init__(self, account_id: str, account_muxed_id: int | None = None) -> None:
         if account_muxed_id is not None and account_muxed_id < 0:
             raise ValueError(
                 "`account_muxed_id` must be a non-negative integer if provided."
+            )
+        if account_muxed_id is not None and account_muxed_id > 2**64 - 1:
+            raise ValueError(
+                "`account_muxed_id` must be at most 2**64 - 1 if provided."
             )
         Keypair.from_public_key(account_id)
         self.account_id: str = account_id
