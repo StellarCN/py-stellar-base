@@ -6,7 +6,7 @@ from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..signer import Signer
-from ..strkey import StrKey
+from ..strkey import Ed25519PublicKey
 from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
@@ -196,8 +196,10 @@ class SetOptions(Operation):
                 xdr_object.body.set_options_op.inflation_dest.account_id.ed25519
                 is not None
             )
-            inflation_dest = StrKey.encode_ed25519_public_key(
-                xdr_object.body.set_options_op.inflation_dest.account_id.ed25519.uint256
+            inflation_dest = str(
+                Ed25519PublicKey(
+                    xdr_object.body.set_options_op.inflation_dest.account_id.ed25519.uint256
+                )
             )
 
         clear_flags_xdr = xdr_object.body.set_options_op.clear_flags

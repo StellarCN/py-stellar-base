@@ -2,7 +2,15 @@ from enum import IntEnum
 
 from . import xdr as stellar_xdr
 from .__version__ import __issues__
-from .strkey import StrKey, _get_version_byte_for_prefix, _VersionByte
+from .exceptions import Ed25519PublicKeyInvalidError
+from .strkey import (
+    Ed25519PublicKey,
+    Ed25519SignedPayload,
+    HashX,
+    PreAuthTx,
+    StrkeyError,
+    parse,
+)
 
 __all__ = ["SignedPayloadSigner", "SignerKey", "SignerKeyType"]
 
@@ -12,6 +20,17 @@ class SignerKeyType(IntEnum):
     SIGNER_KEY_TYPE_PRE_AUTH_TX = 1
     SIGNER_KEY_TYPE_HASH_X = 2
     SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD = 3
+
+
+_STRKEY_TYPES: dict[
+    SignerKeyType,
+    type[Ed25519PublicKey | PreAuthTx | HashX | Ed25519SignedPayload],
+] = {
+    SignerKeyType.SIGNER_KEY_TYPE_ED25519: Ed25519PublicKey,
+    SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX: PreAuthTx,
+    SignerKeyType.SIGNER_KEY_TYPE_HASH_X: HashX,
+    SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD: Ed25519SignedPayload,
+}
 
 
 class SignedPayloadSigner:
@@ -53,20 +72,12 @@ class SignerKey:
         """
         return: The signer key encoded in Strkey format.
         """
-        if self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
-            return StrKey.encode_ed25519_public_key(self.signer_key)
-        elif self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
-            return StrKey.encode_pre_auth_tx(self.signer_key)
-        elif self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
-            return StrKey.encode_sha256_hash(self.signer_key)
-        elif (
-            self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
-        ):
-            return StrKey.encode_ed25519_signed_payload(self.signer_key)
-        else:
+        strkey_type = _STRKEY_TYPES.get(self.signer_key_type)
+        if strkey_type is None:
             raise ValueError(
                 f"{self.signer_key_type!r} is an unsupported signer key type."
             )
+        return str(strkey_type.from_bytes(self.signer_key))
 
     @classmethod
     def from_encoded_signer_key(cls, encoded_signer_key: str) -> "SignerKey":
@@ -75,17 +86,13 @@ class SignerKey:
         :param encoded_signer_key: The encoded signer key. (ex. ``GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC``)
         :return: The :class:`SignerKey` object.
         """
-        prefix = _get_version_byte_for_prefix(encoded_signer_key)
-        if prefix == _VersionByte.ED25519_PUBLIC_KEY:
-            return cls.ed25519_public_key(encoded_signer_key)
-        elif prefix == _VersionByte.PRE_AUTH_TX:
-            return cls.pre_auth_tx(encoded_signer_key)
-        elif prefix == _VersionByte.SHA256_HASH:
-            return cls.sha256_hash(encoded_signer_key)
-        elif prefix == _VersionByte.ED25519_SIGNED_PAYLOAD:
-            return cls.ed25519_signed_payload(encoded_signer_key)
-        else:
-            raise ValueError(f"{prefix!r} is an unsupported version byte.")
+        strkey = parse(encoded_signer_key)
+        for signer_key_type, strkey_type in _STRKEY_TYPES.items():
+            if isinstance(strkey, strkey_type):
+                return cls(strkey.to_bytes(), signer_key_type)
+        raise ValueError(
+            f"{type(strkey).__name__} is not a signer key type: {encoded_signer_key}"
+        )
 
     @classmethod
     def ed25519_public_key(cls, account_id: str | bytes) -> "SignerKey":
@@ -98,9 +105,15 @@ class SignerKey:
             is not a valid ed25519 public key.
         """
         signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_ED25519
-        if isinstance(account_id, str):
-            account_id = StrKey.decode_ed25519_public_key(account_id)
-        return cls(signer_key=account_id, signer_key_type=signer_key_type)
+        if isinstance(account_id, bytes):
+            return cls(signer_key=account_id, signer_key_type=signer_key_type)
+        try:
+            key = Ed25519PublicKey.from_string(account_id).key
+        except StrkeyError as e:
+            raise Ed25519PublicKeyInvalidError(
+                f"Invalid Ed25519 Public Key: {account_id}"
+            ) from e
+        return cls(signer_key=key, signer_key_type=signer_key_type)
 
     @classmethod
     def pre_auth_tx(cls, pre_auth_tx_hash: str | bytes) -> "SignerKey":
@@ -112,7 +125,7 @@ class SignerKey:
         """
         signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
         if isinstance(pre_auth_tx_hash, str):
-            pre_auth_tx_hash = StrKey.decode_pre_auth_tx(pre_auth_tx_hash)
+            pre_auth_tx_hash = PreAuthTx.from_string(pre_auth_tx_hash).hash
         return cls(signer_key=pre_auth_tx_hash, signer_key_type=signer_key_type)
 
     @classmethod
@@ -125,7 +138,7 @@ class SignerKey:
         """
         signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_HASH_X
         if isinstance(sha256_hash, str):
-            sha256_hash = StrKey.decode_sha256_hash(sha256_hash)
+            sha256_hash = HashX.from_string(sha256_hash).hash
         return cls(signer_key=sha256_hash, signer_key_type=signer_key_type)
 
     @classmethod
@@ -140,21 +153,14 @@ class SignerKey:
         """
         signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
         if isinstance(ed25519_signed_payload, str):
-            ed25519_signed_payload = StrKey.decode_ed25519_signed_payload(
+            ed25519_signed_payload = Ed25519SignedPayload.from_string(
                 ed25519_signed_payload
-            )
+            ).to_bytes()
         if isinstance(ed25519_signed_payload, SignedPayloadSigner):
-            decoded_account_id = StrKey.decode_ed25519_public_key(
-                ed25519_signed_payload.account_id
-            )
-            payload_length = len(ed25519_signed_payload.payload)
-            payload = ed25519_signed_payload.payload
-            payload += b"\0" * ((4 - payload_length % 4) % 4)
-            ed25519_signed_payload = (
-                decoded_account_id
-                + int.to_bytes(payload_length, length=4, byteorder="big")
-                + payload
-            )
+            ed25519_signed_payload = Ed25519SignedPayload(
+                Ed25519PublicKey.from_string(ed25519_signed_payload.account_id).key,
+                ed25519_signed_payload.payload,
+            ).to_bytes()
         return cls(signer_key=ed25519_signed_payload, signer_key_type=signer_key_type)
 
     def to_signed_payload_signer(self) -> "SignedPayloadSigner":
@@ -165,7 +171,7 @@ class SignerKey:
             )
 
         payload_length = int.from_bytes(self.signer_key[32:36], byteorder="big")
-        account_id = StrKey.encode_ed25519_public_key(self.signer_key[:32])
+        account_id = str(Ed25519PublicKey(self.signer_key[:32]))
         payload = self.signer_key[36 : 36 + payload_length]
         return SignedPayloadSigner(account_id, payload)
 
@@ -228,8 +234,8 @@ class SignerKey:
             == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
         ):
             assert xdr_object.ed25519_signed_payload is not None
-            encoded_account_id = StrKey.encode_ed25519_public_key(
-                xdr_object.ed25519_signed_payload.ed25519.uint256
+            encoded_account_id = str(
+                Ed25519PublicKey(xdr_object.ed25519_signed_payload.ed25519.uint256)
             )
             payload = xdr_object.ed25519_signed_payload.payload
             ed25519_signed_payload = SignedPayloadSigner(encoded_account_id, payload)

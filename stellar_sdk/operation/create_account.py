@@ -4,7 +4,7 @@ from typing import ClassVar
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
-from ..strkey import StrKey
+from ..strkey import Ed25519PublicKey
 from ..utils import raise_if_not_valid_amount, raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
@@ -66,8 +66,10 @@ class CreateAccount(Operation):
         assert (
             xdr_object.body.create_account_op.destination.account_id.ed25519 is not None
         )
-        destination = StrKey.encode_ed25519_public_key(
-            xdr_object.body.create_account_op.destination.account_id.ed25519.uint256
+        destination = str(
+            Ed25519PublicKey(
+                xdr_object.body.create_account_op.destination.account_id.ed25519.uint256
+            )
         )
         starting_balance = Operation.from_xdr_amount(
             xdr_object.body.create_account_op.starting_balance.int64

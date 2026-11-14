@@ -12,7 +12,7 @@ from urllib.parse import urljoin, urlsplit, urlunsplit
 from . import xdr as stellar_xdr
 from .address import Address, AddressType
 from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
-from .strkey import StrKey
+from .strkey import Ed25519PublicKey
 
 if TYPE_CHECKING:
     from .asset import Asset
@@ -94,8 +94,8 @@ def is_valid_hash(data: str) -> bool:
 
 def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> None:
     try:
-        StrKey.decode_ed25519_public_key(value)
-    except Exception as e:
+        Ed25519PublicKey.from_string(value)
+    except (TypeError, ValueError) as e:
         raise Ed25519PublicKeyInvalidError(
             f'Value of argument "{argument_name}" is not a valid ed25519 public key: {value}'
         ) from e

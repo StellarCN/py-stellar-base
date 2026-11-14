@@ -6,14 +6,14 @@ Example: Using ED25519 Signed Payload (Protocol 19 Feature)
 This example demonstrates how to work with the new `ED25519_SIGNED_PAYLOAD`
 key type introduced in Stellar Protocol 19.
 
-The ED25519 Signed Payload is an advanced type of StrKey that allows accounts
+The ED25519 Signed Payload is an advanced type of strkey that allows accounts
 to authorize transactions based on a **signed payload**, providing enhanced
 security and flexibility for smart contract interactions and pre-signed data.
 
 Operations demonstrated:
 1. Create an `ED25519_SIGNED_PAYLOAD` key from an account and payload.
-2. Encode it into a StrKey format.
-3. Decode the StrKey back to a signer key.
+2. Encode it into a strkey.
+3. Decode the strkey back to a signer key.
 4. Extract and print the original payload and account ID.
 
 Official Documentation:
@@ -61,14 +61,14 @@ signed_payload_signer = SignedPayloadSigner(account_id, payload)
 # Create a SignerKey using the `ed25519_signed_payload` method
 signer_key = SignerKey.ed25519_signed_payload(signed_payload_signer)
 
-# Encode the signer key into StrKey format (Stellar’s base32 representation)
+# Encode the signer key into a strkey (Stellar’s base32 representation)
 encoded_key = signer_key.encoded_signer_key
 
 print(f"Encoded ED25519 Signed Payload: {encoded_key}")
 print("-" * 68)
 
 # ==============================================================
-# === 2. Decode the Signed Payload from StrKey =================
+# === 2. Decode the Signed Payload from a strkey =================
 # ==============================================================
 
 print("=== Decode ED25519 Signed Payload ===")
@@ -76,7 +76,7 @@ print("=== Decode ED25519 Signed Payload ===")
 # Example encoded key (from previous output)
 encoded_key = "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
 
-# Decode the SignerKey back from its StrKey representation
+# Decode the SignerKey back from its strkey
 signer_key = SignerKey.from_encoded_signer_key(encoded_key)
 
 # Convert it back to a SignedPayloadSigner object to extract details

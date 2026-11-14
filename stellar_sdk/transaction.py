@@ -9,7 +9,7 @@ from .operation.create_claimable_balance import CreateClaimableBalance
 from .operation.operation import Operation
 from .preconditions import Preconditions
 from .soroban_data_builder import SorobanDataBuilder
-from .strkey import StrKey
+from .strkey import Ed25519PublicKey
 from .time_bounds import TimeBounds
 from .utils import sha256
 
@@ -211,8 +211,8 @@ class Transaction:
                 soroban_data = xdr_object.ext.soroban_data
         else:
             assert isinstance(xdr_object, stellar_xdr.TransactionV0)
-            ed25519_key = StrKey.encode_ed25519_public_key(
-                xdr_object.source_account_ed25519.uint256
+            ed25519_key = str(
+                Ed25519PublicKey(xdr_object.source_account_ed25519.uint256)
             )
             source = MuxedAccount(ed25519_key, None)
             if xdr_object.time_bounds:

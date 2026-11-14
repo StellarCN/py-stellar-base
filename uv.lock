@@ -2210,6 +2210,7 @@ dependencies = [
     { name = "pynacl" },
     { name = "requests" },
     { name = "requests-sse" },
+    { name = "stellar-strkey" },
     { name = "xdrlib3" },
 ]
 
@@ -2254,6 +2255,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.0.0" },
     { name = "requests-sse", specifier = ">=0.3" },
     { name = "shamir-mnemonic", marker = "extra == 'shamir'", specifier = ">=0.3.0" },
+    { name = "stellar-strkey", specifier = ">=0.2.0,<0.3.0" },
     { name = "xdrlib3", specifier = ">=0.1.1" },
 ]
 provides-extras = ["aiohttp", "shamir"]
@@ -2275,6 +2277,15 @@ docs = [
     { name = "sphinx", specifier = ">=7.1.2" },
     { name = "sphinx-autodoc-typehints", specifier = ">=2.0.1" },
     { name = "sphinx-rtd-theme", specifier = ">=3.0.2" },
+]
+
+[[package]]
+name = "stellar-strkey"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0c/05/4c93a8ac9ae30662255853a4dc9b6130859296f3bb62540bc9da82bb2d51/stellar_strkey-0.2.0.tar.gz", hash = "sha256:1b1c89bbb0a64cf9e6ec332e80e72d272300f61f9a628a84cf16994a4effc433", size = 36078, upload-time = "2026-11-12T03:42:00.441Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9c/cd/71bafcc0c2324e03a2c6ff06b0674a9f70d570ccad26d3420650666902db/stellar_strkey-0.2.0-py3-none-any.whl", hash = "sha256:59f2acbb8b3dc6ecdb2742980b864163ff9d2477aabef14b2bc42acae12a42ae", size = 18046, upload-time = "2026-11-12T03:41:59.058Z" },
 ]
 
 [[package]]

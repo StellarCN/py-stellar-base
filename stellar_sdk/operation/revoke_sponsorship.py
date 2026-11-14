@@ -9,7 +9,7 @@ from ..keypair import Keypair
 from ..liquidity_pool_id import LiquidityPoolId
 from ..muxed_account import MuxedAccount
 from ..signer_key import SignerKey
-from ..strkey import StrKey
+from ..strkey import Ed25519PublicKey
 from ..utils import (
     raise_if_not_valid_balance_id,
     raise_if_not_valid_ed25519_public_key,
@@ -462,16 +462,20 @@ class RevokeSponsorship(Operation):
             if ledger_key_type == stellar_xdr.LedgerEntryType.ACCOUNT:
                 assert ledger_key.account is not None
                 assert ledger_key.account.account_id.account_id.ed25519 is not None
-                account_id = StrKey.encode_ed25519_public_key(
-                    ledger_key.account.account_id.account_id.ed25519.uint256
+                account_id = str(
+                    Ed25519PublicKey(
+                        ledger_key.account.account_id.account_id.ed25519.uint256
+                    )
                 )
                 op = cls.revoke_account_sponsorship(account_id, source)
             elif ledger_key_type == stellar_xdr.LedgerEntryType.TRUSTLINE:
                 assert ledger_key.trust_line is not None
                 assert ledger_key.trust_line.account_id is not None
                 assert ledger_key.trust_line.account_id.account_id.ed25519 is not None
-                account_id = StrKey.encode_ed25519_public_key(
-                    ledger_key.trust_line.account_id.account_id.ed25519.uint256
+                account_id = str(
+                    Ed25519PublicKey(
+                        ledger_key.trust_line.account_id.account_id.ed25519.uint256
+                    )
                 )
                 if (
                     ledger_key.trust_line.asset.type
@@ -486,8 +490,10 @@ class RevokeSponsorship(Operation):
             elif ledger_key_type == stellar_xdr.LedgerEntryType.OFFER:
                 assert ledger_key.offer is not None
                 assert ledger_key.offer.seller_id.account_id.ed25519 is not None
-                seller_id = StrKey.encode_ed25519_public_key(
-                    ledger_key.offer.seller_id.account_id.ed25519.uint256
+                seller_id = str(
+                    Ed25519PublicKey(
+                        ledger_key.offer.seller_id.account_id.ed25519.uint256
+                    )
                 )
                 offer_id = ledger_key.offer.offer_id.int64
                 op = cls.revoke_offer_sponsorship(seller_id, offer_id, source)
@@ -496,8 +502,10 @@ class RevokeSponsorship(Operation):
                 assert ledger_key.data.account_id is not None
                 assert ledger_key.data.account_id.account_id is not None
                 assert ledger_key.data.account_id.account_id.ed25519 is not None
-                account_id = StrKey.encode_ed25519_public_key(
-                    ledger_key.data.account_id.account_id.ed25519.uint256
+                account_id = str(
+                    Ed25519PublicKey(
+                        ledger_key.data.account_id.account_id.ed25519.uint256
+                    )
                 )
                 data_name = ledger_key.data.data_name.string64.decode()
                 op = cls.revoke_data_sponsorship(account_id, data_name, source)
@@ -524,8 +532,10 @@ class RevokeSponsorship(Operation):
                 xdr_object.body.revoke_sponsorship_op.signer.account_id.account_id.ed25519
                 is not None
             )
-            account_id = StrKey.encode_ed25519_public_key(
-                xdr_object.body.revoke_sponsorship_op.signer.account_id.account_id.ed25519.uint256
+            account_id = str(
+                Ed25519PublicKey(
+                    xdr_object.body.revoke_sponsorship_op.signer.account_id.account_id.ed25519.uint256
+                )
             )
             signer_key = SignerKey.from_xdr_object(
                 xdr_object.body.revoke_sponsorship_op.signer.signer_key

@@ -9,7 +9,6 @@ from stellar_sdk import (
     Asset,
     Keypair,
     SorobanServer,
-    StrKey,
     TransactionBuilder,
     scval,
 )
@@ -17,6 +16,7 @@ from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.contract import ContractClient
 from stellar_sdk.contract.exceptions import NoSignatureNeededError
 from stellar_sdk.soroban_rpc import GetTransactionStatus
+from stellar_sdk.strkey import Contract, MuxedContract
 from tests.integration_utils import NETWORK_PASSPHRASE, RPC_URL, fund_account
 
 SOURCE = Keypair.random()
@@ -187,9 +187,12 @@ class TestContractClient:
         # underlying contract and reports the muxed id in the transfer event.
         native_contract_id = create_contract_from_asset(Asset.native())
         muxed_id = 1234
-        destination = Address.from_raw_muxed_contract(
-            StrKey.decode_contract(self.hello_world_contract_id)
-            + muxed_id.to_bytes(8, "big")
+        destination = Address(
+            str(
+                MuxedContract(
+                    Contract.from_string(self.hello_world_contract_id).hash, muxed_id
+                )
+            )
         )
         assert destination.address.startswith("W")
 

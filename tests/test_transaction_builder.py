@@ -24,7 +24,6 @@ from stellar_sdk import (
     SignerKey,
     SorobanDataBuilder,
     SorobanServer,
-    StrKey,
     TimeBounds,
     TransactionBuilder,
     TransactionEnvelope,
@@ -33,6 +32,7 @@ from stellar_sdk import (
     scval,
 )
 from stellar_sdk import xdr as stellar_xdr
+from stellar_sdk.strkey import Contract, MuxedContract
 
 from . import integration_utils
 
@@ -1427,11 +1427,13 @@ class TestTransaction:
         [
             "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY",
             "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26",
-            StrKey.encode_muxed_contract(
-                StrKey.decode_contract(
-                    "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+            str(
+                MuxedContract(
+                    Contract.from_string(
+                        "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
+                    ).hash,
+                    1,
                 )
-                + (1).to_bytes(8, "big")
             ),
         ],
         ids=["account", "muxed_account", "muxed_contract"],

@@ -57,15 +57,14 @@ balance is credited to the underlying contract, and the ID is reported as `to_mu
 the transfer event, so one contract account can tell its depositors apart.
 
 ```python
-from stellar_sdk import Address, StrKey, scval
+from stellar_sdk import Address, scval
+from stellar_sdk.strkey import Contract, MuxedContract
 
 muxed_id = 1234
-w = Address.from_raw_muxed_contract(
-    StrKey.decode_contract("C...") + muxed_id.to_bytes(8, "big")
-)
-raw = StrKey.decode_muxed_contract(w.address)  # 32-byte contract ID + 8-byte big-endian ID
-contract_id = StrKey.encode_contract(raw[:32])
-muxed_id = int.from_bytes(raw[32:], "big")
+w = Address(str(MuxedContract(Contract.from_string("C...").hash, muxed_id)))
+muxed = MuxedContract.from_string(w.address)
+contract_id = str(Contract(muxed.hash))
+muxed_id = muxed.id
 
 # SAC transfer to the muxed contract (client = ContractClient for the asset's SAC)
 client.invoke(

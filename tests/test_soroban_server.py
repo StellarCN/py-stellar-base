@@ -9,7 +9,6 @@ from stellar_sdk import (
     Asset,
     Keypair,
     Network,
-    StrKey,
     TransactionBuilder,
     scval,
 )
@@ -24,6 +23,7 @@ from stellar_sdk.exceptions import (
 )
 from stellar_sdk.operation import InvokeHostFunction
 from stellar_sdk.soroban_rpc import *
+from stellar_sdk.strkey import Contract, MuxedContract
 from tests.helpers import resolve
 
 _CONTRACT_ID = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
@@ -31,9 +31,7 @@ _ACCOUNT_ID = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
 _MUXED_ACCOUNT_ID = (
     "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
 )
-_MUXED_CONTRACT_ID = StrKey.encode_muxed_contract(
-    StrKey.decode_contract(_CONTRACT_ID) + (1).to_bytes(8, "big")
-)
+_MUXED_CONTRACT_ID = str(MuxedContract(Contract.from_string(_CONTRACT_ID).hash, 1))
 _NON_CONTRACT_IDS = pytest.mark.parametrize(
     "contract_id",
     [_ACCOUNT_ID, _MUXED_ACCOUNT_ID, _MUXED_CONTRACT_ID],

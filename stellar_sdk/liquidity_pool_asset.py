@@ -1,6 +1,6 @@
 from . import xdr as stellar_xdr
 from .asset import Asset
-from .strkey import StrKey
+from .strkey import Ed25519PublicKey
 from .utils import sha256
 
 __all__ = ["LIQUIDITY_POOL_FEE_V18", "LiquidityPoolAsset"]
@@ -82,9 +82,10 @@ class LiquidityPoolAsset:
         # Compare asset issuers by raw key bytes, as stellar-core does.
         assert asset_a.issuer is not None
         assert asset_b.issuer is not None
-        return StrKey.decode_ed25519_public_key(
-            asset_a.issuer
-        ) < StrKey.decode_ed25519_public_key(asset_b.issuer)
+        return (
+            Ed25519PublicKey.from_string(asset_a.issuer).key
+            < Ed25519PublicKey.from_string(asset_b.issuer).key
+        )
 
     def to_change_trust_asset_xdr_object(self) -> stellar_xdr.ChangeTrustAsset:
         """Returns the xdr object for this ChangeTrustAsset object.
