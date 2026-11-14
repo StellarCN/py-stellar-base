@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Fixes
+- `StrKey.decode_ed25519_signed_payload` and `StrKey.is_valid_ed25519_signed_payload` now reject a signed payload strkey (`P...`) whose padding bytes after the payload are not zero, as SEP-23 requires. Such a key used to decode to the same signer as the valid key.
+
 ### Version 17.0.1
 
 Released on November 9, 2026

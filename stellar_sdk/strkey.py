@@ -425,6 +425,9 @@ def _decode_check(version_byte: _VersionByte, encoded: str) -> bytes:
             data[36:]
         ):
             raise ValueError(f"Invalid Ed25519 Signed Payload Key: {encoded}")
+        # SEP-23: the bytes after the payload are zero padding.
+        if any(data[36 + payload_length_prefix :]):
+            raise ValueError(f"Invalid Ed25519 Signed Payload Key: {encoded}")
     return data
 
 
