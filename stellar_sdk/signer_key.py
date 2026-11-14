@@ -148,6 +148,11 @@ class SignerKey:
                 ed25519_signed_payload.account_id
             )
             payload_length = len(ed25519_signed_payload.payload)
+            if not 1 <= payload_length <= 64:
+                raise ValueError(
+                    f"Invalid signed payload length: {payload_length}, "
+                    "the payload must be 1 to 64 bytes."
+                )
             payload = ed25519_signed_payload.payload
             payload += b"\0" * ((4 - payload_length % 4) % 4)
             ed25519_signed_payload = (

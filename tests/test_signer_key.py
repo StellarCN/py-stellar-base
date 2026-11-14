@@ -269,3 +269,20 @@ class TestSignedPayloadSigner:
         signer2 = SignedPayloadSigner(account_id, b"dog")
 
         assert signer1 != signer2
+
+    @pytest.mark.parametrize("size", [1, 64])
+    def test_ed25519_signed_payload_length_ok(self, size):
+        account_id = "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"
+        signer = SignedPayloadSigner(account_id, b"\x01" * size)
+        encoded = SignerKey.ed25519_signed_payload(signer).encoded_signer_key
+        assert (
+            SignerKey.from_encoded_signer_key(encoded).to_signed_payload_signer()
+            == signer
+        )
+
+    @pytest.mark.parametrize("size", [0, 65])
+    def test_ed25519_signed_payload_length_raise(self, size):
+        account_id = "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"
+        signer = SignedPayloadSigner(account_id, b"\x01" * size)
+        with pytest.raises(ValueError, match="the payload must be 1 to 64 bytes"):
+            SignerKey.ed25519_signed_payload(signer)
