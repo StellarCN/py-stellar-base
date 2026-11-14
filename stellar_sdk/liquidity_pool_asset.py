@@ -1,7 +1,6 @@
-from stellar_strkey import Ed25519PublicKey
-
 from . import xdr as stellar_xdr
 from .asset import Asset
+from .strkey import Ed25519PublicKey
 from .utils import sha256
 
 __all__ = ["LIQUIDITY_POOL_FEE_V18", "LiquidityPoolAsset"]

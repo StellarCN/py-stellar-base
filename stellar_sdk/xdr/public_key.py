@@ -85,15 +85,14 @@ class PublicKey:
         return cls.from_json_dict(json.loads(json_str))
 
     def to_json_dict(self) -> str:
-        from stellar_strkey import Ed25519PublicKey
+        from ..strkey import Ed25519PublicKey
 
         assert self.ed25519 is not None
         return str(Ed25519PublicKey(self.ed25519.uint256))
 
     @classmethod
     def from_json_dict(cls, json_value: str) -> PublicKey:
-        from stellar_strkey import Ed25519PublicKey
-
+        from ..strkey import Ed25519PublicKey
         from .public_key_type import PublicKeyType
         from .uint256 import Uint256
 

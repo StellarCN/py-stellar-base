@@ -9,11 +9,10 @@ from decimal import ROUND_FLOOR, Context, Decimal, Inexact
 from typing import TYPE_CHECKING
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
-from stellar_strkey import Ed25519PublicKey
-
 from . import xdr as stellar_xdr
 from .address import Address, AddressType
 from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
+from .strkey import Ed25519PublicKey
 
 if TYPE_CHECKING:
     from .asset import Asset

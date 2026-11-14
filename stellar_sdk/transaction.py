@@ -1,7 +1,5 @@
 from collections.abc import Sequence
 
-from stellar_strkey import Ed25519PublicKey
-
 from . import xdr as stellar_xdr
 from .keypair import Keypair
 from .memo import Memo, NoneMemo
@@ -11,6 +9,7 @@ from .operation.create_claimable_balance import CreateClaimableBalance
 from .operation.operation import Operation
 from .preconditions import Preconditions
 from .soroban_data_builder import SorobanDataBuilder
+from .strkey import Ed25519PublicKey
 from .time_bounds import TimeBounds
 from .utils import sha256
 

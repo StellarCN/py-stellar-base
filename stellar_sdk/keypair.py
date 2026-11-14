@@ -3,7 +3,6 @@ from collections.abc import Iterable
 
 import nacl.signing as ed25519
 from nacl.exceptions import BadSignatureError as NaclBadSignatureError
-from stellar_strkey import Ed25519PrivateKey, Ed25519PublicKey, StrkeyError
 
 from . import xdr as stellar_xdr
 from .decorated_signature import DecoratedSignature
@@ -14,6 +13,7 @@ from .exceptions import (
     MissingEd25519SecretSeedError,
 )
 from .sep.mnemonic import Language, StellarMnemonic
+from .strkey import Ed25519PrivateKey, Ed25519PublicKey, StrkeyError
 from .utils import sha256
 
 __all__ = ["Keypair"]

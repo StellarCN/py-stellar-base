@@ -150,8 +150,7 @@ class SCAddress:
         return cls.from_json_dict(json.loads(json_str))
 
     def to_json_dict(self) -> str:
-        from stellar_strkey import Contract, MuxedEd25519Account
-
+        from ..strkey import Contract, MuxedEd25519Account
         from .sc_address_type import SCAddressType
 
         if self.type == SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
@@ -177,8 +176,7 @@ class SCAddress:
 
     @classmethod
     def from_json_dict(cls, json_value: str) -> SCAddress:
-        from stellar_strkey import Contract, MuxedEd25519Account
-
+        from ..strkey import Contract, MuxedEd25519Account
         from .sc_address_type import SCAddressType
 
         if json_value.startswith("G"):

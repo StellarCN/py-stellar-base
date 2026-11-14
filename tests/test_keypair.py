@@ -4,7 +4,6 @@ import itertools
 import pytest
 import shamir_mnemonic  # type: ignore[import-untyped]
 from mnemonic import Mnemonic
-from stellar_strkey import Ed25519PrivateKey, Ed25519PublicKey
 
 from stellar_sdk import Keypair
 from stellar_sdk.exceptions import (
@@ -14,6 +13,7 @@ from stellar_sdk.exceptions import (
     MissingEd25519SecretSeedError,
 )
 from stellar_sdk.sep.mnemonic import Language, StellarMnemonic
+from stellar_sdk.strkey import Ed25519PrivateKey, Ed25519PublicKey
 
 SEP_5_CASES = (
     {

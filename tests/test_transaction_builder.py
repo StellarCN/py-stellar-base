@@ -2,7 +2,6 @@ import binascii
 import time
 
 import pytest
-from stellar_strkey import Contract, MuxedContract
 
 from stellar_sdk import (
     LIQUIDITY_POOL_FEE_V18,
@@ -33,6 +32,7 @@ from stellar_sdk import (
     scval,
 )
 from stellar_sdk import xdr as stellar_xdr
+from stellar_sdk.strkey import Contract, MuxedContract
 
 from . import integration_utils
 

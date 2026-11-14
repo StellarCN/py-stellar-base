@@ -3,7 +3,6 @@ import copy
 
 import pytest
 from pydantic import ValidationError
-from stellar_strkey import Contract, MuxedContract
 
 from stellar_sdk import (
     Account,
@@ -24,6 +23,7 @@ from stellar_sdk.exceptions import (
 )
 from stellar_sdk.operation import InvokeHostFunction
 from stellar_sdk.soroban_rpc import *
+from stellar_sdk.strkey import Contract, MuxedContract
 from tests.helpers import resolve
 
 _CONTRACT_ID = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"

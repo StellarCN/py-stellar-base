@@ -57,9 +57,8 @@ balance is credited to the underlying contract, and the ID is reported as `to_mu
 the transfer event, so one contract account can tell its depositors apart.
 
 ```python
-from stellar_strkey import Contract, MuxedContract
-
 from stellar_sdk import Address, scval
+from stellar_sdk.strkey import Contract, MuxedContract
 
 muxed_id = 1234
 w = Address(str(MuxedContract(Contract.from_string("C...").hash, muxed_id)))

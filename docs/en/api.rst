@@ -767,6 +767,11 @@ SignerKey
 .. autoclass:: stellar_sdk.signer_key.SignerKeyType
    :members:
 
+Strkey
+^^^^^^
+
+.. automodule:: stellar_sdk.strkey
+
 TimeBounds
 ^^^^^^^^^^
 

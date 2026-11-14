@@ -6,14 +6,13 @@ import uuid
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from stellar_strkey import Contract
-
 from . import scval
 from . import xdr as stellar_xdr
 from .address import Address
 from .asset import Asset
 from .operation import InvokeHostFunction
 from .soroban_rpc import *
+from .strkey import Contract
 
 if TYPE_CHECKING:
     from .transaction_envelope import TransactionEnvelope

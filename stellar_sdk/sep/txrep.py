@@ -12,8 +12,6 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from enum import Enum
 
-from stellar_strkey import HashX, PreAuthTx
-
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..decorated_signature import DecoratedSignature
@@ -31,6 +29,7 @@ from ..preconditions import Preconditions
 from ..price import Price
 from ..signer import Signer
 from ..signer_key import SignerKey, SignerKeyType
+from ..strkey import HashX, PreAuthTx
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction
 from ..transaction_envelope import TransactionEnvelope

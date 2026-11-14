@@ -6,8 +6,6 @@ import warnings
 from collections.abc import Sequence
 from decimal import Decimal
 
-from stellar_strkey import Contract
-
 from . import scval
 from . import xdr as stellar_xdr
 from .account import Account
@@ -28,6 +26,7 @@ from .price import Price
 from .signer import Signer
 from .signer_key import SignedPayloadSigner, SignerKey
 from .soroban_data_builder import SorobanDataBuilder
+from .strkey import Contract
 from .time_bounds import TimeBounds
 from .transaction import Transaction
 from .transaction_envelope import TransactionEnvelope

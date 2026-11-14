@@ -132,13 +132,7 @@ class SignerKey:
         return cls.from_json_dict(json.loads(json_str))
 
     def to_json_dict(self) -> str:
-        from stellar_strkey import (
-            Ed25519PublicKey,
-            Ed25519SignedPayload,
-            HashX,
-            PreAuthTx,
-        )
-
+        from ..strkey import Ed25519PublicKey, Ed25519SignedPayload, HashX, PreAuthTx
         from .signer_key_type import SignerKeyType
 
         if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
@@ -162,13 +156,7 @@ class SignerKey:
 
     @classmethod
     def from_json_dict(cls, json_value: str) -> SignerKey:
-        from stellar_strkey import (
-            Ed25519PublicKey,
-            Ed25519SignedPayload,
-            HashX,
-            PreAuthTx,
-        )
-
+        from ..strkey import Ed25519PublicKey, Ed25519SignedPayload, HashX, PreAuthTx
         from .signer_key_type import SignerKeyType
         from .uint256 import Uint256
 

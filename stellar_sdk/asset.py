@@ -1,12 +1,11 @@
 import builtins
 import re
 
-from stellar_strkey import Contract, Ed25519PublicKey
-
 from . import xdr as stellar_xdr
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
 from .keypair import Keypair
 from .network import Network
+from .strkey import Contract, Ed25519PublicKey
 from .utils import sha256
 
 __all__ = ["Asset"]

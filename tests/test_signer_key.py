@@ -1,12 +1,12 @@
 import binascii
 
 import pytest
-from stellar_strkey import Ed25519PublicKey
 
 import stellar_sdk
 import stellar_sdk.xdr
 from stellar_sdk import SignedPayloadSigner, SignerKey, SignerKeyType
 from stellar_sdk import xdr as stellar_xdr
+from stellar_sdk.strkey import Ed25519PublicKey
 
 
 class TestSignerKey:

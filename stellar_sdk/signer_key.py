@@ -1,6 +1,9 @@
 from enum import IntEnum
 
-from stellar_strkey import (
+from . import xdr as stellar_xdr
+from .__version__ import __issues__
+from .exceptions import Ed25519PublicKeyInvalidError
+from .strkey import (
     Ed25519PublicKey,
     Ed25519SignedPayload,
     HashX,
@@ -8,10 +11,6 @@ from stellar_strkey import (
     StrkeyError,
     parse,
 )
-
-from . import xdr as stellar_xdr
-from .__version__ import __issues__
-from .exceptions import Ed25519PublicKeyInvalidError
 
 __all__ = ["SignedPayloadSigner", "SignerKey", "SignerKeyType"]
 

@@ -1,5 +1,8 @@
 import pytest
-from stellar_strkey import (
+
+from stellar_sdk import xdr as stellar_xdr
+from stellar_sdk.address import Address, AddressType
+from stellar_sdk.strkey import (
     ClaimableBalance,
     Contract,
     Ed25519PublicKey,
@@ -7,9 +10,6 @@ from stellar_strkey import (
     MuxedContract,
     MuxedEd25519Account,
 )
-
-from stellar_sdk import xdr as stellar_xdr
-from stellar_sdk.address import Address, AddressType
 
 
 class TestAddress:

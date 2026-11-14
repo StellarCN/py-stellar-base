@@ -1,7 +1,6 @@
 from typing import Any, cast
 
 import pytest
-from stellar_strkey import Contract, MuxedContract
 
 from stellar_sdk import Address, Keypair, Network, scval, utils
 from stellar_sdk import xdr as stellar_xdr
@@ -13,6 +12,7 @@ from stellar_sdk.auth import (
     build_authorization_preimage,
     build_with_delegates_entry,
 )
+from stellar_sdk.strkey import Contract, MuxedContract
 
 
 def _ed25519_auth_signer(signer: Keypair):

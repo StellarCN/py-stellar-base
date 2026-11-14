@@ -5,7 +5,7 @@ Release History
 
 #### Breaking changes
 - Drop support for Python 3.10, which reached end of life in October 2026.
-- Remove `StrKey` and the `stellar_sdk.strkey` module. The SDK now uses [stellar-strkey](https://pypi.org/project/stellar-strkey/), which has a class for each strkey type. For example:
+- Remove `StrKey`. The SDK now uses [stellar-strkey](https://stellar-strkey.readthedocs.io/), which has a class for each strkey type, and `stellar_sdk.strkey` re-exports it. For example:
   - `StrKey.encode_ed25519_public_key(raw)` becomes `str(Ed25519PublicKey(raw))`.
   - `StrKey.decode_ed25519_public_key(s)` becomes `Ed25519PublicKey.from_string(s).key`.
   - `StrKey.is_valid_contract(s)` becomes `Contract.is_valid(s)`.

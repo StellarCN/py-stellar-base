@@ -1,8 +1,8 @@
 import pytest
-from stellar_strkey import Ed25519PublicKey
 
 from stellar_sdk import MuxedAccount
 from stellar_sdk import xdr as stellar_xdr
+from stellar_sdk.strkey import Ed25519PublicKey
 
 
 class TestMuxedAccount:

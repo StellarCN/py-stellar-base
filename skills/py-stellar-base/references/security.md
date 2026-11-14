@@ -21,10 +21,10 @@ Rules for code that handles keys, money, and signatures.
 ## Validate addresses before use
 
 `Keypair.from_public_key` / `from_secret` raise on malformed input, but to validate without
-constructing, use the classes of `stellar_strkey` (installed with the SDK):
+constructing, use the classes in `stellar_sdk.strkey`:
 
 ```python
-from stellar_strkey import (
+from stellar_sdk.strkey import (
     Contract,
     Ed25519PrivateKey,
     Ed25519PublicKey,

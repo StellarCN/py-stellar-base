@@ -1,7 +1,6 @@
-from stellar_strkey import Ed25519PublicKey, MuxedEd25519Account, StrkeyError, parse
-
 from . import xdr as stellar_xdr
 from .keypair import Keypair
+from .strkey import Ed25519PublicKey, MuxedEd25519Account, StrkeyError, parse
 
 __all__ = ["MuxedAccount"]
 

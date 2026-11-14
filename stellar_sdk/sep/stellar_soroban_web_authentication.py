@@ -12,8 +12,6 @@ import base64
 import os
 from collections.abc import Iterable
 
-from stellar_strkey import Contract
-
 from .. import scval
 from .. import xdr as stellar_xdr
 from ..account import Account
@@ -23,6 +21,7 @@ from ..keypair import Keypair
 from ..soroban_rpc import SimulateTransactionResponse
 from ..soroban_server import SorobanServer
 from ..soroban_server_async import SorobanServerAsync
+from ..strkey import Contract
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
 from .exceptions import InvalidSep45ChallengeError

@@ -3,7 +3,6 @@ from random import choice
 from string import ascii_uppercase
 
 import pytest
-from stellar_strkey import Contract, MuxedContract
 
 from stellar_sdk import (
     Address,
@@ -17,6 +16,7 @@ from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.contract import ContractClient
 from stellar_sdk.contract.exceptions import NoSignatureNeededError
 from stellar_sdk.soroban_rpc import GetTransactionStatus
+from stellar_sdk.strkey import Contract, MuxedContract
 from tests.integration_utils import NETWORK_PASSPHRASE, RPC_URL, fund_account
 
 SOURCE = Keypair.random()

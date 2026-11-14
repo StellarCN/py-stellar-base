@@ -102,8 +102,7 @@ class MuxedAccount:
         return cls.from_json_dict(json.loads(json_str))
 
     def to_json_dict(self) -> str:
-        from stellar_strkey import Ed25519PublicKey, MuxedEd25519Account
-
+        from ..strkey import Ed25519PublicKey, MuxedEd25519Account
         from .crypto_key_type import CryptoKeyType
 
         if self.type == CryptoKeyType.KEY_TYPE_ED25519:
@@ -116,8 +115,7 @@ class MuxedAccount:
 
     @classmethod
     def from_json_dict(cls, json_value: str) -> MuxedAccount:
-        from stellar_strkey import Ed25519PublicKey, MuxedEd25519Account
-
+        from ..strkey import Ed25519PublicKey, MuxedEd25519Account
         from .crypto_key_type import CryptoKeyType
         from .uint256 import Uint256
 

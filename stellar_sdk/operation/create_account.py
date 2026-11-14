@@ -1,11 +1,10 @@
 from decimal import Decimal
 from typing import ClassVar
 
-from stellar_strkey import Ed25519PublicKey
-
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
+from ..strkey import Ed25519PublicKey
 from ..utils import raise_if_not_valid_amount, raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 

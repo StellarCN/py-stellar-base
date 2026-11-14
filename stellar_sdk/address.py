@@ -1,9 +1,18 @@
 import binascii
 from enum import IntEnum
 
-import stellar_strkey
-
 from . import xdr as stellar_xdr
+from .strkey import (
+    ClaimableBalance,
+    Contract,
+    Ed25519PublicKey,
+    LiquidityPool,
+    MuxedContract,
+    MuxedEd25519Account,
+    Strkey,
+    StrkeyError,
+    parse,
+)
 
 __all__ = ["Address", "AddressType"]
 
@@ -30,13 +39,13 @@ class AddressType(IntEnum):
     """A muxed contract address, address looks like ``WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAAAAAAAA...``."""
 
 
-_STRKEY_TYPES: dict[AddressType, type[stellar_strkey.Strkey]] = {
-    AddressType.ACCOUNT: stellar_strkey.Ed25519PublicKey,
-    AddressType.CONTRACT: stellar_strkey.Contract,
-    AddressType.MUXED_ACCOUNT: stellar_strkey.MuxedEd25519Account,
-    AddressType.CLAIMABLE_BALANCE: stellar_strkey.ClaimableBalance,
-    AddressType.LIQUIDITY_POOL: stellar_strkey.LiquidityPool,
-    AddressType.MUXED_CONTRACT: stellar_strkey.MuxedContract,
+_STRKEY_TYPES: dict[AddressType, type[Strkey]] = {
+    AddressType.ACCOUNT: Ed25519PublicKey,
+    AddressType.CONTRACT: Contract,
+    AddressType.MUXED_ACCOUNT: MuxedEd25519Account,
+    AddressType.CLAIMABLE_BALANCE: ClaimableBalance,
+    AddressType.LIQUIDITY_POOL: LiquidityPool,
+    AddressType.MUXED_CONTRACT: MuxedContract,
 }
 
 
@@ -49,8 +58,8 @@ class Address:
 
     def __init__(self, address: str):
         try:
-            strkey = stellar_strkey.parse(address)
-        except stellar_strkey.StrkeyError as e:
+            strkey = parse(address)
+        except StrkeyError as e:
             raise ValueError("Unsupported address type.") from e
         for address_type, strkey_type in _STRKEY_TYPES.items():
             if isinstance(strkey, strkey_type):
@@ -76,7 +85,7 @@ class Address:
         """
         if isinstance(account, str):
             account = binascii.unhexlify(account)
-        return Address(str(stellar_strkey.Ed25519PublicKey.from_bytes(account)))
+        return Address(str(Ed25519PublicKey.from_bytes(account)))
 
     @staticmethod
     def from_raw_contract(contract: bytes | str) -> "Address":
@@ -87,7 +96,7 @@ class Address:
         """
         if isinstance(contract, str):
             contract = binascii.unhexlify(contract)
-        return Address(str(stellar_strkey.Contract.from_bytes(contract)))
+        return Address(str(Contract.from_bytes(contract)))
 
     @staticmethod
     def from_raw_muxed_account(muxed_account: bytes | str) -> "Address":
@@ -98,9 +107,7 @@ class Address:
         """
         if isinstance(muxed_account, str):
             muxed_account = binascii.unhexlify(muxed_account)
-        return Address(
-            str(stellar_strkey.MuxedEd25519Account.from_bytes(muxed_account))
-        )
+        return Address(str(MuxedEd25519Account.from_bytes(muxed_account)))
 
     @staticmethod
     def from_raw_claimable_balance(claimable_balance: bytes | str) -> "Address":
@@ -111,9 +118,7 @@ class Address:
         """
         if isinstance(claimable_balance, str):
             claimable_balance = binascii.unhexlify(claimable_balance)
-        return Address(
-            str(stellar_strkey.ClaimableBalance.from_bytes(claimable_balance))
-        )
+        return Address(str(ClaimableBalance.from_bytes(claimable_balance)))
 
     @staticmethod
     def from_raw_liquidity_pool(liquidity_pool: bytes | str) -> "Address":
@@ -124,7 +129,7 @@ class Address:
         """
         if isinstance(liquidity_pool, str):
             liquidity_pool = binascii.unhexlify(liquidity_pool)
-        return Address(str(stellar_strkey.LiquidityPool.from_bytes(liquidity_pool)))
+        return Address(str(LiquidityPool.from_bytes(liquidity_pool)))
 
     @staticmethod
     def from_raw_muxed_contract(muxed_contract: bytes | str) -> "Address":
@@ -135,7 +140,7 @@ class Address:
         """
         if isinstance(muxed_contract, str):
             muxed_contract = binascii.unhexlify(muxed_contract)
-        return Address(str(stellar_strkey.MuxedContract.from_bytes(muxed_contract)))
+        return Address(str(MuxedContract.from_bytes(muxed_contract)))
 
     def to_xdr_sc_address(self) -> stellar_xdr.SCAddress:
         """Converts the Address object to a :class:`stellar_sdk.xdr.SCAddress` XDR object.

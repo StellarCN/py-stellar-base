@@ -1425,13 +1425,13 @@ class Generator < Xdrgen::Generators::Base
     when "PublicKey"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from stellar_strkey import Ed25519PublicKey
+            from ..strkey import Ed25519PublicKey
             assert self.ed25519 is not None
             return str(Ed25519PublicKey(self.ed25519.uint256))
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{union_name}:
-            from stellar_strkey import Ed25519PublicKey
+            from ..strkey import Ed25519PublicKey
             from .public_key_type import PublicKeyType
             from .uint256 import Uint256
             raw = Ed25519PublicKey.from_string(json_value).key
@@ -1440,7 +1440,7 @@ class Generator < Xdrgen::Generators::Base
     when "MuxedAccount"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from stellar_strkey import Ed25519PublicKey, MuxedEd25519Account
+            from ..strkey import Ed25519PublicKey, MuxedEd25519Account
             from .crypto_key_type import CryptoKeyType
             if self.type == CryptoKeyType.KEY_TYPE_ED25519:
                 assert self.ed25519 is not None
@@ -1450,7 +1450,7 @@ class Generator < Xdrgen::Generators::Base
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{union_name}:
-            from stellar_strkey import Ed25519PublicKey, MuxedEd25519Account
+            from ..strkey import Ed25519PublicKey, MuxedEd25519Account
             from .crypto_key_type import CryptoKeyType
             from .uint256 import Uint256
             if json_value.startswith("G"):
@@ -1465,7 +1465,7 @@ class Generator < Xdrgen::Generators::Base
     when "SCAddress"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from stellar_strkey import Contract, MuxedEd25519Account
+            from ..strkey import Contract, MuxedEd25519Account
             from .sc_address_type import SCAddressType
             if self.type == SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
                 assert self.account_id is not None
@@ -1486,7 +1486,7 @@ class Generator < Xdrgen::Generators::Base
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{union_name}:
-            from stellar_strkey import Contract, MuxedEd25519Account
+            from ..strkey import Contract, MuxedEd25519Account
             from .sc_address_type import SCAddressType
             if json_value.startswith("G"):
                 from .account_id import AccountID
@@ -1513,7 +1513,7 @@ class Generator < Xdrgen::Generators::Base
     when "SignerKey"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from stellar_strkey import Ed25519PublicKey, Ed25519SignedPayload, HashX, PreAuthTx
+            from ..strkey import Ed25519PublicKey, Ed25519SignedPayload, HashX, PreAuthTx
             from .signer_key_type import SignerKeyType
             if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
                 assert self.ed25519 is not None
@@ -1531,7 +1531,7 @@ class Generator < Xdrgen::Generators::Base
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{union_name}:
-            from stellar_strkey import Ed25519PublicKey, Ed25519SignedPayload, HashX, PreAuthTx
+            from ..strkey import Ed25519PublicKey, Ed25519SignedPayload, HashX, PreAuthTx
             from .signer_key_type import SignerKeyType
             from .uint256 import Uint256
             if json_value.startswith("G"):
@@ -1553,12 +1553,12 @@ class Generator < Xdrgen::Generators::Base
     when "ClaimableBalanceID"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from stellar_strkey import ClaimableBalance
+            from ..strkey import ClaimableBalance
             return str(ClaimableBalance.from_bytes(self.to_xdr_bytes()[3:]))
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{union_name}:
-            from stellar_strkey import ClaimableBalance
+            from ..strkey import ClaimableBalance
             raw = ClaimableBalance.from_string(json_value).to_bytes()
             return cls.from_xdr_bytes(b"\\x00\\x00\\x00" + raw)
       HEREDOC
@@ -1570,13 +1570,13 @@ class Generator < Xdrgen::Generators::Base
     when "AccountID"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from stellar_strkey import Ed25519PublicKey
+            from ..strkey import Ed25519PublicKey
             assert self.account_id.ed25519 is not None
             return str(Ed25519PublicKey(self.account_id.ed25519.uint256))
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{typedef_name}:
-            from stellar_strkey import Ed25519PublicKey
+            from ..strkey import Ed25519PublicKey
             from .public_key import PublicKey
             from .public_key_type import PublicKeyType
             from .uint256 import Uint256
@@ -1586,12 +1586,12 @@ class Generator < Xdrgen::Generators::Base
     when "PoolID"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from stellar_strkey import LiquidityPool
+            from ..strkey import LiquidityPool
             return str(LiquidityPool(self.pool_id.hash))
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{typedef_name}:
-            from stellar_strkey import LiquidityPool
+            from ..strkey import LiquidityPool
             from .hash import Hash
             raw = LiquidityPool.from_string(json_value).hash
             return cls(Hash(raw))
