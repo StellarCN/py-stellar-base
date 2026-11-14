@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Fixes
+- `Operation.from_xdr_amount` (and so the `amount` of operations decoded from XDR) returned amounts below 0.000001 in scientific notation, e.g. `"1E-7"` for 1 stroop. It now returns `"0.0000001"`.
+
 ### Version 17.0.1
 
 Released on November 9, 2026
