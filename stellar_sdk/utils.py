@@ -115,6 +115,15 @@ def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
         )
 
 
+def raise_if_not_valid_offer_id(value: int, argument_name: str) -> None:
+    # stellar-core rejects a negative offer ID as malformed, and an Int64 cannot
+    # hold more than 2**63 - 1; anything else would be written modulo 2**64.
+    if not 0 <= value <= 2**63 - 1:
+        raise ValueError(
+            f'Value of argument "{argument_name}" must be an integer between 0 and 2**63 - 1: {value}'
+        )
+
+
 def raise_if_not_valid_hash(value: str, argument_name: str) -> None:
     if not is_valid_hash(value):
         raise ValueError(
@@ -213,4 +222,4 @@ def from_xdr_amount(value: int) -> str:
         amount.
 
     """
-    return str(Decimal(value) / _ONE)
+    return format(Decimal(value) / _ONE, "f")
