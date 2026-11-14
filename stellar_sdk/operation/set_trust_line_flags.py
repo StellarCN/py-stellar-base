@@ -1,11 +1,12 @@
 from enum import IntFlag
 from typing import ClassVar
 
+from stellar_strkey import Ed25519PublicKey
+
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
-from ..strkey import StrKey
 from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
@@ -94,8 +95,10 @@ class SetTrustLineFlags(Operation):
             xdr_object.body.set_trust_line_flags_op.trustor.account_id.ed25519
             is not None
         )
-        trustor = StrKey.encode_ed25519_public_key(
-            xdr_object.body.set_trust_line_flags_op.trustor.account_id.ed25519.uint256
+        trustor = str(
+            Ed25519PublicKey(
+                xdr_object.body.set_trust_line_flags_op.trustor.account_id.ed25519.uint256
+            )
         )
         asset = Asset.from_xdr_object(xdr_object.body.set_trust_line_flags_op.asset)
         clear_flags_xdr = xdr_object.body.set_trust_line_flags_op.clear_flags.uint32

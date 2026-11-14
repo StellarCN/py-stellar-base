@@ -6,13 +6,14 @@ import uuid
 from enum import Enum
 from typing import TYPE_CHECKING
 
+from stellar_strkey import Contract
+
 from . import scval
 from . import xdr as stellar_xdr
 from .address import Address
 from .asset import Asset
 from .operation import InvokeHostFunction
 from .soroban_rpc import *
-from .strkey import StrKey
 
 if TYPE_CHECKING:
     from .transaction_envelope import TransactionEnvelope
@@ -43,7 +44,7 @@ _MUXED_SC_ADDRESS_TYPES = (
 def _validate_contract_id(contract_id: str) -> None:
     # Only a contract (C...) owns contract data; a muxed contract (W...) is just a
     # payment destination and has no storage of its own.
-    if not StrKey.is_valid_contract(contract_id):
+    if not Contract.is_valid(contract_id):
         raise ValueError(f"Invalid contract ID: {contract_id}")
 
 

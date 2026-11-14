@@ -85,15 +85,15 @@ class ClaimableBalanceID:
         return cls.from_json_dict(json.loads(json_str))
 
     def to_json_dict(self) -> str:
-        from ..strkey import StrKey
+        from stellar_strkey import ClaimableBalance
 
-        return StrKey.encode_claimable_balance(self.to_xdr_bytes()[3:])
+        return str(ClaimableBalance.from_bytes(self.to_xdr_bytes()[3:]))
 
     @classmethod
     def from_json_dict(cls, json_value: str) -> ClaimableBalanceID:
-        from ..strkey import StrKey
+        from stellar_strkey import ClaimableBalance
 
-        raw = StrKey.decode_claimable_balance(json_value)
+        raw = ClaimableBalance.from_string(json_value).to_bytes()
         return cls.from_xdr_bytes(b"\x00\x00\x00" + raw)
 
     def __hash__(self):

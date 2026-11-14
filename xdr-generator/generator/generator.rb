@@ -1425,70 +1425,57 @@ class Generator < Xdrgen::Generators::Base
     when "PublicKey"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from ..strkey import StrKey
+            from stellar_strkey import Ed25519PublicKey
             assert self.ed25519 is not None
-            return StrKey.encode_ed25519_public_key(self.ed25519.uint256)
+            return str(Ed25519PublicKey(self.ed25519.uint256))
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{union_name}:
-            from ..strkey import StrKey
+            from stellar_strkey import Ed25519PublicKey
             from .public_key_type import PublicKeyType
             from .uint256 import Uint256
-            raw = StrKey.decode_ed25519_public_key(json_value)
+            raw = Ed25519PublicKey.from_string(json_value).key
             return cls(type=PublicKeyType.PUBLIC_KEY_TYPE_ED25519, ed25519=Uint256(raw))
       HEREDOC
     when "MuxedAccount"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from ..strkey import StrKey
+            from stellar_strkey import Ed25519PublicKey, MuxedEd25519Account
             from .crypto_key_type import CryptoKeyType
             if self.type == CryptoKeyType.KEY_TYPE_ED25519:
                 assert self.ed25519 is not None
-                return StrKey.encode_ed25519_public_key(self.ed25519.uint256)
+                return str(Ed25519PublicKey(self.ed25519.uint256))
             assert self.med25519 is not None
-            from .muxed_account_med25519 import MuxedAccountMed25519
-            from xdrlib3 import Packer as _Packer
-            packer = _Packer()
-            self.med25519.ed25519.pack(packer)
-            self.med25519.id.pack(packer)
-            return StrKey.encode_med25519_public_key(packer.get_buffer())
+            return str(MuxedEd25519Account(self.med25519.ed25519.uint256, self.med25519.id.uint64))
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{union_name}:
-            from ..strkey import StrKey
+            from stellar_strkey import Ed25519PublicKey, MuxedEd25519Account
             from .crypto_key_type import CryptoKeyType
             from .uint256 import Uint256
             if json_value.startswith("G"):
-                raw = StrKey.decode_ed25519_public_key(json_value)
+                raw = Ed25519PublicKey.from_string(json_value).key
                 return cls(type=CryptoKeyType.KEY_TYPE_ED25519, ed25519=Uint256(raw))
             from .muxed_account_med25519 import MuxedAccountMed25519
             from .uint64 import Uint64
-            from xdrlib3 import Unpacker as _Unpacker
-            raw = StrKey.decode_med25519_public_key(json_value)
-            unpacker = _Unpacker(raw)
-            ed25519 = Uint256.unpack(unpacker)
-            id = Uint64.unpack(unpacker)
-            med25519 = MuxedAccountMed25519(id=id, ed25519=ed25519)
+            muxed = MuxedEd25519Account.from_string(json_value)
+            med25519 = MuxedAccountMed25519(id=Uint64(muxed.id), ed25519=Uint256(muxed.key))
             return cls(type=CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519)
       HEREDOC
     when "SCAddress"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from ..strkey import StrKey
+            from stellar_strkey import Contract, MuxedEd25519Account
             from .sc_address_type import SCAddressType
             if self.type == SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
                 assert self.account_id is not None
                 return self.account_id.to_json_dict()
             if self.type == SCAddressType.SC_ADDRESS_TYPE_CONTRACT:
                 assert self.contract_id is not None
-                return StrKey.encode_contract(self.contract_id.contract_id.hash)
+                return str(Contract(self.contract_id.contract_id.hash))
             if self.type == SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT:
                 assert self.muxed_account is not None
-                from xdrlib3 import Packer as _Packer
-                packer = _Packer()
-                self.muxed_account.ed25519.pack(packer)
-                self.muxed_account.id.pack(packer)
-                return StrKey.encode_med25519_public_key(packer.get_buffer())
+                return str(MuxedEd25519Account(self.muxed_account.ed25519.uint256, self.muxed_account.id.uint64))
             if self.type == SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE:
                 assert self.claimable_balance_id is not None
                 return self.claimable_balance_id.to_json_dict()
@@ -1499,7 +1486,7 @@ class Generator < Xdrgen::Generators::Base
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{union_name}:
-            from ..strkey import StrKey
+            from stellar_strkey import Contract, MuxedEd25519Account
             from .sc_address_type import SCAddressType
             if json_value.startswith("G"):
                 from .account_id import AccountID
@@ -1507,18 +1494,14 @@ class Generator < Xdrgen::Generators::Base
             if json_value.startswith("C"):
                 from .contract_id import ContractID
                 from .hash import Hash
-                raw = StrKey.decode_contract(json_value)
+                raw = Contract.from_string(json_value).hash
                 return cls(type=SCAddressType.SC_ADDRESS_TYPE_CONTRACT, contract_id=ContractID(Hash(raw)))
             if json_value.startswith("M"):
-                from .muxed_ed25519_account import MuxedEd25519Account
+                from .muxed_ed25519_account import MuxedEd25519Account as XdrMuxedEd25519Account
                 from .uint256 import Uint256
                 from .uint64 import Uint64
-                from xdrlib3 import Unpacker as _Unpacker
-                raw = StrKey.decode_med25519_public_key(json_value)
-                unpacker = _Unpacker(raw)
-                ed25519 = Uint256.unpack(unpacker)
-                id = Uint64.unpack(unpacker)
-                return cls(type=SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT, muxed_account=MuxedEd25519Account(id=id, ed25519=ed25519))
+                muxed = MuxedEd25519Account.from_string(json_value)
+                return cls(type=SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT, muxed_account=XdrMuxedEd25519Account(id=Uint64(muxed.id), ed25519=Uint256(muxed.key)))
             if json_value.startswith("B"):
                 from .claimable_balance_id import ClaimableBalanceID
                 return cls(type=SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE, claimable_balance_id=ClaimableBalanceID.from_json_dict(json_value))
@@ -1530,58 +1513,53 @@ class Generator < Xdrgen::Generators::Base
     when "SignerKey"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from ..strkey import StrKey
+            from stellar_strkey import Ed25519PublicKey, Ed25519SignedPayload, HashX, PreAuthTx
             from .signer_key_type import SignerKeyType
             if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
                 assert self.ed25519 is not None
-                return StrKey.encode_ed25519_public_key(self.ed25519.uint256)
+                return str(Ed25519PublicKey(self.ed25519.uint256))
             if self.type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
                 assert self.pre_auth_tx is not None
-                return StrKey.encode_pre_auth_tx(self.pre_auth_tx.uint256)
+                return str(PreAuthTx(self.pre_auth_tx.uint256))
             if self.type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
                 assert self.hash_x is not None
-                return StrKey.encode_sha256_hash(self.hash_x.uint256)
+                return str(HashX(self.hash_x.uint256))
             if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD:
                 assert self.ed25519_signed_payload is not None
-                from xdrlib3 import Packer as _Packer
-                packer = _Packer()
-                self.ed25519_signed_payload.pack(packer)
-                return StrKey.encode_ed25519_signed_payload(packer.get_buffer())
+                return str(Ed25519SignedPayload(self.ed25519_signed_payload.ed25519.uint256, self.ed25519_signed_payload.payload))
             raise ValueError(f"Unknown SignerKey type: {self.type}")
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{union_name}:
-            from ..strkey import StrKey
+            from stellar_strkey import Ed25519PublicKey, Ed25519SignedPayload, HashX, PreAuthTx
             from .signer_key_type import SignerKeyType
             from .uint256 import Uint256
             if json_value.startswith("G"):
-                raw = StrKey.decode_ed25519_public_key(json_value)
+                raw = Ed25519PublicKey.from_string(json_value).key
                 return cls(type=SignerKeyType.SIGNER_KEY_TYPE_ED25519, ed25519=Uint256(raw))
             if json_value.startswith("T"):
-                raw = StrKey.decode_pre_auth_tx(json_value)
+                raw = PreAuthTx.from_string(json_value).hash
                 return cls(type=SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX, pre_auth_tx=Uint256(raw))
             if json_value.startswith("X"):
-                raw = StrKey.decode_sha256_hash(json_value)
+                raw = HashX.from_string(json_value).hash
                 return cls(type=SignerKeyType.SIGNER_KEY_TYPE_HASH_X, hash_x=Uint256(raw))
             if json_value.startswith("P"):
                 from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
-                from xdrlib3 import Unpacker as _Unpacker
-                raw = StrKey.decode_ed25519_signed_payload(json_value)
-                unpacker = _Unpacker(raw)
-                payload = SignerKeyEd25519SignedPayload.unpack(unpacker)
+                signed_payload = Ed25519SignedPayload.from_string(json_value)
+                payload = SignerKeyEd25519SignedPayload(ed25519=Uint256(signed_payload.key), payload=signed_payload.payload)
                 return cls(type=SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD, ed25519_signed_payload=payload)
             raise ValueError(f"Invalid SignerKey strkey: {json_value}")
       HEREDOC
     when "ClaimableBalanceID"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from ..strkey import StrKey
-            return StrKey.encode_claimable_balance(self.to_xdr_bytes()[3:])
+            from stellar_strkey import ClaimableBalance
+            return str(ClaimableBalance.from_bytes(self.to_xdr_bytes()[3:]))
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{union_name}:
-            from ..strkey import StrKey
-            raw = StrKey.decode_claimable_balance(json_value)
+            from stellar_strkey import ClaimableBalance
+            raw = ClaimableBalance.from_string(json_value).to_bytes()
             return cls.from_xdr_bytes(b"\\x00\\x00\\x00" + raw)
       HEREDOC
     end
@@ -1592,30 +1570,30 @@ class Generator < Xdrgen::Generators::Base
     when "AccountID"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from ..strkey import StrKey
+            from stellar_strkey import Ed25519PublicKey
             assert self.account_id.ed25519 is not None
-            return StrKey.encode_ed25519_public_key(self.account_id.ed25519.uint256)
+            return str(Ed25519PublicKey(self.account_id.ed25519.uint256))
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{typedef_name}:
-            from ..strkey import StrKey
+            from stellar_strkey import Ed25519PublicKey
             from .public_key import PublicKey
             from .public_key_type import PublicKeyType
             from .uint256 import Uint256
-            raw = StrKey.decode_ed25519_public_key(json_value)
+            raw = Ed25519PublicKey.from_string(json_value).key
             return cls(PublicKey(type=PublicKeyType.PUBLIC_KEY_TYPE_ED25519, ed25519=Uint256(raw)))
       HEREDOC
     when "PoolID"
       out.puts <<~HEREDOC
         def to_json_dict(self) -> str:
-            from ..strkey import StrKey
-            return StrKey.encode_liquidity_pool(self.pool_id.hash)
+            from stellar_strkey import LiquidityPool
+            return str(LiquidityPool(self.pool_id.hash))
 
         @classmethod
         def from_json_dict(cls, json_value: str) -> #{typedef_name}:
-            from ..strkey import StrKey
+            from stellar_strkey import LiquidityPool
             from .hash import Hash
-            raw = StrKey.decode_liquidity_pool(json_value)
+            raw = LiquidityPool.from_string(json_value).hash
             return cls(Hash(raw))
       HEREDOC
     when "AssetCode4"

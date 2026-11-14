@@ -12,6 +12,8 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from enum import Enum
 
+from stellar_strkey import HashX, PreAuthTx
+
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..decorated_signature import DecoratedSignature
@@ -29,7 +31,6 @@ from ..preconditions import Preconditions
 from ..price import Price
 from ..signer import Signer
 from ..signer_key import SignerKey, SignerKeyType
-from ..strkey import StrKey
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction
 from ..transaction_envelope import TransactionEnvelope
@@ -546,10 +547,10 @@ def _get_set_options_op(
         if key.startswith("G"):
             signer = Signer.ed25519_public_key(key, weight)
         elif key.startswith("X"):
-            sha256_hash = StrKey.decode_sha256_hash(key)
+            sha256_hash = HashX.from_string(key).hash
             signer = Signer.sha256_hash(sha256_hash, weight)
         elif key.startswith("T"):
-            pre_auth_tx_hash = StrKey.decode_pre_auth_tx(key)
+            pre_auth_tx_hash = PreAuthTx.from_string(key).hash
             signer = Signer.pre_auth_tx(pre_auth_tx_hash, weight)
         else:
             raise ValueError("Signer key should start with `G`, `X` or `T`.")
@@ -934,7 +935,7 @@ def _get_revoke_sponsorship_op(
             key = _get_value(
                 raw_data_map, f"{operation_prefix}signer.signerKey.preAuthTx"
             )
-            signer_key = SignerKey.pre_auth_tx(StrKey.decode_pre_auth_tx(key))
+            signer_key = SignerKey.pre_auth_tx(PreAuthTx.from_string(key).hash)
         elif signer_key_type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519.name:
             key = _get_value(
                 raw_data_map, f"{operation_prefix}signer.signerKey.ed25519"
@@ -942,7 +943,7 @@ def _get_revoke_sponsorship_op(
             signer_key = SignerKey.ed25519_public_key(key)
         elif signer_key_type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X.name:
             key = _get_value(raw_data_map, f"{operation_prefix}signer.signerKey.hashX")
-            signer_key = SignerKey.sha256_hash(StrKey.decode_sha256_hash(key))
+            signer_key = SignerKey.sha256_hash(HashX.from_string(key).hash)
         else:
             raise ValueError(
                 f"This signer key type has not been implemented yet, "

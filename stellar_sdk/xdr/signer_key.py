@@ -132,52 +132,64 @@ class SignerKey:
         return cls.from_json_dict(json.loads(json_str))
 
     def to_json_dict(self) -> str:
-        from ..strkey import StrKey
+        from stellar_strkey import (
+            Ed25519PublicKey,
+            Ed25519SignedPayload,
+            HashX,
+            PreAuthTx,
+        )
+
         from .signer_key_type import SignerKeyType
 
         if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
             assert self.ed25519 is not None
-            return StrKey.encode_ed25519_public_key(self.ed25519.uint256)
+            return str(Ed25519PublicKey(self.ed25519.uint256))
         if self.type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
             assert self.pre_auth_tx is not None
-            return StrKey.encode_pre_auth_tx(self.pre_auth_tx.uint256)
+            return str(PreAuthTx(self.pre_auth_tx.uint256))
         if self.type == SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
             assert self.hash_x is not None
-            return StrKey.encode_sha256_hash(self.hash_x.uint256)
+            return str(HashX(self.hash_x.uint256))
         if self.type == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD:
             assert self.ed25519_signed_payload is not None
-            from xdrlib3 import Packer as _Packer
-
-            packer = _Packer()
-            self.ed25519_signed_payload.pack(packer)
-            return StrKey.encode_ed25519_signed_payload(packer.get_buffer())
+            return str(
+                Ed25519SignedPayload(
+                    self.ed25519_signed_payload.ed25519.uint256,
+                    self.ed25519_signed_payload.payload,
+                )
+            )
         raise ValueError(f"Unknown SignerKey type: {self.type}")
 
     @classmethod
     def from_json_dict(cls, json_value: str) -> SignerKey:
-        from ..strkey import StrKey
+        from stellar_strkey import (
+            Ed25519PublicKey,
+            Ed25519SignedPayload,
+            HashX,
+            PreAuthTx,
+        )
+
         from .signer_key_type import SignerKeyType
         from .uint256 import Uint256
 
         if json_value.startswith("G"):
-            raw = StrKey.decode_ed25519_public_key(json_value)
+            raw = Ed25519PublicKey.from_string(json_value).key
             return cls(type=SignerKeyType.SIGNER_KEY_TYPE_ED25519, ed25519=Uint256(raw))
         if json_value.startswith("T"):
-            raw = StrKey.decode_pre_auth_tx(json_value)
+            raw = PreAuthTx.from_string(json_value).hash
             return cls(
                 type=SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX, pre_auth_tx=Uint256(raw)
             )
         if json_value.startswith("X"):
-            raw = StrKey.decode_sha256_hash(json_value)
+            raw = HashX.from_string(json_value).hash
             return cls(type=SignerKeyType.SIGNER_KEY_TYPE_HASH_X, hash_x=Uint256(raw))
         if json_value.startswith("P"):
-            from xdrlib3 import Unpacker as _Unpacker
-
             from .signer_key_ed25519_signed_payload import SignerKeyEd25519SignedPayload
 
-            raw = StrKey.decode_ed25519_signed_payload(json_value)
-            unpacker = _Unpacker(raw)
-            payload = SignerKeyEd25519SignedPayload.unpack(unpacker)
+            signed_payload = Ed25519SignedPayload.from_string(json_value)
+            payload = SignerKeyEd25519SignedPayload(
+                ed25519=Uint256(signed_payload.key), payload=signed_payload.payload
+            )
             return cls(
                 type=SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD,
                 ed25519_signed_payload=payload,

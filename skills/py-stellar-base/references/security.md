@@ -21,16 +21,22 @@ Rules for code that handles keys, money, and signatures.
 ## Validate addresses before use
 
 `Keypair.from_public_key` / `from_secret` raise on malformed input, but to validate without
-constructing, use `StrKey`:
+constructing, use the classes of `stellar_strkey` (installed with the SDK):
 
 ```python
-from stellar_sdk import StrKey
+from stellar_strkey import (
+    Contract,
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
+    MuxedContract,
+    MuxedEd25519Account,
+)
 
-StrKey.is_valid_ed25519_public_key("GD2J...HPYU")   # -> bool
-StrKey.is_valid_ed25519_secret_seed("S...")          # -> bool
-StrKey.is_valid_contract("C...")                     # -> bool
-StrKey.is_valid_med25519_public_key("M...")          # muxed account
-StrKey.is_valid_muxed_contract("W...")               # muxed contract (CAP-84)
+Ed25519PublicKey.is_valid("GD2J...HPYU")   # -> bool
+Ed25519PrivateKey.is_valid("S...")         # -> bool
+Contract.is_valid("C...")                  # -> bool
+MuxedEd25519Account.is_valid("M...")       # muxed account
+MuxedContract.is_valid("W...")             # muxed contract (CAP-84)
 ```
 
 ## Network passphrase

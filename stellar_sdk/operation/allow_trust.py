@@ -2,11 +2,12 @@ import warnings
 from enum import IntFlag
 from typing import ClassVar
 
+from stellar_strkey import Ed25519PublicKey
+
 from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
-from ..strkey import StrKey
 from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
@@ -114,8 +115,10 @@ class AllowTrust(Operation):
         source = Operation.get_source_from_xdr_obj(xdr_object)
         assert xdr_object.body.allow_trust_op is not None
         assert xdr_object.body.allow_trust_op.trustor.account_id.ed25519 is not None
-        trustor = StrKey.encode_ed25519_public_key(
-            xdr_object.body.allow_trust_op.trustor.account_id.ed25519.uint256
+        trustor = str(
+            Ed25519PublicKey(
+                xdr_object.body.allow_trust_op.trustor.account_id.ed25519.uint256
+            )
         )
         authorize = xdr_object.body.allow_trust_op.authorize.uint32
         authorize = TrustLineEntryFlag(authorize)

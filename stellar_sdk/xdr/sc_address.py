@@ -150,7 +150,8 @@ class SCAddress:
         return cls.from_json_dict(json.loads(json_str))
 
     def to_json_dict(self) -> str:
-        from ..strkey import StrKey
+        from stellar_strkey import Contract, MuxedEd25519Account
+
         from .sc_address_type import SCAddressType
 
         if self.type == SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
@@ -158,15 +159,14 @@ class SCAddress:
             return self.account_id.to_json_dict()
         if self.type == SCAddressType.SC_ADDRESS_TYPE_CONTRACT:
             assert self.contract_id is not None
-            return StrKey.encode_contract(self.contract_id.contract_id.hash)
+            return str(Contract(self.contract_id.contract_id.hash))
         if self.type == SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT:
             assert self.muxed_account is not None
-            from xdrlib3 import Packer as _Packer
-
-            packer = _Packer()
-            self.muxed_account.ed25519.pack(packer)
-            self.muxed_account.id.pack(packer)
-            return StrKey.encode_med25519_public_key(packer.get_buffer())
+            return str(
+                MuxedEd25519Account(
+                    self.muxed_account.ed25519.uint256, self.muxed_account.id.uint64
+                )
+            )
         if self.type == SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE:
             assert self.claimable_balance_id is not None
             return self.claimable_balance_id.to_json_dict()
@@ -177,7 +177,8 @@ class SCAddress:
 
     @classmethod
     def from_json_dict(cls, json_value: str) -> SCAddress:
-        from ..strkey import StrKey
+        from stellar_strkey import Contract, MuxedEd25519Account
+
         from .sc_address_type import SCAddressType
 
         if json_value.startswith("G"):
@@ -191,25 +192,24 @@ class SCAddress:
             from .contract_id import ContractID
             from .hash import Hash
 
-            raw = StrKey.decode_contract(json_value)
+            raw = Contract.from_string(json_value).hash
             return cls(
                 type=SCAddressType.SC_ADDRESS_TYPE_CONTRACT,
                 contract_id=ContractID(Hash(raw)),
             )
         if json_value.startswith("M"):
-            from xdrlib3 import Unpacker as _Unpacker
-
-            from .muxed_ed25519_account import MuxedEd25519Account
+            from .muxed_ed25519_account import (
+                MuxedEd25519Account as XdrMuxedEd25519Account,
+            )
             from .uint64 import Uint64
             from .uint256 import Uint256
 
-            raw = StrKey.decode_med25519_public_key(json_value)
-            unpacker = _Unpacker(raw)
-            ed25519 = Uint256.unpack(unpacker)
-            id = Uint64.unpack(unpacker)
+            muxed = MuxedEd25519Account.from_string(json_value)
             return cls(
                 type=SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT,
-                muxed_account=MuxedEd25519Account(id=id, ed25519=ed25519),
+                muxed_account=XdrMuxedEd25519Account(
+                    id=Uint64(muxed.id), ed25519=Uint256(muxed.key)
+                ),
             )
         if json_value.startswith("B"):
             from .claimable_balance_id import ClaimableBalanceID

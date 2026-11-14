@@ -3,13 +3,13 @@ from random import choice
 from string import ascii_uppercase
 
 import pytest
+from stellar_strkey import Contract, MuxedContract
 
 from stellar_sdk import (
     Address,
     Asset,
     Keypair,
     SorobanServer,
-    StrKey,
     TransactionBuilder,
     scval,
 )
@@ -187,9 +187,12 @@ class TestContractClient:
         # underlying contract and reports the muxed id in the transfer event.
         native_contract_id = create_contract_from_asset(Asset.native())
         muxed_id = 1234
-        destination = Address.from_raw_muxed_contract(
-            StrKey.decode_contract(self.hello_world_contract_id)
-            + muxed_id.to_bytes(8, "big")
+        destination = Address(
+            str(
+                MuxedContract(
+                    Contract.from_string(self.hello_world_contract_id).hash, muxed_id
+                )
+            )
         )
         assert destination.address.startswith("W")
 

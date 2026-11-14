@@ -66,19 +66,20 @@ class AccountID:
         return cls.from_json_dict(json.loads(json_str))
 
     def to_json_dict(self) -> str:
-        from ..strkey import StrKey
+        from stellar_strkey import Ed25519PublicKey
 
         assert self.account_id.ed25519 is not None
-        return StrKey.encode_ed25519_public_key(self.account_id.ed25519.uint256)
+        return str(Ed25519PublicKey(self.account_id.ed25519.uint256))
 
     @classmethod
     def from_json_dict(cls, json_value: str) -> AccountID:
-        from ..strkey import StrKey
+        from stellar_strkey import Ed25519PublicKey
+
         from .public_key import PublicKey
         from .public_key_type import PublicKeyType
         from .uint256 import Uint256
 
-        raw = StrKey.decode_ed25519_public_key(json_value)
+        raw = Ed25519PublicKey.from_string(json_value).key
         return cls(
             PublicKey(type=PublicKeyType.PUBLIC_KEY_TYPE_ED25519, ed25519=Uint256(raw))
         )

@@ -5,6 +5,12 @@ Release History
 
 #### Breaking changes
 - Drop support for Python 3.10, which reached end of life in October 2026.
+- Remove `StrKey` and the `stellar_sdk.strkey` module. The SDK now uses [stellar-strkey](https://pypi.org/project/stellar-strkey/), which has a class for each strkey type. For example:
+  - `StrKey.encode_ed25519_public_key(raw)` becomes `str(Ed25519PublicKey(raw))`.
+  - `StrKey.decode_ed25519_public_key(s)` becomes `Ed25519PublicKey.from_string(s).key`.
+  - `StrKey.is_valid_contract(s)` becomes `Contract.is_valid(s)`.
+- Strkeys are checked when they are encoded as well as when they are decoded, so invalid raw data raises `ValueError` instead of producing an invalid strkey. For example, `SignerKey.ed25519_signed_payload` rejects a payload that is empty or longer than 64 bytes.
+- `Keypair.from_secret` no longer puts the rejected input in its error message, since the input may be a real secret.
 
 #### Fixes
 - `StrKey.decode_ed25519_signed_payload` and `StrKey.is_valid_ed25519_signed_payload` now reject a signed payload strkey (`P...`) whose padding bytes after the payload are not zero, as SEP-23 requires. Such a key used to decode to the same signer as the valid key.

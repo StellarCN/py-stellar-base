@@ -6,7 +6,9 @@ import warnings
 from collections.abc import Sequence
 from decimal import Decimal
 
-from . import StrKey, scval
+from stellar_strkey import Contract
+
+from . import scval
 from . import xdr as stellar_xdr
 from .account import Account
 from .address import Address
@@ -1263,7 +1265,7 @@ class TransactionBuilder:
             transaction's source account.
         :return: This builder instance.
         """
-        if not StrKey.is_valid_contract(contract_id):
+        if not Contract.is_valid(contract_id):
             raise ValueError("`contract_id` is invalid.")
 
         if parameters is None:
@@ -1535,7 +1537,7 @@ class TransactionBuilder:
             transaction's source account.
         :return: This builder instance.
         """
-        if not StrKey.is_valid_contract(destination):
+        if not Contract.is_valid(destination):
             raise ValueError("`destination` is not a valid contract address.")
 
         from_address = (
@@ -1691,7 +1693,7 @@ class TransactionBuilder:
         """
         # Only contracts hold SAC balances in contract data; an account's balance is its
         # trustline, and a muxed contract (W...) is credited to its base contract.
-        if not StrKey.is_valid_contract(balance_owner):
+        if not Contract.is_valid(balance_owner):
             raise ValueError("`balance_owner` is not a valid contract address.")
 
         contract_id = asset.contract_id(self.network_passphrase)

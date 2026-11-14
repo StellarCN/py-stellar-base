@@ -12,7 +12,9 @@ import base64
 import os
 from collections.abc import Iterable
 
-from .. import StrKey, scval
+from stellar_strkey import Contract
+
+from .. import scval
 from .. import xdr as stellar_xdr
 from ..account import Account
 from ..address import Address
@@ -573,7 +575,7 @@ def _build_challenge_tx(
 
     Returns a tuple of (transaction, server_keypair, nonce).
     """
-    if not StrKey.is_valid_contract(client_account_id):
+    if not Contract.is_valid(client_account_id):
         raise ValueError("client_account_id must be a contract account.")
 
     if nonce is None:

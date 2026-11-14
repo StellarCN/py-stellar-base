@@ -1,6 +1,7 @@
+from stellar_strkey import Ed25519PublicKey, MuxedEd25519Account, StrkeyError, parse
+
 from . import xdr as stellar_xdr
 from .keypair import Keypair
-from .strkey import StrKey
 
 __all__ = ["MuxedAccount"]
 
@@ -55,15 +56,8 @@ class MuxedAccount:
         if self.account_muxed_id is None:
             return None
 
-        med25519 = stellar_xdr.MuxedAccountMed25519(
-            id=stellar_xdr.Uint64(self.account_muxed_id),
-            ed25519=stellar_xdr.Uint256(
-                StrKey.decode_ed25519_public_key(self.account_id)
-            ),
-        )
-        return StrKey.encode_med25519_public_key(
-            med25519.ed25519.to_xdr_bytes() + med25519.id.to_xdr_bytes()
-        )
+        key = Ed25519PublicKey.from_string(self.account_id).key
+        return str(MuxedEd25519Account(key, self.account_muxed_id))
 
     @account_muxed.setter
     def account_muxed(self, value):
@@ -92,27 +86,23 @@ class MuxedAccount:
             or muxed account id (ex. ``"GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD"``
             or ``"MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"``)
         """
-        if StrKey.is_valid_ed25519_public_key(account):
-            # If the account is a valid ed25519 public key, return a MuxedAccount with no muxed id.
+        try:
+            strkey = parse(account)
+        except StrkeyError as e:
+            raise ValueError(f"This is not a valid account: {account}") from e
+        if isinstance(strkey, Ed25519PublicKey):
             return cls(account_id=account, account_muxed_id=None)
-        elif StrKey.is_valid_med25519_public_key(account):
-            raw_bytes = StrKey.decode_med25519_public_key(account)
-            muxed = stellar_xdr.MuxedAccountMed25519(
-                id=stellar_xdr.Uint64.from_xdr_bytes(raw_bytes[-8:]),
-                ed25519=stellar_xdr.Uint256.from_xdr_bytes(raw_bytes[:-8]),
-            )
-            account_id = StrKey.encode_ed25519_public_key(muxed.ed25519.uint256)
-            account_muxed_id = muxed.id.uint64
-            return cls(account_id=account_id, account_muxed_id=account_muxed_id)
-        else:
-            raise ValueError(f"This is not a valid account: {account}")
+        if isinstance(strkey, MuxedEd25519Account):
+            account_id = str(Ed25519PublicKey(strkey.key))
+            return cls(account_id=account_id, account_muxed_id=strkey.id)
+        raise ValueError(f"This is not a valid account: {account}")
 
     def to_xdr_object(self) -> stellar_xdr.MuxedAccount:
         """Returns the xdr object for this MuxedAccount object.
 
         :return: XDR MuxedAccount object
         """
-        account_id_bytes = StrKey.decode_ed25519_public_key(self.account_id)
+        account_id_bytes = Ed25519PublicKey.from_string(self.account_id).key
         if self.account_muxed_id is None:
             return stellar_xdr.MuxedAccount(
                 type=stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519,
@@ -136,14 +126,12 @@ class MuxedAccount:
         """
         if xdr_object.type == stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519:
             assert xdr_object.ed25519 is not None
-            account_id = StrKey.encode_ed25519_public_key(xdr_object.ed25519.uint256)
+            account_id = str(Ed25519PublicKey(xdr_object.ed25519.uint256))
             return cls(account_id=account_id, account_muxed_id=None)
         assert xdr_object.med25519 is not None
         account_id_id = xdr_object.med25519.id.uint64
         assert xdr_object.med25519 is not None
-        account_id = StrKey.encode_ed25519_public_key(
-            xdr_object.med25519.ed25519.uint256
-        )
+        account_id = str(Ed25519PublicKey(xdr_object.med25519.ed25519.uint256))
         return cls(account_id=account_id, account_muxed_id=account_id_id)
 
     def __hash__(self):

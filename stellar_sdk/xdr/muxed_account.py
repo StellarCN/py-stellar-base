@@ -102,39 +102,33 @@ class MuxedAccount:
         return cls.from_json_dict(json.loads(json_str))
 
     def to_json_dict(self) -> str:
-        from ..strkey import StrKey
+        from stellar_strkey import Ed25519PublicKey, MuxedEd25519Account
+
         from .crypto_key_type import CryptoKeyType
 
         if self.type == CryptoKeyType.KEY_TYPE_ED25519:
             assert self.ed25519 is not None
-            return StrKey.encode_ed25519_public_key(self.ed25519.uint256)
+            return str(Ed25519PublicKey(self.ed25519.uint256))
         assert self.med25519 is not None
-        from xdrlib3 import Packer as _Packer
-
-        packer = _Packer()
-        self.med25519.ed25519.pack(packer)
-        self.med25519.id.pack(packer)
-        return StrKey.encode_med25519_public_key(packer.get_buffer())
+        return str(
+            MuxedEd25519Account(self.med25519.ed25519.uint256, self.med25519.id.uint64)
+        )
 
     @classmethod
     def from_json_dict(cls, json_value: str) -> MuxedAccount:
-        from ..strkey import StrKey
+        from stellar_strkey import Ed25519PublicKey, MuxedEd25519Account
+
         from .crypto_key_type import CryptoKeyType
         from .uint256 import Uint256
 
         if json_value.startswith("G"):
-            raw = StrKey.decode_ed25519_public_key(json_value)
+            raw = Ed25519PublicKey.from_string(json_value).key
             return cls(type=CryptoKeyType.KEY_TYPE_ED25519, ed25519=Uint256(raw))
-        from xdrlib3 import Unpacker as _Unpacker
-
         from .muxed_account_med25519 import MuxedAccountMed25519
         from .uint64 import Uint64
 
-        raw = StrKey.decode_med25519_public_key(json_value)
-        unpacker = _Unpacker(raw)
-        ed25519 = Uint256.unpack(unpacker)
-        id = Uint64.unpack(unpacker)
-        med25519 = MuxedAccountMed25519(id=id, ed25519=ed25519)
+        muxed = MuxedEd25519Account.from_string(json_value)
+        med25519 = MuxedAccountMed25519(id=Uint64(muxed.id), ed25519=Uint256(muxed.key))
         return cls(type=CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519)
 
     def __hash__(self):

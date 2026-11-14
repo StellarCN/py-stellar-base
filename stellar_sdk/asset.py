@@ -1,11 +1,12 @@
 import builtins
 import re
 
+from stellar_strkey import Contract, Ed25519PublicKey
+
 from . import xdr as stellar_xdr
 from .exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
 from .keypair import Keypair
 from .network import Network
-from .strkey import StrKey
 from .utils import sha256
 
 __all__ = ["Asset"]
@@ -50,7 +51,7 @@ class Asset:
                 "The issuer cannot be `None` except for the native asset."
             )
 
-        if issuer is not None and not StrKey.is_valid_ed25519_public_key(issuer):
+        if issuer is not None and not Ed25519PublicKey.is_valid(issuer):
             raise AssetIssuerInvalidError("The issuer should be a correct public key.")
 
         self.code: str = code
@@ -102,7 +103,7 @@ class Asset:
             ),
         )
         contract_id = sha256(preimage.to_xdr_bytes())
-        return StrKey.encode_contract(contract_id)
+        return str(Contract(contract_id))
 
     def guess_asset_type(self) -> str:
         """Return the type of the asset, Can be one of
@@ -224,15 +225,19 @@ class Asset:
         elif xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
             assert xdr_object.alpha_num4 is not None
             assert xdr_object.alpha_num4.issuer.account_id.ed25519 is not None
-            issuer = StrKey.encode_ed25519_public_key(
-                xdr_object.alpha_num4.issuer.account_id.ed25519.uint256
+            issuer = str(
+                Ed25519PublicKey(
+                    xdr_object.alpha_num4.issuer.account_id.ed25519.uint256
+                )
             )
             code = xdr_object.alpha_num4.asset_code.asset_code4.decode().rstrip("\x00")
         elif xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
             assert xdr_object.alpha_num12 is not None
             assert xdr_object.alpha_num12.issuer.account_id.ed25519 is not None
-            issuer = StrKey.encode_ed25519_public_key(
-                xdr_object.alpha_num12.issuer.account_id.ed25519.uint256
+            issuer = str(
+                Ed25519PublicKey(
+                    xdr_object.alpha_num12.issuer.account_id.ed25519.uint256
+                )
             )
             code = xdr_object.alpha_num12.asset_code.asset_code12.decode().rstrip(
                 "\x00"

@@ -3,13 +3,13 @@ import copy
 
 import pytest
 from pydantic import ValidationError
+from stellar_strkey import Contract, MuxedContract
 
 from stellar_sdk import (
     Account,
     Asset,
     Keypair,
     Network,
-    StrKey,
     TransactionBuilder,
     scval,
 )
@@ -31,9 +31,7 @@ _ACCOUNT_ID = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
 _MUXED_ACCOUNT_ID = (
     "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
 )
-_MUXED_CONTRACT_ID = StrKey.encode_muxed_contract(
-    StrKey.decode_contract(_CONTRACT_ID) + (1).to_bytes(8, "big")
-)
+_MUXED_CONTRACT_ID = str(MuxedContract(Contract.from_string(_CONTRACT_ID).hash, 1))
 _NON_CONTRACT_IDS = pytest.mark.parametrize(
     "contract_id",
     [_ACCOUNT_ID, _MUXED_ACCOUNT_ID, _MUXED_CONTRACT_ID],

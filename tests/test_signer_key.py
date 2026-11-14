@@ -1,10 +1,11 @@
 import binascii
 
 import pytest
+from stellar_strkey import Ed25519PublicKey
 
 import stellar_sdk
 import stellar_sdk.xdr
-from stellar_sdk import SignedPayloadSigner, SignerKey, SignerKeyType, StrKey
+from stellar_sdk import SignedPayloadSigner, SignerKey, SignerKeyType
 from stellar_sdk import xdr as stellar_xdr
 
 
@@ -243,7 +244,7 @@ class TestSignedPayloadSigner:
         assert xdr_obj.ed25519_signed_payload
         assert (
             xdr_obj.ed25519_signed_payload.ed25519.uint256
-            == StrKey.decode_ed25519_public_key(account_id)
+            == Ed25519PublicKey.from_string(account_id).key
         )
         assert xdr_obj.ed25519_signed_payload.payload == payload
         assert (

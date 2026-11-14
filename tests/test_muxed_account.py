@@ -1,6 +1,7 @@
 import pytest
+from stellar_strkey import Ed25519PublicKey
 
-from stellar_sdk import MuxedAccount, StrKey
+from stellar_sdk import MuxedAccount
 from stellar_sdk import xdr as stellar_xdr
 
 
@@ -13,7 +14,7 @@ class TestMuxedAccount:
         )
         med25519 = stellar_xdr.MuxedAccountMed25519(
             id=stellar_xdr.Uint64(account_id_id),
-            ed25519=stellar_xdr.Uint256(StrKey.decode_ed25519_public_key(account_id)),
+            ed25519=stellar_xdr.Uint256(Ed25519PublicKey.from_string(account_id).key),
         )
         muxed_account_xdr = stellar_xdr.MuxedAccount(
             type=stellar_xdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519
@@ -29,7 +30,7 @@ class TestMuxedAccount:
         account_id_id = None
         muxed_account_xdr = stellar_xdr.MuxedAccount(
             type=stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519,
-            ed25519=stellar_xdr.Uint256(StrKey.decode_ed25519_public_key(account_id)),
+            ed25519=stellar_xdr.Uint256(Ed25519PublicKey.from_string(account_id).key),
         )
         muxed_account = MuxedAccount(account_id, account_id_id)
         assert muxed_account.to_xdr_object().to_xdr() == muxed_account_xdr.to_xdr()
