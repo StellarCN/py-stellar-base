@@ -8,14 +8,9 @@ Updated: 2019-06-12
 Version: 2.1.0
 """
 
-import sys
 from collections.abc import MutableMapping
+from tomllib import loads as toml_loads
 from typing import Any
-
-if sys.version_info >= (3, 11):
-    from tomllib import loads as toml_loads
-else:
-    from toml import loads as toml_loads
 
 from ..client.aiohttp_client import AiohttpClient
 from ..client.base_async_client import BaseAsyncClient

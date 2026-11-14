@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Breaking changes
+- Drop support for Python 3.10, which reached end of life in October 2026.
+
 #### Fixes
 - `StrKey.decode_ed25519_signed_payload` and `StrKey.is_valid_ed25519_signed_payload` now reject a signed payload strkey (`P...`) whose padding bytes after the payload are not zero, as SEP-23 requires. Such a key used to decode to the same signer as the valid key.
 - `ManageSellOffer` and `ManageBuyOffer` raise `ValueError` for an `offer_id` outside `0` to `2**63 - 1`, and `MuxedAccount` raises for an `account_muxed_id` above `2**64 - 1`, instead of writing the value modulo `2**64`. Operations read from XDR keep their offer ID as it is. ([#1251](https://github.com/StellarCN/py-stellar-base/issues/1251))
