@@ -210,6 +210,18 @@ class StrKey:
         :raises:
             :exc:`ValueError <stellar_sdk.exceptions.ValueError>`
         """
+        # The same layout _decode_check accepts: a 32-byte key, a 4-byte length
+        # and a payload of 1 to 64 bytes, padded to a multiple of 4 bytes.
+        payload_length = int.from_bytes(data[32:36], byteorder="big")
+        if (
+            len(data) < 32 + 4 + 4
+            or not 1 <= payload_length <= 64
+            or len(data) != 32 + 4 + payload_length + ((4 - payload_length % 4) % 4)
+        ):
+            raise ValueError(
+                "Invalid Ed25519 Signed Payload data: the payload must be 1 to 64 bytes, "
+                "padded to a multiple of 4 bytes."
+            )
         return _encode_check(_VersionByte.ED25519_SIGNED_PAYLOAD, data)
 
     @staticmethod

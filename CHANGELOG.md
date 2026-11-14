@@ -3,6 +3,9 @@ Release History
 
 ### Pending
 
+#### Fixes
+- `SignerKey.ed25519_signed_payload` and `StrKey.encode_ed25519_signed_payload` now raise `ValueError` when the signed payload is empty or longer than 64 bytes. They used to return a `P...` strkey that `StrKey.decode_ed25519_signed_payload` then rejected.
+
 ### Version 17.0.1
 
 Released on November 9, 2026
