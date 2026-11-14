@@ -214,6 +214,25 @@ class TestStrKey:
         encoded = "PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAEQAAAAAAAAAAAAAAAAAABBXA"
         assert StrKey.encode_ed25519_signed_payload(data) == encoded
 
+    @pytest.mark.parametrize(
+        "data",
+        [
+            # empty payload: key + length prefix 0
+            "3f0c34bf93ad0d9971d04ccc90f705511c838aad9734a4a2fb0d7a03fc7fe89a00000000",
+            # 65-byte payload, padded to 68 bytes
+            "3f0c34bf93ad0d9971d04ccc90f705511c838aad9734a4a2fb0d7a03fc7fe89a00000041"
+            + "01" * 65
+            + "000000",
+            # length prefix 9 but only 4 payload bytes
+            "363eaa3867841fbad0f4ed88c779e4fe66e56a2470dc98c0ec9c073d05c7b1030000000900000000",
+            # shorter than a key and a length prefix
+            "363eaa3867841fbad0f4ed88c779e4fe66e56a2470dc98c0ec9c073d05c7b103",
+        ],
+    )
+    def test_encode_ed25519_signed_payload_raise(self, data):
+        with pytest.raises(ValueError, match="Invalid Ed25519 Signed Payload data"):
+            StrKey.encode_ed25519_signed_payload(binascii.unhexlify(data))
+
     def test_decode_ed25519_signed_payload(self):
         decoded = binascii.unhexlify(
             "363eaa3867841fbad0f4ed88c779e4fe66e56a2470dc98c0ec9c073d05c7b10300000009000000000000000000000000"
