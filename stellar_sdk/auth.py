@@ -1,4 +1,3 @@
-import copy
 import itertools
 import random
 from collections.abc import Callable, Sequence
@@ -13,7 +12,7 @@ from .network import Network
 from .utils import sha256
 
 AuthorizationSigner: TypeAlias = Callable[
-    [stellar_xdr.HashIDPreimage], stellar_xdr.SCVal
+    [stellar_xdr.HashIDPreimage.Any], stellar_xdr.SCVal.Any
 ]
 """Type alias for a custom Soroban authorization signer.
 
@@ -34,7 +33,7 @@ __all__ = [
 ]
 
 
-def authorization_payload_hash(preimage: stellar_xdr.HashIDPreimage) -> bytes:
+def authorization_payload_hash(preimage: stellar_xdr.HashIDPreimage.Any) -> bytes:
     """Return the 32-byte payload that account contracts receive in ``__check_auth``.
 
     Use this inside a custom :data:`AuthorizationSigner` to obtain the bytes the
@@ -48,37 +47,26 @@ def authorization_payload_hash(preimage: stellar_xdr.HashIDPreimage) -> bytes:
 
 
 def _get_address_credentials(
-    credentials: stellar_xdr.SorobanCredentials,
+    credentials: stellar_xdr.SorobanCredentials.Any,
 ) -> stellar_xdr.SorobanAddressCredentials | None:
     """Extract the address credentials from any address-based credential type.
 
-    Returns the inner :class:`stellar_sdk.xdr.SorobanAddressCredentials`
-    reference (assigning to its fields writes back into the entry), or ``None``
-    for source-account credentials, which carry no address payload.
+    Returns the inner :class:`stellar_sdk.xdr.SorobanAddressCredentials`, or
+    ``None`` for source-account credentials, which carry no address payload.
     """
-    if (
-        credentials.type
-        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
-    ):
-        assert credentials.address is not None
-        return credentials.address
-    if (
-        credentials.type
-        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2
-    ):
-        assert credentials.address_v2 is not None
-        return credentials.address_v2
-    if (
-        credentials.type
-        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES
-    ):
-        assert credentials.address_with_delegates is not None
-        return credentials.address_with_delegates.address_credentials
-    return None
+    match credentials:
+        case stellar_xdr.SorobanCredentials.Address(address_credentials):
+            return address_credentials
+        case stellar_xdr.SorobanCredentials.AddressV2(address_credentials):
+            return address_credentials
+        case stellar_xdr.SorobanCredentials.AddressWithDelegates(with_delegates):
+            return with_delegates.address_credentials
+        case _:
+            return None
 
 
 def _collect_signature_nodes(
-    credentials: stellar_xdr.SorobanCredentials,
+    credentials: stellar_xdr.SorobanCredentials.Any,
 ) -> list[stellar_xdr.SorobanAddressCredentials | stellar_xdr.SorobanDelegateSignature]:
     """Every node in ``credentials`` that can carry a signature, in a stable
     order: the top-level address credentials first, then (only for
@@ -92,13 +80,9 @@ def _collect_signature_nodes(
     nodes: list[
         stellar_xdr.SorobanAddressCredentials | stellar_xdr.SorobanDelegateSignature
     ] = [addr_auth]
-    if (
-        credentials.type
-        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES
-    ):
-        assert credentials.address_with_delegates is not None
+    if isinstance(credentials, stellar_xdr.SorobanCredentials.AddressWithDelegates):
 
-        def walk(delegates: list[stellar_xdr.SorobanDelegateSignature]) -> None:
+        def walk(delegates: Sequence[stellar_xdr.SorobanDelegateSignature]) -> None:
             for delegate in delegates:
                 nodes.append(delegate)
                 walk(delegate.nested_delegates)
@@ -107,11 +91,64 @@ def _collect_signature_nodes(
     return nodes
 
 
+def _with_signatures(
+    credentials: stellar_xdr.SorobanCredentials.Any,
+    signature: stellar_xdr.SCVal.Any,
+    signature_expiration_ledger: int,
+    target_ids: set[int],
+) -> stellar_xdr.SorobanCredentials.Any:
+    """Return ``credentials`` with ``signature`` on the nodes whose ``id`` is in
+    ``target_ids`` and the expiration ledger set to ``signature_expiration_ledger``.
+
+    XDR values are immutable, so every node on the way to a changed one is
+    rebuilt; the nodes that don't change are shared with ``credentials``.
+    """
+
+    def sign_address(
+        node: stellar_xdr.SorobanAddressCredentials,
+    ) -> stellar_xdr.SorobanAddressCredentials:
+        return stellar_xdr.replace(
+            node,
+            signature_expiration_ledger=signature_expiration_ledger,
+            signature=signature if id(node) in target_ids else node.signature,
+        )
+
+    def sign_delegate(
+        node: stellar_xdr.SorobanDelegateSignature,
+    ) -> stellar_xdr.SorobanDelegateSignature:
+        return stellar_xdr.replace(
+            node,
+            signature=signature if id(node) in target_ids else node.signature,
+            nested_delegates=[sign_delegate(d) for d in node.nested_delegates],
+        )
+
+    match credentials:
+        case stellar_xdr.SorobanCredentials.Address(address_credentials):
+            return stellar_xdr.SorobanCredentials.Address(
+                sign_address(address_credentials)
+            )
+        case stellar_xdr.SorobanCredentials.AddressV2(address_credentials):
+            return stellar_xdr.SorobanCredentials.AddressV2(
+                sign_address(address_credentials)
+            )
+        case stellar_xdr.SorobanCredentials.AddressWithDelegates(with_delegates):
+            return stellar_xdr.SorobanCredentials.AddressWithDelegates(
+                stellar_xdr.SorobanAddressCredentialsWithDelegates(
+                    address_credentials=sign_address(
+                        with_delegates.address_credentials
+                    ),
+                    delegates=[sign_delegate(d) for d in with_delegates.delegates],
+                )
+            )
+        case _:
+            return credentials
+
+
 def build_authorization_preimage(
     entry: stellar_xdr.SorobanAuthorizationEntry,
     valid_until_ledger_sequence: int,
     network_passphrase: str,
-) -> stellar_xdr.HashIDPreimage:
+) -> stellar_xdr.HashIDPreimage.Any:
     """Build the signature preimage for a Soroban address authorization entry.
 
     For ``SOROBAN_CREDENTIALS_ADDRESS`` this is the legacy, non-address-bound
@@ -142,34 +179,30 @@ def build_authorization_preimage(
         entry.credentials.type
         == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
     ):
-        return stellar_xdr.HashIDPreimage(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION,
-            soroban_authorization=stellar_xdr.HashIDPreimageSorobanAuthorization(
+        return stellar_xdr.HashIDPreimage.SorobanAuthorization(
+            stellar_xdr.HashIDPreimageSorobanAuthorization(
                 network_id=stellar_xdr.Hash(network_id),
                 nonce=addr_auth.nonce,
-                signature_expiration_ledger=stellar_xdr.Uint32(
-                    valid_until_ledger_sequence
-                ),
+                signature_expiration_ledger=valid_until_ledger_sequence,
                 invocation=entry.root_invocation,
-            ),
+            )
         )
     # ADDRESS_V2 and ADDRESS_WITH_DELEGATES bind the address into the signed
     # payload (CAP-71); for the delegates variant it is the top-level address.
-    return stellar_xdr.HashIDPreimage(
-        type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS,
-        soroban_authorization_with_address=stellar_xdr.HashIDPreimageSorobanAuthorizationWithAddress(
+    return stellar_xdr.HashIDPreimage.SorobanAuthorizationWithAddress(
+        stellar_xdr.HashIDPreimageSorobanAuthorizationWithAddress(
             network_id=stellar_xdr.Hash(network_id),
             nonce=addr_auth.nonce,
-            signature_expiration_ledger=stellar_xdr.Uint32(valid_until_ledger_sequence),
+            signature_expiration_ledger=valid_until_ledger_sequence,
             address=addr_auth.address,
             invocation=entry.root_invocation,
-        ),
+        )
     )
 
 
 def _default_account_signature_scval(
     public_key: bytes, signature: bytes
-) -> stellar_xdr.SCVal:
+) -> stellar_xdr.SCVal.Any:
     """Build the signature ``SCVal`` shape expected by the default Stellar Account contract.
 
     Shape: ``Vec<Map{public_key: Bytes, signature: Bytes}>``. Documented at
@@ -189,15 +222,15 @@ def _default_account_signature_scval(
 
 def _sign_authorization(
     signer: Keypair | AuthorizationSigner,
-    preimage: stellar_xdr.HashIDPreimage,
-) -> stellar_xdr.SCVal:
+    preimage: stellar_xdr.HashIDPreimage.Any,
+) -> stellar_xdr.SCVal.Any:
     if isinstance(signer, Keypair):
         payload = authorization_payload_hash(preimage)
         return _default_account_signature_scval(
             signer.raw_public_key(), signer.sign(payload)
         )
     result = signer(preimage)
-    if not isinstance(result, stellar_xdr.SCVal):
+    if not isinstance(result, stellar_xdr.SCVal.Any):
         raise TypeError(
             "Authorization signer must return a stellar_sdk.xdr.SCVal "
             "(the legacy (public_key, signature) tuple form is no longer supported)."
@@ -215,7 +248,7 @@ _AUTHORIZED_ADDRESS_ERROR = (
 )
 
 
-def _ensure_authorization_sc_address(address: stellar_xdr.SCAddress) -> None:
+def _ensure_authorization_sc_address(address: stellar_xdr.SCAddress.Any) -> None:
     if address.type not in _AUTHORIZED_SC_ADDRESS_TYPES:
         raise ValueError(_AUTHORIZED_ADDRESS_ERROR)
 
@@ -227,7 +260,7 @@ def _resolve_account_or_contract_address(address: Address | str) -> Address:
     return resolved
 
 
-def _resolve_address(address: Address | str) -> stellar_xdr.SCAddress:
+def _resolve_address(address: Address | str) -> stellar_xdr.SCAddress.Any:
     return _resolve_account_or_contract_address(address).to_xdr_sc_address()
 
 
@@ -303,14 +336,9 @@ def authorize_entry(
         signature on another node of the entry already commits to.
     """
     if isinstance(entry, str):
-        entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr(entry)
-    else:
-        entry = copy.deepcopy(entry)
+        entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr_base64(entry)
 
-    if (
-        entry.credentials.type
-        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
-    ):
+    if isinstance(entry.credentials, stellar_xdr.SorobanCredentials.SourceAccount):
         return entry
 
     addr_auth = _get_address_credentials(entry.credentials)
@@ -345,7 +373,7 @@ def authorize_entry(
     # to that value, so re-stamping it would invalidate any signature already
     # collected on a node that is not about to be replaced. Signature values
     # are opaque to the SDK: anything but the `scvVoid` placeholder counts.
-    stored_expiration = addr_auth.signature_expiration_ledger.uint32
+    stored_expiration = addr_auth.signature_expiration_ledger
     if stored_expiration != valid_until_ledger_sequence and any(
         node.signature.type != stellar_xdr.SCValType.SCV_VOID
         for node in nodes
@@ -359,19 +387,19 @@ def authorize_entry(
             "other nodes are unsigned."
         )
 
-    # Set the expiration before building the preimage, so the signed payload
-    # commits to the same expiration ledger stored in the credentials.
-    addr_auth.signature_expiration_ledger = stellar_xdr.Uint32(
-        valid_until_ledger_sequence
-    )
-
+    # The signed payload commits to the expiration ledger that is stored in the
+    # credentials below.
     preimage = build_authorization_preimage(
         entry, valid_until_ledger_sequence, network_passphrase
     )
     signature = _sign_authorization(signer, preimage)
-    for node in targets:
-        node.signature = signature
-    return entry
+    credentials = _with_signatures(
+        entry.credentials,
+        signature,
+        valid_until_ledger_sequence,
+        {id(node) for node in targets},
+    )
+    return stellar_xdr.replace(entry, credentials=credentials)
 
 
 def authorize_invocation(
@@ -436,24 +464,22 @@ def authorize_invocation(
     nonce = random.randint(-(2**63), 2**63 - 1)
     address_credentials = stellar_xdr.SorobanAddressCredentials(
         address=_resolve_address(address),
-        nonce=stellar_xdr.Int64(nonce),
-        signature_expiration_ledger=stellar_xdr.Uint32(0),
-        signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
+        nonce=nonce,
+        signature_expiration_ledger=0,
+        signature=stellar_xdr.SCVal.Void(),
     )
     if (
         credentials_type
         == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
     ):
-        credentials = stellar_xdr.SorobanCredentials(
-            type=credentials_type, address=address_credentials
+        credentials: stellar_xdr.SorobanCredentials.Any = (
+            stellar_xdr.SorobanCredentials.Address(address_credentials)
         )
     elif (
         credentials_type
         == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2
     ):
-        credentials = stellar_xdr.SorobanCredentials(
-            type=credentials_type, address_v2=address_credentials
-        )
+        credentials = stellar_xdr.SorobanCredentials.AddressV2(address_credentials)
     else:
         raise ValueError(
             "`credentials_type` must be SOROBAN_CREDENTIALS_ADDRESS or "
@@ -479,7 +505,7 @@ class DelegateSignature:
     address: Address | str
     """The delegate's address (``G...`` account or ``C...`` contract)."""
 
-    signature: stellar_xdr.SCVal | None = None
+    signature: stellar_xdr.SCVal.Any | None = None
     """The delegate's signature value. Defaults to an ``scvVoid`` placeholder,
     which can be filled afterwards with :func:`authorize_entry` (passing this
     address as ``for_address``) or by editing the entry directly."""
@@ -500,7 +526,7 @@ def _build_delegate_nodes(
             signature=(
                 delegate.signature
                 if delegate.signature is not None
-                else stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID)
+                else stellar_xdr.SCVal.Void()
             ),
             nested_delegates=_build_delegate_nodes(delegate.nested_delegates),
         )
@@ -520,7 +546,7 @@ def build_with_delegates_entry(
     entry: stellar_xdr.SorobanAuthorizationEntry | str,
     valid_until_ledger_sequence: int,
     delegates: Sequence[DelegateSignature],
-    signature: stellar_xdr.SCVal | None = None,
+    signature: stellar_xdr.SCVal.Any | None = None,
 ) -> stellar_xdr.SorobanAuthorizationEntry:
     """Build a ``SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES`` authorization
     entry by wrapping the address credentials of an existing ``ADDRESS`` /
@@ -567,9 +593,7 @@ def build_with_delegates_entry(
         classic account (``G...``) or contract (``C...``) address.
     """
     if isinstance(entry, str):
-        entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr(entry)
-    else:
-        entry = copy.deepcopy(entry)
+        entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr_base64(entry)
 
     if entry.credentials.type not in (
         stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
@@ -584,23 +608,18 @@ def build_with_delegates_entry(
     _ensure_authorization_sc_address(addr_auth.address)
 
     return stellar_xdr.SorobanAuthorizationEntry(
-        credentials=stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES,
-            address_with_delegates=stellar_xdr.SorobanAddressCredentialsWithDelegates(
+        credentials=stellar_xdr.SorobanCredentials.AddressWithDelegates(
+            stellar_xdr.SorobanAddressCredentialsWithDelegates(
                 address_credentials=stellar_xdr.SorobanAddressCredentials(
                     address=addr_auth.address,
                     nonce=addr_auth.nonce,
-                    signature_expiration_ledger=stellar_xdr.Uint32(
-                        valid_until_ledger_sequence
-                    ),
+                    signature_expiration_ledger=valid_until_ledger_sequence,
                     signature=(
-                        signature
-                        if signature is not None
-                        else stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID)
+                        signature if signature is not None else stellar_xdr.SCVal.Void()
                     ),
                 ),
                 delegates=_build_delegate_nodes(delegates),
-            ),
+            )
         ),
         root_invocation=entry.root_invocation,
     )

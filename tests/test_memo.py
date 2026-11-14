@@ -9,11 +9,11 @@ from stellar_sdk.exceptions import MemoInvalidException
 class TestMemo:
     def test_none_memo(self):
         memo = NoneMemo()
-        assert memo.to_xdr_object().to_xdr() == "AAAAAA=="
+        assert memo.to_xdr_object().to_xdr_base64() == "AAAAAA=="
 
         base_memo = Memo.from_xdr_object(memo.to_xdr_object())
         assert isinstance(base_memo, NoneMemo)
-        assert base_memo.to_xdr_object().to_xdr() == "AAAAAA=="
+        assert base_memo.to_xdr_object().to_xdr_base64() == "AAAAAA=="
 
     @pytest.mark.parametrize(
         ("text", "xdr"),
@@ -25,11 +25,11 @@ class TestMemo:
     )
     def test_text_memo(self, text, xdr):
         memo = TextMemo(text)
-        assert memo.to_xdr_object().to_xdr() == xdr
+        assert memo.to_xdr_object().to_xdr_base64() == xdr
 
         base_memo = Memo.from_xdr_object(memo.to_xdr_object())
         assert isinstance(base_memo, TextMemo)
-        assert base_memo.to_xdr_object().to_xdr() == xdr
+        assert base_memo.to_xdr_object().to_xdr_base64() == xdr
 
     def test_text_memo_max_length_allowed(self):
         """28 bytes is the boundary and must still be accepted."""
@@ -54,11 +54,11 @@ class TestMemo:
     )
     def test_id_memo(self, id, xdr):
         memo = IdMemo(id)
-        assert memo.to_xdr_object().to_xdr() == xdr
+        assert memo.to_xdr_object().to_xdr_base64() == xdr
 
         base_memo = Memo.from_xdr_object(memo.to_xdr_object())
         assert isinstance(base_memo, IdMemo)
-        assert base_memo.to_xdr_object().to_xdr() == xdr
+        assert base_memo.to_xdr_object().to_xdr_base64() == xdr
 
     @pytest.mark.parametrize("id", [-1, 2**64])
     def test_id_memo_invalid_raise(self, id):
@@ -73,11 +73,11 @@ class TestMemo:
         xdr = "AAAAA1c8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f"
         hash = binascii.unhexlify(hex)
         memo = HashMemo(hash)
-        assert memo.to_xdr_object().to_xdr() == xdr
+        assert memo.to_xdr_object().to_xdr_base64() == xdr
 
         base_memo = Memo.from_xdr_object(memo.to_xdr_object())
         assert isinstance(base_memo, HashMemo)
-        assert base_memo.to_xdr_object().to_xdr() == xdr
+        assert base_memo.to_xdr_object().to_xdr_base64() == xdr
 
     def test_hash_memo_too_long_raise(self):
         length = 33
@@ -100,11 +100,11 @@ class TestMemo:
         xdr = "AAAABFc8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f"
         return_hash = binascii.unhexlify(hex)
         memo = ReturnHashMemo(return_hash)
-        assert memo.to_xdr_object().to_xdr() == xdr
+        assert memo.to_xdr_object().to_xdr_base64() == xdr
 
         base_memo = Memo.from_xdr_object(memo.to_xdr_object())
         assert isinstance(base_memo, ReturnHashMemo)
-        assert base_memo.to_xdr_object().to_xdr() == xdr
+        assert base_memo.to_xdr_object().to_xdr_base64() == xdr
 
     def test_return_hash_memo_too_long_raise(self):
         length = 48

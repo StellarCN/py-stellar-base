@@ -47,7 +47,7 @@ dependencies = [
     "requests>=2.0.0",
     "requests-sse>=0.3",
     "stellar-strkey>=0.2.0,<0.3.0",
-    "xdrlib3>=0.1.1",
+    "stellar-xdr>=0.2.0,<0.3.0",
 ]
 
 [project.urls]
@@ -102,7 +102,6 @@ warn_unused_configs = true
 source = ["stellar_sdk/", "tests/"]
 
 [tool.coverage.report]
-omit = ["stellar_sdk/xdr/*"]
 exclude_lines = [
     "pragma: no cover",
     "raise AssertionError",

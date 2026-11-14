@@ -2211,7 +2211,7 @@ dependencies = [
     { name = "requests" },
     { name = "requests-sse" },
     { name = "stellar-strkey" },
-    { name = "xdrlib3" },
+    { name = "stellar-xdr" },
 ]
 
 [package.optional-dependencies]
@@ -2256,7 +2256,7 @@ requires-dist = [
     { name = "requests-sse", specifier = ">=0.3" },
     { name = "shamir-mnemonic", marker = "extra == 'shamir'", specifier = ">=0.3.0" },
     { name = "stellar-strkey", specifier = ">=0.2.0,<0.3.0" },
-    { name = "xdrlib3", specifier = ">=0.1.1" },
+    { name = "stellar-xdr", specifier = ">=0.2.0,<0.3.0" },
 ]
 provides-extras = ["aiohttp", "shamir"]
 
@@ -2286,6 +2286,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0c/05/4c93a8ac9ae30662255853a4dc9b6130859296f3bb62540bc9da82bb2d51/stellar_strkey-0.2.0.tar.gz", hash = "sha256:1b1c89bbb0a64cf9e6ec332e80e72d272300f61f9a628a84cf16994a4effc433", size = 36078, upload-time = "2026-11-12T03:42:00.441Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9c/cd/71bafcc0c2324e03a2c6ff06b0674a9f70d570ccad26d3420650666902db/stellar_strkey-0.2.0-py3-none-any.whl", hash = "sha256:59f2acbb8b3dc6ecdb2742980b864163ff9d2477aabef14b2bc42acae12a42ae", size = 18046, upload-time = "2026-11-12T03:41:59.058Z" },
+]
+
+[[package]]
+name = "stellar-xdr"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "stellar-strkey" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/52/2c/b129abbaed13f779af14d39faa2efa791bae083a9f8c907709cc0f4f5acb/stellar_xdr-0.2.0.tar.gz", hash = "sha256:72219a460e8306468539e3d9f75160875578431bf95e8117c2a4146382760af6", size = 1768929, upload-time = "2026-11-13T09:30:46.204Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/72/8bc14784418f0d70b75e0a765f0a9c06dece621876302eb70e895e0b8c6c/stellar_xdr-0.2.0-py3-none-any.whl", hash = "sha256:47d000487d949b04186c543814b7bc76bf56abc173cb5559869a32fba6e7375c", size = 271039, upload-time = "2026-11-13T09:30:44.497Z" },
 ]
 
 [[package]]
@@ -2428,15 +2441,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a4/34/4dd12fc8bb7d61c91467ec3efe415ffa7d5456f799954b40c5bbaeae470e/werkzeug-3.1.9.tar.gz", hash = "sha256:55ca7c70a75689be937aa27f8ff4b018f06ff4838fc73045560bf0f5a1291060", size = 940188, upload-time = "2026-09-27T18:33:41.637Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a1/38/df03f564f43cec2684823f3cccae1a652ee7face1cbaa76fb223096e64d7/werkzeug-3.1.9-py3-none-any.whl", hash = "sha256:6392e50c78460ba618e5b21f08a71f59c99ce99cdc6cf6e3dd7e6ccca8754fab", size = 228700, upload-time = "2026-09-27T18:33:39.685Z" },
-]
-
-[[package]]
-name = "xdrlib3"
-version = "0.1.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/97/8e/aab54b230c9f021678c75365d8247ac40bf5beaf5b08a7d88d6706b80e3a/xdrlib3-0.1.1.tar.gz", hash = "sha256:26697013af45afab6c6ff9a598fd04979cde83fa7215da059551b088aea88f34", size = 3218, upload-time = "2023-05-06T11:45:48.531Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/66/9c/14f0e5cafc672566c52ae54a1bb221f2ba2155be4830af7b17d0d3b5ec59/xdrlib3-0.1.1-py3-none-any.whl", hash = "sha256:175c0645f347c64e76bb374c2109480007eb2ff04ad08acfe885a130d2b0877d", size = 3747, upload-time = "2023-05-06T11:45:46.634Z" },
 ]
 
 [[package]]

@@ -55,14 +55,14 @@ __all__ = [
 
 
 def to_native(
-    sc_val: stellar_xdr.SCVal | bytes | str,
+    sc_val: stellar_xdr.SCVal.Any | bytes | str,
 ) -> (
     bool
     | int
     | str
     | bytes
     | Address
-    | stellar_xdr.SCVal
+    | stellar_xdr.SCVal.Any
     | list[Any]
     | dict[Any, Any]
     | None
@@ -122,12 +122,10 @@ def to_native(
         return from_symbol(sc_val)
     if sc_val.type == stellar_xdr.SCValType.SCV_VEC:
         assert sc_val.vec is not None
-        return [to_native(val) for val in sc_val.vec.sc_vec]
+        return [to_native(val) for val in sc_val.vec]
     if sc_val.type == stellar_xdr.SCValType.SCV_MAP:
         assert sc_val.map is not None
-        return {
-            to_native(entry.key): to_native(entry.val) for entry in sc_val.map.sc_map
-        }
+        return {to_native(entry.key): to_native(entry.val) for entry in sc_val.map}
     if sc_val.type == stellar_xdr.SCValType.SCV_ADDRESS:
         return from_address(sc_val)
     if sc_val.type == stellar_xdr.SCValType.SCV_EXECUTABLE_TAG:
@@ -137,7 +135,7 @@ def to_native(
     return sc_val
 
 
-def to_address(data: Address | str) -> stellar_xdr.SCVal:
+def to_address(data: Address | str) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an :class:`stellar_sdk.address.Address` object.
 
     :param data: The :class:`stellar_sdk.address.Address` object to convert.
@@ -145,12 +143,10 @@ def to_address(data: Address | str) -> stellar_xdr.SCVal:
     """
     if isinstance(data, str):
         data = Address(data)
-    return stellar_xdr.SCVal(
-        stellar_xdr.SCValType.SCV_ADDRESS, address=data.to_xdr_sc_address()
-    )
+    return stellar_xdr.SCVal.Address(data.to_xdr_sc_address())
 
 
-def from_address(sc_val: stellar_xdr.SCVal | bytes | str) -> Address:
+def from_address(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> Address:
     """Creates an :class:`stellar_sdk.address.Address` object from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -165,16 +161,16 @@ def from_address(sc_val: stellar_xdr.SCVal | bytes | str) -> Address:
     return Address.from_xdr_sc_address(sc_val.address)
 
 
-def to_bool(data: bool) -> stellar_xdr.SCVal:
+def to_bool(data: bool) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a bool value.
 
     :param data: The bool value to convert.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_BOOL`.
     """
-    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_BOOL, b=data)
+    return stellar_xdr.SCVal.Bool(data)
 
 
-def from_bool(sc_val: stellar_xdr.SCVal | bytes | str) -> bool:
+def from_bool(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> bool:
     """Creates a bool value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -189,15 +185,15 @@ def from_bool(sc_val: stellar_xdr.SCVal | bytes | str) -> bool:
     return sc_val.b
 
 
-def to_void() -> stellar_xdr.SCVal:
+def to_void() -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object of type :class:`stellar_sdk.xdr.SCValType.SCV_VOID`.
 
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object of type :class:`stellar_sdk.xdr.SCValType.SCV_VOID`.
     """
-    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VOID)
+    return stellar_xdr.SCVal.Void()
 
 
-def from_void(sc_val: stellar_xdr.SCVal | bytes | str) -> None:
+def from_void(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> None:
     """Creates a None value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -211,18 +207,16 @@ def from_void(sc_val: stellar_xdr.SCVal | bytes | str) -> None:
     return None
 
 
-def to_bytes(data: bytes) -> stellar_xdr.SCVal:
+def to_bytes(data: bytes) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a bytes value.
 
     :param data: The bytes value to convert.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_BYTES`.
     """
-    return stellar_xdr.SCVal(
-        stellar_xdr.SCValType.SCV_BYTES, bytes=stellar_xdr.SCBytes(data)
-    )
+    return stellar_xdr.SCVal.Bytes(stellar_xdr.SCBytes(data))
 
 
-def from_bytes(sc_val: stellar_xdr.SCVal | bytes | str) -> bytes:
+def from_bytes(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> bytes:
     """Creates a bytes value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -234,10 +228,10 @@ def from_bytes(sc_val: stellar_xdr.SCVal | bytes | str) -> bytes:
     if sc_val.type != stellar_xdr.SCValType.SCV_BYTES:
         raise ValueError(f"Invalid sc_val type, must be SCV_BYTES, got {sc_val.type}")
     assert sc_val.bytes is not None
-    return bytes(sc_val.bytes.sc_bytes)
+    return bytes(sc_val.bytes)
 
 
-def to_duration(data: int) -> stellar_xdr.SCVal:
+def to_duration(data: int) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an int value.
 
     :param data: The duration. (uint64)
@@ -246,11 +240,11 @@ def to_duration(data: int) -> stellar_xdr.SCVal:
     """
     if data < 0 or data > 2**64 - 1:
         raise ValueError("Invalid data, must be between 0 and 2**64 - 1.")
-    duration = stellar_xdr.Duration(stellar_xdr.Uint64(data))
-    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_DURATION, duration=duration)
+    duration = stellar_xdr.Duration(data)
+    return stellar_xdr.SCVal.Duration(duration)
 
 
-def from_duration(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
+def from_duration(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> int:
     """Creates an int value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -264,10 +258,10 @@ def from_duration(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
             f"Invalid sc_val type, must be SCV_DURATION, got {sc_val.type}"
         )
     assert sc_val.duration is not None
-    return sc_val.duration.duration.uint64
+    return int(sc_val.duration)
 
 
-def to_executable_tag(data: str | bytes) -> stellar_xdr.SCVal:
+def to_executable_tag(data: str | bytes) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a
     `CAP-85 <https://stellar.org/protocol/cap-85>`_ executable tag.
 
@@ -284,13 +278,10 @@ def to_executable_tag(data: str | bytes) -> stellar_xdr.SCVal:
     """
     if isinstance(data, str):
         data = data.encode("utf-8")
-    return stellar_xdr.SCVal(
-        stellar_xdr.SCValType.SCV_EXECUTABLE_TAG,
-        executable_tag=stellar_xdr.SCString(data),
-    )
+    return stellar_xdr.SCVal.ExecutableTag(stellar_xdr.SCString(data))
 
 
-def from_executable_tag(sc_val: stellar_xdr.SCVal | bytes | str) -> bytes:
+def from_executable_tag(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> bytes:
     """Creates a `CAP-85 <https://stellar.org/protocol/cap-85>`_ executable tag from a
     :class:`stellar_sdk.xdr.SCVal` XDR object.
 
@@ -311,10 +302,10 @@ def from_executable_tag(sc_val: stellar_xdr.SCVal | bytes | str) -> bytes:
             f"Invalid sc_val type, must be SCV_EXECUTABLE_TAG, got {sc_val.type}"
         )
     assert sc_val.executable_tag is not None
-    return sc_val.executable_tag.sc_string
+    return bytes(sc_val.executable_tag)
 
 
-def to_int32(data: int) -> stellar_xdr.SCVal:
+def to_int32(data: int) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an int value.
 
     :param data: The int to convert. (int32)
@@ -324,10 +315,10 @@ def to_int32(data: int) -> stellar_xdr.SCVal:
     if data < -(2**31) or data > 2**31 - 1:
         raise ValueError("Invalid data, must be between -(2**31) and 2**31 - 1.")
 
-    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_I32, i32=stellar_xdr.Int32(data))
+    return stellar_xdr.SCVal.I32(data)
 
 
-def from_int32(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
+def from_int32(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> int:
     """Creates an int value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -339,10 +330,10 @@ def from_int32(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
     if sc_val.type != stellar_xdr.SCValType.SCV_I32:
         raise ValueError(f"Invalid sc_val type, must be SCV_I32, got {sc_val.type}")
     assert sc_val.i32 is not None
-    return sc_val.i32.int32
+    return sc_val.i32
 
 
-def to_int64(data: int) -> stellar_xdr.SCVal:
+def to_int64(data: int) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an int value.
 
     :param data: The int to convert. (int64)
@@ -352,10 +343,10 @@ def to_int64(data: int) -> stellar_xdr.SCVal:
     if data < -(2**63) or data > 2**63 - 1:
         raise ValueError("Invalid data, must be between -(2**63) and 2**63 - 1.")
 
-    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_I64, i64=stellar_xdr.Int64(data))
+    return stellar_xdr.SCVal.I64(data)
 
 
-def from_int64(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
+def from_int64(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> int:
     """Creates an int value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -367,10 +358,10 @@ def from_int64(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
     if sc_val.type != stellar_xdr.SCValType.SCV_I64:
         raise ValueError(f"Invalid sc_val type, must be SCV_I64, got {sc_val.type}")
     assert sc_val.i64 is not None
-    return sc_val.i64.int64
+    return sc_val.i64
 
 
-def to_int128(data: int) -> stellar_xdr.SCVal:
+def to_int128(data: int) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an int value.
 
     :param data: The int to convert. (int128)
@@ -382,13 +373,13 @@ def to_int128(data: int) -> stellar_xdr.SCVal:
 
     value_bytes = data.to_bytes(16, "big", signed=True)
     i128 = stellar_xdr.Int128Parts(
-        hi=stellar_xdr.Int64(int.from_bytes(value_bytes[0:8], "big", signed=True)),
-        lo=stellar_xdr.Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
+        hi=int.from_bytes(value_bytes[0:8], "big", signed=True),
+        lo=int.from_bytes(value_bytes[8:16], "big", signed=False),
     )
-    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_I128, i128=i128)
+    return stellar_xdr.SCVal.I128(i128)
 
 
-def from_int128(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
+def from_int128(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> int:
     """Creates an int value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -401,13 +392,13 @@ def from_int128(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
         raise ValueError(f"Invalid sc_val type, must be SCV_I128, got {sc_val.type}")
     assert sc_val.i128 is not None
 
-    value_bytes = sc_val.i128.hi.int64.to_bytes(
+    value_bytes = sc_val.i128.hi.to_bytes(
         8, "big", signed=True
-    ) + sc_val.i128.lo.uint64.to_bytes(8, "big", signed=False)
+    ) + sc_val.i128.lo.to_bytes(8, "big", signed=False)
     return int.from_bytes(value_bytes, "big", signed=True)
 
 
-def to_int256(data: int) -> stellar_xdr.SCVal:
+def to_int256(data: int) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an int value.
 
     :param data: The int to convert. (int256)
@@ -425,15 +416,15 @@ def to_int256(data: int) -> stellar_xdr.SCVal:
         int.from_bytes(value_bytes[24:32], "big", signed=False),
     )
     i256 = stellar_xdr.Int256Parts(
-        hi_hi=stellar_xdr.Int64(hi_hi),
-        hi_lo=stellar_xdr.Uint64(hi_lo),
-        lo_hi=stellar_xdr.Uint64(lo_hi),
-        lo_lo=stellar_xdr.Uint64(lo_lo),
+        hi_hi=hi_hi,
+        hi_lo=hi_lo,
+        lo_hi=lo_hi,
+        lo_lo=lo_lo,
     )
-    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_I256, i256=i256)
+    return stellar_xdr.SCVal.I256(i256)
 
 
-def from_int256(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
+def from_int256(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> int:
     """Creates an int value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -447,15 +438,17 @@ def from_int256(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
     assert sc_val.i256 is not None
 
     value_bytes = (
-        sc_val.i256.hi_hi.int64.to_bytes(8, "big", signed=True)
-        + sc_val.i256.hi_lo.uint64.to_bytes(8, "big", signed=False)
-        + sc_val.i256.lo_hi.uint64.to_bytes(8, "big", signed=False)
-        + sc_val.i256.lo_lo.uint64.to_bytes(8, "big", signed=False)
+        sc_val.i256.hi_hi.to_bytes(8, "big", signed=True)
+        + sc_val.i256.hi_lo.to_bytes(8, "big", signed=False)
+        + sc_val.i256.lo_hi.to_bytes(8, "big", signed=False)
+        + sc_val.i256.lo_lo.to_bytes(8, "big", signed=False)
     )
     return int.from_bytes(value_bytes, "big", signed=True)
 
 
-def to_map(data: dict[stellar_xdr.SCVal, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
+def to_map(
+    data: dict[stellar_xdr.SCVal.Any, stellar_xdr.SCVal.Any],
+) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a dict value.
 
     The entries are sorted by key following Soroban runtime ordering rules,
@@ -468,15 +461,12 @@ def to_map(data: dict[stellar_xdr.SCVal, stellar_xdr.SCVal]) -> stellar_xdr.SCVa
         stellar_xdr.SCMapEntry(key=key, val=value) for key, value in data.items()
     ]
     entries.sort(key=functools.cmp_to_key(lambda a, b: _compare_sc_val(a.key, b.key)))
-    return stellar_xdr.SCVal(
-        stellar_xdr.SCValType.SCV_MAP,
-        map=stellar_xdr.SCMap(sc_map=entries),
-    )
+    return stellar_xdr.SCVal.Map(entries)
 
 
 def from_map(
-    sc_val: stellar_xdr.SCVal | bytes | str,
-) -> dict[stellar_xdr.SCVal, stellar_xdr.SCVal]:
+    sc_val: stellar_xdr.SCVal.Any | bytes | str,
+) -> dict[stellar_xdr.SCVal.Any, stellar_xdr.SCVal.Any]:
     """Creates a dict value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -488,10 +478,10 @@ def from_map(
     if sc_val.type != stellar_xdr.SCValType.SCV_MAP:
         raise ValueError(f"Invalid sc_val type, must be SCV_MAP, got {sc_val.type}")
     assert sc_val.map is not None
-    return {entry.key: entry.val for entry in sc_val.map.sc_map}
+    return {entry.key: entry.val for entry in sc_val.map}
 
 
-def to_string(data: str | bytes) -> stellar_xdr.SCVal:
+def to_string(data: str | bytes) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a string value.
 
     :param data: The string value to convert.
@@ -499,12 +489,10 @@ def to_string(data: str | bytes) -> stellar_xdr.SCVal:
     """
     if isinstance(data, str):
         data = data.encode("utf-8")
-    return stellar_xdr.SCVal(
-        stellar_xdr.SCValType.SCV_STRING, str=stellar_xdr.SCString(data)
-    )
+    return stellar_xdr.SCVal.String(stellar_xdr.SCString(data))
 
 
-def from_string(sc_val: stellar_xdr.SCVal | bytes | str) -> bytes:
+def from_string(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> bytes:
     """Creates a string value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -516,21 +504,19 @@ def from_string(sc_val: stellar_xdr.SCVal | bytes | str) -> bytes:
     if sc_val.type != stellar_xdr.SCValType.SCV_STRING:
         raise ValueError(f"Invalid sc_val type, must be SCV_STRING, got {sc_val.type}")
     assert sc_val.str is not None
-    return sc_val.str.sc_string
+    return bytes(sc_val.str)
 
 
-def to_symbol(data: str) -> stellar_xdr.SCVal:
+def to_symbol(data: str) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a symbol value.
 
     :param data: The symbol value to convert.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_SYMBOL`.
     """
-    return stellar_xdr.SCVal(
-        stellar_xdr.SCValType.SCV_SYMBOL, sym=stellar_xdr.SCSymbol(data.encode("utf-8"))
-    )
+    return stellar_xdr.SCVal.Symbol(stellar_xdr.SCSymbol(data.encode("utf-8")))
 
 
-def from_symbol(sc_val: stellar_xdr.SCVal | bytes | str) -> str:
+def from_symbol(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> str:
     """Creates a symbol value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -542,10 +528,10 @@ def from_symbol(sc_val: stellar_xdr.SCVal | bytes | str) -> str:
     if sc_val.type != stellar_xdr.SCValType.SCV_SYMBOL:
         raise ValueError(f"Invalid sc_val type, must be SCV_SYMBOL, got {sc_val.type}")
     assert sc_val.sym is not None
-    return sc_val.sym.sc_symbol.decode("utf-8")
+    return sc_val.sym.decode("utf-8")
 
 
-def to_timepoint(data: int) -> stellar_xdr.SCVal:
+def to_timepoint(data: int) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an int value.
 
     :param data: The time point. (uint64)
@@ -554,11 +540,11 @@ def to_timepoint(data: int) -> stellar_xdr.SCVal:
     """
     if data < 0 or data > 2**64 - 1:
         raise ValueError("Invalid data, must be between 0 and 2**64 - 1.")
-    time_point = stellar_xdr.TimePoint(stellar_xdr.Uint64(data))
-    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_TIMEPOINT, timepoint=time_point)
+    time_point = stellar_xdr.TimePoint(data)
+    return stellar_xdr.SCVal.TimePoint(time_point)
 
 
-def from_timepoint(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
+def from_timepoint(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> int:
     """Creates an int value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -572,10 +558,10 @@ def from_timepoint(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
             f"Invalid sc_val type, must be SCV_TIMEPOINT, got {sc_val.type}"
         )
     assert sc_val.timepoint is not None
-    return sc_val.timepoint.time_point.uint64
+    return int(sc_val.timepoint)
 
 
-def to_uint32(data: int) -> stellar_xdr.SCVal:
+def to_uint32(data: int) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an int value.
 
     :param data: The int to convert. (uint32)
@@ -585,12 +571,10 @@ def to_uint32(data: int) -> stellar_xdr.SCVal:
     if data < 0 or data > 2**32 - 1:
         raise ValueError("Invalid data, must be between 0 and 2**32 - 1.")
 
-    return stellar_xdr.SCVal(
-        stellar_xdr.SCValType.SCV_U32, u32=stellar_xdr.Uint32(data)
-    )
+    return stellar_xdr.SCVal.U32(data)
 
 
-def from_uint32(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
+def from_uint32(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> int:
     """Creates an int value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -602,10 +586,10 @@ def from_uint32(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
     if sc_val.type != stellar_xdr.SCValType.SCV_U32:
         raise ValueError(f"Invalid sc_val type, must be SCV_U32, got {sc_val.type}")
     assert sc_val.u32 is not None
-    return sc_val.u32.uint32
+    return sc_val.u32
 
 
-def to_uint64(data: int) -> stellar_xdr.SCVal:
+def to_uint64(data: int) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an int value.
 
     :param data: The int to convert. (uint64)
@@ -615,12 +599,10 @@ def to_uint64(data: int) -> stellar_xdr.SCVal:
     if data < 0 or data > 2**64 - 1:
         raise ValueError("Invalid data, must be between 0 and 2**64 - 1.")
 
-    return stellar_xdr.SCVal(
-        stellar_xdr.SCValType.SCV_U64, u64=stellar_xdr.Uint64(data)
-    )
+    return stellar_xdr.SCVal.U64(data)
 
 
-def from_uint64(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
+def from_uint64(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> int:
     """Creates an int value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -632,10 +614,10 @@ def from_uint64(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
     if sc_val.type != stellar_xdr.SCValType.SCV_U64:
         raise ValueError(f"Invalid sc_val type, must be SCV_U64, got {sc_val.type}")
     assert sc_val.u64 is not None
-    return sc_val.u64.uint64
+    return sc_val.u64
 
 
-def to_uint128(data: int) -> stellar_xdr.SCVal:
+def to_uint128(data: int) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an int value.
 
     :param data: The int to convert. (uint128)
@@ -647,13 +629,13 @@ def to_uint128(data: int) -> stellar_xdr.SCVal:
 
     value_bytes = data.to_bytes(16, "big", signed=False)
     u128 = stellar_xdr.UInt128Parts(
-        hi=stellar_xdr.Uint64(int.from_bytes(value_bytes[0:8], "big", signed=False)),
-        lo=stellar_xdr.Uint64(int.from_bytes(value_bytes[8:16], "big", signed=False)),
+        hi=int.from_bytes(value_bytes[0:8], "big", signed=False),
+        lo=int.from_bytes(value_bytes[8:16], "big", signed=False),
     )
-    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_U128, u128=u128)
+    return stellar_xdr.SCVal.U128(u128)
 
 
-def from_uint128(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
+def from_uint128(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> int:
     """Creates an int value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -666,13 +648,13 @@ def from_uint128(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
         raise ValueError(f"Invalid sc_val type, must be SCV_U128, got {sc_val.type}")
     assert sc_val.u128 is not None
 
-    value_bytes = sc_val.u128.hi.uint64.to_bytes(
+    value_bytes = sc_val.u128.hi.to_bytes(
         8, "big", signed=False
-    ) + sc_val.u128.lo.uint64.to_bytes(8, "big", signed=False)
+    ) + sc_val.u128.lo.to_bytes(8, "big", signed=False)
     return int.from_bytes(value_bytes, "big", signed=False)
 
 
-def to_uint256(data: int) -> stellar_xdr.SCVal:
+def to_uint256(data: int) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from an int value.
 
     :param data: The int to convert. (uint256)
@@ -690,15 +672,15 @@ def to_uint256(data: int) -> stellar_xdr.SCVal:
         int.from_bytes(value_bytes[24:32], "big", signed=False),
     )
     u256 = stellar_xdr.UInt256Parts(
-        hi_hi=stellar_xdr.Uint64(hi_hi),
-        hi_lo=stellar_xdr.Uint64(hi_lo),
-        lo_hi=stellar_xdr.Uint64(lo_hi),
-        lo_lo=stellar_xdr.Uint64(lo_lo),
+        hi_hi=hi_hi,
+        hi_lo=hi_lo,
+        lo_hi=lo_hi,
+        lo_lo=lo_lo,
     )
-    return stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_U256, u256=u256)
+    return stellar_xdr.SCVal.U256(u256)
 
 
-def from_uint256(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
+def from_uint256(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> int:
     """Creates an int value from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -712,26 +694,26 @@ def from_uint256(sc_val: stellar_xdr.SCVal | bytes | str) -> int:
     assert sc_val.u256 is not None
 
     value_bytes = (
-        sc_val.u256.hi_hi.uint64.to_bytes(8, "big", signed=False)
-        + sc_val.u256.hi_lo.uint64.to_bytes(8, "big", signed=False)
-        + sc_val.u256.lo_hi.uint64.to_bytes(8, "big", signed=False)
-        + sc_val.u256.lo_lo.uint64.to_bytes(8, "big", signed=False)
+        sc_val.u256.hi_hi.to_bytes(8, "big", signed=False)
+        + sc_val.u256.hi_lo.to_bytes(8, "big", signed=False)
+        + sc_val.u256.lo_hi.to_bytes(8, "big", signed=False)
+        + sc_val.u256.lo_lo.to_bytes(8, "big", signed=False)
     )
     return int.from_bytes(value_bytes, "big", signed=False)
 
 
-def to_vec(data: Sequence[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
+def to_vec(data: Sequence[stellar_xdr.SCVal.Any]) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object from a list of :class:`stellar_sdk.xdr.SCVal` XDR objects.
 
     :param data: The list of :class:`stellar_sdk.xdr.SCVal` XDR objects.
     :return: A new :class:`stellar_sdk.xdr.SCVal` XDR object with type :class:`stellar_sdk.xdr.SCValType.SCV_VEC`.
     """
-    return stellar_xdr.SCVal(
-        stellar_xdr.SCValType.SCV_VEC, vec=stellar_xdr.SCVec(list(data))
-    )
+    return stellar_xdr.SCVal.Vec(stellar_xdr.SCVec(list(data)))
 
 
-def from_vec(sc_val: stellar_xdr.SCVal | bytes | str) -> list[stellar_xdr.SCVal]:
+def from_vec(
+    sc_val: stellar_xdr.SCVal.Any | bytes | str,
+) -> list[stellar_xdr.SCVal.Any]:
     """Creates a list of :class:`stellar_sdk.xdr.SCVal` XDR objects from a :class:`stellar_sdk.xdr.SCVal` XDR object.
 
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
@@ -743,12 +725,12 @@ def from_vec(sc_val: stellar_xdr.SCVal | bytes | str) -> list[stellar_xdr.SCVal]
     if sc_val.type != stellar_xdr.SCValType.SCV_VEC:
         raise ValueError(f"Invalid sc_val type, must be VEC, got {sc_val.type}")
     assert sc_val.vec is not None
-    return sc_val.vec.sc_vec
+    return list(sc_val.vec)
 
 
 def to_enum(
-    key: str, data: stellar_xdr.SCVal | list[stellar_xdr.SCVal] | None
-) -> stellar_xdr.SCVal:
+    key: str, data: stellar_xdr.SCVal.Any | list[stellar_xdr.SCVal.Any] | None
+) -> stellar_xdr.SCVal.Any:
     """Creates a :class:`stellar_sdk.xdr.SCVal` XDR object corresponding to the Enum in the Rust SDK.
 
     .. warning::
@@ -761,7 +743,7 @@ def to_enum(
     """
     scv = [to_symbol(key)]
     if data is not None:
-        if isinstance(data, stellar_xdr.SCVal):
+        if isinstance(data, stellar_xdr.SCVal.Any):
             scv.append(data)
         else:
             scv.extend(data)
@@ -769,8 +751,8 @@ def to_enum(
 
 
 def from_enum(
-    sc_val: stellar_xdr.SCVal | bytes | str,
-) -> tuple[str, stellar_xdr.SCVal | list[stellar_xdr.SCVal] | None]:
+    sc_val: stellar_xdr.SCVal.Any | bytes | str,
+) -> tuple[str, stellar_xdr.SCVal.Any | list[stellar_xdr.SCVal.Any] | None]:
     """Creates a tuple corresponding to the Enum in the Rust SDK.
 
     .. warning::
@@ -785,7 +767,7 @@ def from_enum(
     vec = from_vec(sc_val)
     if len(vec) == 0:
         raise ValueError(
-            f"Invalid sc_val, can not parse enum, sc_val: {sc_val.to_xdr()}"
+            f"Invalid sc_val, can not parse enum, sc_val: {sc_val.to_xdr_base64()}"
         )
     key = from_symbol(vec[0])
     if len(vec) == 1:
@@ -796,7 +778,7 @@ def from_enum(
         return key, vec[1:]
 
 
-def to_tuple_struct(data: Sequence[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
+def to_tuple_struct(data: Sequence[stellar_xdr.SCVal.Any]) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object corresponding to the Tuple Struct in the Rust SDK.
 
     .. warning::
@@ -810,8 +792,8 @@ def to_tuple_struct(data: Sequence[stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
 
 
 def from_tuple_struct(
-    sc_val: stellar_xdr.SCVal | bytes | str,
-) -> list[stellar_xdr.SCVal]:
+    sc_val: stellar_xdr.SCVal.Any | bytes | str,
+) -> list[stellar_xdr.SCVal.Any]:
     """Creates a list corresponding to the Tuple Struct in the Rust SDK.
 
     .. warning::
@@ -825,7 +807,7 @@ def from_tuple_struct(
     return from_vec(sc_val)
 
 
-def to_struct(data: dict[str, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
+def to_struct(data: dict[str, stellar_xdr.SCVal.Any]) -> stellar_xdr.SCVal.Any:
     """Creates a new :class:`stellar_sdk.xdr.SCVal` XDR object corresponding to the Struct in the Rust SDK.
 
     .. warning::
@@ -838,15 +820,15 @@ def to_struct(data: dict[str, stellar_xdr.SCVal]) -> stellar_xdr.SCVal:
     # sort the dict by key to ensure the order of the fields.
     # see https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046-01.md#validity
     sorted_data = dict(sorted(data.items()))
-    v: dict[stellar_xdr.SCVal, stellar_xdr.SCVal] = {}
+    v: dict[stellar_xdr.SCVal.Any, stellar_xdr.SCVal.Any] = {}
     for key, val in sorted_data.items():
         v[to_symbol(key)] = val
     return to_map(v)
 
 
 def from_struct(
-    sc_val: stellar_xdr.SCVal | bytes | str,
-) -> dict[str, stellar_xdr.SCVal]:
+    sc_val: stellar_xdr.SCVal.Any | bytes | str,
+) -> dict[str, stellar_xdr.SCVal.Any]:
     """Creates a dict corresponding to the Struct in the Rust SDK.
 
     .. warning::
@@ -861,101 +843,99 @@ def from_struct(
     return {from_symbol(key): val for key, val in v.items()}
 
 
-def _compare_sc_address(a: stellar_xdr.SCAddress, b: stellar_xdr.SCAddress) -> int:
-    c = (a.type.value > b.type.value) - (a.type.value < b.type.value)
-    if c != 0:
-        return c
-    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
-        assert a.account_id is not None
-        assert b.account_id is not None
-        ax, bx = a.account_id.to_xdr_bytes(), b.account_id.to_xdr_bytes()
-        return (ax > bx) - (ax < bx)
-    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CONTRACT:
-        assert a.contract_id is not None
-        assert b.contract_id is not None
-        ax, bx = a.contract_id.to_xdr_bytes(), b.contract_id.to_xdr_bytes()
-        return (ax > bx) - (ax < bx)
-    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT:
-        assert a.muxed_account is not None
-        assert b.muxed_account is not None
-        at = (a.muxed_account.id.uint64, a.muxed_account.ed25519.uint256)
-        bt = (b.muxed_account.id.uint64, b.muxed_account.ed25519.uint256)
-        return (at > bt) - (at < bt)
-    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE:
-        assert a.claimable_balance_id is not None
-        assert b.claimable_balance_id is not None
-        ax, bx = (
-            a.claimable_balance_id.to_xdr_bytes(),
-            b.claimable_balance_id.to_xdr_bytes(),
-        )
-        return (ax > bx) - (ax < bx)
-    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL:
-        assert a.liquidity_pool_id is not None
-        assert b.liquidity_pool_id is not None
-        ax, bx = (
-            a.liquidity_pool_id.to_xdr_bytes(),
-            b.liquidity_pool_id.to_xdr_bytes(),
-        )
-        return (ax > bx) - (ax < bx)
-    if a.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT:
-        assert a.muxed_contract is not None
-        assert b.muxed_contract is not None
-        at = (
-            a.muxed_contract.id.uint64,
-            a.muxed_contract.contract_id.contract_id.hash,
-        )
-        bt = (
-            b.muxed_contract.id.uint64,
-            b.muxed_contract.contract_id.contract_id.hash,
-        )
-        return (at > bt) - (at < bt)
+def _cmp(a: Any, b: Any) -> int:
+    return (a > b) - (a < b)
+
+
+def _compare_sc_address(
+    a: stellar_xdr.SCAddress.Any, b: stellar_xdr.SCAddress.Any
+) -> int:
+    if a.type != b.type:
+        return _cmp(a.type.value, b.type.value)
+    match a, b:
+        case stellar_xdr.SCAddress.Account(x), stellar_xdr.SCAddress.Account(y):
+            return _cmp(x.ed25519, y.ed25519)
+        case stellar_xdr.SCAddress.Contract(x), stellar_xdr.SCAddress.Contract(y):
+            return _cmp(x, y)
+        case (
+            stellar_xdr.SCAddress.MuxedAccount(x),
+            stellar_xdr.SCAddress.MuxedAccount(y),
+        ):
+            return _cmp((x.id, x.ed25519), (y.id, y.ed25519))
+        case (
+            stellar_xdr.SCAddress.ClaimableBalance(x),
+            stellar_xdr.SCAddress.ClaimableBalance(y),
+        ):
+            return _cmp(x.to_xdr_bytes(), y.to_xdr_bytes())
+        case (
+            stellar_xdr.SCAddress.LiquidityPool(x),
+            stellar_xdr.SCAddress.LiquidityPool(y),
+        ):
+            return _cmp(x, y)
+        case (
+            stellar_xdr.SCAddress.MuxedContract(x),
+            stellar_xdr.SCAddress.MuxedContract(y),
+        ):
+            return _cmp((x.id, x.contract_id), (y.id, y.contract_id))
     raise ValueError(f"Unsupported SCAddress type: {a.type}")
 
 
 def _compare_contract_executable(
-    a: stellar_xdr.ContractExecutable, b: stellar_xdr.ContractExecutable
+    a: stellar_xdr.ContractExecutable.Any, b: stellar_xdr.ContractExecutable.Any
 ) -> int:
-    c = (a.type.value > b.type.value) - (a.type.value < b.type.value)
-    if c != 0:
-        return c
-    if a.type == stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM:
-        assert a.wasm_hash is not None
-        assert b.wasm_hash is not None
-        ah, bh = a.wasm_hash.hash, b.wasm_hash.hash
-        return (ah > bh) - (ah < bh)
-    if a.type == stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF:
-        assert a.external_ref is not None
-        assert b.external_ref is not None
-        c = _compare_sc_address(
-            a.external_ref.executable_owner, b.external_ref.executable_owner
-        )
-        if c != 0:
-            return c
-        at, bt = a.external_ref.tag.sc_string, b.external_ref.tag.sc_string
-        return (at > bt) - (at < bt)
+    if a.type != b.type:
+        return _cmp(a.type.value, b.type.value)
+    match a, b:
+        case stellar_xdr.ContractExecutable.Wasm(
+            x
+        ), stellar_xdr.ContractExecutable.Wasm(y):
+            return _cmp(x, y)
+        case (
+            stellar_xdr.ContractExecutable.ExternalRef(x),
+            stellar_xdr.ContractExecutable.ExternalRef(y),
+        ):
+            c = _compare_sc_address(x.executable_owner, y.executable_owner)
+            if c != 0:
+                return c
+            return _cmp(x.tag, y.tag)
     return 0
 
 
-def _compare_optional_sc_map(
-    a: stellar_xdr.SCMap | None, b: stellar_xdr.SCMap | None
+def _compare_sc_error(a: stellar_xdr.SCError.Any, b: stellar_xdr.SCError.Any) -> int:
+    if a.type != b.type:
+        return _cmp(a.type.value, b.type.value)
+    if isinstance(a, stellar_xdr.SCError.Contract) and isinstance(
+        b, stellar_xdr.SCError.Contract
+    ):
+        return _cmp(a.contract_code, b.contract_code)
+    # The types are equal, so neither is a contract error.
+    assert not isinstance(a, stellar_xdr.SCError.Contract)
+    assert not isinstance(b, stellar_xdr.SCError.Contract)
+    return _cmp(a.code.value, b.code.value)
+
+
+def _compare_optional_sequence(
+    a: Sequence[Any] | None,
+    b: Sequence[Any] | None,
+    compare_item: Any,
 ) -> int:
-    if a is None and b is None:
-        return 0
-    if a is None:
-        return -1
-    if b is None:
-        return 1
-    for ae, be in zip(a.sc_map, b.sc_map, strict=False):
-        c = _compare_sc_val(ae.key, be.key)
+    if a is None or b is None:
+        return _cmp(a is not None, b is not None)
+    for ae, be in zip(a, b, strict=False):
+        c = compare_item(ae, be)
         if c != 0:
             return c
-        c = _compare_sc_val(ae.val, be.val)
-        if c != 0:
-            return c
-    return (len(a.sc_map) > len(b.sc_map)) - (len(a.sc_map) < len(b.sc_map))
+    return _cmp(len(a), len(b))
 
 
-def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
+def _compare_sc_map_entry(a: stellar_xdr.SCMapEntry, b: stellar_xdr.SCMapEntry) -> int:
+    c = _compare_sc_val(a.key, b.key)
+    if c != 0:
+        return c
+    return _compare_sc_val(a.val, b.val)
+
+
+def _compare_sc_val(a: stellar_xdr.SCVal.Any, b: stellar_xdr.SCVal.Any) -> int:
     """Compare two SCVal values following Soroban runtime ordering rules.
 
     This mirrors Rust's ``#[derive(Ord)]`` on the ``ScVal`` enum in
@@ -995,194 +975,66 @@ def _compare_sc_val(a: stellar_xdr.SCVal, b: stellar_xdr.SCVal) -> int:
     """
     # Cross-type: compare by discriminant value
     if a.type != b.type:
-        return (a.type.value > b.type.value) - (a.type.value < b.type.value)
+        return _cmp(a.type.value, b.type.value)
 
-    t = a.type
-
-    if t == stellar_xdr.SCValType.SCV_BOOL:
-        assert a.b is not None
-        assert b.b is not None
-        ai, bi = int(a.b), int(b.b)
-        return (ai > bi) - (ai < bi)
-
-    if t in (
-        stellar_xdr.SCValType.SCV_VOID,
-        stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE,
-    ):
-        return 0
-
-    if t == stellar_xdr.SCValType.SCV_U32:
-        assert a.u32 is not None
-        assert b.u32 is not None
-        av, bv = a.u32.uint32, b.u32.uint32
-        return (av > bv) - (av < bv)
-
-    if t == stellar_xdr.SCValType.SCV_I32:
-        assert a.i32 is not None
-        assert b.i32 is not None
-        av, bv = a.i32.int32, b.i32.int32
-        return (av > bv) - (av < bv)
-
-    if t == stellar_xdr.SCValType.SCV_U64:
-        assert a.u64 is not None
-        assert b.u64 is not None
-        av, bv = a.u64.uint64, b.u64.uint64
-        return (av > bv) - (av < bv)
-
-    if t == stellar_xdr.SCValType.SCV_I64:
-        assert a.i64 is not None
-        assert b.i64 is not None
-        av, bv = a.i64.int64, b.i64.int64
-        return (av > bv) - (av < bv)
-
-    if t == stellar_xdr.SCValType.SCV_TIMEPOINT:
-        assert a.timepoint is not None
-        assert b.timepoint is not None
-        av, bv = a.timepoint.time_point.uint64, b.timepoint.time_point.uint64
-        return (av > bv) - (av < bv)
-
-    if t == stellar_xdr.SCValType.SCV_DURATION:
-        assert a.duration is not None
-        assert b.duration is not None
-        av, bv = a.duration.duration.uint64, b.duration.duration.uint64
-        return (av > bv) - (av < bv)
-
-    if t == stellar_xdr.SCValType.SCV_U128:
-        assert a.u128 is not None
-        assert b.u128 is not None
-        at = (a.u128.hi.uint64, a.u128.lo.uint64)
-        bt = (b.u128.hi.uint64, b.u128.lo.uint64)
-        return (at > bt) - (at < bt)
-
-    if t == stellar_xdr.SCValType.SCV_I128:
-        assert a.i128 is not None
-        assert b.i128 is not None
-        at = (a.i128.hi.int64, a.i128.lo.uint64)
-        bt = (b.i128.hi.int64, b.i128.lo.uint64)
-        return (at > bt) - (at < bt)
-
-    if t == stellar_xdr.SCValType.SCV_U256:
-        assert a.u256 is not None
-        assert b.u256 is not None
-        at256 = (
-            a.u256.hi_hi.uint64,
-            a.u256.hi_lo.uint64,
-            a.u256.lo_hi.uint64,
-            a.u256.lo_lo.uint64,
-        )
-        bt256 = (
-            b.u256.hi_hi.uint64,
-            b.u256.hi_lo.uint64,
-            b.u256.lo_hi.uint64,
-            b.u256.lo_lo.uint64,
-        )
-        return (at256 > bt256) - (at256 < bt256)
-
-    if t == stellar_xdr.SCValType.SCV_I256:
-        assert a.i256 is not None
-        assert b.i256 is not None
-        ai256 = (
-            a.i256.hi_hi.int64,
-            a.i256.hi_lo.uint64,
-            a.i256.lo_hi.uint64,
-            a.i256.lo_lo.uint64,
-        )
-        bi256 = (
-            b.i256.hi_hi.int64,
-            b.i256.hi_lo.uint64,
-            b.i256.lo_hi.uint64,
-            b.i256.lo_lo.uint64,
-        )
-        return (ai256 > bi256) - (ai256 < bi256)
-
-    if t == stellar_xdr.SCValType.SCV_BYTES:
-        assert a.bytes is not None
-        assert b.bytes is not None
-        ab, bb = a.bytes.sc_bytes, b.bytes.sc_bytes
-        return (ab > bb) - (ab < bb)
-
-    if t == stellar_xdr.SCValType.SCV_STRING:
-        assert a.str is not None
-        assert b.str is not None
-        ab, bb = a.str.sc_string, b.str.sc_string
-        return (ab > bb) - (ab < bb)
-
-    if t == stellar_xdr.SCValType.SCV_SYMBOL:
-        assert a.sym is not None
-        assert b.sym is not None
-        ab, bb = a.sym.sc_symbol, b.sym.sc_symbol
-        return (ab > bb) - (ab < bb)
-
-    if t == stellar_xdr.SCValType.SCV_VEC:
-        assert a.vec is not None
-        assert b.vec is not None
-        for ae, be in zip(a.vec.sc_vec, b.vec.sc_vec, strict=False):
-            c = _compare_sc_val(ae, be)
+    match a, b:
+        case stellar_xdr.SCVal.Bool(x), stellar_xdr.SCVal.Bool(y):
+            return _cmp(x, y)
+        case (
+            (stellar_xdr.SCVal.U32(x), stellar_xdr.SCVal.U32(y))
+            | (stellar_xdr.SCVal.I32(x), stellar_xdr.SCVal.I32(y))
+            | (stellar_xdr.SCVal.U64(x), stellar_xdr.SCVal.U64(y))
+            | (stellar_xdr.SCVal.I64(x), stellar_xdr.SCVal.I64(y))
+            | (stellar_xdr.SCVal.TimePoint(x), stellar_xdr.SCVal.TimePoint(y))
+            | (stellar_xdr.SCVal.Duration(x), stellar_xdr.SCVal.Duration(y))
+        ):
+            return _cmp(x, y)
+        case (stellar_xdr.SCVal.U128(x), stellar_xdr.SCVal.U128(y)) | (
+            stellar_xdr.SCVal.I128(x),
+            stellar_xdr.SCVal.I128(y),
+        ):
+            return _cmp((x.hi, x.lo), (y.hi, y.lo))
+        case (stellar_xdr.SCVal.U256(x), stellar_xdr.SCVal.U256(y)) | (
+            stellar_xdr.SCVal.I256(x),
+            stellar_xdr.SCVal.I256(y),
+        ):
+            return _cmp(
+                (x.hi_hi, x.hi_lo, x.lo_hi, x.lo_lo),
+                (y.hi_hi, y.hi_lo, y.lo_hi, y.lo_lo),
+            )
+        case (
+            (stellar_xdr.SCVal.Bytes(x), stellar_xdr.SCVal.Bytes(y))
+            | (stellar_xdr.SCVal.String(x), stellar_xdr.SCVal.String(y))
+            | (stellar_xdr.SCVal.Symbol(x), stellar_xdr.SCVal.Symbol(y))
+            | (stellar_xdr.SCVal.ExecutableTag(x), stellar_xdr.SCVal.ExecutableTag(y))
+        ):
+            return _cmp(x, y)
+        case stellar_xdr.SCVal.Vec(x), stellar_xdr.SCVal.Vec(y):
+            return _compare_optional_sequence(x, y, _compare_sc_val)
+        case stellar_xdr.SCVal.Map(x), stellar_xdr.SCVal.Map(y):
+            return _compare_optional_sequence(x, y, _compare_sc_map_entry)
+        case stellar_xdr.SCVal.Address(x), stellar_xdr.SCVal.Address(y):
+            return _compare_sc_address(x, y)
+        case stellar_xdr.SCVal.Error(x), stellar_xdr.SCVal.Error(y):
+            return _compare_sc_error(x, y)
+        case stellar_xdr.SCVal.ContractInstance(x), stellar_xdr.SCVal.ContractInstance(
+            y
+        ):
+            c = _compare_contract_executable(x.executable, y.executable)
             if c != 0:
                 return c
-        return (len(a.vec.sc_vec) > len(b.vec.sc_vec)) - (
-            len(a.vec.sc_vec) < len(b.vec.sc_vec)
-        )
+            return _compare_optional_sequence(
+                x.storage, y.storage, _compare_sc_map_entry
+            )
+        case stellar_xdr.SCVal.LedgerKeyNonce(x), stellar_xdr.SCVal.LedgerKeyNonce(y):
+            return _cmp(x.nonce, y.nonce)
+        case (stellar_xdr.SCVal.Void(), stellar_xdr.SCVal.Void()) | (
+            stellar_xdr.SCVal.LedgerKeyContractInstance(),
+            stellar_xdr.SCVal.LedgerKeyContractInstance(),
+        ):
+            return 0
 
-    if t == stellar_xdr.SCValType.SCV_MAP:
-        assert a.map is not None
-        assert b.map is not None
-        for am, bm in zip(a.map.sc_map, b.map.sc_map, strict=False):
-            c = _compare_sc_val(am.key, bm.key)
-            if c != 0:
-                return c
-            c = _compare_sc_val(am.val, bm.val)
-            if c != 0:
-                return c
-        return (len(a.map.sc_map) > len(b.map.sc_map)) - (
-            len(a.map.sc_map) < len(b.map.sc_map)
-        )
-
-    if t == stellar_xdr.SCValType.SCV_ADDRESS:
-        assert a.address is not None
-        assert b.address is not None
-        return _compare_sc_address(a.address, b.address)
-
-    if t == stellar_xdr.SCValType.SCV_ERROR:
-        assert a.error is not None
-        assert b.error is not None
-        c = (a.error.type.value > b.error.type.value) - (
-            a.error.type.value < b.error.type.value
-        )
-        if c != 0:
-            return c
-        if a.error.type == stellar_xdr.SCErrorType.SCE_CONTRACT:
-            assert a.error.contract_code is not None
-            assert b.error.contract_code is not None
-            av, bv = a.error.contract_code.uint32, b.error.contract_code.uint32
-            return (av > bv) - (av < bv)
-        assert a.error.code is not None
-        assert b.error.code is not None
-        return (a.error.code.value > b.error.code.value) - (
-            a.error.code.value < b.error.code.value
-        )
-
-    if t == stellar_xdr.SCValType.SCV_CONTRACT_INSTANCE:
-        assert a.instance is not None
-        assert b.instance is not None
-        c = _compare_contract_executable(a.instance.executable, b.instance.executable)
-        if c != 0:
-            return c
-        return _compare_optional_sc_map(a.instance.storage, b.instance.storage)
-
-    if t == stellar_xdr.SCValType.SCV_LEDGER_KEY_NONCE:
-        assert a.nonce_key is not None
-        assert b.nonce_key is not None
-        av, bv = a.nonce_key.nonce.int64, b.nonce_key.nonce.int64
-        return (av > bv) - (av < bv)
-
-    if t == stellar_xdr.SCValType.SCV_EXECUTABLE_TAG:
-        assert a.executable_tag is not None
-        assert b.executable_tag is not None
-        ab, bb = a.executable_tag.sc_string, b.executable_tag.sc_string
-        return (ab > bb) - (ab < bb)
-
-    raise ValueError(f"Unsupported SCVal type: {t}")
+    raise ValueError(f"Unsupported SCVal type: {a.type}")
 
 
 def _decode_utf8_or_bytes(data: bytes) -> str | bytes:
@@ -1193,12 +1045,12 @@ def _decode_utf8_or_bytes(data: bytes) -> str | bytes:
         return data
 
 
-def _parse_sc_val(sc_val: stellar_xdr.SCVal | bytes | str) -> stellar_xdr.SCVal:
+def _parse_sc_val(sc_val: stellar_xdr.SCVal.Any | bytes | str) -> stellar_xdr.SCVal.Any:
     if isinstance(sc_val, bytes):
         return stellar_xdr.SCVal.from_xdr_bytes(sc_val)
     elif isinstance(sc_val, str):
-        return stellar_xdr.SCVal.from_xdr(sc_val)
-    elif isinstance(sc_val, stellar_xdr.SCVal):
+        return stellar_xdr.SCVal.from_xdr_base64(sc_val)
+    elif isinstance(sc_val, stellar_xdr.SCVal.Any):
         return sc_val
     else:
         raise ValueError("Invalid sc_val type, must be bytes, str or SCVal")

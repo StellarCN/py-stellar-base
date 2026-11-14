@@ -127,7 +127,7 @@ class TestAsset:
     )
     def test_to_xdr_object(self, asset, xdr):
         xdr_object = asset.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Asset.from_xdr_object(xdr_object) == asset
 
     @pytest.mark.parametrize(
@@ -153,7 +153,7 @@ class TestAsset:
     )
     def test_to_xdr_trust_line_xdr_asset_object(self, asset: Asset, xdr):
         xdr_object = asset.to_trust_line_asset_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Asset.from_xdr_object(xdr_object) == asset
 
     @pytest.mark.parametrize(
@@ -179,7 +179,7 @@ class TestAsset:
     )
     def test_to_xdr_change_trust_xdr_asset_object(self, asset, xdr):
         xdr_object = asset.to_change_trust_asset_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Asset.from_xdr_object(xdr_object) == asset
 
     @pytest.mark.parametrize(

@@ -42,13 +42,12 @@ def _sample_invocation(
     contract_id: str = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
 ) -> stellar_xdr.SorobanAuthorizedInvocation:
     return stellar_xdr.SorobanAuthorizedInvocation(
-        function=stellar_xdr.SorobanAuthorizedFunction(
-            type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-            contract_fn=stellar_xdr.InvokeContractArgs(
+        function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+            stellar_xdr.InvokeContractArgs(
                 contract_address=Address(contract_id).to_xdr_sc_address(),
                 function_name=stellar_xdr.SCSymbol(b"increment"),
                 args=[],
-            ),
+            )
         ),
         sub_invocations=[],
     )
@@ -60,21 +59,19 @@ def _sample_auth_entry(
 ) -> stellar_xdr.SorobanAuthorizationEntry:
     address_credentials = stellar_xdr.SorobanAddressCredentials(
         address=Address(address).to_xdr_sc_address(),
-        nonce=stellar_xdr.Int64(123456789),
-        signature_expiration_ledger=stellar_xdr.Uint32(0),
-        signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
+        nonce=123456789,
+        signature_expiration_ledger=0,
+        signature=stellar_xdr.SCVal.Void(),
     )
     if (
         credentials_type
         == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
     ):
-        credentials = stellar_xdr.SorobanCredentials(
-            type=credentials_type, address=address_credentials
+        credentials: stellar_xdr.SorobanCredentials.Any = (
+            stellar_xdr.SorobanCredentials.Address(address_credentials)
         )
     else:
-        credentials = stellar_xdr.SorobanCredentials(
-            type=credentials_type, address_v2=address_credentials
-        )
+        credentials = stellar_xdr.SorobanCredentials.AddressV2(address_credentials)
     return stellar_xdr.SorobanAuthorizationEntry(
         credentials=credentials,
         root_invocation=_sample_invocation(),
@@ -106,8 +103,8 @@ class _FakeSorobanServer:
             restore_preamble=restore_preamble,
             latest_ledger=101,
             min_resource_fee=100,
-            transaction_data=SorobanDataBuilder().build().to_xdr(),
-            results=[SimpleNamespace(auth=[], xdr=scval.to_uint32(1).to_xdr())],
+            transaction_data=SorobanDataBuilder().build().to_xdr_base64(),
+            results=[SimpleNamespace(auth=[], xdr=scval.to_uint32(1).to_xdr_base64())],
         )
 
 
@@ -136,8 +133,8 @@ class _FakeSorobanServerAsync:
             restore_preamble=restore_preamble,
             latest_ledger=101,
             min_resource_fee=100,
-            transaction_data=SorobanDataBuilder().build().to_xdr(),
-            results=[SimpleNamespace(auth=[], xdr=scval.to_uint32(1).to_xdr())],
+            transaction_data=SorobanDataBuilder().build().to_xdr_base64(),
+            results=[SimpleNamespace(auth=[], xdr=scval.to_uint32(1).to_xdr_base64())],
         )
 
 
@@ -196,7 +193,7 @@ def _assembled_async_with_auth(address: str, server=None, *, entries=None):
 def test_authorize_contract_address_requires_preparation():
     contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
     assembled, _, _ = _assembled_with_auth(contract_id)
-    seen_preimages: list[stellar_xdr.HashIDPreimage] = []
+    seen_preimages: list[stellar_xdr.HashIDPreimage.Any] = []
 
     assembled.authorize(
         address=contract_id,
@@ -208,11 +205,10 @@ def test_authorize_contract_address_requires_preparation():
 
     assert assembled._needs_preparation is True
     assert len(seen_preimages) == 1
-    assert seen_preimages[0].soroban_authorization is not None
-    assert (
-        seen_preimages[0].soroban_authorization.signature_expiration_ledger.uint32
-        == 120
+    assert isinstance(
+        seen_preimages[0], stellar_xdr.HashIDPreimage.SorobanAuthorization
     )
+    assert seen_preimages[0].soroban_authorization.signature_expiration_ledger == 120
     with pytest.raises(NeedsPreparationError, match="Authorization entries"):
         assembled.sign(force=True)
     with pytest.raises(NeedsPreparationError, match="Authorization entries"):
@@ -320,7 +316,10 @@ def test_restore_footprint_inherits_use_upgraded_auth(monkeypatch, kwargs, expec
 
     assembled.restore_footprint(
         cast(
-            Any, SimpleNamespace(transaction_data=SorobanDataBuilder().build().to_xdr())
+            Any,
+            SimpleNamespace(
+                transaction_data=SorobanDataBuilder().build().to_xdr_base64()
+            ),
         )
     )
 
@@ -352,7 +351,10 @@ async def test_restore_footprint_inherits_use_upgraded_auth_async(
 
     await assembled.restore_footprint(
         cast(
-            Any, SimpleNamespace(transaction_data=SorobanDataBuilder().build().to_xdr())
+            Any,
+            SimpleNamespace(
+                transaction_data=SorobanDataBuilder().build().to_xdr_base64()
+            ),
         )
     )
 
@@ -461,7 +463,7 @@ def test_authorize_accepts_keypair_as_first_argument():
     assert assembled.built_transaction is not None
     op = assembled.built_transaction.transaction.operations[0]
     assert isinstance(op, InvokeHostFunction)
-    assert op.auth[0].credentials.address is not None
+    assert isinstance(op.auth[0].credentials, stellar_xdr.SorobanCredentials.Address)
     assert (
         op.auth[0].credentials.address.signature.type != stellar_xdr.SCValType.SCV_VOID
     )
@@ -560,9 +562,7 @@ def test_sign_auth_entries_signs_v2_entry():
     )
     assert entry.credentials.address_v2 is not None
     assert entry.credentials.address_v2.signature.type == stellar_xdr.SCValType.SCV_VEC
-    assert entry.credentials.address_v2.signature_expiration_ledger == (
-        stellar_xdr.Uint32(120)
-    )
+    assert entry.credentials.address_v2.signature_expiration_ledger == (120)
 
 
 async def test_async_sign_auth_entries_signs_v2_entry():
@@ -611,9 +611,7 @@ def _mixed_credential_entries():
             [DelegateSignature(delegate.public_key)],
         ),
         stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
-            ),
+            credentials=stellar_xdr.SorobanCredentials.SourceAccount(),
             root_invocation=_sample_invocation(),
         ),
     ]
@@ -700,9 +698,10 @@ def _invoke_op(assembled) -> InvokeHostFunction:
 def _with_delegates_of(
     entry: stellar_xdr.SorobanAuthorizationEntry,
 ) -> stellar_xdr.SorobanAddressCredentialsWithDelegates:
-    with_delegates = entry.credentials.address_with_delegates
-    assert with_delegates is not None
-    return with_delegates
+    assert isinstance(
+        entry.credentials, stellar_xdr.SorobanCredentials.AddressWithDelegates
+    )
+    return entry.credentials.address_with_delegates
 
 
 def _assert_top_level_signed_at(assembled, delegate_signature, valid_until: int):
@@ -712,7 +711,7 @@ def _assert_top_level_signed_at(assembled, delegate_signature, valid_until: int)
         == stellar_xdr.SCValType.SCV_VEC
     )
     assert with_delegates.address_credentials.signature_expiration_ledger == (
-        stellar_xdr.Uint32(valid_until)
+        valid_until
     )
     # the delegate's signature is still the one it produced
     assert with_delegates.delegates[0].signature == delegate_signature
@@ -749,20 +748,22 @@ def test_authorize_leaves_every_entry_untouched_when_one_is_rejected():
     )
     delegated = _pre_signed_delegates_entry(top, delegate, 1000)
     assembled, _, _ = _assembled_with_auth(top.public_key, entries=[plain, delegated])
-    before = [e.to_xdr() for e in _invoke_op(assembled).auth]
+    before = [e.to_xdr_base64() for e in _invoke_op(assembled).auth]
 
     with pytest.raises(ValueError, match=r"signature_expiration_ledger=1000"):
         assembled.authorize(top)
 
-    assert [e.to_xdr() for e in _invoke_op(assembled).auth] == before
+    assert [e.to_xdr_base64() for e in _invoke_op(assembled).auth] == before
 
     assembled.authorize(top, valid_until_ledger_sequence=1000)
     for e in _invoke_op(assembled).auth:
         addr_auth = (
-            e.credentials.address_v2 or _with_delegates_of(e).address_credentials
+            e.credentials.address_v2
+            if isinstance(e.credentials, stellar_xdr.SorobanCredentials.AddressV2)
+            else _with_delegates_of(e).address_credentials
         )
         assert addr_auth.signature.type == stellar_xdr.SCValType.SCV_VEC
-        assert addr_auth.signature_expiration_ledger == stellar_xdr.Uint32(1000)
+        assert addr_auth.signature_expiration_ledger == 1000
 
 
 async def test_async_authorize_leaves_every_entry_untouched_when_one_is_rejected():
@@ -776,9 +777,9 @@ async def test_async_authorize_leaves_every_entry_untouched_when_one_is_rejected
     assembled, _, _ = _assembled_async_with_auth(
         top.public_key, entries=[plain, delegated]
     )
-    before = [e.to_xdr() for e in _invoke_op(assembled).auth]
+    before = [e.to_xdr_base64() for e in _invoke_op(assembled).auth]
 
     with pytest.raises(ValueError, match=r"signature_expiration_ledger=1000"):
         await assembled.authorize(top)
 
-    assert [e.to_xdr() for e in _invoke_op(assembled).auth] == before
+    assert [e.to_xdr_base64() for e in _invoke_op(assembled).auth] == before

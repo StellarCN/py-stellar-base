@@ -97,7 +97,7 @@ class BaseTransactionEnvelope(Generic[T]):
         else:
             self.signatures.append(sig)
 
-    def to_xdr_object(self) -> stellar_xdr.TransactionEnvelope:
+    def to_xdr_object(self) -> stellar_xdr.TransactionEnvelope.Any:
         """Get an XDR object representation of this :class:`BaseTransactionEnvelope`.
 
         :return: XDR TransactionEnvelope object
@@ -110,11 +110,11 @@ class BaseTransactionEnvelope(Generic[T]):
 
         :return: XDR TransactionEnvelope base64 string object
         """
-        return self.to_xdr_object().to_xdr()
+        return self.to_xdr_object().to_xdr_base64()
 
     @classmethod
     def from_xdr_object(
-        cls, xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
+        cls, xdr_object: stellar_xdr.TransactionEnvelope.Any, network_passphrase: str
     ) -> T:
         """Create a new :class:`BaseTransactionEnvelope` from an XDR object.
 
@@ -134,7 +134,7 @@ class BaseTransactionEnvelope(Generic[T]):
 
         :return: A new :class:`BaseTransactionEnvelope` object from the given XDR TransactionEnvelope base64 string object.
         """
-        xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
+        xdr_object = stellar_xdr.TransactionEnvelope.from_xdr_base64(xdr)
         return cls.from_xdr_object(xdr_object, network_passphrase)
 
     @abstractmethod

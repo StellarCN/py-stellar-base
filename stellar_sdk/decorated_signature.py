@@ -35,8 +35,8 @@ class DecoratedSignature:
         :param xdr_object: The XDR DecoratedSignature object.
         :return: A new :class:`DecoratedSignature` object from the given XDR DecoratedSignature object.
         """
-        signature_hint = xdr_object.hint.signature_hint
-        signature = xdr_object.signature.signature
+        signature_hint = bytes(xdr_object.hint)
+        signature = bytes(xdr_object.signature)
         return cls(signature_hint, signature)
 
     def __hash__(self):

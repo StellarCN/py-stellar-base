@@ -33,11 +33,11 @@ class Memo(metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def to_xdr_object(self) -> stellar_xdr.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo.Any:
         """Creates an XDR Memo object that represents this :class:`Memo`."""
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> Memo:
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo.Any) -> Memo:
         """Returns an Memo object from XDR memo object."""
         if xdr_object.type == stellar_xdr.MemoType.MEMO_NONE:
             return NoneMemo.from_xdr_object(xdr_object)
@@ -68,14 +68,14 @@ class NoneMemo(Memo):
     """The :class:`NoneMemo`, which represents no memo for a transaction."""
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> NoneMemo:
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo.Any) -> NoneMemo:
         """Returns an :class:`NoneMemo` object from XDR memo object."""
 
         return cls()
 
-    def to_xdr_object(self) -> stellar_xdr.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo.Any:
         """Creates an XDR Memo object that represents this :class:`NoneMemo`."""
-        return stellar_xdr.Memo(type=stellar_xdr.MemoType.MEMO_NONE)
+        return stellar_xdr.Memo.None_()
 
     def __hash__(self):
         return hash(None)
@@ -110,16 +110,14 @@ class TextMemo(Memo):
             )
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> TextMemo:
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo.Any) -> TextMemo:
         """Returns an :class:`TextMemo` object from XDR memo object."""
-        assert xdr_object.text is not None
+        assert isinstance(xdr_object, stellar_xdr.Memo.Text)
         return cls(bytes(xdr_object.text))
 
-    def to_xdr_object(self) -> stellar_xdr.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo.Any:
         """Creates an XDR Memo object that represents this :class:`TextMemo`."""
-        return stellar_xdr.Memo(
-            type=stellar_xdr.MemoType.MEMO_TEXT, text=self.memo_text
-        )
+        return stellar_xdr.Memo.Text(self.memo_text)
 
     def __hash__(self):
         return hash(self.memo_text)
@@ -151,16 +149,14 @@ class IdMemo(Memo):
         self.memo_id: int = memo_id
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> IdMemo:
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo.Any) -> IdMemo:
         """Returns an :class:`IdMemo` object from XDR memo object."""
-        assert xdr_object.id is not None
-        return cls(xdr_object.id.uint64)
+        assert isinstance(xdr_object, stellar_xdr.Memo.ID)
+        return cls(xdr_object.id)
 
-    def to_xdr_object(self) -> stellar_xdr.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo.Any:
         """Creates an XDR Memo object that represents this :class:`IdMemo`."""
-        return stellar_xdr.Memo(
-            type=stellar_xdr.MemoType.MEMO_ID, id=stellar_xdr.Uint64(self.memo_id)
-        )
+        return stellar_xdr.Memo.ID(self.memo_id)
 
     def __hash__(self):
         return hash(self.memo_id)
@@ -193,16 +189,14 @@ class HashMemo(Memo):
         self.memo_hash: bytes = memo_hash
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> HashMemo:
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo.Any) -> HashMemo:
         """Returns an :class:`HashMemo` object from XDR memo object."""
-        assert xdr_object.hash is not None
-        return cls(xdr_object.hash.hash)
+        assert isinstance(xdr_object, stellar_xdr.Memo.Hash)
+        return cls(bytes(xdr_object.hash))
 
-    def to_xdr_object(self) -> stellar_xdr.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo.Any:
         """Creates an XDR Memo object that represents this :class:`HashMemo`."""
-        return stellar_xdr.Memo(
-            type=stellar_xdr.MemoType.MEMO_HASH, hash=stellar_xdr.Hash(self.memo_hash)
-        )
+        return stellar_xdr.Memo.Hash(stellar_xdr.Hash(self.memo_hash))
 
     def __hash__(self):
         return hash(self.memo_hash)
@@ -240,17 +234,14 @@ class ReturnHashMemo(Memo):
         self.memo_return: bytes = memo_return
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo) -> ReturnHashMemo:
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Memo.Any) -> ReturnHashMemo:
         """Returns an :class:`ReturnHashMemo` object from XDR memo object."""
-        assert xdr_object.ret_hash is not None
-        return cls(xdr_object.ret_hash.hash)
+        assert isinstance(xdr_object, stellar_xdr.Memo.Return)
+        return cls(bytes(xdr_object.ret_hash))
 
-    def to_xdr_object(self) -> stellar_xdr.Memo:
+    def to_xdr_object(self) -> stellar_xdr.Memo.Any:
         """Creates an XDR Memo object that represents this :class:`ReturnHashMemo`."""
-        return stellar_xdr.Memo(
-            type=stellar_xdr.MemoType.MEMO_RETURN,
-            ret_hash=stellar_xdr.Hash(self.memo_return),
-        )
+        return stellar_xdr.Memo.Return(stellar_xdr.Hash(self.memo_return))
 
     def __hash__(self):
         return hash(self.memo_return)

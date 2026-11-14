@@ -14,7 +14,7 @@ class TestTimeBounds:
     )
     def test_to_xdr(self, min_time, max_time, xdr):
         op_xdr_object = TimeBounds(min_time, max_time).to_xdr_object()
-        assert op_xdr_object.to_xdr() == xdr
+        assert op_xdr_object.to_xdr_base64() == xdr
         from_instance = TimeBounds.from_xdr_object(op_xdr_object)
         assert isinstance(from_instance, TimeBounds)
         assert from_instance.max_time == max_time

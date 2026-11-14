@@ -1089,7 +1089,7 @@ def _add_preconditions(
     cond: Preconditions | None, prefix: str, lines: list[str]
 ) -> None:
     if cond is None:
-        cond_xdr = stellar_xdr.Preconditions(stellar_xdr.PreconditionType.PRECOND_NONE)
+        cond_xdr: stellar_xdr.Preconditions.Any = stellar_xdr.Preconditions.None_()
     else:
         cond_xdr = cond.to_xdr_object()
     _add_line(f"{prefix}type", cond_xdr.type.name, lines)
@@ -1496,14 +1496,14 @@ def _add_operation(
         if operation.revoke_sponsorship_type == RevokeSponsorshipType.ACCOUNT:
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.ACCOUNT.name)
             add_body_line("ledgerKey.account", operation.account_id)
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.TRUSTLINE:
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.TRUSTLINE.name)
             assert operation.trustline is not None
@@ -1516,7 +1516,7 @@ def _add_operation(
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.OFFER:
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.OFFER.name)
             assert operation.offer is not None
@@ -1525,7 +1525,7 @@ def _add_operation(
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.DATA:
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.DATA.name)
             assert operation.data is not None
@@ -1536,7 +1536,7 @@ def _add_operation(
         ):
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line(
                 "ledgerKey.type", stellar_xdr.LedgerEntryType.CLAIMABLE_BALANCE.name
@@ -1547,7 +1547,7 @@ def _add_operation(
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.LIQUIDITY_POOL:
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line(
                 "ledgerKey.type", stellar_xdr.LedgerEntryType.LIQUIDITY_POOL.name
@@ -1559,7 +1559,7 @@ def _add_operation(
             assert operation.signer is not None
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER.name,
             )
             add_body_line("signer.accountID", operation.signer.account_id)
             signer_key_xdr = operation.signer.signer_key.to_xdr_object()

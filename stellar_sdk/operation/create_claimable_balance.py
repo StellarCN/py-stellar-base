@@ -185,58 +185,41 @@ class ClaimPredicate:
             rel_before=None,
         )
 
-    def to_xdr_object(self) -> stellar_xdr.ClaimPredicate:
+    def to_xdr_object(self) -> stellar_xdr.ClaimPredicate.Any:
         if (
             self.claim_predicate_type
             == ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL
         ):
-            return stellar_xdr.ClaimPredicate(
-                stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL
-            )
+            return stellar_xdr.ClaimPredicate.Unconditional()
         elif (
             self.claim_predicate_type
             == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME
         ):
             assert self.abs_before is not None
-            return stellar_xdr.ClaimPredicate(
-                stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME,
-                abs_before=stellar_xdr.Int64(self.abs_before),
-            )
+            return stellar_xdr.ClaimPredicate.BeforeAbsoluteTime(self.abs_before)
         elif (
             self.claim_predicate_type
             == ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
         ):
             assert self.rel_before is not None
-            return stellar_xdr.ClaimPredicate(
-                stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME,
-                rel_before=stellar_xdr.Int64(self.rel_before),
-            )
+            return stellar_xdr.ClaimPredicate.BeforeRelativeTime(self.rel_before)
         elif self.claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_NOT:
             assert self.not_predicate is not None
-            return stellar_xdr.ClaimPredicate(
-                stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_NOT,
-                not_predicate=self.not_predicate.to_xdr_object(),
-            )
+            return stellar_xdr.ClaimPredicate.Not(self.not_predicate.to_xdr_object())
         elif self.claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_AND:
             assert self.and_predicates is not None
             and_predicates = [
                 self.and_predicates.left.to_xdr_object(),
                 self.and_predicates.right.to_xdr_object(),
             ]
-            return stellar_xdr.ClaimPredicate(
-                stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_AND,
-                and_predicates=and_predicates,
-            )
+            return stellar_xdr.ClaimPredicate.And(and_predicates)
         elif self.claim_predicate_type == ClaimPredicateType.CLAIM_PREDICATE_OR:
             assert self.or_predicates is not None
             or_predicates = [
                 self.or_predicates.left.to_xdr_object(),
                 self.or_predicates.right.to_xdr_object(),
             ]
-            return stellar_xdr.ClaimPredicate(
-                stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_OR,
-                or_predicates=or_predicates,
-            )
+            return stellar_xdr.ClaimPredicate.Or(or_predicates)
         else:
             raise ValueError(
                 f"{self.claim_predicate_type} is not a valid ClaimPredicateType."
@@ -244,49 +227,30 @@ class ClaimPredicate:
 
     @classmethod
     def from_xdr_object(
-        cls, xdr_object: stellar_xdr.ClaimPredicate
+        cls, xdr_object: stellar_xdr.ClaimPredicate.Any
     ) -> "ClaimPredicate":
-        claim_predicate_type = xdr_object.type
-        if (
-            claim_predicate_type
-            == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_UNCONDITIONAL
-        ):
-            return cls.predicate_unconditional()
-        elif (
-            claim_predicate_type
-            == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME
-        ):
-            assert xdr_object.abs_before is not None
-            abs_before = xdr_object.abs_before.int64
-            return cls.predicate_before_absolute_time(abs_before)
-        elif (
-            claim_predicate_type
-            == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-        ):
-            assert xdr_object.rel_before is not None
-            rel_before = xdr_object.rel_before.int64
-            return cls.predicate_before_relative_time(rel_before)
-        elif claim_predicate_type == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_NOT:
-            not_predicate = xdr_object.not_predicate
-            assert not_predicate is not None
-            predicate = cls.from_xdr_object(not_predicate)
-            return cls.predicate_not(predicate)
-        elif claim_predicate_type == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_AND:
-            and_predicates = xdr_object.and_predicates
-            assert and_predicates is not None
-            left = cls.from_xdr_object(and_predicates[0])
-            right = cls.from_xdr_object(and_predicates[1])
-            return cls.predicate_and(left, right)
-        elif claim_predicate_type == stellar_xdr.ClaimPredicateType.CLAIM_PREDICATE_OR:
-            or_predicates = xdr_object.or_predicates
-            assert or_predicates is not None
-            left = cls.from_xdr_object(or_predicates[0])
-            right = cls.from_xdr_object(or_predicates[1])
-            return cls.predicate_or(left, right)
-        else:
-            raise ValueError(
-                f"{claim_predicate_type} is an unsupported ClaimPredicateType."
-            )
+        match xdr_object:
+            case stellar_xdr.ClaimPredicate.Unconditional():
+                return cls.predicate_unconditional()
+            case stellar_xdr.ClaimPredicate.BeforeAbsoluteTime(abs_before):
+                return cls.predicate_before_absolute_time(abs_before)
+            case stellar_xdr.ClaimPredicate.BeforeRelativeTime(rel_before):
+                return cls.predicate_before_relative_time(rel_before)
+            case stellar_xdr.ClaimPredicate.Not(not_predicate):
+                assert not_predicate is not None
+                return cls.predicate_not(cls.from_xdr_object(not_predicate))
+            case stellar_xdr.ClaimPredicate.And((left, right)):
+                return cls.predicate_and(
+                    cls.from_xdr_object(left), cls.from_xdr_object(right)
+                )
+            case stellar_xdr.ClaimPredicate.Or((left, right)):
+                return cls.predicate_or(
+                    cls.from_xdr_object(left), cls.from_xdr_object(right)
+                )
+            case _:
+                raise ValueError(
+                    f"{xdr_object.type} is an unsupported ClaimPredicateType."
+                )
 
     def __hash__(self):
         return hash(
@@ -339,24 +303,17 @@ class Claimant:
         self.predicate: ClaimPredicate = predicate
         raise_if_not_valid_ed25519_public_key(self.destination, "destination")
 
-    def to_xdr_object(self) -> stellar_xdr.Claimant:
+    def to_xdr_object(self) -> stellar_xdr.Claimant.Any:
         claimant_v0 = stellar_xdr.ClaimantV0(
             destination=Keypair.from_public_key(self.destination).xdr_account_id(),
             predicate=self.predicate.to_xdr_object(),
         )
-        claimant = stellar_xdr.Claimant(
-            stellar_xdr.ClaimantType.CLAIMANT_TYPE_V0, claimant_v0
-        )
+        claimant = stellar_xdr.Claimant.V0(claimant_v0)
         return claimant
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Claimant) -> "Claimant":
-        assert xdr_object.v0 is not None
-        assert xdr_object.v0.destination.account_id.ed25519 is not None
-
-        destination = str(
-            Ed25519PublicKey(xdr_object.v0.destination.account_id.ed25519.uint256)
-        )
+    def from_xdr_object(cls, xdr_object: stellar_xdr.Claimant.Any) -> "Claimant":
+        destination = str(Ed25519PublicKey(xdr_object.v0.destination.ed25519))
         predicate = ClaimPredicate.from_xdr_object(xdr_object.v0.predicate)
         return cls(destination=destination, predicate=predicate)
 
@@ -411,16 +368,15 @@ class CreateClaimableBalance(Operation):
         self.claimants: Sequence[Claimant] = claimants
         raise_if_not_valid_amount(self.amount, "amount")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         asset = self.asset.to_xdr_object()
         amount = Operation.to_xdr_amount(self.amount)
         claimants = [claimant.to_xdr_object() for claimant in self.claimants]
         create_claimable_balance_op = stellar_xdr.CreateClaimableBalanceOp(
-            asset=asset, amount=stellar_xdr.Int64(amount), claimants=claimants
+            asset=asset, amount=amount, claimants=claimants
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE,
-            create_claimable_balance_op=create_claimable_balance_op,
+        body = stellar_xdr.OperationBody.CreateClaimableBalance(
+            create_claimable_balance_op
         )
         return body
 
@@ -432,13 +388,12 @@ class CreateClaimableBalance(Operation):
         object.
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.create_claimable_balance_op is not None
-        asset = Asset.from_xdr_object(xdr_object.body.create_claimable_balance_op.asset)
-        amount = Operation.from_xdr_amount(
-            xdr_object.body.create_claimable_balance_op.amount.int64
-        )
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.CreateClaimableBalance)
+        asset = Asset.from_xdr_object(body.create_claimable_balance_op.asset)
+        amount = Operation.from_xdr_amount(body.create_claimable_balance_op.amount)
         claimants = []
-        for claimant_xdr_obj in xdr_object.body.create_claimable_balance_op.claimants:
+        for claimant_xdr_obj in body.create_claimable_balance_op.claimants:
             claimants.append(Claimant.from_xdr_object(claimant_xdr_obj))
         op = cls(asset=asset, amount=amount, claimants=claimants, source=source)
         return op

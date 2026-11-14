@@ -170,7 +170,7 @@ class TestSorobanServer:
             "result": result,
         }
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
-        key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
+        key = stellar_xdr.SCVal.LedgerKeyContractInstance()
         rpc_mock.expect_response(data)
         entries = GetLedgerEntriesResponse.model_validate(result).entries
         assert entries
@@ -179,9 +179,7 @@ class TestSorobanServer:
             == entries[0]
         )
 
-        assert key == stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
-        )
+        assert key == stellar_xdr.SCVal.LedgerKeyContractInstance()
         rpc_mock.assert_request(
             "getLedgerEntries",
             {
@@ -199,13 +197,11 @@ class TestSorobanServer:
             "result": result,
         }
         contract_id = "CBNYUGHFAIWK3HOINA2OIGOOBMQU4D3MPQWFYBTUYY5WY4FVDO2GWXUY"
-        key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
+        key = stellar_xdr.SCVal.LedgerKeyContractInstance()
         rpc_mock.expect_response(data)
         assert await resolve(soroban_server.get_contract_data(contract_id, key)) is None
 
-        assert key == stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
-        )
+        assert key == stellar_xdr.SCVal.LedgerKeyContractInstance()
         rpc_mock.assert_request(
             "getLedgerEntries",
             {
@@ -272,13 +268,12 @@ class TestSorobanServer:
                 )
             }
         )
-        expected_key = stellar_xdr.LedgerKey(
-            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-            contract_data=stellar_xdr.LedgerKeyContractData(
+        expected_key = stellar_xdr.LedgerKey.ContractData(
+            stellar_xdr.LedgerKeyContractData(
                 contract=Address(_CONTRACT_ID).to_xdr_sc_address(),
                 key=key,
                 durability=stellar_xdr.ContractDataDurability.TEMPORARY,
-            ),
+            )
         )
         rpc_mock.expect_response(
             {
@@ -295,7 +290,9 @@ class TestSorobanServer:
             )
             is None
         )
-        rpc_mock.assert_request("getLedgerEntries", {"keys": [expected_key.to_xdr()]})
+        rpc_mock.assert_request(
+            "getLedgerEntries", {"keys": [expected_key.to_xdr_base64()]}
+        )
 
     @pytest.mark.parametrize(
         "method",
@@ -351,18 +348,16 @@ class TestSorobanServer:
         }
 
         account_id0 = "GCZJ46F2ENQAEEZVVY4RKTGVXWZNETKZBZ4LIW5CMUF7AHP6M7BEV464"
-        key0 = stellar_xdr.LedgerKey(
-            stellar_xdr.LedgerEntryType.ACCOUNT,
-            account=stellar_xdr.LedgerKeyAccount(
+        key0 = stellar_xdr.LedgerKey.Account(
+            stellar_xdr.LedgerKeyAccount(
                 account_id=Keypair.from_public_key(account_id0).xdr_account_id(),
-            ),
+            )
         )
         account_id1 = "GDAT5HWTGIU4TSSZ4752OUC4SABDLTLZFRPZUJ3D6LKBNEPA7V2CIG54"
-        key1 = stellar_xdr.LedgerKey(
-            stellar_xdr.LedgerEntryType.ACCOUNT,
-            account=stellar_xdr.LedgerKeyAccount(
+        key1 = stellar_xdr.LedgerKey.Account(
+            stellar_xdr.LedgerKeyAccount(
                 account_id=Keypair.from_public_key(account_id1).xdr_account_id(),
-            ),
+            )
         )
         rpc_mock.expect_response(data)
         assert await resolve(
@@ -902,15 +897,14 @@ class TestSorobanServer:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         sac_id = sac.contract_id(network_passphrase)
         key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(contract_id)])
-        ledger_key = stellar_xdr.LedgerKey(
-            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-            contract_data=stellar_xdr.LedgerKeyContractData(
+        ledger_key = stellar_xdr.LedgerKey.ContractData(
+            stellar_xdr.LedgerKeyContractData(
                 contract=Address(sac_id).to_xdr_sc_address(),
                 key=key,
                 durability=stellar_xdr.ContractDataDurability.PERSISTENT,
-            ),
+            )
         )
-        expected_key = ledger_key.to_xdr()
+        expected_key = ledger_key.to_xdr_base64()
         latest_ledger = 57387047
         last_modified_ledger = 57386587
         live_until_ledger = 57904987
@@ -966,15 +960,14 @@ class TestSorobanServer:
         network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
         sac_id = sac.contract_id(network_passphrase)
         key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(contract_id)])
-        ledger_key = stellar_xdr.LedgerKey(
-            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-            contract_data=stellar_xdr.LedgerKeyContractData(
+        ledger_key = stellar_xdr.LedgerKey.ContractData(
+            stellar_xdr.LedgerKeyContractData(
                 contract=Address(sac_id).to_xdr_sc_address(),
                 key=key,
                 durability=stellar_xdr.ContractDataDurability.PERSISTENT,
-            ),
+            )
         )
-        expected_key = ledger_key.to_xdr()
+        expected_key = ledger_key.to_xdr_base64()
         latest_ledger = 57387178
         result = {"entries": [], "latestLedger": latest_ledger}
         data = {
@@ -1218,13 +1211,13 @@ class TestSorobanServer:
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
         expected_transaction.transaction.soroban_data = (
-            stellar_xdr.SorobanTransactionData.from_xdr(
+            stellar_xdr.SorobanTransactionData.from_xdr_base64(
                 data["result"]["transactionData"]
             )
         )
         op = expected_transaction.transaction.operations[0]
         op.auth = [
-            stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
+            stellar_xdr.SorobanAuthorizationEntry.from_xdr_base64(xdr)
             for xdr in data["result"]["results"][0]["auth"]
         ]
         assert new_transaction == expected_transaction
@@ -1288,16 +1281,16 @@ class TestSorobanServer:
         }
 
         soroban_data = stellar_xdr.SorobanTransactionData(
-            ext=stellar_xdr.SorobanTransactionDataExt(0),
-            resource_fee=stellar_xdr.Int64(50000),
+            ext=stellar_xdr.SorobanTransactionDataExt.V0(),
+            resource_fee=50000,
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
                     read_write=[],
                 ),
-                disk_read_bytes=stellar_xdr.Uint32(2),
-                write_bytes=stellar_xdr.Uint32(3),
-                instructions=stellar_xdr.Uint32(4),
+                disk_read_bytes=2,
+                write_bytes=3,
+                instructions=4,
             ),
         )  # soroban_data will be overwritten by the response
         transaction = _build_soroban_transaction(soroban_data, [])
@@ -1308,13 +1301,13 @@ class TestSorobanServer:
             data["result"]["minResourceFee"]
         )  # 50000 is base fee
         expected_transaction.transaction.soroban_data = (
-            stellar_xdr.SorobanTransactionData.from_xdr(
+            stellar_xdr.SorobanTransactionData.from_xdr_base64(
                 data["result"]["transactionData"]
             )
         )
         op = expected_transaction.transaction.operations[0]
         op.auth = [
-            stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
+            stellar_xdr.SorobanAuthorizationEntry.from_xdr_base64(xdr)
             for xdr in data["result"]["results"][0]["auth"]
         ]
         assert new_transaction == expected_transaction
@@ -1343,19 +1336,16 @@ class TestSorobanServer:
         }
 
         auth = stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
-            ),
+            credentials=stellar_xdr.SorobanCredentials.SourceAccount(),
             root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
-                function=stellar_xdr.SorobanAuthorizedFunction(
-                    type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                    contract_fn=stellar_xdr.InvokeContractArgs(
+                function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                    stellar_xdr.InvokeContractArgs(
                         contract_address=Address(
                             "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
                         ).to_xdr_sc_address(),
                         function_name=stellar_xdr.SCSymbol(b"increment"),
                         args=[],
-                    ),
+                    )
                 ),
                 sub_invocations=[],
             ),
@@ -1367,7 +1357,7 @@ class TestSorobanServer:
         expected_transaction = copy.deepcopy(transaction)
         expected_transaction.transaction.fee += int(data["result"]["minResourceFee"])
         expected_transaction.transaction.soroban_data = (
-            stellar_xdr.SorobanTransactionData.from_xdr(
+            stellar_xdr.SorobanTransactionData.from_xdr_base64(
                 data["result"]["transactionData"]
             )
         )

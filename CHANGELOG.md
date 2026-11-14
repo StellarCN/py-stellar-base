@@ -11,6 +11,12 @@ Release History
   - `StrKey.is_valid_contract(s)` becomes `Contract.is_valid(s)`.
 - Strkeys are checked when they are encoded as well as when they are decoded, so invalid raw data raises `ValueError` instead of producing an invalid strkey. For example, `SignerKey.ed25519_signed_payload` rejects a payload that is empty or longer than 64 bytes.
 - `Keypair.from_secret` no longer puts the rejected input in its error message, since the input may be a real secret.
+- Replace the generated XDR classes with [stellar-xdr](https://stellar-xdr.readthedocs.io/), which `stellar_sdk.xdr` now re-exports. The SDK's own methods, such as `to_xdr_object()` and `from_xdr_object()`, keep their names and take and return the new types. What changes for code that uses `stellar_sdk.xdr`:
+  - A union is built from one of its arms: `xdr.SCVal(xdr.SCValType.SCV_U32, u32=xdr.Uint32(7))` becomes `xdr.SCVal.U32(7)`. Annotate with `xdr.SCVal.Any`, and use `match` or `isinstance(value, xdr.SCVal.U32)` to read one.
+  - Integer typedefs such as `Uint32` and `Int64` are plain `int`s, and other typedefs are the value they wrap: `sc_val.u32.uint32` becomes `sc_val.u32`.
+  - `to_xdr()` and `from_xdr()` on XDR types become `to_xdr_base64()` and `from_xdr_base64()`. SEP-51 JSON is `to_json_value()` and `from_json_value()`.
+  - Values are immutable: use `xdr.replace(value, field=...)` to change a field. Arrays are stored as tuples.
+  - Decoding is strict, and raises `xdr.XdrError` for input that is not canonical XDR.
 
 #### Fixes
 - `StrKey.decode_ed25519_signed_payload` and `StrKey.is_valid_ed25519_signed_payload` now reject a signed payload strkey (`P...`) whose padding bytes after the payload are not zero, as SEP-23 requires. Such a key used to decode to the same signer as the valid key.

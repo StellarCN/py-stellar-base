@@ -72,7 +72,9 @@ simulation = server.simulate_transaction(tx)
 if simulation.error:
     raise RuntimeError(f"Simulation failed: {simulation.error}")
 assert simulation.results is not None and simulation.results[0].auth is not None
-entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr(simulation.results[0].auth[0])
+entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr_base64(
+    simulation.results[0].auth[0]
+)
 
 # Every signer of a delegated entry commits to the same expiration ledger.
 valid_until_ledger_sequence = simulation.latest_ledger + 100
@@ -115,9 +117,10 @@ if get_response.status != GetTransactionStatus.SUCCESS:
     raise RuntimeError(f"Transaction failed: {get_response}")
 
 assert get_response.result_meta_xdr is not None
-meta = stellar_xdr.TransactionMeta.from_xdr(get_response.result_meta_xdr)
-body = meta.v4 if meta.v4 is not None else meta.v3
-assert body is not None and body.soroban_meta is not None
+meta = stellar_xdr.TransactionMeta.from_xdr_base64(get_response.result_meta_xdr)
+assert isinstance(meta, stellar_xdr.TransactionMeta.V4)
+body = meta.v4
+assert body.soroban_meta is not None
 assert body.soroban_meta.return_value is not None
 print(
     f"Transaction success, result: {scval.from_uint32(body.soroban_meta.return_value)}"

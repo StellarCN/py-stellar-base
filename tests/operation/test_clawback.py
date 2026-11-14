@@ -82,7 +82,7 @@ class TestClawback:
         else:
             assert op.from_ == from_
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_amount_raise(self):

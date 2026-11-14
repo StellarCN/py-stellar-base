@@ -50,9 +50,8 @@ Every Wasm-reading method above resolves the reference for you (one extra
 ```python
 from stellar_sdk import xdr as stellar_xdr
 
-executable = instance.executable
-if executable.type == stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF:
-    wasm_hash = server.get_external_ref_wasm_hash(executable.external_ref)
+if isinstance(instance.executable, stellar_xdr.ContractExecutable.ExternalRef):
+    wasm_hash = server.get_external_ref_wasm_hash(instance.executable.external_ref)
     wasm = server.get_contract_wasm_by_hash(wasm_hash)
 ```
 

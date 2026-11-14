@@ -1,7 +1,5 @@
 from collections.abc import Sequence
 
-from xdrlib3 import Packer
-
 from . import xdr as stellar_xdr
 from .base_transaction_envelope import BaseTransactionEnvelope
 from .decorated_signature import DecoratedSignature
@@ -52,15 +50,16 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
 
         """
         network_id = self._network_id
-        packer = Packer()
-        stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP.pack(packer)
-        self.transaction.to_xdr_object().pack(packer)
-        return network_id + packer.get_buffer()
+        return (
+            network_id
+            + stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP.to_xdr_bytes()
+            + self.transaction.to_xdr_object().to_xdr_bytes()
+        )
 
     @staticmethod
     def is_fee_bump_transaction_envelope(xdr: str | bytes) -> bool:
         if isinstance(xdr, str):
-            xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(xdr)
+            xdr_object = stellar_xdr.TransactionEnvelope.from_xdr_base64(xdr)
         else:
             xdr_object = stellar_xdr.TransactionEnvelope.from_xdr_bytes(xdr)
         te_type = xdr_object.type
@@ -76,20 +75,20 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
                 f"This transaction envelope type is not supported, type = {te_type}."
             )
 
-    def to_xdr_object(self) -> stellar_xdr.TransactionEnvelope:
+    def to_xdr_object(self) -> stellar_xdr.TransactionEnvelope.Any:
         """Get an XDR object representation of this :class:`TransactionEnvelope`.
 
         :return: XDR TransactionEnvelope object
         """
         tx = self.transaction.to_xdr_object()
-        te_type = stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP
         signatures = [signature.to_xdr_object() for signature in self.signatures]
-        tx_envelope = stellar_xdr.FeeBumpTransactionEnvelope(tx, signatures)
-        return stellar_xdr.TransactionEnvelope(type=te_type, fee_bump=tx_envelope)
+        return stellar_xdr.TransactionEnvelope.TxFeeBump(
+            stellar_xdr.FeeBumpTransactionEnvelope(tx, signatures)
+        )
 
     @classmethod
     def from_xdr_object(
-        cls, xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
+        cls, xdr_object: stellar_xdr.TransactionEnvelope.Any, network_passphrase: str
     ) -> "FeeBumpTransactionEnvelope":
         """Create a new :class:`FeeBumpTransactionEnvelope` from an XDR object.
 
@@ -97,15 +96,11 @@ class FeeBumpTransactionEnvelope(BaseTransactionEnvelope["FeeBumpTransactionEnve
         :param network_passphrase: The network to connect to for verifying and retrieving additional attributes from.
         :return: A new :class:`FeeBumpTransactionEnvelope` object from the given XDR TransactionEnvelope object.
         """
-        te_type = xdr_object.type
-        if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
-            assert xdr_object.fee_bump is not None
-            tx = FeeBumpTransaction.from_xdr_object(
-                xdr_object.fee_bump.tx, network_passphrase
-            )
-        else:
+        if not isinstance(xdr_object, stellar_xdr.TransactionEnvelope.TxFeeBump):
             raise ValueError("Invalid EnvelopeType: %d.", xdr_object.type)
-        assert xdr_object.fee_bump is not None
+        tx = FeeBumpTransaction.from_xdr_object(
+            xdr_object.fee_bump.tx, network_passphrase
+        )
         signatures = [
             DecoratedSignature.from_xdr_object(s)
             for s in xdr_object.fee_bump.signatures

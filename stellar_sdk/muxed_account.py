@@ -96,41 +96,40 @@ class MuxedAccount:
             return cls(account_id=account_id, account_muxed_id=strkey.id)
         raise ValueError(f"This is not a valid account: {account}")
 
-    def to_xdr_object(self) -> stellar_xdr.MuxedAccount:
+    def to_xdr_object(self) -> stellar_xdr.MuxedAccount.Any:
         """Returns the xdr object for this MuxedAccount object.
 
         :return: XDR MuxedAccount object
         """
         account_id_bytes = Ed25519PublicKey.from_string(self.account_id).key
         if self.account_muxed_id is None:
-            return stellar_xdr.MuxedAccount(
-                type=stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519,
-                ed25519=stellar_xdr.Uint256(account_id_bytes),
+            return stellar_xdr.MuxedAccount.Ed25519(
+                stellar_xdr.Uint256(account_id_bytes)
             )
         else:
-            return stellar_xdr.MuxedAccount(
-                type=stellar_xdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519,
-                med25519=stellar_xdr.MuxedAccountMed25519(
-                    id=stellar_xdr.Uint64(self.account_muxed_id),
+            return stellar_xdr.MuxedAccount.MuxedEd25519(
+                stellar_xdr.MuxedAccountMed25519(
+                    id=self.account_muxed_id,
                     ed25519=stellar_xdr.Uint256(account_id_bytes),
-                ),
+                )
             )
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.MuxedAccount) -> "MuxedAccount":
+    def from_xdr_object(
+        cls, xdr_object: stellar_xdr.MuxedAccount.Any
+    ) -> "MuxedAccount":
         """Create a :class:`MuxedAccount` object from an XDR Asset object.
 
         :param xdr_object: The MuxedAccount object.
         :return: A new :class:`MuxedAccount` object from the given XDR MuxedAccount object.
         """
         if xdr_object.type == stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519:
-            assert xdr_object.ed25519 is not None
-            account_id = str(Ed25519PublicKey(xdr_object.ed25519.uint256))
+            account_id = str(Ed25519PublicKey(xdr_object.ed25519))
             return cls(account_id=account_id, account_muxed_id=None)
         assert xdr_object.med25519 is not None
-        account_id_id = xdr_object.med25519.id.uint64
+        account_id_id = xdr_object.med25519.id
         assert xdr_object.med25519 is not None
-        account_id = str(Ed25519PublicKey(xdr_object.med25519.ed25519.uint256))
+        account_id = str(Ed25519PublicKey(xdr_object.med25519.ed25519))
         return cls(account_id=account_id, account_muxed_id=account_id_id)
 
     def __hash__(self):

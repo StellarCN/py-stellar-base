@@ -8,7 +8,7 @@ from stellar_sdk import (
     CreateClaimableBalance,
     Operation,
 )
-from stellar_sdk.xdr.claim_predicate import ClaimPredicate as XdrClaimPredicate
+from stellar_sdk.xdr import ClaimPredicate as XdrClaimPredicate
 from tests.operation.helpers import (
     asset1,
     check_source,
@@ -95,7 +95,7 @@ class TestCreateClaimableBalance:
         assert op.claimants == claimants
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_amount_raise(self):
@@ -116,27 +116,27 @@ class TestCreateClaimableBalance:
 class TestClaimPredicate:
     @staticmethod
     def to_xdr(predicate):
-        return predicate.to_xdr_object().to_xdr()
+        return predicate.to_xdr_object().to_xdr_base64()
 
     def test_predicate_unconditional(self):
         xdr = "AAAAAA=="
         predicate = ClaimPredicate.predicate_unconditional()
         assert xdr == self.to_xdr(predicate)
-        xdr_object = XdrClaimPredicate.from_xdr(xdr)
+        xdr_object = XdrClaimPredicate.from_xdr_base64(xdr)
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
     def test_predicate_before_relative_time(self):
         xdr = "AAAABQAAAAAAAAPo"
         predicate = ClaimPredicate.predicate_before_relative_time(1000)
         assert xdr == self.to_xdr(predicate)
-        xdr_object = XdrClaimPredicate.from_xdr(xdr)
+        xdr_object = XdrClaimPredicate.from_xdr_base64(xdr)
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
     def test_predicate_before_absolute_time(self):
         xdr = "AAAABAAAAABfc0qi"
         predicate = ClaimPredicate.predicate_before_absolute_time(1601391266)
         assert xdr == self.to_xdr(predicate)
-        xdr_object = XdrClaimPredicate.from_xdr(xdr)
+        xdr_object = XdrClaimPredicate.from_xdr_base64(xdr)
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
     def test_predicate_not(self):
@@ -144,7 +144,7 @@ class TestClaimPredicate:
         predicate_abs = ClaimPredicate.predicate_before_absolute_time(1601391266)
         predicate = ClaimPredicate.predicate_not(predicate_abs)
         assert xdr == self.to_xdr(predicate)
-        xdr_object = XdrClaimPredicate.from_xdr(xdr)
+        xdr_object = XdrClaimPredicate.from_xdr_base64(xdr)
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
     def test_predicate_and_1(self):
@@ -153,7 +153,7 @@ class TestClaimPredicate:
         predicate_rel = ClaimPredicate.predicate_before_relative_time(1000)
         predicate = ClaimPredicate.predicate_and(predicate_abs, predicate_rel)
         assert xdr == self.to_xdr(predicate)
-        xdr_object = XdrClaimPredicate.from_xdr(xdr)
+        xdr_object = XdrClaimPredicate.from_xdr_base64(xdr)
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
     def test_predicate_and_2(self):
@@ -162,7 +162,7 @@ class TestClaimPredicate:
         predicate_rel = ClaimPredicate.predicate_before_relative_time(1000)
         predicate = ClaimPredicate.predicate_and(predicate_rel, predicate_abs)
         assert xdr == self.to_xdr(predicate)
-        xdr_object = XdrClaimPredicate.from_xdr(xdr)
+        xdr_object = XdrClaimPredicate.from_xdr_base64(xdr)
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
     def test_predicate_or_1(self):
@@ -171,7 +171,7 @@ class TestClaimPredicate:
         predicate_rel = ClaimPredicate.predicate_before_relative_time(1000)
         predicate = ClaimPredicate.predicate_or(predicate_abs, predicate_rel)
         assert xdr == self.to_xdr(predicate)
-        xdr_object = XdrClaimPredicate.from_xdr(xdr)
+        xdr_object = XdrClaimPredicate.from_xdr_base64(xdr)
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
     def test_predicate_or_2(self):
@@ -180,7 +180,7 @@ class TestClaimPredicate:
         predicate_rel = ClaimPredicate.predicate_before_relative_time(1000)
         predicate = ClaimPredicate.predicate_or(predicate_rel, predicate_abs)
         assert xdr == self.to_xdr(predicate)
-        xdr_object = XdrClaimPredicate.from_xdr(xdr)
+        xdr_object = XdrClaimPredicate.from_xdr_base64(xdr)
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
     def test_predicate_mix(self):
@@ -197,14 +197,14 @@ class TestClaimPredicate:
         )
         predicate = ClaimPredicate.predicate_and(predicate_left, predicate_right)
         assert xdr == self.to_xdr(predicate)
-        xdr_object = XdrClaimPredicate.from_xdr(xdr)
+        xdr_object = XdrClaimPredicate.from_xdr_base64(xdr)
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
 
 class TestClaimant:
     @staticmethod
     def to_xdr(claimant):
-        return claimant.to_xdr_object().to_xdr()
+        return claimant.to_xdr_object().to_xdr_base64()
 
     def test_claimant(self):
         xdr = "AAAAAAAAAACJmyhA7VY2xW3cXxSyOXX3nxuiOI0mlOTFbs3dyWDl7wAAAAEAAAACAAAAAQAAAAIAAAAEAAAAAF9eEAAAAAAAAAAAAgAAAAIAAAAFAAAAAAAAw1AAAAADAAAAAQAAAAQAAAAAZVPxAA=="

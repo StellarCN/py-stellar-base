@@ -59,7 +59,7 @@ class PathPaymentStrictSend(Operation):
         raise_if_not_valid_amount(self.send_amount, "send_amount")
         raise_if_not_valid_amount(self.dest_min, "dest_min")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         destination = self.destination.to_xdr_object()
         send_asset = self.send_asset.to_xdr_object()
         dest_asset = self.dest_asset.to_xdr_object()
@@ -67,15 +67,14 @@ class PathPaymentStrictSend(Operation):
 
         path_payment_strict_send_op = stellar_xdr.PathPaymentStrictSendOp(
             send_asset,
-            stellar_xdr.Int64(Operation.to_xdr_amount(self.send_amount)),
+            Operation.to_xdr_amount(self.send_amount),
             destination,
             dest_asset,
-            stellar_xdr.Int64(Operation.to_xdr_amount(self.dest_min)),
+            Operation.to_xdr_amount(self.dest_min),
             path,
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE,
-            path_payment_strict_send_op=path_payment_strict_send_op,
+        body = stellar_xdr.OperationBody.PathPaymentStrictSend(
+            path_payment_strict_send_op
         )
         return body
 
@@ -88,27 +87,22 @@ class PathPaymentStrictSend(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.path_payment_strict_send_op is not None
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.PathPaymentStrictSend)
         destination = MuxedAccount.from_xdr_object(
-            xdr_object.body.path_payment_strict_send_op.destination
+            body.path_payment_strict_send_op.destination
         )
-        send_asset = Asset.from_xdr_object(
-            xdr_object.body.path_payment_strict_send_op.send_asset
-        )
-        dest_asset = Asset.from_xdr_object(
-            xdr_object.body.path_payment_strict_send_op.dest_asset
-        )
+        send_asset = Asset.from_xdr_object(body.path_payment_strict_send_op.send_asset)
+        dest_asset = Asset.from_xdr_object(body.path_payment_strict_send_op.dest_asset)
         send_amount = Operation.from_xdr_amount(
-            xdr_object.body.path_payment_strict_send_op.send_amount.int64
+            body.path_payment_strict_send_op.send_amount
         )
-        dest_min = Operation.from_xdr_amount(
-            xdr_object.body.path_payment_strict_send_op.dest_min.int64
-        )
+        dest_min = Operation.from_xdr_amount(body.path_payment_strict_send_op.dest_min)
 
         path = []
         # In fact, we don't need to check it.
-        if xdr_object.body.path_payment_strict_send_op.path:
-            for x in xdr_object.body.path_payment_strict_send_op.path:
+        if body.path_payment_strict_send_op.path:
+            for x in body.path_payment_strict_send_op.path:
                 path.append(Asset.from_xdr_object(x))
 
         op = cls(

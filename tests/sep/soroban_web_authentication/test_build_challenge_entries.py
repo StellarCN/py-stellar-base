@@ -287,14 +287,13 @@ async def test_build_challenge_forwards_use_upgraded_auth(
 
     def unsigned_entry(address: str) -> stellar_xdr.SorobanAuthorizationEntry:
         return stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-                address=stellar_xdr.SorobanAddressCredentials(
+            credentials=stellar_xdr.SorobanCredentials.Address(
+                stellar_xdr.SorobanAddressCredentials(
                     address=Address(address).to_xdr_sc_address(),
-                    nonce=stellar_xdr.Int64(1),
-                    signature_expiration_ledger=stellar_xdr.Uint32(0),
-                    signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-                ),
+                    nonce=1,
+                    signature_expiration_ledger=0,
+                    signature=stellar_xdr.SCVal.Void(),
+                )
             ),
             root_invocation=build_root_invocation(
                 args=build_args(client_domain=None, client_domain_account=None)
@@ -309,8 +308,8 @@ async def test_build_challenge_forwards_use_upgraded_auth(
                 "results": [
                     {
                         "auth": [
-                            unsigned_entry(CLIENT_CONTRACT_ACCOUNT).to_xdr(),
-                            unsigned_entry(SERVER_ACCOUNT).to_xdr(),
+                            unsigned_entry(CLIENT_CONTRACT_ACCOUNT).to_xdr_base64(),
+                            unsigned_entry(SERVER_ACCOUNT).to_xdr_base64(),
                         ],
                         "xdr": "AAAAAQ==",
                     }
@@ -339,14 +338,13 @@ async def test_build_challenge_signs_v2_entries(soroban_server, rpc_mock):
 
     def unsigned_v2_entry(address: str) -> stellar_xdr.SorobanAuthorizationEntry:
         return stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
-                address_v2=stellar_xdr.SorobanAddressCredentials(
+            credentials=stellar_xdr.SorobanCredentials.AddressV2(
+                stellar_xdr.SorobanAddressCredentials(
                     address=Address(address).to_xdr_sc_address(),
-                    nonce=stellar_xdr.Int64(1),
-                    signature_expiration_ledger=stellar_xdr.Uint32(0),
-                    signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-                ),
+                    nonce=1,
+                    signature_expiration_ledger=0,
+                    signature=stellar_xdr.SCVal.Void(),
+                )
             ),
             root_invocation=build_root_invocation(
                 args=build_args(client_domain=None, client_domain_account=None)
@@ -360,8 +358,8 @@ async def test_build_challenge_signs_v2_entries(soroban_server, rpc_mock):
             "results": [
                 {
                     "auth": [
-                        unsigned_v2_entry(CLIENT_CONTRACT_ACCOUNT).to_xdr(),
-                        unsigned_v2_entry(SERVER_ACCOUNT).to_xdr(),
+                        unsigned_v2_entry(CLIENT_CONTRACT_ACCOUNT).to_xdr_base64(),
+                        unsigned_v2_entry(SERVER_ACCOUNT).to_xdr_base64(),
                     ],
                     "xdr": "AAAAAQ==",
                 }
@@ -381,21 +379,23 @@ async def test_build_challenge_signs_v2_entries(soroban_server, rpc_mock):
         network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
     )
 
-    entries = stellar_xdr.SorobanAuthorizationEntries.from_xdr(
-        challenge
-    ).soroban_authorization_entries
+    entries = stellar_xdr.SorobanAuthorizationEntries.from_xdr_base64(challenge)
     assert len(entries) == 2
     client_entry, server_entry = entries
-    assert client_entry.credentials.address_v2 is not None
+    assert isinstance(
+        client_entry.credentials, stellar_xdr.SorobanCredentials.AddressV2
+    )
     assert (
         client_entry.credentials.address_v2.signature.type
         == stellar_xdr.SCValType.SCV_VOID
     )
-    assert server_entry.credentials.address_v2 is not None
+    assert isinstance(
+        server_entry.credentials, stellar_xdr.SorobanCredentials.AddressV2
+    )
     assert (
         server_entry.credentials.address_v2.signature.type
         == stellar_xdr.SCValType.SCV_VEC
     )
     assert server_entry.credentials.address_v2.signature_expiration_ledger == (
-        stellar_xdr.Uint32(82106 + 180)
+        82106 + 180
     )

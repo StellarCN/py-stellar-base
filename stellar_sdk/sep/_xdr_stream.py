@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
-from typing import Protocol, TypeVar
-
-from xdrlib3 import ConversionError, Packer, Unpacker
+from collections.abc import Iterable
 
 from .. import xdr as stellar_xdr
 from .exceptions import InvalidWasmError
@@ -18,79 +15,48 @@ __all__ = [
 ]
 
 
-class _XdrPackable(Protocol):
-    def pack(self, packer: Packer) -> None: ...
-
-
-_XdrEntry = TypeVar("_XdrEntry", bound=_XdrPackable)
-
-
-def parse_sc_meta_entries(data: bytes) -> tuple[stellar_xdr.SCMetaEntry, ...]:
+def parse_sc_meta_entries(data: bytes) -> tuple[stellar_xdr.SCMetaEntry.Any, ...]:
     """Parse a SEP-46 stream of ``SCMetaEntry`` values."""
-    return _parse_xdr_stream(data, stellar_xdr.SCMetaEntry.unpack, "SCMetaEntry")
+    try:
+        return tuple(stellar_xdr.decode_stream(stellar_xdr.SCMetaEntry, data))
+    except stellar_xdr.XdrError as exc:
+        raise InvalidWasmError("Invalid XDR stream for SCMetaEntry.") from exc
 
 
-def parse_sc_spec_entries(data: bytes) -> tuple[stellar_xdr.SCSpecEntry, ...]:
+def parse_sc_spec_entries(data: bytes) -> tuple[stellar_xdr.SCSpecEntry.Any, ...]:
     """Parse a SEP-48 stream of ``SCSpecEntry`` values."""
-    return _parse_xdr_stream(data, stellar_xdr.SCSpecEntry.unpack, "SCSpecEntry")
+    try:
+        return tuple(stellar_xdr.decode_stream(stellar_xdr.SCSpecEntry, data))
+    except stellar_xdr.XdrError as exc:
+        raise InvalidWasmError("Invalid XDR stream for SCSpecEntry.") from exc
 
 
-def parse_sc_env_meta_entries(data: bytes) -> tuple[stellar_xdr.SCEnvMetaEntry, ...]:
+def parse_sc_env_meta_entries(
+    data: bytes,
+) -> tuple[stellar_xdr.SCEnvMetaEntry.Any, ...]:
     """Parse a stream of ``SCEnvMetaEntry`` values."""
-    return _parse_xdr_stream(data, stellar_xdr.SCEnvMetaEntry.unpack, "SCEnvMetaEntry")
+    try:
+        return tuple(stellar_xdr.decode_stream(stellar_xdr.SCEnvMetaEntry, data))
+    except stellar_xdr.XdrError as exc:
+        raise InvalidWasmError("Invalid XDR stream for SCEnvMetaEntry.") from exc
 
 
 def serialize_sc_meta_entries(
-    entries: Iterable[stellar_xdr.SCMetaEntry],
+    entries: Iterable[stellar_xdr.SCMetaEntry.Any],
 ) -> bytes:
     """Serialize ``SCMetaEntry`` values as an unframed XDR stream."""
-    return _serialize_xdr_stream(entries)
+    return stellar_xdr.encode_stream(entries)
 
 
 def serialize_sc_spec_entries(
-    entries: Iterable[stellar_xdr.SCSpecEntry],
+    entries: Iterable[stellar_xdr.SCSpecEntry.Any],
 ) -> bytes:
     """Serialize ``SCSpecEntry`` values as an unframed XDR stream."""
-    return _serialize_xdr_stream(entries)
+    return stellar_xdr.encode_stream(entries)
 
 
 def serialize_sc_env_meta_entries(
-    entries: Iterable[stellar_xdr.SCEnvMetaEntry],
+    entries: Iterable[stellar_xdr.SCEnvMetaEntry.Any],
 ) -> bytes:
     """Serialize ``SCEnvMetaEntry`` values as an unframed XDR stream."""
-    return _serialize_xdr_stream(entries)
-
-
-def _parse_xdr_stream(
-    data: bytes,
-    unpack_entry: Callable[[Unpacker], _XdrEntry],
-    entry_name: str,
-) -> tuple[_XdrEntry, ...]:
-    if not isinstance(data, bytes):
-        raise TypeError("data must be bytes")
-
-    unpacker = Unpacker(data)
-    entries: list[_XdrEntry] = []
-    while unpacker.get_position() < len(data):
-        before = unpacker.get_position()
-        try:
-            entry = unpack_entry(unpacker)
-        except (EOFError, ValueError, ConversionError) as exc:
-            raise InvalidWasmError(f"Invalid XDR stream for {entry_name}.") from exc
-        after = unpacker.get_position()
-        if after <= before:
-            raise InvalidWasmError(
-                f"Invalid XDR stream for {entry_name}: decoder made no progress."
-            )
-        entries.append(entry)
-
-    if unpacker.get_position() != len(data):
-        raise InvalidWasmError(f"Invalid XDR stream for {entry_name}: trailing bytes.")
-    return tuple(entries)
-
-
-def _serialize_xdr_stream(entries: Iterable[_XdrPackable]) -> bytes:
-    packer = Packer()
-    for entry in entries:
-        entry.pack(packer)
-    return packer.get_buffer()
+    return stellar_xdr.encode_stream(entries)

@@ -59,20 +59,17 @@ class LiquidityPoolDeposit(Operation):
         raise_if_not_valid_amount(self.max_amount_b, "max_amount_b")
         raise_if_not_valid_hash(self.liquidity_pool_id, "liquidity_pool_id")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         liquidity_pool_id_bytes = binascii.unhexlify(self.liquidity_pool_id)
         liquidity_pool_id = stellar_xdr.PoolID.from_xdr_bytes(liquidity_pool_id_bytes)
-        max_amount_a = stellar_xdr.Int64(Operation.to_xdr_amount(self.max_amount_a))
-        max_amount_b = stellar_xdr.Int64(Operation.to_xdr_amount(self.max_amount_b))
+        max_amount_a = Operation.to_xdr_amount(self.max_amount_a)
+        max_amount_b = Operation.to_xdr_amount(self.max_amount_b)
         min_price = self.min_price.to_xdr_object()
         max_price = self.max_price.to_xdr_object()
         liquidity_pool_deposit_op = stellar_xdr.LiquidityPoolDepositOp(
             liquidity_pool_id, max_amount_a, max_amount_b, min_price, max_price
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE,
-            liquidity_pool_deposit_op=liquidity_pool_deposit_op,
-        )
+        body = stellar_xdr.OperationBody.LiquidityPoolDeposit(liquidity_pool_deposit_op)
         return body
 
     @classmethod
@@ -81,23 +78,18 @@ class LiquidityPoolDeposit(Operation):
     ) -> "LiquidityPoolDeposit":
         """Creates a :class:`LiquidityPoolDeposit` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.liquidity_pool_deposit_op is not None
-        liquidity_pool_id_bytes = (
-            xdr_object.body.liquidity_pool_deposit_op.liquidity_pool_id.pool_id.hash
-        )
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.LiquidityPoolDeposit)
+        liquidity_pool_id_bytes = body.liquidity_pool_deposit_op.liquidity_pool_id
         liquidity_pool_id = liquidity_pool_id_bytes.hex()
         max_amount_a = Operation.from_xdr_amount(
-            xdr_object.body.liquidity_pool_deposit_op.max_amount_a.int64
+            body.liquidity_pool_deposit_op.max_amount_a
         )
         max_amount_b = Operation.from_xdr_amount(
-            xdr_object.body.liquidity_pool_deposit_op.max_amount_b.int64
+            body.liquidity_pool_deposit_op.max_amount_b
         )
-        min_price = Price.from_xdr_object(
-            xdr_object.body.liquidity_pool_deposit_op.min_price
-        )
-        max_price = Price.from_xdr_object(
-            xdr_object.body.liquidity_pool_deposit_op.max_price
-        )
+        min_price = Price.from_xdr_object(body.liquidity_pool_deposit_op.min_price)
+        max_price = Price.from_xdr_object(body.liquidity_pool_deposit_op.max_price)
 
         op = cls(
             source=source,

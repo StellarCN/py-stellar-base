@@ -51,13 +51,11 @@ class ChangeTrust(Operation):
             self.limit = limit
         raise_if_not_valid_amount(self.limit, "limit")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         line = self.asset.to_change_trust_asset_xdr_object()
-        limit = stellar_xdr.Int64(Operation.to_xdr_amount(self.limit))
+        limit = Operation.to_xdr_amount(self.limit)
         change_trust_op = stellar_xdr.ChangeTrustOp(line, limit)
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, change_trust_op=change_trust_op
-        )
+        body = stellar_xdr.OperationBody.ChangeTrust(change_trust_op)
         return body
 
     @classmethod
@@ -67,17 +65,18 @@ class ChangeTrust(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.change_trust_op is not None
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.ChangeTrust)
         if (
-            xdr_object.body.change_trust_op.line.type
+            body.change_trust_op.line.type
             == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE
         ):
             line: Asset | LiquidityPoolAsset = LiquidityPoolAsset.from_xdr_object(
-                xdr_object.body.change_trust_op.line
+                body.change_trust_op.line
             )
         else:
-            line = Asset.from_xdr_object(xdr_object.body.change_trust_op.line)
-        limit = Operation.from_xdr_amount(xdr_object.body.change_trust_op.limit.int64)
+            line = Asset.from_xdr_object(body.change_trust_op.line)
+        limit = Operation.from_xdr_amount(body.change_trust_op.limit)
         op = cls(source=source, asset=line, limit=limit)
         return op
 

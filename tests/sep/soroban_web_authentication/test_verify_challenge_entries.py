@@ -69,7 +69,7 @@ async def test_verify_challenge_authorization_entries(soroban_server, rpc_mock):
     rpc_mock.expect_response(mock_data)
     resp = await _verify_entries(
         soroban_server,
-        signed_entries.to_xdr(),
+        signed_entries.to_xdr_base64(),
         SERVER_ACCOUNT,
         home_domains=HOME_DOMAIN,
         web_auth_contract=WEB_AUTH_CONTRACT,
@@ -106,7 +106,7 @@ async def test_verify_challenge_authorization_entries_failed(soroban_server, rpc
     ):
         await _verify_entries(
             soroban_server,
-            signed_entries.to_xdr(),
+            signed_entries.to_xdr_base64(),
             SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_contract=WEB_AUTH_CONTRACT,

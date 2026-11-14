@@ -93,7 +93,7 @@ class ChallengeAuthorizationEntries:
     def __hash__(self):
         return hash(
             (
-                self.authorization_entries.to_xdr(),
+                self.authorization_entries.to_xdr_base64(),
                 self.client_account_id,
                 self.matched_home_domain,
                 self.nonce,
@@ -123,7 +123,7 @@ class ChallengeAuthorizationEntries:
     def __repr__(self):
         return (
             f"<ChallengeAuthorizationEntries ["
-            f"authorization_entries={self.authorization_entries.to_xdr()}, "
+            f"authorization_entries={self.authorization_entries.to_xdr_base64()}, "
             f"client_account_id={self.client_account_id}, "
             f"matched_home_domain={self.matched_home_domain}, "
             f"nonce={self.nonce}, "
@@ -160,9 +160,9 @@ def read_challenge_authorization_entries(
     :return: A ChallengeAuthorizationEntries object containing the parsed data.
     """
     try:
-        entries = stellar_xdr.SorobanAuthorizationEntries.from_xdr(
+        entries = stellar_xdr.SorobanAuthorizationEntries.from_xdr_base64(
             challenge_authorization_entries
-        ).soroban_authorization_entries
+        )
     except Exception as e:
         raise InvalidSep45ChallengeError(
             "Invalid challenge_authorization_entries XDR format."
@@ -204,7 +204,7 @@ def read_challenge_authorization_entries(
             f"Contract address does not match. Expected {web_auth_contract}, got {contract_address}."
         )
 
-    function_name = contract_fn.function_name.sc_symbol.decode("utf-8")
+    function_name = contract_fn.function_name.decode("utf-8")
     if function_name != WEB_AUTH_VERIFY_FUNCTION_NAME:
         raise InvalidSep45ChallengeError(
             f"Function name does not match. Expected {WEB_AUTH_VERIFY_FUNCTION_NAME}, got {function_name}."
@@ -583,7 +583,7 @@ def _build_challenge_tx(
     server_kp = Keypair.from_secret(server_secret)
     web_auth_domain_account = server_kp.public_key
 
-    args: dict[str, stellar_xdr.SCVal] = {
+    args: dict[str, stellar_xdr.SCVal.Any] = {
         "account": scval.to_string(client_account_id),
         "home_domain": scval.to_string(home_domain),
         "nonce": scval.to_string(nonce),
@@ -635,7 +635,7 @@ def _process_build_challenge_response(
 
     authorization_entries = []
     for raw_entry in raw_entries:
-        entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr(raw_entry)
+        entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr_base64(raw_entry)
         if entry.credentials.type not in _ALLOWED_CREDENTIAL_TYPES:
             raise ValueError(
                 f"Unsupported SorobanCredentialsType: {entry.credentials.type}."
@@ -653,7 +653,9 @@ def _process_build_challenge_response(
             )
         authorization_entries.append(entry)
 
-    return stellar_xdr.SorobanAuthorizationEntries(authorization_entries).to_xdr()
+    return stellar_xdr.SorobanAuthorizationEntries(
+        authorization_entries
+    ).to_xdr_base64()
 
 
 def _build_verify_tx(
@@ -663,7 +665,7 @@ def _build_verify_tx(
     simulate_tx_account: str,
 ) -> TransactionEnvelope:
     """Build the verification transaction for simulation."""
-    args: dict[str, stellar_xdr.SCVal] = {
+    args: dict[str, stellar_xdr.SCVal.Any] = {
         "account": scval.to_string(parsed_challenge.client_account_id),
         "home_domain": scval.to_string(parsed_challenge.matched_home_domain),
         "nonce": scval.to_string(parsed_challenge.nonce),
@@ -685,7 +687,7 @@ def _build_verify_tx(
             contract_id=web_auth_contract,
             function_name=WEB_AUTH_VERIFY_FUNCTION_NAME,
             parameters=[scval.to_struct(args)],
-            auth=parsed_challenge.authorization_entries.soroban_authorization_entries,
+            auth=parsed_challenge.authorization_entries,
         )
         .build()
     )

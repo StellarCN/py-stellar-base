@@ -90,10 +90,26 @@ xdr = tx.to_xdr()
 te = TransactionEnvelope.from_xdr(xdr, Network.PUBLIC_NETWORK_PASSPHRASE)
 ```
 
-Lower-level XDR types live in `stellar_sdk.xdr` (e.g. `stellar_sdk.xdr.TransactionMeta`,
-`stellar_sdk.xdr.SCVal`). Most carry `.from_xdr(...)` / `.to_xdr()` for base64, and
-`.from_xdr_bytes(...)` / `.to_xdr_bytes()` for raw bytes. Use these to debug result/meta
-XDR, e.g. decoding a `result_meta_xdr` returned by Soroban RPC.
+Lower-level XDR types live in `stellar_sdk.xdr`, which re-exports
+[stellar-xdr](https://stellar-xdr.readthedocs.io/) (e.g. `xdr.TransactionMeta`,
+`xdr.SCVal`). Decode with `T.from_xdr_base64(...)` / `T.from_xdr_bytes(...)` and encode
+with `.to_xdr_base64()` / `.to_xdr_bytes()`. Use these to debug result/meta XDR, e.g.
+decoding a `result_meta_xdr` returned by Soroban RPC.
+
+Values are immutable; change a field with `xdr.replace(value, field=...)`. A union such as
+`SCVal` is a namespace of arm classes: build `xdr.SCVal.U32(7)`, annotate with
+`xdr.SCVal.Any`, and read with `match` or `isinstance`:
+
+```python
+from stellar_sdk import scval, xdr
+
+meta = xdr.TransactionMeta.from_xdr_base64(result_meta_xdr)
+match meta:
+    case xdr.TransactionMeta.V4(body) if body.soroban_meta is not None:
+        result = body.soroban_meta.return_value
+        if result is not None:
+            print(scval.to_native(result))
+```
 
 ## TxRep (SEP-11, human-readable transactions)
 
@@ -107,5 +123,6 @@ envelope = from_txrep(text, Network.TESTNET_NETWORK_PASSPHRASE)
 
 ## SEP-51 JSON
 
-XDR base classes support JSON encoding/decoding (SEP-51) in addition to base64/bytes,
-useful for inspecting structures in a readable form.
+Every XDR value converts to and from SEP-51 JSON with `.to_json_value()` and
+`T.from_json_value(...)`, in addition to base64/bytes, which is useful for inspecting
+structures in a readable form: `json.dumps(value.to_json_value(), indent=2)`.
