@@ -8,7 +8,7 @@
 [![Stellar Protocol](https://img.shields.io/badge/Stellar%20Protocol-30-blue)](https://developers.stellar.org/docs/learn/fundamentals/stellar-consensus-protocol)
 
 py-stellar-base is a Python library for communicating with
-a [Stellar Horizon server](https://developers.stellar.org/docs/data/apis/horizon) and [Stellar RPC server](https://developers.stellar.org/docs/data/apis/rpc). It is used for building Stellar apps on Python. It supports **Python 3.10+** as
+a [Stellar Horizon server](https://developers.stellar.org/docs/data/apis/horizon) and [Stellar RPC server](https://developers.stellar.org/docs/data/apis/rpc). It is used for building Stellar apps on Python. It supports **Python 3.11+** as
 well as PyPy 3.11.
 
 It provides:

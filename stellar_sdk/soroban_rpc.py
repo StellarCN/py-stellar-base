@@ -1,10 +1,9 @@
 from collections.abc import Callable, Sequence
 from datetime import datetime
 from enum import Enum
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Self, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from typing_extensions import Self
 
 from . import scval
 from . import xdr as stellar_xdr
