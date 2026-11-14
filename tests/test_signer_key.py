@@ -15,9 +15,8 @@ class TestSignerKey:
         signer_key_data = b"\x85\xba{e\xeb\x92\x83r\xb2\xf5\xc4Z$\xc2\x84b\xc6\x8a\xa6\x04\x86dg$x6\x0c\xeb\x9aW\x13W"
         signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_ED25519
         signer_key = SignerKey(signer_key_data, signer_key_type)
-        signer_key_xdr = stellar_xdr.SignerKey(
-            type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519,
-            ed25519=stellar_sdk.xdr.Uint256(signer_key_data),
+        signer_key_xdr = stellar_xdr.SignerKey.Ed25519(
+            stellar_sdk.xdr.Uint256(signer_key_data)
         )
         assert signer_key.to_xdr_object() == signer_key_xdr
         assert signer_key.encoded_signer_key == account_id
@@ -31,9 +30,8 @@ class TestSignerKey:
         signer_key_data = b"\x85\xba{e\xeb\x92\x83r\xb2\xf5\xc4Z$\xc2\x84b\xc6\x8a\xa6\x04\x86dg$x6\x0c\xeb\x9aW\x13W"
         signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX
         signer_key = SignerKey(signer_key_data, signer_key_type)
-        signer_key_xdr = stellar_xdr.SignerKey(
-            type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX,
-            pre_auth_tx=stellar_sdk.xdr.Uint256(signer_key_data),
+        signer_key_xdr = stellar_xdr.SignerKey.PreAuthTx(
+            stellar_sdk.xdr.Uint256(signer_key_data)
         )
         assert signer_key.to_xdr_object() == signer_key_xdr
         assert signer_key.encoded_signer_key == pre_auth_tx
@@ -47,9 +45,8 @@ class TestSignerKey:
         signer_key_data = b"\x85\xba{e\xeb\x92\x83r\xb2\xf5\xc4Z$\xc2\x84b\xc6\x8a\xa6\x04\x86dg$x6\x0c\xeb\x9aW\x13W"
         signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_HASH_X
         signer_key = SignerKey(signer_key_data, signer_key_type)
-        signer_key_xdr = stellar_xdr.SignerKey(
-            type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X,
-            hash_x=stellar_sdk.xdr.Uint256(signer_key_data),
+        signer_key_xdr = stellar_xdr.SignerKey.HashX(
+            stellar_sdk.xdr.Uint256(signer_key_data)
         )
         assert signer_key.to_xdr_object() == signer_key_xdr
         assert signer_key.encoded_signer_key == sha256_hash
@@ -116,9 +113,8 @@ class TestSignerKey:
         )
         signer_key_type = SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
         signer_key = SignerKey(signer_key_data, signer_key_type)
-        signer_key_xdr = stellar_xdr.SignerKey(
-            type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD,
-            ed25519_signed_payload=stellar_xdr.SignerKeyEd25519SignedPayload(
+        signer_key_xdr = stellar_xdr.SignerKey.Ed25519SignedPayload(
+            stellar_xdr.SignerKeyEd25519SignedPayload(
                 ed25519=stellar_xdr.Uint256(
                     bytes(
                         bytearray(
@@ -174,7 +170,7 @@ class TestSignerKey:
                         ]
                     )
                 ),
-            ),
+            )
         )
         assert signer_key.to_xdr_object() == signer_key_xdr
         assert signer_key.encoded_signer_key == ed25519_signed_payload
@@ -243,7 +239,7 @@ class TestSignedPayloadSigner:
         )
         assert xdr_obj.ed25519_signed_payload
         assert (
-            xdr_obj.ed25519_signed_payload.ed25519.uint256
+            xdr_obj.ed25519_signed_payload.ed25519
             == Ed25519PublicKey.from_string(account_id).key
         )
         assert xdr_obj.ed25519_signed_payload.payload == payload

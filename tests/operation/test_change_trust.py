@@ -81,7 +81,7 @@ class TestChangeTrust:
         op = ChangeTrust(asset, limit, source)
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
         assert op.asset == asset
         assert op.limit == str(limit) if limit is not None else "922337203685.4775807"

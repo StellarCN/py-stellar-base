@@ -47,7 +47,7 @@ dependencies = [
     "requests>=2.0.0",
     "requests-sse>=0.3",
     "stellar-strkey>=0.2.0,<0.3.0",
-    "xdrlib3>=0.1.1",
+    "stellar-xdr>=0.2.0,<0.3.0",
 ]
 
 [project.urls]
@@ -81,6 +81,10 @@ docs = [
     "sphinx-rtd-theme>=3.0.2",
 ]
 
+# Temporary, while stellar-xdr gaps found by this migration are fixed. Remove before merging.
+[tool.uv.sources]
+stellar-xdr = { path = "../py-stellar-xdr", editable = true }
+
 [build-system]
 requires = ["flit_core>=3.2,<5"]
 build-backend = "flit_core.buildapi"
@@ -102,7 +106,6 @@ warn_unused_configs = true
 source = ["stellar_sdk/", "tests/"]
 
 [tool.coverage.report]
-omit = ["stellar_sdk/xdr/*"]
 exclude_lines = [
     "pragma: no cover",
     "raise AssertionError",

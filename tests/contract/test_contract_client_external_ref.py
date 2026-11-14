@@ -71,8 +71,8 @@ def _external_ref_of(
     envelope = captured["builder"].build()
     op = envelope.transaction.operations[0]
     assert isinstance(op, InvokeHostFunction)
+    assert isinstance(op.host_function, stellar_xdr.HostFunction.CreateContractV2)
     create_contract = op.host_function.create_contract_v2
-    assert create_contract is not None
     assert (
         create_contract.executable.type
         == stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF
@@ -118,7 +118,7 @@ def test_create_contract_from_external_ref(monkeypatch):
     assert captured["force"] is True
     external_ref = _external_ref_of(captured)
     assert external_ref.executable_owner == Address(OWNER).to_xdr_sc_address()
-    assert external_ref.tag.sc_string == b"v1"
+    assert external_ref.tag == b"v1"
 
 
 async def test_create_contract_from_external_ref_async(monkeypatch):
@@ -156,7 +156,7 @@ async def test_create_contract_from_external_ref_async(monkeypatch):
     assert captured["force"] is True
     external_ref = _external_ref_of(captured)
     assert external_ref.executable_owner == Address(OWNER).to_xdr_sc_address()
-    assert external_ref.tag.sc_string == b"\xff\xfe"
+    assert external_ref.tag == b"\xff\xfe"
 
 
 def test_create_contract_from_external_ref_rejects_non_contract_owner(monkeypatch):

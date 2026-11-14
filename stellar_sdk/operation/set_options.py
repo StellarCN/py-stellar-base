@@ -124,7 +124,7 @@ class SetOptions(Operation):
         if self.inflation_dest is not None:
             raise_if_not_valid_ed25519_public_key(self.inflation_dest, "inflation_dest")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         inflation_dest = (
             Keypair.from_public_key(self.inflation_dest).xdr_account_id()
             if self.inflation_dest is not None
@@ -135,34 +135,12 @@ class SetOptions(Operation):
             if self.home_domain is not None
             else None
         )
-        clear_flags = (
-            None
-            if self.clear_flags is None
-            else stellar_xdr.Uint32(self.clear_flags.value)
-        )
-        set_flags = (
-            None if self.set_flags is None else stellar_xdr.Uint32(self.set_flags.value)
-        )
-        master_weight = (
-            None
-            if self.master_weight is None
-            else stellar_xdr.Uint32(self.master_weight)
-        )
-        low_threshold = (
-            None
-            if self.low_threshold is None
-            else stellar_xdr.Uint32(self.low_threshold)
-        )
-        med_threshold = (
-            None
-            if self.med_threshold is None
-            else stellar_xdr.Uint32(self.med_threshold)
-        )
-        high_threshold = (
-            None
-            if self.high_threshold is None
-            else stellar_xdr.Uint32(self.high_threshold)
-        )
+        clear_flags = None if self.clear_flags is None else self.clear_flags.value
+        set_flags = None if self.set_flags is None else self.set_flags.value
+        master_weight = None if self.master_weight is None else self.master_weight
+        low_threshold = None if self.low_threshold is None else self.low_threshold
+        med_threshold = None if self.med_threshold is None else self.med_threshold
+        high_threshold = None if self.high_threshold is None else self.high_threshold
         signer = None if self.signer is None else self.signer.to_xdr_object()
 
         set_options_op = stellar_xdr.SetOptionsOp(
@@ -176,9 +154,7 @@ class SetOptions(Operation):
             home_domain,
             signer,
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, set_options_op=set_options_op
-        )
+        body = stellar_xdr.OperationBody.SetOptions(set_options_op)
         return body
 
     @classmethod
@@ -190,44 +166,36 @@ class SetOptions(Operation):
         source = Operation.get_source_from_xdr_obj(xdr_object)
 
         inflation_dest = None
-        assert xdr_object.body.set_options_op is not None
-        if xdr_object.body.set_options_op.inflation_dest:
-            assert (
-                xdr_object.body.set_options_op.inflation_dest.account_id.ed25519
-                is not None
-            )
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.SetOptions)
+        if body.set_options_op.inflation_dest:
             inflation_dest = str(
-                Ed25519PublicKey(
-                    xdr_object.body.set_options_op.inflation_dest.account_id.ed25519.uint256
-                )
+                Ed25519PublicKey(body.set_options_op.inflation_dest.ed25519)
             )
 
-        clear_flags_xdr = xdr_object.body.set_options_op.clear_flags
-        set_flags_xdr = xdr_object.body.set_options_op.set_flags
-        master_weight_xdr = xdr_object.body.set_options_op.master_weight
-        low_threshold_xdr = xdr_object.body.set_options_op.low_threshold
-        med_threshold_xdr = xdr_object.body.set_options_op.med_threshold
-        high_threshold_xdr = xdr_object.body.set_options_op.high_threshold
-        home_domain_xdr = xdr_object.body.set_options_op.home_domain
-        signer_xdr_object = xdr_object.body.set_options_op.signer
+        clear_flags_xdr = body.set_options_op.clear_flags
+        set_flags_xdr = body.set_options_op.set_flags
+        master_weight_xdr = body.set_options_op.master_weight
+        low_threshold_xdr = body.set_options_op.low_threshold
+        med_threshold_xdr = body.set_options_op.med_threshold
+        high_threshold_xdr = body.set_options_op.high_threshold
+        home_domain_xdr = body.set_options_op.home_domain
+        signer_xdr_object = body.set_options_op.signer
 
-        clear_flags = None if clear_flags_xdr is None else clear_flags_xdr.uint32
-        set_flags = None if set_flags_xdr is None else set_flags_xdr.uint32
-        master_weight = None if master_weight_xdr is None else master_weight_xdr.uint32
-        low_threshold = None if low_threshold_xdr is None else low_threshold_xdr.uint32
-        med_threshold = None if med_threshold_xdr is None else med_threshold_xdr.uint32
-        high_threshold = (
-            None if high_threshold_xdr is None else high_threshold_xdr.uint32
+        clear_flags = None if clear_flags_xdr is None else clear_flags_xdr
+        set_flags = None if set_flags_xdr is None else set_flags_xdr
+        master_weight = None if master_weight_xdr is None else master_weight_xdr
+        low_threshold = None if low_threshold_xdr is None else low_threshold_xdr
+        med_threshold = None if med_threshold_xdr is None else med_threshold_xdr
+        high_threshold = None if high_threshold_xdr is None else high_threshold_xdr
+        home_domain = (
+            None if home_domain_xdr is None else home_domain_xdr.decode("utf-8")
         )
-        home_domain = None if home_domain_xdr is None else home_domain_xdr.string32
         signer = (
             None
             if signer_xdr_object is None
             else Signer.from_xdr_object(signer_xdr_object)
         )
-
-        if home_domain is not None:
-            home_domain = home_domain.decode("utf-8")
 
         op = cls(
             inflation_dest=inflation_dest,

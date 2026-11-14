@@ -3,7 +3,6 @@ from __future__ import annotations
 import pytest
 
 from stellar_sdk.sep._xdr_stream import (
-    _parse_xdr_stream,
     parse_sc_meta_entries,
     serialize_sc_env_meta_entries,
     serialize_sc_meta_entries,
@@ -22,13 +21,8 @@ def test_xdr_stream_round_trip():
 
 
 def test_xdr_stream_rejects_non_bytes():
-    with pytest.raises(TypeError, match="data must be bytes"):
+    with pytest.raises(TypeError, match="expected bytes"):
         parse_sc_meta_entries("not bytes")  # type: ignore[arg-type]
-
-
-def test_xdr_stream_rejects_decoders_that_make_no_progress():
-    with pytest.raises(InvalidWasmError, match="made no progress"):
-        _parse_xdr_stream(b"\x00", lambda unpacker: meta_entry("key", "value"), "test")
 
 
 def test_xdr_stream_rejects_trailing_bytes():

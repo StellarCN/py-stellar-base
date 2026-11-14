@@ -1,4 +1,3 @@
-import builtins
 import re
 
 from . import xdr as stellar_xdr
@@ -91,15 +90,13 @@ class Asset:
         :return: The contract Id for the asset contract.
         """
         network_id_hash = stellar_xdr.Hash(Network(network_passphrase).network_id())
-        preimage = stellar_xdr.HashIDPreimage(
-            stellar_xdr.EnvelopeType.ENVELOPE_TYPE_CONTRACT_ID,
-            contract_id=stellar_xdr.HashIDPreimageContractID(
+        preimage = stellar_xdr.HashIDPreimage.ContractID(
+            stellar_xdr.HashIDPreimageContractID(
                 network_id=network_id_hash,
-                contract_id_preimage=stellar_xdr.ContractIDPreimage(
-                    stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ASSET,
-                    from_asset=self.to_xdr_object(),
+                contract_id_preimage=stellar_xdr.ContractIDPreimage.Asset(
+                    self.to_xdr_object()
                 ),
-            ),
+            )
         )
         contract_id = sha256(preimage.to_xdr_bytes())
         return str(Contract(contract_id))
@@ -144,68 +141,62 @@ class Asset:
         """
         return self.issuer is None
 
-    def to_xdr_object(self) -> stellar_xdr.Asset:
+    def to_xdr_object(self) -> stellar_xdr.Asset.Any:
         """Returns the xdr object for this asset.
 
         :return: XDR Asset object
         """
-        asset_xdr = self._to_xdr_object(stellar_xdr.Asset)
-        assert isinstance(asset_xdr, stellar_xdr.Asset)
-        return asset_xdr
+        alpha_num = self._to_xdr_alpha_num()
+        if alpha_num is None:
+            return stellar_xdr.Asset.Native()
+        if isinstance(alpha_num, stellar_xdr.AlphaNum4):
+            return stellar_xdr.Asset.CreditAlphaNum4(alpha_num)
+        return stellar_xdr.Asset.CreditAlphaNum12(alpha_num)
 
-    def to_change_trust_asset_xdr_object(self) -> stellar_xdr.ChangeTrustAsset:
+    def to_change_trust_asset_xdr_object(self) -> stellar_xdr.ChangeTrustAsset.Any:
         """Returns the xdr object for this asset.
 
         :return: XDR ChangeTrustAsset object
         """
-        asset_xdr = self._to_xdr_object(stellar_xdr.ChangeTrustAsset)
-        assert isinstance(asset_xdr, stellar_xdr.ChangeTrustAsset)
-        return asset_xdr
+        alpha_num = self._to_xdr_alpha_num()
+        if alpha_num is None:
+            return stellar_xdr.ChangeTrustAsset.Native()
+        if isinstance(alpha_num, stellar_xdr.AlphaNum4):
+            return stellar_xdr.ChangeTrustAsset.CreditAlphaNum4(alpha_num)
+        return stellar_xdr.ChangeTrustAsset.CreditAlphaNum12(alpha_num)
 
-    def to_trust_line_asset_xdr_object(self) -> stellar_xdr.TrustLineAsset:
+    def to_trust_line_asset_xdr_object(self) -> stellar_xdr.TrustLineAsset.Any:
         """Returns the xdr object for this asset.
 
         :return: XDR TrustLineAsset object
         """
-        asset_xdr = self._to_xdr_object(stellar_xdr.TrustLineAsset)
-        assert isinstance(asset_xdr, stellar_xdr.TrustLineAsset)
-        return asset_xdr
+        alpha_num = self._to_xdr_alpha_num()
+        if alpha_num is None:
+            return stellar_xdr.TrustLineAsset.Native()
+        if isinstance(alpha_num, stellar_xdr.AlphaNum4):
+            return stellar_xdr.TrustLineAsset.CreditAlphaNum4(alpha_num)
+        return stellar_xdr.TrustLineAsset.CreditAlphaNum12(alpha_num)
 
-    def _to_xdr_object(
+    def _to_xdr_alpha_num(
         self,
-        xdr_asset: (
-            builtins.type[stellar_xdr.Asset]
-            | builtins.type[stellar_xdr.ChangeTrustAsset]
-            | builtins.type[stellar_xdr.TrustLineAsset]
-        ),
-    ) -> stellar_xdr.Asset | stellar_xdr.ChangeTrustAsset | stellar_xdr.TrustLineAsset:
+    ) -> stellar_xdr.AlphaNum4 | stellar_xdr.AlphaNum12 | None:
+        """Returns the code and issuer of a non-native asset, or ``None`` for the native one."""
         if self.is_native():
-            asset_type = stellar_xdr.AssetType.ASSET_TYPE_NATIVE
-            return xdr_asset(type=asset_type)
-        else:
-            assert self.issuer is not None
-            length = len(self.code)
-            pad_length = 4 - length if length <= 4 else 12 - length
-            asset_code = bytes(bytearray(self.code, "ascii") + b"\x00" * pad_length)
-            issuer = Keypair.from_public_key(self.issuer).xdr_account_id()
-        if length <= 4:
-            xdr_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4
-            asset_code4 = stellar_xdr.AssetCode4(asset_code)
-            alpha_num4 = stellar_xdr.AlphaNum4(asset_code4, issuer)
-            return xdr_asset(type=xdr_type, alpha_num4=alpha_num4)
-        else:
-            xdr_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12
-            asset_code12 = stellar_xdr.AssetCode12(asset_code)
-            alpha_num12 = stellar_xdr.AlphaNum12(asset_code12, issuer)
-            return xdr_asset(type=xdr_type, alpha_num12=alpha_num12)
+            return None
+        assert self.issuer is not None
+        issuer = Keypair.from_public_key(self.issuer).xdr_account_id()
+        code = self.code.encode("ascii")
+        if len(code) <= 4:
+            return stellar_xdr.AlphaNum4(code.ljust(4, b"\x00"), issuer)
+        return stellar_xdr.AlphaNum12(code.ljust(12, b"\x00"), issuer)
 
     @classmethod
     def from_xdr_object(
         cls,
         xdr_object: (
-            stellar_xdr.Asset
-            | stellar_xdr.ChangeTrustAsset
-            | stellar_xdr.TrustLineAsset
+            stellar_xdr.Asset.Any
+            | stellar_xdr.ChangeTrustAsset.Any
+            | stellar_xdr.TrustLineAsset.Any
         ),
     ) -> "Asset":
         """Create a :class:`Asset` from an XDR Asset/ChangeTrustAsset/TrustLineAsset object.
@@ -219,30 +210,27 @@ class Asset:
         :param xdr_object: The XDR Asset/ChangeTrustAsset/TrustLineAsset object.
         :return: A new :class:`Asset` object from the given XDR object.
         """
-        if xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_NATIVE:
-            return Asset.native()
-        elif xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
-            assert xdr_object.alpha_num4 is not None
-            assert xdr_object.alpha_num4.issuer.account_id.ed25519 is not None
-            issuer = str(
-                Ed25519PublicKey(
-                    xdr_object.alpha_num4.issuer.account_id.ed25519.uint256
-                )
-            )
-            code = xdr_object.alpha_num4.asset_code.asset_code4.decode().rstrip("\x00")
-        elif xdr_object.type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
-            assert xdr_object.alpha_num12 is not None
-            assert xdr_object.alpha_num12.issuer.account_id.ed25519 is not None
-            issuer = str(
-                Ed25519PublicKey(
-                    xdr_object.alpha_num12.issuer.account_id.ed25519.uint256
-                )
-            )
-            code = xdr_object.alpha_num12.asset_code.asset_code12.decode().rstrip(
-                "\x00"
-            )
-        else:
-            raise ValueError(f"Invalid asset type: {xdr_object.type}")
+        alpha_num: stellar_xdr.AlphaNum4 | stellar_xdr.AlphaNum12
+        match xdr_object:
+            case (
+                stellar_xdr.Asset.Native()
+                | stellar_xdr.ChangeTrustAsset.Native()
+                | stellar_xdr.TrustLineAsset.Native()
+            ):
+                return Asset.native()
+            case (
+                stellar_xdr.Asset.CreditAlphaNum4(alpha_num)
+                | stellar_xdr.ChangeTrustAsset.CreditAlphaNum4(alpha_num)
+                | stellar_xdr.TrustLineAsset.CreditAlphaNum4(alpha_num)
+                | stellar_xdr.Asset.CreditAlphaNum12(alpha_num)
+                | stellar_xdr.ChangeTrustAsset.CreditAlphaNum12(alpha_num)
+                | stellar_xdr.TrustLineAsset.CreditAlphaNum12(alpha_num)
+            ):
+                pass
+            case _:
+                raise ValueError(f"Invalid asset type: {xdr_object.type}")
+        issuer = str(Ed25519PublicKey(alpha_num.issuer.ed25519))
+        code = alpha_num.asset_code.decode().rstrip("\x00")
         return cls(code, issuer)
 
     def __hash__(self) -> int:

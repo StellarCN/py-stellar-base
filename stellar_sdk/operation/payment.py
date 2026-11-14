@@ -47,14 +47,12 @@ class Payment(Operation):
         self.amount: str = str(amount)
         raise_if_not_valid_amount(self.amount, "amount")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         asset = self.asset.to_xdr_object()
         destination = self.destination.to_xdr_object()
-        amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
+        amount = Operation.to_xdr_amount(self.amount)
         payment_op = stellar_xdr.PaymentOp(destination, asset, amount)
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, payment_op=payment_op
-        )
+        body = stellar_xdr.OperationBody.Payment(payment_op)
         return body
 
     @classmethod
@@ -64,12 +62,11 @@ class Payment(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.payment_op is not None
-        destination = MuxedAccount.from_xdr_object(
-            xdr_object.body.payment_op.destination
-        )
-        asset = Asset.from_xdr_object(xdr_object.body.payment_op.asset)
-        amount = Operation.from_xdr_amount(xdr_object.body.payment_op.amount.int64)
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.Payment)
+        destination = MuxedAccount.from_xdr_object(body.payment_op.destination)
+        asset = Asset.from_xdr_object(body.payment_op.asset)
+        amount = Operation.from_xdr_amount(body.payment_op.amount)
         op = cls(source=source, destination=destination, asset=asset, amount=amount)
         return op
 

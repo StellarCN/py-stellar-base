@@ -59,7 +59,7 @@ class TestFeeBumpTransaction:
         assert restore_te == fee_bump_tx
         assert restore_te.transaction == fee_bump_tx.transaction
         assert restore_te.transaction == FeeBumpTransaction.from_xdr(
-            fee_bump_tx.transaction.to_xdr_object().to_xdr(),
+            fee_bump_tx.transaction.to_xdr_object().to_xdr_base64(),
             Network.TESTNET_NETWORK_PASSPHRASE,
         )
         restore_tx = restore_te.transaction
@@ -106,7 +106,7 @@ class TestFeeBumpTransaction:
         assert restore_te == fee_bump_tx
         assert restore_te.transaction == fee_bump_tx.transaction
         assert restore_te.transaction == FeeBumpTransaction.from_xdr(
-            fee_bump_tx.transaction.to_xdr_object().to_xdr(),
+            fee_bump_tx.transaction.to_xdr_object().to_xdr_base64(),
             Network.TESTNET_NETWORK_PASSPHRASE,
         )
         assert (
@@ -305,7 +305,7 @@ class TestFeeBumpTransaction:
         assert restore_te == fee_bump_tx
         assert restore_te.transaction == fee_bump_tx.transaction
         assert restore_te.transaction == FeeBumpTransaction.from_xdr(
-            fee_bump_tx.transaction.to_xdr_object().to_xdr(),
+            fee_bump_tx.transaction.to_xdr_object().to_xdr_base64(),
             Network.TESTNET_NETWORK_PASSPHRASE,
         )
         assert (

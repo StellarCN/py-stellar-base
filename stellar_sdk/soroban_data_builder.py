@@ -18,16 +18,16 @@ class SorobanDataBuilder:
 
     def __init__(self):
         self._data = stellar_xdr.SorobanTransactionData(
-            ext=stellar_xdr.SorobanTransactionDataExt(0),
-            resource_fee=stellar_xdr.Int64(0),
+            ext=stellar_xdr.SorobanTransactionDataExt.V0(),
+            resource_fee=0,
             resources=stellar_xdr.SorobanResources(
                 footprint=stellar_xdr.LedgerFootprint(
                     read_only=[],
                     read_write=[],
                 ),
-                disk_read_bytes=stellar_xdr.Uint32(0),
-                write_bytes=stellar_xdr.Uint32(0),
-                instructions=stellar_xdr.Uint32(0),
+                disk_read_bytes=0,
+                write_bytes=0,
+                instructions=0,
             ),
         )
 
@@ -42,11 +42,11 @@ class SorobanDataBuilder:
         """
         data = cls()
         if isinstance(soroban_data, str):
-            data._data = stellar_xdr.SorobanTransactionData.from_xdr(soroban_data)
-        else:
-            data._data = stellar_xdr.SorobanTransactionData.from_xdr_bytes(
-                soroban_data.to_xdr_bytes()
+            data._data = stellar_xdr.SorobanTransactionData.from_xdr_base64(
+                soroban_data
             )
+        else:
+            data._data = soroban_data
         return data
 
     def set_resource_fee(self, fee: int) -> SorobanDataBuilder:
@@ -55,29 +55,29 @@ class SorobanDataBuilder:
         :param fee: The resource fee to set (int64)
         :return: This builder.
         """
-        self._data.resource_fee = stellar_xdr.Int64(fee)
+        self._data = stellar_xdr.replace(self._data, resource_fee=fee)
         return self
 
     def set_read_only(
-        self, read_only: list[stellar_xdr.LedgerKey]
+        self, read_only: list[stellar_xdr.LedgerKey.Any]
     ) -> SorobanDataBuilder:
         """Sets the read-only portion of the storage access footprint to be a certain set of ledger keys.
 
         :param read_only: The read-only ledger keys to set.
         :return: This builder.
         """
-        self._data.resources.footprint.read_only = read_only or []
+        self._set_footprint(read_only=read_only or [])
         return self
 
     def set_read_write(
-        self, read_write: list[stellar_xdr.LedgerKey]
+        self, read_write: list[stellar_xdr.LedgerKey.Any]
     ) -> SorobanDataBuilder:
         """Sets the read-write portion of the storage access footprint to be a certain set of ledger keys.
 
         :param read_write: The read-write ledger keys to set.
         :return: This builder.
         """
-        self._data.resources.footprint.read_write = read_write or []
+        self._set_footprint(read_write=read_write or [])
         return self
 
     def set_resources(
@@ -93,13 +93,21 @@ class SorobanDataBuilder:
         :param write_bytes: Number of bytes being written to disk and memory (uint32)
         :return: This builder.
         """
-        self._data.resources.instructions = stellar_xdr.Uint32(instructions)
-        self._data.resources.disk_read_bytes = stellar_xdr.Uint32(disk_read_bytes)
-        self._data.resources.write_bytes = stellar_xdr.Uint32(write_bytes)
+        resources = stellar_xdr.replace(
+            self._data.resources,
+            instructions=instructions,
+            disk_read_bytes=disk_read_bytes,
+            write_bytes=write_bytes,
+        )
+        self._data = stellar_xdr.replace(self._data, resources=resources)
         return self
 
-    def build(self):
-        """:return: a copy of the final data structure."""
-        return stellar_xdr.SorobanTransactionData.from_xdr_bytes(
-            self._data.to_xdr_bytes()
-        )
+    def build(self) -> stellar_xdr.SorobanTransactionData:
+        """:return: the final data structure."""
+        return self._data
+
+    def _set_footprint(self, **changes: list[stellar_xdr.LedgerKey.Any]) -> None:
+        resources = self._data.resources
+        footprint = stellar_xdr.replace(resources.footprint, **changes)
+        resources = stellar_xdr.replace(resources, footprint=footprint)
+        self._data = stellar_xdr.replace(self._data, resources=resources)

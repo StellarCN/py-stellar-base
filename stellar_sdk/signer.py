@@ -70,9 +70,7 @@ class Signer:
 
         :return: XDR Signer object
         """
-        return stellar_xdr.Signer(
-            self.signer_key.to_xdr_object(), stellar_xdr.Uint32(self.weight)
-        )
+        return stellar_xdr.Signer(self.signer_key.to_xdr_object(), self.weight)
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Signer) -> "Signer":
@@ -81,7 +79,7 @@ class Signer:
         :param xdr_object: The XDR Signer object.
         :return: A new :class:`Signer` object from the given XDR Signer object.
         """
-        weight = xdr_object.weight.uint32
+        weight = xdr_object.weight
         signer_key = SignerKey.from_xdr_object(xdr_object.key)
         return cls(signer_key, weight)
 

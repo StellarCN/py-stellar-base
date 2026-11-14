@@ -60,7 +60,7 @@ class TestAccountMerge:
         op = AccountMerge(destination, source)
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
         if isinstance(destination, str):

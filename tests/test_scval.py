@@ -8,8 +8,9 @@ from stellar_sdk.address import Address
 from stellar_sdk.scval import *
 from stellar_sdk.scval import (
     _compare_contract_executable,
-    _compare_optional_sc_map,
+    _compare_optional_sequence,
     _compare_sc_address,
+    _compare_sc_map_entry,
     _compare_sc_val,
 )
 
@@ -67,20 +68,16 @@ from stellar_sdk.scval import (
             Address("GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX"),
         ),
         (
-            stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE),
-            stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE),
+            stellar_xdr.SCVal.LedgerKeyContractInstance(),
+            stellar_xdr.SCVal.LedgerKeyContractInstance(),
         ),
         (
-            stellar_xdr.SCVal(
-                stellar_xdr.SCValType.SCV_EXECUTABLE_TAG,
-                executable_tag=stellar_xdr.SCString(b"v1"),
-            ),
+            stellar_xdr.SCVal.ExecutableTag(stellar_xdr.SCString(b"v1")),
             "v1",
         ),
         (
-            stellar_xdr.SCVal(
-                stellar_xdr.SCValType.SCV_EXECUTABLE_TAG,
-                executable_tag=stellar_xdr.SCString(b"\t\xd0Y\x17Ap}\x96\xces"),
+            stellar_xdr.SCVal.ExecutableTag(
+                stellar_xdr.SCString(b"\t\xd0Y\x17Ap}\x96\xces")
             ),
             b"\t\xd0Y\x17Ap}\x96\xces",
         ),
@@ -98,46 +95,44 @@ def test_address():
     expected_scval = addr.to_xdr_sc_val()
     assert scval == expected_scval
     assert from_address(scval) == addr
-    assert from_address(scval.to_xdr()) == addr
+    assert from_address(scval.to_xdr_base64()) == addr
     assert from_address(scval.to_xdr_bytes()) == addr
 
 
 def test_bool():
     scval = to_bool(True)
-    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_BOOL, b=True)
+    expected_scval = xdr.SCVal.Bool(True)
     assert scval == expected_scval
     assert from_bool(scval) is True
 
 
 def test_void():
     scval = to_void()
-    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_VOID)
+    expected_scval = xdr.SCVal.Void()
     assert scval == expected_scval
     assert from_void(scval) is None
-    assert from_void(scval.to_xdr()) is None
+    assert from_void(scval.to_xdr_base64()) is None
     assert from_void(scval.to_xdr_bytes()) is None
 
 
 def test_bytes():
     v = b"hello"
     scval = to_bytes(v)
-    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_BYTES, bytes=xdr.SCBytes(v))
+    expected_scval = xdr.SCVal.Bytes(xdr.SCBytes(v))
     assert scval == expected_scval
     assert from_bytes(scval) == v
-    assert from_bytes(scval.to_xdr()) == v
+    assert from_bytes(scval.to_xdr_base64()) == v
     assert from_bytes(scval.to_xdr_bytes()) == v
 
 
 @pytest.mark.parametrize("v", [(2**64) - 1, 0])
 def test_duration(v):
     scval = to_duration(v)
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_DURATION, duration=xdr.Duration(xdr.Uint64(v))
-    )
+    expected_scval = xdr.SCVal.Duration(xdr.Duration(v))
 
     assert scval == expected_scval
     assert from_duration(scval) == v
-    assert from_duration(scval.to_xdr()) == v
+    assert from_duration(scval.to_xdr_base64()) == v
     assert from_duration(scval.to_xdr_bytes()) == v
 
 
@@ -151,10 +146,10 @@ def test_duration_out_of_range_raise(v):
 @pytest.mark.parametrize("v", [2**31 - 1, -(2**31)])
 def test_int32(v):
     scval = to_int32(v)
-    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_I32, i32=xdr.Int32(v))
+    expected_scval = xdr.SCVal.I32(v)
     assert scval == expected_scval
     assert from_int32(scval) == v
-    assert from_int32(scval.to_xdr()) == v
+    assert from_int32(scval.to_xdr_base64()) == v
     assert from_int32(scval.to_xdr_bytes()) == v
 
 
@@ -167,10 +162,10 @@ def test_int32_out_of_range_raise(v):
 @pytest.mark.parametrize("v", [2**63 - 1, -(2**63)])
 def test_int64(v):
     scval = to_int64(v)
-    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_I64, i64=xdr.Int64(v))
+    expected_scval = xdr.SCVal.I64(v)
     assert scval == expected_scval
     assert from_int64(scval) == v
-    assert from_int64(scval.to_xdr()) == v
+    assert from_int64(scval.to_xdr_base64()) == v
     assert from_int64(scval.to_xdr_bytes()) == v
 
 
@@ -194,9 +189,9 @@ def test_int64_out_of_range_raise(v):
 )
 def test_int128(v, expected_xdr):
     scval = to_int128(v)
-    assert scval.to_xdr() == expected_xdr
+    assert scval.to_xdr_base64() == expected_xdr
     assert from_int128(scval) == v
-    assert from_int128(scval.to_xdr()) == v
+    assert from_int128(scval.to_xdr_base64()) == v
     assert from_int128(scval.to_xdr_bytes()) == v
 
 
@@ -227,9 +222,9 @@ def test_int128_out_of_range_raise(v):
 )
 def test_int256(v, expected_xdr):
     scval = to_int256(v)
-    assert scval.to_xdr() == expected_xdr
+    assert scval.to_xdr_base64() == expected_xdr
     assert from_int256(scval) == v
-    assert from_int256(scval.to_xdr()) == v
+    assert from_int256(scval.to_xdr_base64()) == v
     assert from_int256(scval.to_xdr_bytes()) == v
 
 
@@ -246,15 +241,14 @@ def test_map():
         to_string("hello2"): to_string("world"),
     }
     scval = to_map(v)
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_MAP,
-        map=xdr.SCMap(
+    expected_scval = xdr.SCVal.Map(
+        xdr.SCMap(
             [
                 xdr.SCMapEntry(to_string("hello2"), to_string("world")),
                 xdr.SCMapEntry(to_symbol("hello1"), to_int256(23423432)),
                 xdr.SCMapEntry(to_symbol("hello3"), to_int32(1)),
             ]
-        ),
+        )
     )
     assert scval == expected_scval
 
@@ -267,8 +261,9 @@ def test_map_to_map_sorts_keys():
         to_uint32(2): to_void(),
     }
     scval = to_map(v)
+    assert isinstance(scval, stellar_xdr.SCVal.Map)
     assert scval.map is not None
-    keys = [entry.key for entry in scval.map.sc_map]
+    keys = [entry.key for entry in scval.map]
     assert keys == [to_uint32(1), to_uint32(2), to_uint32(3)]
 
 
@@ -282,8 +277,9 @@ def test_map_to_map_strictly_increasing():
         to_int32(-1): to_void(),
     }
     scval = to_map(v)
+    assert isinstance(scval, stellar_xdr.SCVal.Map)
     assert scval.map is not None
-    keys = [entry.key for entry in scval.map.sc_map]
+    keys = [entry.key for entry in scval.map]
     for i in range(len(keys) - 1):
         assert _compare_sc_val(keys[i], keys[i + 1]) < 0, (
             f"keys[{i}] not strictly less than keys[{i + 1}]"
@@ -298,8 +294,9 @@ def test_map_to_map_mixed_types():
         to_bool(True): to_int32(3),
     }
     scval = to_map(v)
+    assert isinstance(scval, stellar_xdr.SCVal.Map)
     assert scval.map is not None
-    keys = [entry.key for entry in scval.map.sc_map]
+    keys = [entry.key for entry in scval.map]
     # SCV_BOOL(0) < SCV_U32(3) < SCV_SYMBOL(15)
     assert keys == [to_bool(True), to_uint32(42), to_symbol("x")]
 
@@ -313,8 +310,9 @@ def test_map_to_map_signed_negative_boundaries():
         to_int32(-1): to_void(),
     }
     scval = to_map(v)
+    assert isinstance(scval, stellar_xdr.SCVal.Map)
     assert scval.map is not None
-    keys = [entry.key for entry in scval.map.sc_map]
+    keys = [entry.key for entry in scval.map]
     assert keys == [
         to_int32(-(2**31)),
         to_int32(-1),
@@ -332,8 +330,9 @@ def test_map_to_map_signed_i128_negative():
         to_int128(-1): to_void(),
     }
     scval = to_map(v)
+    assert isinstance(scval, stellar_xdr.SCVal.Map)
     assert scval.map is not None
-    keys = [entry.key for entry in scval.map.sc_map]
+    keys = [entry.key for entry in scval.map]
     assert keys == [
         to_int128(-(2**127)),
         to_int128(-1),
@@ -350,129 +349,92 @@ def test_map_to_map_already_sorted_idempotent():
         to_uint32(3): to_int32(30),
     }
     scval = to_map(v)
+    assert isinstance(scval, stellar_xdr.SCVal.Map)
     assert scval.map is not None
-    keys = [entry.key for entry in scval.map.sc_map]
+    keys = [entry.key for entry in scval.map]
     assert keys == [to_uint32(1), to_uint32(2), to_uint32(3)]
 
 
 class TestCompareScVal:
     """Tests for _compare_sc_val, _compare_sc_address,
-    _compare_contract_executable, and _compare_optional_sc_map."""
+    _compare_contract_executable, and _compare_optional_sequence."""
 
     @staticmethod
-    def _make_error_contract(code: int) -> stellar_xdr.SCVal:
-        return stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_ERROR,
-            error=stellar_xdr.SCError(
-                type=stellar_xdr.SCErrorType.SCE_CONTRACT,
-                contract_code=stellar_xdr.Uint32(code),
-            ),
-        )
+    def _make_error_contract(code: int) -> stellar_xdr.SCVal.Any:
+        return stellar_xdr.SCVal.Error(stellar_xdr.SCError.Contract(code))
 
     @staticmethod
-    def _make_error_wasm(code: stellar_xdr.SCErrorCode) -> stellar_xdr.SCVal:
-        return stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_ERROR,
-            error=stellar_xdr.SCError(
-                type=stellar_xdr.SCErrorType.SCE_WASM_VM,
-                code=code,
-            ),
-        )
+    def _make_error_wasm(code: stellar_xdr.SCErrorCode) -> stellar_xdr.SCVal.Any:
+        return stellar_xdr.SCVal.Error(stellar_xdr.SCError.WasmVm(code))
 
     @staticmethod
     def _make_wasm_instance(
         wasm_hash: bytes, storage: stellar_xdr.SCMap | None = None
-    ) -> stellar_xdr.SCVal:
-        return stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_CONTRACT_INSTANCE,
-            instance=stellar_xdr.SCContractInstance(
-                executable=stellar_xdr.ContractExecutable(
-                    type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
-                    wasm_hash=stellar_xdr.Hash(wasm_hash),
+    ) -> stellar_xdr.SCVal.Any:
+        return stellar_xdr.SCVal.ContractInstance(
+            stellar_xdr.SCContractInstance(
+                executable=stellar_xdr.ContractExecutable.Wasm(
+                    stellar_xdr.Hash(wasm_hash)
                 ),
                 storage=storage,
-            ),
+            )
         )
 
     @staticmethod
     def _make_stellar_asset_instance(
         storage: stellar_xdr.SCMap | None = None,
-    ) -> stellar_xdr.SCVal:
-        return stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_CONTRACT_INSTANCE,
-            instance=stellar_xdr.SCContractInstance(
-                executable=stellar_xdr.ContractExecutable(
-                    type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
-                ),
+    ) -> stellar_xdr.SCVal.Any:
+        return stellar_xdr.SCVal.ContractInstance(
+            stellar_xdr.SCContractInstance(
+                executable=stellar_xdr.ContractExecutable.StellarAsset(),
                 storage=storage,
-            ),
+            )
         )
 
     @staticmethod
-    def _make_nonce(v: int) -> stellar_xdr.SCVal:
-        return stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_LEDGER_KEY_NONCE,
-            nonce_key=stellar_xdr.SCNonceKey(nonce=stellar_xdr.Int64(v)),
+    def _make_nonce(v: int) -> stellar_xdr.SCVal.Any:
+        return stellar_xdr.SCVal.LedgerKeyNonce(stellar_xdr.SCNonceKey(nonce=v))
+
+    @staticmethod
+    def _account_address(key: bytes) -> stellar_xdr.SCAddress.Any:
+        return stellar_xdr.SCAddress.Account(
+            stellar_xdr.PublicKey.Ed25519(stellar_xdr.Uint256(key))
         )
 
     @staticmethod
-    def _account_address(key: bytes) -> stellar_xdr.SCAddress:
-        return stellar_xdr.SCAddress(
-            type=stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_ACCOUNT,
-            account_id=stellar_xdr.AccountID(
-                stellar_xdr.PublicKey(
-                    type=stellar_xdr.PublicKeyType.PUBLIC_KEY_TYPE_ED25519,
-                    ed25519=stellar_xdr.Uint256(key),
-                )
-            ),
+    def _contract_address(hash_bytes: bytes) -> stellar_xdr.SCAddress.Any:
+        return stellar_xdr.SCAddress.Contract(
+            stellar_xdr.ContractID(stellar_xdr.Hash(hash_bytes))
         )
 
     @staticmethod
-    def _contract_address(hash_bytes: bytes) -> stellar_xdr.SCAddress:
-        return stellar_xdr.SCAddress(
-            type=stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CONTRACT,
-            contract_id=stellar_xdr.ContractID(stellar_xdr.Hash(hash_bytes)),
+    def _claimable_balance_address(hash_bytes: bytes) -> stellar_xdr.SCAddress.Any:
+        return stellar_xdr.SCAddress.ClaimableBalance(
+            stellar_xdr.ClaimableBalanceID.V0(stellar_xdr.Hash(hash_bytes))
         )
 
     @staticmethod
-    def _claimable_balance_address(hash_bytes: bytes) -> stellar_xdr.SCAddress:
-        return stellar_xdr.SCAddress(
-            type=stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE,
-            claimable_balance_id=stellar_xdr.ClaimableBalanceID(
-                type=stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0,
-                v0=stellar_xdr.Hash(hash_bytes),
-            ),
-        )
+    def _liquidity_pool_address(hash_bytes: bytes) -> stellar_xdr.SCAddress.Any:
+        return stellar_xdr.SCAddress.LiquidityPool(hash_bytes)
 
     @staticmethod
-    def _liquidity_pool_address(hash_bytes: bytes) -> stellar_xdr.SCAddress:
-        return stellar_xdr.SCAddress(
-            type=stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL,
-            liquidity_pool_id=stellar_xdr.PoolID(
-                pool_id=stellar_xdr.Hash(hash_bytes),
-            ),
-        )
-
-    @staticmethod
-    def _muxed_address(id_val: int, key: bytes) -> stellar_xdr.SCAddress:
-        return stellar_xdr.SCAddress(
-            type=stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT,
-            muxed_account=stellar_xdr.MuxedEd25519Account(
-                id=stellar_xdr.Uint64(id_val),
+    def _muxed_address(id_val: int, key: bytes) -> stellar_xdr.SCAddress.Any:
+        return stellar_xdr.SCAddress.MuxedAccount(
+            stellar_xdr.MuxedEd25519Account(
+                id=id_val,
                 ed25519=stellar_xdr.Uint256(key),
-            ),
+            )
         )
 
     @staticmethod
     def _muxed_contract_address(
         id_val: int, hash_bytes: bytes
-    ) -> stellar_xdr.SCAddress:
-        return stellar_xdr.SCAddress(
-            type=stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT,
-            muxed_contract=stellar_xdr.MuxedContract(
-                id=stellar_xdr.Uint64(id_val),
+    ) -> stellar_xdr.SCAddress.Any:
+        return stellar_xdr.SCAddress.MuxedContract(
+            stellar_xdr.MuxedContract(
+                id=id_val,
                 contract_id=stellar_xdr.ContractID(stellar_xdr.Hash(hash_bytes)),
-            ),
+            )
         )
 
     def test_cross_type(self):
@@ -491,8 +453,8 @@ class TestCompareScVal:
         assert _compare_sc_val(to_void(), to_void()) == 0
 
     def test_ledger_key_contract_instance(self):
-        a = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
-        b = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
+        a = stellar_xdr.SCVal.LedgerKeyContractInstance()
+        b = stellar_xdr.SCVal.LedgerKeyContractInstance()
         assert _compare_sc_val(a, b) == 0
 
     def test_u32(self):
@@ -581,40 +543,34 @@ class TestCompareScVal:
         assert _compare_sc_val(a, b) == 0
 
     def test_map_by_key(self):
-        a = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_MAP,
-            map=stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_void())]),
+        a = stellar_xdr.SCVal.Map(
+            stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_void())])
         )
-        b = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_MAP,
-            map=stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(2), to_void())]),
+        b = stellar_xdr.SCVal.Map(
+            stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(2), to_void())])
         )
         assert _compare_sc_val(a, b) < 0
 
     def test_map_by_val(self):
-        a = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_MAP,
-            map=stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_int32(10))]),
+        a = stellar_xdr.SCVal.Map(
+            stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_int32(10))])
         )
-        b = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_MAP,
-            map=stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_int32(20))]),
+        b = stellar_xdr.SCVal.Map(
+            stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_int32(20))])
         )
         assert _compare_sc_val(a, b) < 0
 
     def test_map_shorter_is_less(self):
-        a = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_MAP,
-            map=stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_void())]),
+        a = stellar_xdr.SCVal.Map(
+            stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_void())])
         )
-        b = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_MAP,
-            map=stellar_xdr.SCMap(
+        b = stellar_xdr.SCVal.Map(
+            stellar_xdr.SCMap(
                 [
                     stellar_xdr.SCMapEntry(to_uint32(1), to_void()),
                     stellar_xdr.SCMapEntry(to_uint32(2), to_void()),
                 ]
-            ),
+            )
         )
         assert _compare_sc_val(a, b) < 0
         assert _compare_sc_val(b, a) > 0
@@ -746,49 +702,35 @@ class TestCompareScVal:
             assert _compare_sc_address(addrs[i], addrs[i + 1]) < 0
 
     def test_executable_different_type(self):
-        wasm = stellar_xdr.ContractExecutable(
-            type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
-            wasm_hash=stellar_xdr.Hash(b"\x00" * 32),
-        )
-        asset = stellar_xdr.ContractExecutable(
-            type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
-        )
+        wasm = stellar_xdr.ContractExecutable.Wasm(stellar_xdr.Hash(b"\x00" * 32))
+        asset = stellar_xdr.ContractExecutable.StellarAsset()
         assert _compare_contract_executable(wasm, asset) < 0
 
     def test_executable_wasm_hash(self):
-        a = stellar_xdr.ContractExecutable(
-            type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
-            wasm_hash=stellar_xdr.Hash(b"\x00" * 32),
-        )
-        b = stellar_xdr.ContractExecutable(
-            type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
-            wasm_hash=stellar_xdr.Hash(b"\x00" * 31 + b"\x01"),
+        a = stellar_xdr.ContractExecutable.Wasm(stellar_xdr.Hash(b"\x00" * 32))
+        b = stellar_xdr.ContractExecutable.Wasm(
+            stellar_xdr.Hash(b"\x00" * 31 + b"\x01")
         )
         assert _compare_contract_executable(a, b) < 0
         assert _compare_contract_executable(a, a) == 0
 
     def test_executable_stellar_asset_equal(self):
-        a = stellar_xdr.ContractExecutable(
-            type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
-        )
+        a = stellar_xdr.ContractExecutable.StellarAsset()
         assert _compare_contract_executable(a, a) == 0
 
     @staticmethod
     def _external_ref_executable(
         owner: bytes, tag: bytes
-    ) -> stellar_xdr.ContractExecutable:
-        return stellar_xdr.ContractExecutable(
-            type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF,
-            external_ref=stellar_xdr.ContractExecutableExternalRef(
+    ) -> stellar_xdr.ContractExecutable.Any:
+        return stellar_xdr.ContractExecutable.ExternalRef(
+            stellar_xdr.ContractExecutableExternalRef(
                 executable_owner=TestCompareScVal._contract_address(owner),
                 tag=stellar_xdr.SCString(tag),
-            ),
+            )
         )
 
     def test_executable_external_ref_after_stellar_asset(self):
-        asset = stellar_xdr.ContractExecutable(
-            type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
-        )
+        asset = stellar_xdr.ContractExecutable.StellarAsset()
         external_ref = self._external_ref_executable(b"\x00" * 32, b"v1")
         assert _compare_contract_executable(asset, external_ref) < 0
         assert _compare_contract_executable(external_ref, asset) > 0
@@ -807,11 +749,8 @@ class TestCompareScVal:
         assert _compare_contract_executable(a, a) == 0
 
     @staticmethod
-    def _executable_tag(tag: bytes) -> stellar_xdr.SCVal:
-        return stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_EXECUTABLE_TAG,
-            executable_tag=stellar_xdr.SCString(tag),
-        )
+    def _executable_tag(tag: bytes) -> stellar_xdr.SCVal.Any:
+        return stellar_xdr.SCVal.ExecutableTag(stellar_xdr.SCString(tag))
 
     def test_executable_tag(self):
         a, b, c = (
@@ -825,50 +764,45 @@ class TestCompareScVal:
 
     def test_executable_tag_is_the_highest_discriminant(self):
         # SCV_LEDGER_KEY_NONCE(21) < SCV_EXECUTABLE_TAG(22)
-        nonce = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_LEDGER_KEY_NONCE,
-            nonce_key=stellar_xdr.SCNonceKey(stellar_xdr.Int64(0)),
-        )
+        nonce = stellar_xdr.SCVal.LedgerKeyNonce(stellar_xdr.SCNonceKey(0))
         tag = self._executable_tag(b"v1")
         assert _compare_sc_val(nonce, tag) < 0
         assert _compare_sc_val(tag, nonce) > 0
 
     def test_instance_by_external_ref(self):
-        a = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_CONTRACT_INSTANCE,
-            instance=stellar_xdr.SCContractInstance(
+        a = stellar_xdr.SCVal.ContractInstance(
+            stellar_xdr.SCContractInstance(
                 executable=self._external_ref_executable(b"\x00" * 32, b"v1"),
                 storage=None,
-            ),
+            )
         )
-        b = stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_CONTRACT_INSTANCE,
-            instance=stellar_xdr.SCContractInstance(
+        b = stellar_xdr.SCVal.ContractInstance(
+            stellar_xdr.SCContractInstance(
                 executable=self._external_ref_executable(b"\x00" * 32, b"v2"),
                 storage=None,
-            ),
+            )
         )
         assert _compare_sc_val(a, b) < 0
         assert _compare_sc_val(b, a) > 0
         assert _compare_sc_val(a, a) == 0
 
     def test_optional_map_none_none(self):
-        assert _compare_optional_sc_map(None, None) == 0
+        assert _compare_optional_sequence(None, None, _compare_sc_map_entry) == 0
 
     def test_optional_map_none_vs_some(self):
         m = stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_void())])
-        assert _compare_optional_sc_map(None, m) < 0
-        assert _compare_optional_sc_map(m, None) > 0
+        assert _compare_optional_sequence(None, m, _compare_sc_map_entry) < 0
+        assert _compare_optional_sequence(m, None, _compare_sc_map_entry) > 0
 
     def test_optional_map_by_key(self):
         m1 = stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_void())])
         m2 = stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(2), to_void())])
-        assert _compare_optional_sc_map(m1, m2) < 0
+        assert _compare_optional_sequence(m1, m2, _compare_sc_map_entry) < 0
 
     def test_optional_map_by_val(self):
         m1 = stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_int32(10))])
         m2 = stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_int32(20))])
-        assert _compare_optional_sc_map(m1, m2) < 0
+        assert _compare_optional_sequence(m1, m2, _compare_sc_map_entry) < 0
 
     def test_optional_map_shorter_is_less(self):
         m1 = stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_void())])
@@ -878,11 +812,11 @@ class TestCompareScVal:
                 stellar_xdr.SCMapEntry(to_uint32(2), to_void()),
             ]
         )
-        assert _compare_optional_sc_map(m1, m2) < 0
+        assert _compare_optional_sequence(m1, m2, _compare_sc_map_entry) < 0
 
     def test_optional_map_equal(self):
         m = stellar_xdr.SCMap([stellar_xdr.SCMapEntry(to_uint32(1), to_int32(42))])
-        assert _compare_optional_sc_map(m, m) == 0
+        assert _compare_optional_sequence(m, m, _compare_sc_map_entry) == 0
 
     _ANTISYMMETRY_PAIRS = [  # noqa: RUF012
         (to_bool(False), to_bool(True)),
@@ -910,7 +844,7 @@ class TestCompareScVal:
         _ANTISYMMETRY_PAIRS,
         ids=[f"pair{i}" for i in range(len(_ANTISYMMETRY_PAIRS))],
     )
-    def test_antisymmetry(self, a: stellar_xdr.SCVal, b: stellar_xdr.SCVal):
+    def test_antisymmetry(self, a: stellar_xdr.SCVal.Any, b: stellar_xdr.SCVal.Any):
         """cmp(a, b) == -cmp(b, a) for all pairs."""
         assert _compare_sc_val(a, b) == -_compare_sc_val(b, a)
 
@@ -931,9 +865,9 @@ class TestCompareScVal:
     )
     def test_transitivity(
         self,
-        a: stellar_xdr.SCVal,
-        b: stellar_xdr.SCVal,
-        c: stellar_xdr.SCVal,
+        a: stellar_xdr.SCVal.Any,
+        b: stellar_xdr.SCVal.Any,
+        c: stellar_xdr.SCVal.Any,
     ):
         """a < b and b < c implies a < c."""
         assert _compare_sc_val(a, b) < 0
@@ -960,10 +894,10 @@ def test_string(v):
 
     if isinstance(v, str):
         v = v.encode("utf-8")
-    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_STRING, str=xdr.SCString(v))
+    expected_scval = xdr.SCVal.String(xdr.SCString(v))
     assert scval == expected_scval
     assert from_string(scval) == v
-    assert from_string(scval.to_xdr()) == v
+    assert from_string(scval.to_xdr_base64()) == v
     assert from_string(scval.to_xdr_bytes()) == v
 
 
@@ -973,12 +907,10 @@ def test_executable_tag(v):
 
     if isinstance(v, str):
         v = v.encode("utf-8")
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_EXECUTABLE_TAG, executable_tag=xdr.SCString(v)
-    )
+    expected_scval = xdr.SCVal.ExecutableTag(xdr.SCString(v))
     assert sc_val == expected_scval
     assert from_executable_tag(sc_val) == v
-    assert from_executable_tag(sc_val.to_xdr()) == v
+    assert from_executable_tag(sc_val.to_xdr_base64()) == v
     assert from_executable_tag(sc_val.to_xdr_bytes()) == v
 
 
@@ -1006,24 +938,20 @@ def test_from_executable_tag_rejects_other_type():
 def test_symbol():
     v = "increment"
     scval = to_symbol(v)
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_SYMBOL, sym=xdr.SCSymbol(v.encode("utf-8"))
-    )
+    expected_scval = xdr.SCVal.Symbol(xdr.SCSymbol(v.encode("utf-8")))
     assert scval == expected_scval
     assert from_symbol(scval) == v
-    assert from_symbol(scval.to_xdr()) == v
+    assert from_symbol(scval.to_xdr_base64()) == v
     assert from_symbol(scval.to_xdr_bytes()) == v
 
 
 def test_timepoint():
     v = 1234567890
     scval = to_timepoint(v)
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_TIMEPOINT, timepoint=xdr.TimePoint(xdr.Uint64(v))
-    )
+    expected_scval = xdr.SCVal.TimePoint(xdr.TimePoint(v))
     assert scval == expected_scval
     assert from_timepoint(scval) == v
-    assert from_timepoint(scval.to_xdr()) == v
+    assert from_timepoint(scval.to_xdr_base64()) == v
     assert from_timepoint(scval.to_xdr_bytes()) == v
 
 
@@ -1036,10 +964,10 @@ def test_timepoint_out_of_range_raise(v):
 @pytest.mark.parametrize("v", [2**32 - 1, 0])
 def test_uint32(v):
     scval = to_uint32(v)
-    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_U32, u32=xdr.Uint32(v))
+    expected_scval = xdr.SCVal.U32(v)
     assert scval == expected_scval
     assert from_uint32(scval) == v
-    assert from_uint32(scval.to_xdr()) == v
+    assert from_uint32(scval.to_xdr_base64()) == v
     assert from_uint32(scval.to_xdr_bytes()) == v
 
 
@@ -1052,10 +980,10 @@ def test_uint32_out_of_range_raise(v):
 @pytest.mark.parametrize("v", [2**64 - 1, 0])
 def test_uint64(v):
     scval = to_uint64(v)
-    expected_scval = xdr.SCVal(stellar_xdr.SCValType.SCV_U64, u64=xdr.Uint64(v))
+    expected_scval = xdr.SCVal.U64(v)
     assert scval == expected_scval
     assert from_uint64(scval) == v
-    assert from_uint64(scval.to_xdr()) == v
+    assert from_uint64(scval.to_xdr_base64()) == v
     assert from_uint64(scval.to_xdr_bytes()) == v
 
 
@@ -1076,9 +1004,9 @@ def test_uint64_out_of_range_raise(v):
 )
 def test_uint128(v, expected_xdr):
     scval = to_uint128(v)
-    assert scval.to_xdr() == expected_xdr
+    assert scval.to_xdr_base64() == expected_xdr
     assert from_uint128(scval) == v
-    assert from_uint128(scval.to_xdr()) == v
+    assert from_uint128(scval.to_xdr_base64()) == v
     assert from_uint128(scval.to_xdr_bytes()) == v
 
 
@@ -1104,9 +1032,9 @@ def test_uint128_out_of_range_raise(v):
 )
 def test_uint256(v, expected_xdr):
     scval = to_uint256(v)
-    assert scval.to_xdr() == expected_xdr
+    assert scval.to_xdr_base64() == expected_xdr
     assert from_uint256(scval) == v
-    assert from_uint256(scval.to_xdr()) == v
+    assert from_uint256(scval.to_xdr_base64()) == v
     assert from_uint256(scval.to_xdr_bytes()) == v
 
 
@@ -1119,19 +1047,18 @@ def test_uint256_out_of_range_raise(v):
 def test_vec():
     v = [to_int32(1), to_int256(23423432), to_string("world")]
     scval = to_vec(v)
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_VEC,
-        vec=xdr.SCVec(
+    expected_scval = xdr.SCVal.Vec(
+        xdr.SCVec(
             [
                 to_int32(1),
                 to_int256(23423432),
                 to_string("world"),
             ]
-        ),
+        )
     )
     assert scval == expected_scval
     assert from_vec(scval) == v
-    assert from_vec(scval.to_xdr()) == v
+    assert from_vec(scval.to_xdr_base64()) == v
     assert from_vec(scval.to_xdr_bytes()) == v
 
 
@@ -1139,12 +1066,10 @@ def test_enum_with_value():
     key = "Address"
     value = to_address("GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX")
     scval = to_enum(key, value)
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_VEC, vec=xdr.SCVec([to_symbol(key), value])
-    )
+    expected_scval = xdr.SCVal.Vec(xdr.SCVec([to_symbol(key), value]))
     assert scval == expected_scval
     assert from_enum(scval) == (key, value)
-    assert from_enum(scval.to_xdr()) == (key, value)
+    assert from_enum(scval.to_xdr_base64()) == (key, value)
     assert from_enum(scval.to_xdr_bytes()) == (key, value)
 
 
@@ -1156,37 +1081,32 @@ def test_enum_with_multi_values():
     )
     value = [v1, v2]
     scval = to_enum(key, value)
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_VEC, vec=xdr.SCVec([to_symbol(key), v1, v2])
-    )
+    expected_scval = xdr.SCVal.Vec(xdr.SCVec([to_symbol(key), v1, v2]))
     assert scval == expected_scval
     assert from_enum(scval) == (key, value)
-    assert from_enum(scval.to_xdr()) == (key, value)
+    assert from_enum(scval.to_xdr_base64()) == (key, value)
     assert from_enum(scval.to_xdr_bytes()) == (key, value)
 
 
 def test_enum_without_value():
     key = "Address"
     scval = to_enum(key, None)
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_VEC, vec=xdr.SCVec([to_symbol(key)])
-    )
+    expected_scval = xdr.SCVal.Vec(xdr.SCVec([to_symbol(key)]))
     assert scval == expected_scval
     assert from_enum(scval) == (key, None)
-    assert from_enum(scval.to_xdr()) == (key, None)
+    assert from_enum(scval.to_xdr_base64()) == (key, None)
     assert from_enum(scval.to_xdr_bytes()) == (key, None)
 
 
 def test_tuple_struct():
     v = [to_int32(1), to_int256(23423432), to_string("world")]
     scval = to_tuple_struct(v)
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_VEC,
-        vec=xdr.SCVec([to_int32(1), to_int256(23423432), to_string("world")]),
+    expected_scval = xdr.SCVal.Vec(
+        xdr.SCVec([to_int32(1), to_int256(23423432), to_string("world")])
     )
     assert scval == expected_scval
     assert from_tuple_struct(scval) == v
-    assert from_tuple_struct(scval.to_xdr()) == v
+    assert from_tuple_struct(scval.to_xdr_base64()) == v
     assert from_tuple_struct(scval.to_xdr_bytes()) == v
 
 
@@ -1204,9 +1124,8 @@ def test_struct():
         ),
     }
     scval = to_struct(v)
-    expected_scval = xdr.SCVal(
-        stellar_xdr.SCValType.SCV_MAP,
-        map=xdr.SCMap(
+    expected_scval = xdr.SCVal.Map(
+        xdr.SCMap(
             [
                 xdr.SCMapEntry(
                     to_symbol("A"),
@@ -1225,9 +1144,9 @@ def test_struct():
                 xdr.SCMapEntry(to_symbol("data"), to_string("world")),
                 xdr.SCMapEntry(to_symbol("simpleData"), to_int32(1)),
             ]
-        ),
+        )
     )
     assert scval == expected_scval
     assert from_struct(scval) == v
-    assert from_struct(scval.to_xdr()) == v
+    assert from_struct(scval.to_xdr_base64()) == v
     assert from_struct(scval.to_xdr_bytes()) == v

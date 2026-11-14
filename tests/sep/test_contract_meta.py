@@ -82,12 +82,7 @@ def test_contract_meta_value_semantics_and_decode_errors():
         setattr(meta, "entries", ())  # noqa: B010
 
     invalid = ContractMeta(
-        (
-            stellar_xdr.SCMetaEntry(
-                stellar_xdr.SCMetaKind.SC_META_V0,
-                v0=stellar_xdr.SCMetaV0(b"key", b"\xff"),
-            ),
-        )
+        (stellar_xdr.SCMetaEntry.V0(stellar_xdr.SCMetaV0(b"key", b"\xff")),)
     )
     with pytest.raises(InvalidWasmError, match="non-UTF-8"):
         invalid.items()

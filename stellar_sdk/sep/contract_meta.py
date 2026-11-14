@@ -23,11 +23,11 @@ class ContractMeta:
 
     __slots__ = ("_entries",)
 
-    def __init__(self, entries: tuple[stellar_xdr.SCMetaEntry, ...] = ()) -> None:
+    def __init__(self, entries: tuple[stellar_xdr.SCMetaEntry.Any, ...] = ()) -> None:
         self._entries = tuple(entries)
 
     @property
-    def entries(self) -> tuple[stellar_xdr.SCMetaEntry, ...]:
+    def entries(self) -> tuple[stellar_xdr.SCMetaEntry.Any, ...]:
         """Returns the raw SEP-46 metadata XDR entries."""
         return self._entries
 
@@ -39,7 +39,7 @@ class ContractMeta:
         :return: A :class:`ContractMeta` object.
         :raises InvalidWasmError: If the Wasm module or metadata section cannot be decoded.
         """
-        entries: list[stellar_xdr.SCMetaEntry] = []
+        entries: list[stellar_xdr.SCMetaEntry.Any] = []
         for section in get_wasm_custom_sections(wasm, CONTRACT_META_SECTION_NAME):
             entries.extend(parse_sc_meta_entries(section))
         return cls(tuple(entries))
@@ -151,7 +151,7 @@ class ContractMeta:
             raise TypeError("sep must be int")
         return sep in self.supported_seps()
 
-    def __iter__(self) -> Iterator[stellar_xdr.SCMetaEntry]:
+    def __iter__(self) -> Iterator[stellar_xdr.SCMetaEntry.Any]:
         return iter(self.entries)
 
     def __len__(self) -> int:

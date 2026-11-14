@@ -87,57 +87,45 @@ class LiquidityPoolAsset:
             < Ed25519PublicKey.from_string(asset_b.issuer).key
         )
 
-    def to_change_trust_asset_xdr_object(self) -> stellar_xdr.ChangeTrustAsset:
+    def to_change_trust_asset_xdr_object(self) -> stellar_xdr.ChangeTrustAsset.Any:
         """Returns the xdr object for this ChangeTrustAsset object.
 
         :return: XDR ChangeTrustAsset object
         """
         liquidity_pool_parameters = self._liquidity_pool_parameters()
-        return stellar_xdr.ChangeTrustAsset(
-            stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE,
-            liquidity_pool=liquidity_pool_parameters,
-        )
+        return stellar_xdr.ChangeTrustAsset.PoolShare(liquidity_pool_parameters)
 
     @classmethod
     def from_xdr_object(
-        cls, xdr_object: stellar_xdr.ChangeTrustAsset
+        cls, xdr_object: stellar_xdr.ChangeTrustAsset.Any
     ) -> "LiquidityPoolAsset":
         """Create a :class:`LiquidityPoolAsset` from an XDR ChangeTrustAsset object.
 
         :param xdr_object: The XDR ChangeTrustAsset object.
         :return: A new :class:`LiquidityPoolAsset` object from the given XDR ChangeTrustAsset object.
         """
-        asset_type = xdr_object.type
-        if asset_type == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE:
-            assert xdr_object.liquidity_pool is not None
-            assert xdr_object.liquidity_pool.constant_product is not None
-            asset_a = Asset.from_xdr_object(
-                xdr_object.liquidity_pool.constant_product.asset_a
-            )
-            asset_b = Asset.from_xdr_object(
-                xdr_object.liquidity_pool.constant_product.asset_b
-            )
-            fee = xdr_object.liquidity_pool.constant_product.fee.int32
-            return cls(asset_a, asset_b, fee)
-        else:
-            raise ValueError(f"Unexpected asset type: {asset_type}")
+        if not isinstance(xdr_object, stellar_xdr.ChangeTrustAsset.PoolShare):
+            raise ValueError(f"Unexpected asset type: {xdr_object.type}")
+        parameters = xdr_object.liquidity_pool.constant_product
+        asset_a = Asset.from_xdr_object(parameters.asset_a)
+        asset_b = Asset.from_xdr_object(parameters.asset_b)
+        return cls(asset_a, asset_b, parameters.fee)
 
     @property
     def _liquidity_pool_id_bytes(self) -> bytes:
         liquidity_pool_parameters = self._liquidity_pool_parameters()
         return sha256(liquidity_pool_parameters.to_xdr_bytes())
 
-    def _liquidity_pool_parameters(self) -> stellar_xdr.LiquidityPoolParameters:
+    def _liquidity_pool_parameters(self) -> stellar_xdr.LiquidityPoolParameters.Any:
         liquidity_pool_constant_product_parameters = (
             stellar_xdr.LiquidityPoolConstantProductParameters(
                 self.asset_a.to_xdr_object(),
                 self.asset_b.to_xdr_object(),
-                stellar_xdr.Int32(self.fee),
+                self.fee,
             )
         )
-        return stellar_xdr.LiquidityPoolParameters(
-            stellar_xdr.LiquidityPoolType.LIQUIDITY_POOL_CONSTANT_PRODUCT,
-            liquidity_pool_constant_product_parameters,
+        return stellar_xdr.LiquidityPoolParameters.ConstantProduct(
+            liquidity_pool_constant_product_parameters
         )
 
     def __hash__(self):

@@ -47,32 +47,22 @@ class CreateAccount(Operation):
         raise_if_not_valid_ed25519_public_key(self.destination, "destination")
         raise_if_not_valid_amount(self.starting_balance, "starting_balance")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         destination = Keypair.from_public_key(self.destination).xdr_account_id()
-        starting_balance = stellar_xdr.Int64(
-            Operation.to_xdr_amount(self.starting_balance)
-        )
+        starting_balance = Operation.to_xdr_amount(self.starting_balance)
         create_account_op = stellar_xdr.CreateAccountOp(destination, starting_balance)
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, create_account_op=create_account_op
-        )
+        body = stellar_xdr.OperationBody.CreateAccount(create_account_op)
         return body
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "CreateAccount":
         """Creates a :class:`CreateAccount` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.create_account_op is not None
-        assert (
-            xdr_object.body.create_account_op.destination.account_id.ed25519 is not None
-        )
-        destination = str(
-            Ed25519PublicKey(
-                xdr_object.body.create_account_op.destination.account_id.ed25519.uint256
-            )
-        )
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.CreateAccount)
+        destination = str(Ed25519PublicKey(body.create_account_op.destination.ed25519))
         starting_balance = Operation.from_xdr_amount(
-            xdr_object.body.create_account_op.starting_balance.int64
+            body.create_account_op.starting_balance
         )
         op = cls(
             source=source, destination=destination, starting_balance=starting_balance

@@ -7,6 +7,7 @@ from stellar_sdk import (
     Operation,
     Price,
 )
+from stellar_sdk import xdr as stellar_xdr
 from tests.operation.helpers import (
     asset1,
     check_source,
@@ -109,7 +110,7 @@ class TestManageSellOffer:
         assert op.offer_id == offer_id
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_amount_raise(self):
@@ -140,8 +141,15 @@ class TestManageSellOffer:
     def test_from_xdr_object_keeps_negative_offer_id(self):
         op = ManageSellOffer(native_asset, asset1, "1", "1", 1, kp1.public_key)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.body.manage_sell_offer_op is not None
-        xdr_object.body.manage_sell_offer_op.offer_id.int64 = -1
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.ManageSellOffer)
+        body = stellar_xdr.replace(
+            body,
+            manage_sell_offer_op=stellar_xdr.replace(
+                body.manage_sell_offer_op, offer_id=-1
+            ),
+        )
+        xdr_object = stellar_xdr.replace(xdr_object, body=body)
         restored = ManageSellOffer.from_xdr_object(xdr_object)
         assert restored.offer_id == -1
-        assert restored.to_xdr_object().to_xdr() == xdr_object.to_xdr()
+        assert restored.to_xdr_object().to_xdr_base64() == xdr_object.to_xdr_base64()

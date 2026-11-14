@@ -146,22 +146,20 @@ class Keypair:
             "Please use `Keypair.from_public_key` to generate a new Keypair object."
         )
 
-    def xdr_public_key(self) -> stellar_xdr.PublicKey:
+    def xdr_public_key(self) -> stellar_xdr.PublicKey.Any:
         """
         :return: xdr public key
         """
-        return stellar_xdr.PublicKey(
-            stellar_xdr.PublicKeyType.PUBLIC_KEY_TYPE_ED25519,
-            stellar_xdr.Uint256(bytes(self.verify_key)),
+        return stellar_xdr.PublicKey.Ed25519(
+            stellar_xdr.Uint256(bytes(self.verify_key))
         )
 
-    def xdr_account_id(self) -> stellar_xdr.AccountID:
-        return stellar_xdr.AccountID(self.xdr_public_key())
+    def xdr_account_id(self) -> stellar_xdr.AccountID.Any:
+        return self.xdr_public_key()
 
-    def xdr_muxed_account(self) -> stellar_xdr.MuxedAccount:
-        return stellar_xdr.MuxedAccount(
-            type=stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519,
-            ed25519=stellar_xdr.Uint256(bytes(self.verify_key)),
+    def xdr_muxed_account(self) -> stellar_xdr.MuxedAccount.Any:
+        return stellar_xdr.MuxedAccount.Ed25519(
+            stellar_xdr.Uint256(bytes(self.verify_key))
         )
 
     def raw_public_key(self) -> bytes:
@@ -176,10 +174,7 @@ class Keypair:
 
         :return: signature hint
         """
-        ed25519_key = self.xdr_account_id().account_id.ed25519
-        assert ed25519_key is not None
-        signature_hint = bytes(ed25519_key.uint256[-4:])
-        return signature_hint
+        return bytes(self.verify_key)[-4:]
 
     def raw_secret_key(self) -> bytes:
         """Returns raw secret key.

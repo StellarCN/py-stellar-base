@@ -47,25 +47,25 @@ def _validate_contract_id(contract_id: str) -> None:
         raise ValueError(f"Invalid contract ID: {contract_id}")
 
 
-def _contains_muxed_address(val: stellar_xdr.SCVal) -> bool:
+def _contains_muxed_address(val: stellar_xdr.SCVal.Any) -> bool:
     if val.type == stellar_xdr.SCValType.SCV_ADDRESS:
         assert val.address is not None
         return val.address.type in _MUXED_SC_ADDRESS_TYPES
     if val.type == stellar_xdr.SCValType.SCV_VEC:
         return val.vec is not None and any(
-            _contains_muxed_address(item) for item in val.vec.sc_vec
+            _contains_muxed_address(item) for item in val.vec
         )
     if val.type == stellar_xdr.SCValType.SCV_MAP:
         return val.map is not None and any(
             _contains_muxed_address(entry.key) or _contains_muxed_address(entry.val)
-            for entry in val.map.sc_map
+            for entry in val.map
         )
     return False
 
 
 def _build_contract_data_key(
-    contract_id: str, key: stellar_xdr.SCVal, durability: Durability
-) -> stellar_xdr.LedgerKey:
+    contract_id: str, key: stellar_xdr.SCVal.Any, durability: Durability
+) -> stellar_xdr.LedgerKey.Any:
     _validate_contract_id(contract_id)
     # The host rejects muxed addresses (M... or W...) anywhere in a storage key,
     # so no entry under such a key can exist.
@@ -78,20 +78,19 @@ def _build_contract_data_key(
         if durability == Durability.PERSISTENT
         else stellar_xdr.ContractDataDurability.TEMPORARY
     )
-    return stellar_xdr.LedgerKey(
-        stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-        contract_data=stellar_xdr.LedgerKeyContractData(
+    return stellar_xdr.LedgerKey.ContractData(
+        stellar_xdr.LedgerKeyContractData(
             contract=Address(contract_id).to_xdr_sc_address(),
             key=key,
             durability=xdr_durability,
-        ),
+        )
     )
 
 
-def _build_contract_instance_key(contract_id: str) -> stellar_xdr.LedgerKey:
+def _build_contract_instance_key(contract_id: str) -> stellar_xdr.LedgerKey.Any:
     return _build_contract_data_key(
         contract_id,
-        stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE),
+        stellar_xdr.SCVal.LedgerKeyContractInstance(),
         Durability.PERSISTENT,
     )
 
@@ -100,7 +99,7 @@ def _build_sac_balance_ledger_key(
     asset: Asset,
     contract_id: str,
     network_passphrase: str,
-) -> stellar_xdr.LedgerKey:
+) -> stellar_xdr.LedgerKey.Any:
     """Build the ledger key for an SAC asset balance held by a contract.
 
     :param asset: The SAC asset whose balance ledger entry should be looked up.
@@ -110,13 +109,12 @@ def _build_sac_balance_ledger_key(
     """
     sac_id = asset.contract_id(network_passphrase)
     key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(contract_id)])
-    return stellar_xdr.LedgerKey(
-        stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-        contract_data=stellar_xdr.LedgerKeyContractData(
+    return stellar_xdr.LedgerKey.ContractData(
+        stellar_xdr.LedgerKeyContractData(
             contract=Address(sac_id).to_xdr_sc_address(),
             key=key,
             durability=stellar_xdr.ContractDataDurability.PERSISTENT,
-        ),
+        )
     )
 
 
@@ -142,7 +140,7 @@ def _assemble_transaction(
 
     min_resource_fee = simulation.min_resource_fee
     assert simulation.transaction_data is not None
-    soroban_data = stellar_xdr.SorobanTransactionData.from_xdr(
+    soroban_data = stellar_xdr.SorobanTransactionData.from_xdr_base64(
         simulation.transaction_data
     )
     te = copy.deepcopy(transaction_envelope)
@@ -150,7 +148,7 @@ def _assemble_transaction(
 
     # Reset fee to the original value, excluding the resource fee
     if te.transaction.soroban_data:
-        te.transaction.fee -= te.transaction.soroban_data.resource_fee.int64
+        te.transaction.fee -= te.transaction.soroban_data.resource_fee
 
     assert min_resource_fee is not None
     te.transaction.fee += min_resource_fee
@@ -164,7 +162,7 @@ def _assemble_transaction(
 
         if not op.auth and simulation.results[0].auth:
             op.auth = [
-                stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
+                stellar_xdr.SorobanAuthorizationEntry.from_xdr_base64(xdr)
                 for xdr in simulation.results[0].auth
             ]
     return te

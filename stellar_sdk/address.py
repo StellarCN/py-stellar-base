@@ -142,133 +142,81 @@ class Address:
             muxed_contract = binascii.unhexlify(muxed_contract)
         return Address(str(MuxedContract.from_bytes(muxed_contract)))
 
-    def to_xdr_sc_address(self) -> stellar_xdr.SCAddress:
+    def to_xdr_sc_address(self) -> stellar_xdr.SCAddress.Any:
         """Converts the Address object to a :class:`stellar_sdk.xdr.SCAddress` XDR object.
 
         :return: A :class:`stellar_sdk.xdr.SCAddress` XDR object.
         """
         if self.type == AddressType.ACCOUNT:
-            account = stellar_xdr.AccountID(
-                stellar_xdr.PublicKey(
-                    stellar_xdr.PublicKeyType.PUBLIC_KEY_TYPE_ED25519,
-                    stellar_xdr.Uint256(self.key),
-                )
-            )
-            return stellar_xdr.SCAddress(
-                stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_ACCOUNT, account_id=account
+            return stellar_xdr.SCAddress.Account(
+                stellar_xdr.PublicKey.Ed25519(self.key)
             )
         elif self.type == AddressType.CONTRACT:
-            contract = stellar_xdr.ContractID.from_xdr_bytes(self.key)
-            return stellar_xdr.SCAddress(
-                stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CONTRACT, contract_id=contract
-            )
+            return stellar_xdr.SCAddress.Contract(self.key)
         elif self.type == AddressType.MUXED_ACCOUNT:
-            muxed_account = stellar_xdr.MuxedEd25519Account(
-                id=stellar_xdr.Uint64.from_xdr_bytes(self.key[-8:]),
-                ed25519=stellar_xdr.Uint256.from_xdr_bytes(self.key[:-8]),
-            )
-            return stellar_xdr.SCAddress(
-                stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT,
-                muxed_account=muxed_account,
+            muxed_account = MuxedEd25519Account.from_bytes(self.key)
+            return stellar_xdr.SCAddress.MuxedAccount(
+                stellar_xdr.MuxedEd25519Account(
+                    id=muxed_account.id, ed25519=muxed_account.key
+                )
             )
         elif self.type == AddressType.CLAIMABLE_BALANCE:
-            # See https://github.com/stellar/stellar-protocol/pull/1646/files#r1974431825
-            if self.key[:1] != b"\x00":
-                raise ValueError(
-                    f"The claimable balance ID type is not supported, it must be {stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0}."
-                )
-            claimable_balance_id = stellar_xdr.ClaimableBalanceID(
-                stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0,
-                v0=stellar_xdr.Hash.from_xdr_bytes(self.key[1:]),
-            )
-            return stellar_xdr.SCAddress(
-                stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE,
-                claimable_balance_id=claimable_balance_id,
+            claimable_balance = ClaimableBalance.from_bytes(self.key)
+            return stellar_xdr.SCAddress.ClaimableBalance(
+                stellar_xdr.ClaimableBalanceID.V0(claimable_balance.hash)
             )
         elif self.type == AddressType.LIQUIDITY_POOL:
-            liquidity_pool_id = stellar_xdr.PoolID.from_xdr_bytes(self.key)
-            return stellar_xdr.SCAddress(
-                stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL,
-                liquidity_pool_id=liquidity_pool_id,
-            )
+            return stellar_xdr.SCAddress.LiquidityPool(self.key)
         elif self.type == AddressType.MUXED_CONTRACT:
-            muxed_contract = stellar_xdr.MuxedContract(
-                id=stellar_xdr.Uint64.from_xdr_bytes(self.key[-8:]),
-                contract_id=stellar_xdr.ContractID.from_xdr_bytes(self.key[:-8]),
-            )
-            return stellar_xdr.SCAddress(
-                stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT,
-                muxed_contract=muxed_contract,
+            muxed_contract = MuxedContract.from_bytes(self.key)
+            return stellar_xdr.SCAddress.MuxedContract(
+                stellar_xdr.MuxedContract(
+                    id=muxed_contract.id, contract_id=muxed_contract.hash
+                )
             )
         else:
             raise ValueError("Unsupported address type.")
 
     @classmethod
-    def from_xdr_sc_address(cls, sc_address: stellar_xdr.SCAddress) -> "Address":
+    def from_xdr_sc_address(cls, sc_address: stellar_xdr.SCAddress.Any) -> "Address":
         """Creates a new Address object from a :class:`stellar_sdk.xdr.SCAddress` XDR object.
 
         :param sc_address: The :class:`stellar_sdk.xdr.SCAddress` XDR object.
         :return: A new Address object.
         """
-        if sc_address.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_ACCOUNT:
-            assert sc_address.account_id is not None
-            assert sc_address.account_id.account_id.ed25519 is not None
-            return cls.from_raw_account(
-                sc_address.account_id.account_id.ed25519.uint256
-            )
-        elif sc_address.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CONTRACT:
-            assert sc_address.contract_id is not None
-            return cls.from_raw_contract(sc_address.contract_id.to_xdr_bytes())
-        elif sc_address.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT:
-            assert sc_address.muxed_account is not None
-            return cls.from_raw_muxed_account(
-                sc_address.muxed_account.ed25519.to_xdr_bytes()
-                + sc_address.muxed_account.id.to_xdr_bytes()
-            )
-        elif (
-            sc_address.type
-            == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_CLAIMABLE_BALANCE
-        ):
-            assert sc_address.claimable_balance_id is not None
-            # See https://github.com/stellar/stellar-protocol/pull/1646/files#r1974431825
-            if (
-                sc_address.claimable_balance_id.type
-                != stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0
+        match sc_address:
+            case stellar_xdr.SCAddress.Account(stellar_xdr.PublicKey.Ed25519(key)):
+                return cls.from_raw_account(key)
+            case stellar_xdr.SCAddress.Contract(contract_id):
+                return cls.from_raw_contract(contract_id)
+            case stellar_xdr.SCAddress.MuxedAccount(muxed_account):
+                return cls.from_raw_muxed_account(
+                    MuxedEd25519Account(
+                        muxed_account.ed25519, muxed_account.id
+                    ).to_bytes()
+                )
+            case stellar_xdr.SCAddress.ClaimableBalance(
+                stellar_xdr.ClaimableBalanceID.V0(balance_id)
             ):
-                raise ValueError(
-                    f"The claimable balance ID type is not supported: {sc_address.claimable_balance_id.type}"
-                )  # This is a safeguard.
-            return cls.from_raw_claimable_balance(
-                sc_address.claimable_balance_id.to_xdr_bytes()[3:]
-            )
-        elif (
-            sc_address.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_LIQUIDITY_POOL
-        ):
-            assert sc_address.liquidity_pool_id is not None
-            return cls.from_raw_liquidity_pool(
-                sc_address.liquidity_pool_id.to_xdr_bytes()
-            )
-        elif (
-            sc_address.type == stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT
-        ):
-            assert sc_address.muxed_contract is not None
-            return cls.from_raw_muxed_contract(
-                sc_address.muxed_contract.contract_id.to_xdr_bytes()
-                + sc_address.muxed_contract.id.to_xdr_bytes()
-            )
-        else:
-            raise ValueError("Unsupported address type.")
+                return cls.from_raw_claimable_balance(
+                    ClaimableBalance(balance_id).to_bytes()
+                )
+            case stellar_xdr.SCAddress.LiquidityPool(liquidity_pool_id):
+                return cls.from_raw_liquidity_pool(liquidity_pool_id)
+            case stellar_xdr.SCAddress.MuxedContract(muxed_contract):
+                return cls.from_raw_muxed_contract(
+                    MuxedContract(
+                        muxed_contract.contract_id, muxed_contract.id
+                    ).to_bytes()
+                )
 
-    def to_xdr_sc_val(self) -> stellar_xdr.SCVal:
-        return stellar_xdr.SCVal(
-            stellar_xdr.SCValType.SCV_ADDRESS, address=self.to_xdr_sc_address()
-        )
+    def to_xdr_sc_val(self) -> stellar_xdr.SCVal.Address:
+        return stellar_xdr.SCVal.Address(self.to_xdr_sc_address())
 
     @classmethod
-    def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal) -> "Address":
-        if sc_val.type != stellar_xdr.SCValType.SCV_ADDRESS:
+    def from_xdr_sc_val(cls, sc_val: stellar_xdr.SCVal.Any) -> "Address":
+        if not isinstance(sc_val, stellar_xdr.SCVal.Address):
             raise ValueError("Unsupported SCVal type.")
-        assert sc_val.address is not None
         return cls.from_xdr_sc_address(sc_val.address)
 
     def __hash__(self):

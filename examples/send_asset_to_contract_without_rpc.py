@@ -41,18 +41,23 @@ try:
 except BadRequestError as e:
     print("Failed to send payment to contract. Results:", e)
     assert e.result_xdr is not None
-    tx_result = stellar_xdr.TransactionResult.from_xdr(e.result_xdr)
+    tx_result = stellar_xdr.TransactionResult.from_xdr_base64(e.result_xdr)
     # However, it may fail due to the entry being archived; for this reason, we should try to recover the data entry and then resend the transaction.
     # See https://developers.stellar.org/docs/learn/encyclopedia/storage/state-archival
-    if (
-        tx_result.result.code == stellar_xdr.TransactionResultCode.txFAILED
-        and tx_result.result.results
-        and len(tx_result.result.results) == 1
-        and tx_result.result.results[0].tr
-        and tx_result.result.results[0].tr.invoke_host_function_result
-        and tx_result.result.results[0].tr.invoke_host_function_result.code
-        == stellar_xdr.InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_ENTRY_ARCHIVED
-    ):
+    match tx_result.result:
+        case stellar_xdr.TransactionResultResult.TxFailed(
+            [
+                stellar_xdr.OperationResult.OpInner(
+                    stellar_xdr.OperationResultTr.InvokeHostFunction(
+                        stellar_xdr.InvokeHostFunctionResult.EntryArchived()
+                    )
+                )
+            ]
+        ):
+            entry_archived = True
+        case _:
+            entry_archived = False
+    if entry_archived:
         print("The contract has been archived, we need to restore it.")
         # 2. Restore the contract
         # example tx: https://stellar.expert/explorer/public/tx/6992ccd04593452cb1f236ef266e2e9691cded85722c463aee5a01a1ccc006cf

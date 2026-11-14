@@ -27,7 +27,7 @@ from tests.sep.soroban_web_authentication.helpers import (
 def test_read_challenge_success_with_client_domain():
     """Test successful reading of challenge with client domain."""
     entries = build_valid_entries_with_client_domain()
-    challenge_xdr = entries.to_xdr()
+    challenge_xdr = entries.to_xdr_base64()
 
     result = read_challenge_authorization_entries(
         challenge_authorization_entries=challenge_xdr,
@@ -51,7 +51,7 @@ def test_read_challenge_success_with_client_domain():
 def test_read_challenge_success_without_client_domain():
     """Test successful reading of challenge without client domain."""
     entries = build_valid_entries_without_client_domain()
-    challenge_xdr = entries.to_xdr()
+    challenge_xdr = entries.to_xdr_base64()
 
     result = read_challenge_authorization_entries(
         challenge_authorization_entries=challenge_xdr,
@@ -71,7 +71,7 @@ def test_read_challenge_success_without_client_domain():
 def test_read_challenge_success_with_multiple_home_domains():
     """Test successful reading when home_domains is a list."""
     entries = build_valid_entries_with_client_domain()
-    challenge_xdr = entries.to_xdr()
+    challenge_xdr = entries.to_xdr_base64()
 
     result = read_challenge_authorization_entries(
         challenge_authorization_entries=challenge_xdr,
@@ -123,7 +123,7 @@ def test_read_challenge_less_than_two_entries():
         match=r"Challenge must contain at least two authorization entries.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -162,7 +162,7 @@ def test_read_challenge_inconsistent_root_invocation():
         match=r"Inconsistent root_invocation across authorization entries.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -173,13 +173,12 @@ def test_read_challenge_inconsistent_root_invocation():
 def test_read_challenge_has_sub_invocations():
     """Test that sub-invocations raise error."""
     sub_invocation = stellar_xdr.SorobanAuthorizedInvocation(
-        function=stellar_xdr.SorobanAuthorizedFunction(
-            type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-            contract_fn=stellar_xdr.InvokeContractArgs(
+        function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+            stellar_xdr.InvokeContractArgs(
                 contract_address=Address(WEB_AUTH_CONTRACT).to_xdr_sc_address(),
                 function_name=stellar_xdr.SCSymbol(b"sub_function"),
                 args=[],
-            ),
+            )
         ),
         sub_invocations=[],
     )
@@ -214,7 +213,7 @@ def test_read_challenge_has_sub_invocations():
         match=r"Authorization entry must not have sub-invocations.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -232,7 +231,7 @@ def test_read_challenge_wrong_contract_address():
         match=f"Contract address does not match. Expected {wrong_contract}, got {WEB_AUTH_CONTRACT}.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -273,7 +272,7 @@ def test_read_challenge_wrong_function_name():
         match=r"Function name does not match. Expected web_auth_verify, got wrong_function.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -284,16 +283,15 @@ def test_read_challenge_wrong_function_name():
 def test_read_challenge_wrong_args_count():
     """Test that wrong args count raises error."""
     root_invocation = stellar_xdr.SorobanAuthorizedInvocation(
-        function=stellar_xdr.SorobanAuthorizedFunction(
-            type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-            contract_fn=stellar_xdr.InvokeContractArgs(
+        function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+            stellar_xdr.InvokeContractArgs(
                 contract_address=Address(WEB_AUTH_CONTRACT).to_xdr_sc_address(),
                 function_name=stellar_xdr.SCSymbol(b"web_auth_verify"),
                 args=[
                     scval.to_string("arg1"),
                     scval.to_string("arg2"),
                 ],  # Two args instead of one
-            ),
+            )
         ),
         sub_invocations=[],
     )
@@ -324,7 +322,7 @@ def test_read_challenge_wrong_args_count():
         match=r"Expected exactly one argument in contract function call.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -335,13 +333,12 @@ def test_read_challenge_wrong_args_count():
 def test_read_challenge_invalid_struct():
     """Test that invalid struct raises error."""
     root_invocation = stellar_xdr.SorobanAuthorizedInvocation(
-        function=stellar_xdr.SorobanAuthorizedFunction(
-            type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-            contract_fn=stellar_xdr.InvokeContractArgs(
+        function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+            stellar_xdr.InvokeContractArgs(
                 contract_address=Address(WEB_AUTH_CONTRACT).to_xdr_sc_address(),
                 function_name=stellar_xdr.SCSymbol(b"web_auth_verify"),
                 args=[scval.to_string("not a struct")],  # String instead of struct
-            ),
+            )
         ),
         sub_invocations=[],
     )
@@ -372,7 +369,7 @@ def test_read_challenge_invalid_struct():
         match=r"Failed to parse contract function arguments.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -416,7 +413,7 @@ def test_read_challenge_missing_account():
         match=r"Missing 'account' in arguments.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -460,7 +457,7 @@ def test_read_challenge_missing_home_domain():
         match=r"Missing 'home_domain' in arguments.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -504,7 +501,7 @@ def test_read_challenge_missing_nonce():
         match=r"Missing 'nonce' in arguments.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -548,7 +545,7 @@ def test_read_challenge_missing_web_auth_domain():
         match=r"Missing 'web_auth_domain' in arguments.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -592,7 +589,7 @@ def test_read_challenge_missing_web_auth_domain_account():
         match=r"Missing 'web_auth_domain_account' in arguments.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -610,7 +607,7 @@ def test_read_challenge_server_account_mismatch():
         match=f"web_auth_domain_account '{SERVER_ACCOUNT}' does not match server_account_id '{wrong_server}'.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=wrong_server,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -628,7 +625,7 @@ def test_read_challenge_web_auth_domain_mismatch():
         match=f"web_auth_domain '{WEB_AUTH_DOMAIN}' does not match expected '{wrong_web_auth_domain}'.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=wrong_web_auth_domain,
@@ -645,7 +642,7 @@ def test_read_challenge_home_domain_mismatch_string():
         match=f"Home domain '{HOME_DOMAIN}' does not match expected home domain.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains="wrong.com",
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -662,7 +659,7 @@ def test_read_challenge_home_domain_mismatch_list():
         match=f"Home domain '{HOME_DOMAIN}' does not match expected home domains.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=["wrong.com", "other.com"],
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -710,7 +707,7 @@ def test_read_challenge_client_domain_without_account():
         match=r"'client_domain' and 'client_domain_account' must both be provided or both be absent.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -760,7 +757,7 @@ def test_read_challenge_client_domain_account_without_domain():
         match=r"'client_domain' and 'client_domain_account' must both be provided or both be absent.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -801,7 +798,7 @@ def test_read_challenge_unrecognized_entry_address():
         match=f"Unrecognized authorization entry for address: {unknown_account}",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -850,7 +847,7 @@ def test_read_challenge_missing_server_entry():
         match=r"Challenge does not contain an authorization entry for the server.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -899,7 +896,7 @@ def test_read_challenge_missing_client_entry():
         match=r"Challenge does not contain an authorization entry for the client.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -940,7 +937,7 @@ def test_read_challenge_missing_client_domain_entry():
         match=r"Challenge does not contain an authorization entry for the client domain account.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -956,9 +953,7 @@ def test_read_challenge_unsupported_credentials_type():
 
     # Build entry with SOURCE_ACCOUNT credentials type
     entry_with_source_creds = stellar_xdr.SorobanAuthorizationEntry(
-        credentials=stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT,
-        ),
+        credentials=stellar_xdr.SorobanCredentials.SourceAccount(),
         root_invocation=root_invocation,
     )
 
@@ -981,7 +976,7 @@ def test_read_challenge_unsupported_credentials_type():
         match=r"Unsupported SorobanCredentialsType:",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -993,21 +988,17 @@ def test_read_challenge_non_contract_function_type():
     """Test that non-contract function type raises error."""
     # Use CREATE_CONTRACT_HOST_FN instead of CONTRACT_FN
     root_invocation = stellar_xdr.SorobanAuthorizedInvocation(
-        function=stellar_xdr.SorobanAuthorizedFunction(
-            type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CREATE_CONTRACT_V2_HOST_FN,
-            create_contract_v2_host_fn=stellar_xdr.CreateContractArgsV2(
-                contract_id_preimage=stellar_xdr.ContractIDPreimage(
-                    type=stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
-                    from_address=stellar_xdr.ContractIDPreimageFromAddress(
+        function=stellar_xdr.SorobanAuthorizedFunction.CreateContractV2HostFn(
+            stellar_xdr.CreateContractArgsV2(
+                contract_id_preimage=stellar_xdr.ContractIDPreimage.Address(
+                    stellar_xdr.ContractIDPreimageFromAddress(
                         address=Address(SERVER_ACCOUNT).to_xdr_sc_address(),
                         salt=stellar_xdr.Uint256(bytes(32)),
-                    ),
+                    )
                 ),
-                executable=stellar_xdr.ContractExecutable(
-                    type=stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
-                ),
+                executable=stellar_xdr.ContractExecutable.StellarAsset(),
                 constructor_args=[],
-            ),
+            )
         ),
         sub_invocations=[],
     )
@@ -1038,7 +1029,7 @@ def test_read_challenge_non_contract_function_type():
         match=r"Authorization entry must invoke a contract function.",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,
@@ -1075,7 +1066,7 @@ def test_read_challenge_success_with_v2_credentials():
     )
 
     parsed = read_challenge_authorization_entries(
-        challenge_authorization_entries=entries.to_xdr(),
+        challenge_authorization_entries=entries.to_xdr_base64(),
         server_account_id=SERVER_ACCOUNT,
         home_domains=HOME_DOMAIN,
         web_auth_domain=WEB_AUTH_DOMAIN,
@@ -1109,14 +1100,13 @@ def test_read_challenge_rejects_with_delegates_credentials():
         signature_hex="6dbc3b36f6c96a316ff1e7fcefb1b044cbfdafa70236aad669f9d209565c2ba3086412bfff0218365a97cd1f8c3d2483f0daf29ab434531c3276bad8bbbd5102",
         root_invocation=root_invocation,
     )
-    assert server_entry.credentials.address is not None
+    assert isinstance(server_entry.credentials, stellar_xdr.SorobanCredentials.Address)
     delegated_server_entry = stellar_xdr.SorobanAuthorizationEntry(
-        credentials=stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES,
-            address_with_delegates=stellar_xdr.SorobanAddressCredentialsWithDelegates(
+        credentials=stellar_xdr.SorobanCredentials.AddressWithDelegates(
+            stellar_xdr.SorobanAddressCredentialsWithDelegates(
                 address_credentials=server_entry.credentials.address,
                 delegates=[],
-            ),
+            )
         ),
         root_invocation=root_invocation,
     )
@@ -1129,7 +1119,7 @@ def test_read_challenge_rejects_with_delegates_credentials():
         match=r"Unsupported SorobanCredentialsType:",
     ):
         read_challenge_authorization_entries(
-            challenge_authorization_entries=entries.to_xdr(),
+            challenge_authorization_entries=entries.to_xdr_base64(),
             server_account_id=SERVER_ACCOUNT,
             home_domains=HOME_DOMAIN,
             web_auth_domain=WEB_AUTH_DOMAIN,

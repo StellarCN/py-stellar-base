@@ -149,7 +149,7 @@ class TransactionBuilder:
         )
         fee = self.base_fee * len(self.operations)
         if self.soroban_data:
-            fee += self.soroban_data.resource_fee.int64
+            fee += self.soroban_data.resource_fee
         transaction = Transaction(
             source=source,
             sequence=sequence,
@@ -194,7 +194,7 @@ class TransactionBuilder:
         soroban_resource_fee = 0
         if inner_transaction_envelope.transaction.soroban_data:
             soroban_resource_fee = (
-                inner_transaction_envelope.transaction.soroban_data.resource_fee.int64
+                inner_transaction_envelope.transaction.soroban_data.resource_fee
             )
 
         inner_include_fee = (
@@ -1248,7 +1248,7 @@ class TransactionBuilder:
         self,
         contract_id: str,
         function_name: str,
-        parameters: Sequence[stellar_xdr.SCVal] | None = None,
+        parameters: Sequence[stellar_xdr.SCVal.Any] | None = None,
         auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] | None = None,
         source: MuxedAccount | str | None = None,
     ) -> "TransactionBuilder":
@@ -1270,15 +1270,12 @@ class TransactionBuilder:
         if parameters is None:
             parameters = []
 
-        host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
-            invoke_contract=stellar_xdr.InvokeContractArgs(
+        host_function = stellar_xdr.HostFunction.InvokeContract(
+            stellar_xdr.InvokeContractArgs(
                 contract_address=Address(contract_id).to_xdr_sc_address(),
-                function_name=stellar_xdr.SCSymbol(
-                    sc_symbol=function_name.encode("utf-8")
-                ),
+                function_name=function_name,
                 args=list(parameters),
-            ),
+            )
         )
         op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
         return self.append_operation(op)
@@ -1303,10 +1300,7 @@ class TransactionBuilder:
             with open(contract, "rb") as f:
                 contract = f.read()
 
-        host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM,
-            wasm=contract,
-        )
+        host_function = stellar_xdr.HostFunction.UploadContractWasm(contract)
         op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
         return self.append_operation(op)
 
@@ -1314,7 +1308,7 @@ class TransactionBuilder:
         self,
         wasm_id: bytes | str,
         address: str | Address,
-        constructor_args: Sequence[stellar_xdr.SCVal] | None = None,
+        constructor_args: Sequence[stellar_xdr.SCVal.Any] | None = None,
         salt: bytes | None = None,
         auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] | None = None,
         source: MuxedAccount | str | None = None,
@@ -1345,26 +1339,19 @@ class TransactionBuilder:
             address = Address(address)
 
         create_contract = stellar_xdr.CreateContractArgsV2(
-            contract_id_preimage=stellar_xdr.ContractIDPreimage(
-                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
-                from_address=stellar_xdr.ContractIDPreimageFromAddress(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage.Address(
+                stellar_xdr.ContractIDPreimageFromAddress(
                     address=address.to_xdr_sc_address(),
                     salt=stellar_xdr.Uint256(salt),
-                ),
+                )
             ),
-            executable=stellar_xdr.ContractExecutable(
-                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
-                stellar_xdr.Hash(wasm_id),
-            ),
+            executable=stellar_xdr.ContractExecutable.Wasm(stellar_xdr.Hash(wasm_id)),
             constructor_args=(
                 list(constructor_args) if constructor_args is not None else []
             ),
         )
 
-        host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2,
-            create_contract_v2=create_contract,
-        )
+        host_function = stellar_xdr.HostFunction.CreateContractV2(create_contract)
 
         op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
         return self.append_operation(op)
@@ -1374,7 +1361,7 @@ class TransactionBuilder:
         owner: str | Address,
         tag: str | bytes,
         address: str | Address,
-        constructor_args: Sequence[stellar_xdr.SCVal] | None = None,
+        constructor_args: Sequence[stellar_xdr.SCVal.Any] | None = None,
         salt: bytes | None = None,
         auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] | None = None,
         source: MuxedAccount | str | None = None,
@@ -1409,26 +1396,21 @@ class TransactionBuilder:
             address = Address(address)
 
         create_contract = stellar_xdr.CreateContractArgsV2(
-            contract_id_preimage=stellar_xdr.ContractIDPreimage(
-                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ADDRESS,
-                from_address=stellar_xdr.ContractIDPreimageFromAddress(
+            contract_id_preimage=stellar_xdr.ContractIDPreimage.Address(
+                stellar_xdr.ContractIDPreimageFromAddress(
                     address=address.to_xdr_sc_address(),
                     salt=stellar_xdr.Uint256(salt),
-                ),
+                )
             ),
-            executable=stellar_xdr.ContractExecutable(
-                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF,
-                external_ref=build_contract_executable_external_ref(owner, tag),
+            executable=stellar_xdr.ContractExecutable.ExternalRef(
+                build_contract_executable_external_ref(owner, tag)
             ),
             constructor_args=(
                 list(constructor_args) if constructor_args is not None else []
             ),
         )
 
-        host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2,
-            create_contract_v2=create_contract,
-        )
+        host_function = stellar_xdr.HostFunction.CreateContractV2(create_contract)
 
         op = InvokeHostFunction(host_function=host_function, auth=auth, source=source)
         return self.append_operation(op)
@@ -1450,19 +1432,11 @@ class TransactionBuilder:
         asset_param = asset.to_xdr_object()
 
         create_contract = stellar_xdr.CreateContractArgs(
-            contract_id_preimage=stellar_xdr.ContractIDPreimage(
-                stellar_xdr.ContractIDPreimageType.CONTRACT_ID_PREIMAGE_FROM_ASSET,
-                from_asset=asset_param,
-            ),
-            executable=stellar_xdr.ContractExecutable(
-                stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET,
-            ),
+            contract_id_preimage=stellar_xdr.ContractIDPreimage.Asset(asset_param),
+            executable=stellar_xdr.ContractExecutable.StellarAsset(),
         )
 
-        host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_CREATE_CONTRACT,
-            create_contract=create_contract,
-        )
+        host_function = stellar_xdr.HostFunction.CreateContract(create_contract)
 
         op = InvokeHostFunction(host_function=host_function, auth=[], source=source)
         return self.append_operation(op)
@@ -1564,21 +1538,16 @@ class TransactionBuilder:
             parameters=parameters,
             auth=[
                 stellar_xdr.SorobanAuthorizationEntry(
-                    credentials=stellar_xdr.SorobanCredentials(
-                        stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
-                    ),
+                    credentials=stellar_xdr.SorobanCredentials.SourceAccount(),
                     root_invocation=stellar_xdr.SorobanAuthorizedInvocation(
-                        stellar_xdr.SorobanAuthorizedFunction(
-                            stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                            contract_fn=stellar_xdr.InvokeContractArgs(
+                        stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                            stellar_xdr.InvokeContractArgs(
                                 contract_address=Address(
                                     contract_id
                                 ).to_xdr_sc_address(),
-                                function_name=stellar_xdr.SCSymbol(
-                                    sc_symbol=function_name.encode("utf-8")
-                                ),
+                                function_name=function_name,
                                 args=parameters,
-                            ),
+                            )
                         ),
                         sub_invocations=[],
                     ),
@@ -1587,39 +1556,33 @@ class TransactionBuilder:
             source=source,
         )
 
-        contract_instance_ledger_key = stellar_xdr.LedgerKey(
-            type=stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-            contract_data=stellar_xdr.LedgerKeyContractData(
+        contract_instance_ledger_key = stellar_xdr.LedgerKey.ContractData(
+            stellar_xdr.LedgerKeyContractData(
                 contract=Address(contract_id).to_xdr_sc_address(),
-                key=stellar_xdr.SCVal(
-                    stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE
-                ),
+                key=stellar_xdr.SCVal.LedgerKeyContractInstance(),
                 durability=stellar_xdr.ContractDataDurability.PERSISTENT,
-            ),
+            )
         )
 
-        balance_ledger_key = stellar_xdr.LedgerKey(
-            type=stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-            contract_data=stellar_xdr.LedgerKeyContractData(
+        balance_ledger_key = stellar_xdr.LedgerKey.ContractData(
+            stellar_xdr.LedgerKeyContractData(
                 contract=Address(contract_id).to_xdr_sc_address(),
-                key=stellar_xdr.SCVal(
-                    stellar_xdr.SCValType.SCV_VEC,
-                    vec=scval.to_vec(
-                        [scval.to_symbol("Balance"), scval.to_address(destination)]
-                    ).vec,
+                key=scval.to_vec(
+                    [scval.to_symbol("Balance"), scval.to_address(destination)]
                 ),
                 durability=stellar_xdr.ContractDataDurability.PERSISTENT,
-            ),
+            )
         )
 
+        read_only: list[stellar_xdr.LedgerKey.Any]
+        read_write: list[stellar_xdr.LedgerKey.Any]
         if asset.is_native():
             read_only = [contract_instance_ledger_key]
             read_write = [
-                stellar_xdr.LedgerKey(
-                    type=stellar_xdr.LedgerEntryType.ACCOUNT,
-                    account=stellar_xdr.LedgerKeyAccount(
+                stellar_xdr.LedgerKey.Account(
+                    stellar_xdr.LedgerKeyAccount(
                         Keypair.from_public_key(from_address).xdr_account_id()
-                    ),
+                    )
                 ),
                 balance_ledger_key,
             ]
@@ -1628,11 +1591,10 @@ class TransactionBuilder:
             read_only = [
                 # In theory, it is only needed the first time it is sent to the receiving account,
                 # but here we read it every time to simplify the logic.
-                stellar_xdr.LedgerKey(
-                    type=stellar_xdr.LedgerEntryType.ACCOUNT,
-                    account=stellar_xdr.LedgerKeyAccount(
+                stellar_xdr.LedgerKey.Account(
+                    stellar_xdr.LedgerKeyAccount(
                         Keypair.from_public_key(asset.issuer).xdr_account_id()
-                    ),
+                    )
                 ),
                 contract_instance_ledger_key,
             ]
@@ -1641,14 +1603,13 @@ class TransactionBuilder:
             ]
             if asset.issuer != from_address:
                 read_write.append(
-                    stellar_xdr.LedgerKey(
-                        type=stellar_xdr.LedgerEntryType.TRUSTLINE,
-                        trust_line=stellar_xdr.LedgerKeyTrustLine(
+                    stellar_xdr.LedgerKey.TrustLine(
+                        stellar_xdr.LedgerKeyTrustLine(
                             account_id=Keypair.from_public_key(
                                 from_address
                             ).xdr_account_id(),
                             asset=asset.to_trust_line_asset_xdr_object(),
-                        ),
+                        )
                     ),
                 )
 
@@ -1696,18 +1657,14 @@ class TransactionBuilder:
             raise ValueError("`balance_owner` is not a valid contract address.")
 
         contract_id = asset.contract_id(self.network_passphrase)
-        balance_ledger_key = stellar_xdr.LedgerKey(
-            type=stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-            contract_data=stellar_xdr.LedgerKeyContractData(
+        balance_ledger_key = stellar_xdr.LedgerKey.ContractData(
+            stellar_xdr.LedgerKeyContractData(
                 contract=Address(contract_id).to_xdr_sc_address(),
-                key=stellar_xdr.SCVal(
-                    stellar_xdr.SCValType.SCV_VEC,
-                    vec=scval.to_vec(
-                        [scval.to_symbol("Balance"), scval.to_address(balance_owner)]
-                    ).vec,
+                key=scval.to_vec(
+                    [scval.to_symbol("Balance"), scval.to_address(balance_owner)]
                 ),
                 durability=stellar_xdr.ContractDataDurability.PERSISTENT,
-            ),
+            )
         )
         soroban_data = (
             SorobanDataBuilder()

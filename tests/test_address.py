@@ -111,7 +111,7 @@ class TestAddress:
         sc_address = address.to_xdr_sc_address()
 
         xdr = "AAAAAAAAAAA/DDS/k60NmXHQTMyQ9wVRHIOKrZc0pKL7DXoD/H/omg=="
-        assert sc_address.to_xdr() == xdr
+        assert sc_address.to_xdr_base64() == xdr
 
     def test_to_xdr_sc_address_contract(self):
         contract = "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
@@ -119,7 +119,7 @@ class TestAddress:
         sc_address = address.to_xdr_sc_address()
 
         xdr = "AAAAAT8MNL+TrQ2ZcdBMzJD3BVEcg4qtlzSkovsNegP8f+ia"
-        assert sc_address.to_xdr() == xdr
+        assert sc_address.to_xdr_base64() == xdr
 
     def test_to_xdr_sc_address_muxed_account(self):
         muxed_account_id = (
@@ -129,7 +129,7 @@ class TestAddress:
         sc_address = address.to_xdr_sc_address()
 
         xdr = "AAAAAgAAAAAAAATSIAB1furlg/xQ3Wafl2c6zCXsclgjrHP69sffMa0x5Qk="
-        assert sc_address.to_xdr() == xdr
+        assert sc_address.to_xdr_base64() == xdr
 
     def test_to_xdr_sc_address_claimable_balance(self):
         claimable_balance_id = (
@@ -139,7 +139,7 @@ class TestAddress:
         sc_address = address.to_xdr_sc_address()
 
         xdr = "AAAAAwAAAAA/DDS/k60NmXHQTMyQ9wVRHIOKrZc0pKL7DXoD/H/omg=="
-        assert sc_address.to_xdr() == xdr
+        assert sc_address.to_xdr_base64() == xdr
 
     def test_to_xdr_sc_address_liquidity_pool(self):
         liquidity_pool_id = "LA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUPJN"
@@ -147,12 +147,14 @@ class TestAddress:
         sc_address = address.to_xdr_sc_address()
 
         xdr = "AAAABD8MNL+TrQ2ZcdBMzJD3BVEcg4qtlzSkovsNegP8f+ia"
-        assert sc_address.to_xdr() == xdr
+        assert sc_address.to_xdr_base64() == xdr
 
     def test_from_xdr_sc_address_account(self):
         xdr = "AAAAAAAAAAA/DDS/k60NmXHQTMyQ9wVRHIOKrZc0pKL7DXoD/H/omg=="
 
-        sc_address = Address.from_xdr_sc_address(stellar_xdr.SCAddress.from_xdr(xdr))
+        sc_address = Address.from_xdr_sc_address(
+            stellar_xdr.SCAddress.from_xdr_base64(xdr)
+        )
         account_id = "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"
         assert sc_address.address == account_id
         assert sc_address.type == AddressType.ACCOUNT
@@ -160,7 +162,9 @@ class TestAddress:
     def test_from_xdr_sc_address_contract(self):
         xdr = "AAAAAT8MNL+TrQ2ZcdBMzJD3BVEcg4qtlzSkovsNegP8f+ia"
 
-        sc_address = Address.from_xdr_sc_address(stellar_xdr.SCAddress.from_xdr(xdr))
+        sc_address = Address.from_xdr_sc_address(
+            stellar_xdr.SCAddress.from_xdr_base64(xdr)
+        )
         contract = "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
         assert sc_address.address == contract
         assert sc_address.type == AddressType.CONTRACT
@@ -168,7 +172,9 @@ class TestAddress:
     def test_from_xdr_sc_address_muxed_account(self):
         xdr = "AAAAAgAAAAAAAATSIAB1furlg/xQ3Wafl2c6zCXsclgjrHP69sffMa0x5Qk="
 
-        sc_address = Address.from_xdr_sc_address(stellar_xdr.SCAddress.from_xdr(xdr))
+        sc_address = Address.from_xdr_sc_address(
+            stellar_xdr.SCAddress.from_xdr_base64(xdr)
+        )
         muxed_account_id = (
             "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
         )
@@ -178,7 +184,9 @@ class TestAddress:
     def test_from_xdr_sc_address_claimable_balance(self):
         xdr = "AAAAAwAAAAA/DDS/k60NmXHQTMyQ9wVRHIOKrZc0pKL7DXoD/H/omg=="
 
-        sc_address = Address.from_xdr_sc_address(stellar_xdr.SCAddress.from_xdr(xdr))
+        sc_address = Address.from_xdr_sc_address(
+            stellar_xdr.SCAddress.from_xdr_base64(xdr)
+        )
         claimable_balance_id = (
             "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4TU"
         )
@@ -188,7 +196,9 @@ class TestAddress:
     def test_from_xdr_sc_address_liquidity_pool(self):
         xdr = "AAAABD8MNL+TrQ2ZcdBMzJD3BVEcg4qtlzSkovsNegP8f+ia"
 
-        sc_address = Address.from_xdr_sc_address(stellar_xdr.SCAddress.from_xdr(xdr))
+        sc_address = Address.from_xdr_sc_address(
+            stellar_xdr.SCAddress.from_xdr_base64(xdr)
+        )
         liquidity_pool_id = "LA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUPJN"
         assert sc_address.address == liquidity_pool_id
         assert sc_address.type == AddressType.LIQUIDITY_POOL
@@ -199,12 +209,12 @@ class TestAddress:
         sc_val = address.to_xdr_sc_val()
 
         xdr = "AAAAEgAAAAE/DDS/k60NmXHQTMyQ9wVRHIOKrZc0pKL7DXoD/H/omg=="
-        assert sc_val.to_xdr() == xdr
+        assert sc_val.to_xdr_base64() == xdr
 
     def test_from_xdr_sc_val(self):
         xdr = "AAAAEgAAAAE/DDS/k60NmXHQTMyQ9wVRHIOKrZc0pKL7DXoD/H/omg=="
 
-        sc_val = Address.from_xdr_sc_val(stellar_xdr.SCVal.from_xdr(xdr))
+        sc_val = Address.from_xdr_sc_val(stellar_xdr.SCVal.from_xdr_base64(xdr))
         contract = "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
         assert sc_val.address == contract
         assert sc_val.type == AddressType.CONTRACT
@@ -228,9 +238,11 @@ class TestAddress:
         address = Address(muxed_contract_id)
         assert address.type == AddressType.MUXED_CONTRACT
         assert address.address == muxed_contract_id
-        assert address.to_xdr_sc_address().to_xdr() == xdr
+        assert address.to_xdr_sc_address().to_xdr_base64() == xdr
 
-        from_xdr = Address.from_xdr_sc_address(stellar_xdr.SCAddress.from_xdr(xdr))
+        from_xdr = Address.from_xdr_sc_address(
+            stellar_xdr.SCAddress.from_xdr_base64(xdr)
+        )
         assert from_xdr.type == AddressType.MUXED_CONTRACT
         assert from_xdr.address == muxed_contract_id
         assert from_xdr == address

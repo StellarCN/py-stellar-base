@@ -33,12 +33,10 @@ class BumpSequence(Operation):
         super().__init__(source)
         self.bump_to: int = bump_to
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        sequence = stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.bump_to))
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
+        sequence = stellar_xdr.SequenceNumber(self.bump_to)
         bump_sequence_op = stellar_xdr.BumpSequenceOp(sequence)
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, bump_sequence_op=bump_sequence_op
-        )
+        body = stellar_xdr.OperationBody.BumpSequence(bump_sequence_op)
         return body
 
     @classmethod
@@ -48,8 +46,9 @@ class BumpSequence(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.bump_sequence_op is not None
-        bump_to = xdr_object.body.bump_sequence_op.bump_to.sequence_number.int64
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.BumpSequence)
+        bump_to = int(body.bump_sequence_op.bump_to)
         op = cls(source=source, bump_to=bump_to)
         return op
 

@@ -50,18 +50,17 @@ class LiquidityPoolWithdraw(Operation):
         raise_if_not_valid_amount(self.min_amount_b, "min_amount_b")
         raise_if_not_valid_hash(self.liquidity_pool_id, "liquidity_pool_id")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         liquidity_pool_id_bytes = binascii.unhexlify(self.liquidity_pool_id)
         liquidity_pool_id = stellar_xdr.PoolID.from_xdr_bytes(liquidity_pool_id_bytes)
-        amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
-        min_amount_a = stellar_xdr.Int64(Operation.to_xdr_amount(self.min_amount_a))
-        min_amount_b = stellar_xdr.Int64(Operation.to_xdr_amount(self.min_amount_b))
+        amount = Operation.to_xdr_amount(self.amount)
+        min_amount_a = Operation.to_xdr_amount(self.min_amount_a)
+        min_amount_b = Operation.to_xdr_amount(self.min_amount_b)
         liquidity_pool_withdraw_op = stellar_xdr.LiquidityPoolWithdrawOp(
             liquidity_pool_id, amount, min_amount_a, min_amount_b
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE,
-            liquidity_pool_withdraw_op=liquidity_pool_withdraw_op,
+        body = stellar_xdr.OperationBody.LiquidityPoolWithdraw(
+            liquidity_pool_withdraw_op
         )
         return body
 
@@ -71,19 +70,16 @@ class LiquidityPoolWithdraw(Operation):
     ) -> "LiquidityPoolWithdraw":
         """Creates a :class:`LiquidityPoolWithdraw` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.liquidity_pool_withdraw_op is not None
-        liquidity_pool_id_bytes = (
-            xdr_object.body.liquidity_pool_withdraw_op.liquidity_pool_id.pool_id.hash
-        )
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.LiquidityPoolWithdraw)
+        liquidity_pool_id_bytes = body.liquidity_pool_withdraw_op.liquidity_pool_id
         liquidity_pool_id = liquidity_pool_id_bytes.hex()
-        amount = Operation.from_xdr_amount(
-            xdr_object.body.liquidity_pool_withdraw_op.amount.int64
-        )
+        amount = Operation.from_xdr_amount(body.liquidity_pool_withdraw_op.amount)
         min_amount_a = Operation.from_xdr_amount(
-            xdr_object.body.liquidity_pool_withdraw_op.min_amount_a.int64
+            body.liquidity_pool_withdraw_op.min_amount_a
         )
         min_amount_b = Operation.from_xdr_amount(
-            xdr_object.body.liquidity_pool_withdraw_op.min_amount_b.int64
+            body.liquidity_pool_withdraw_op.min_amount_b
         )
 
         op = cls(

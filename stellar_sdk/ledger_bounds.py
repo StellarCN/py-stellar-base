@@ -31,8 +31,8 @@ class LedgerBounds:
 
         :return: XDR LedgerBounds object
         """
-        min_ledger = stellar_xdr.Uint32(self.min_ledger)
-        max_ledger = stellar_xdr.Uint32(self.max_ledger)
+        min_ledger = self.min_ledger
+        max_ledger = self.max_ledger
         return stellar_xdr.LedgerBounds(min_ledger, max_ledger)
 
     @classmethod
@@ -43,8 +43,8 @@ class LedgerBounds:
         :return: A new :class:`LedgerBounds` object from the given XDR LedgerBounds object.
         """
         return cls(
-            min_ledger=xdr_object.min_ledger.uint32,
-            max_ledger=xdr_object.max_ledger.uint32,
+            min_ledger=xdr_object.min_ledger,
+            max_ledger=xdr_object.max_ledger,
         )
 
     def __hash__(self):

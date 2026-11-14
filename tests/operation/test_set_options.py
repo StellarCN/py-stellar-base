@@ -124,7 +124,7 @@ class TestSetOptions:
             source,
         )
         xdr_obj = op.to_xdr_object()
-        assert xdr_obj.to_xdr() == xdr
+        assert xdr_obj.to_xdr_base64() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, SetOptions)
         if source:

@@ -23,11 +23,11 @@ class ContractSpec:
 
     __slots__ = ("_entries",)
 
-    def __init__(self, entries: tuple[stellar_xdr.SCSpecEntry, ...] = ()) -> None:
+    def __init__(self, entries: tuple[stellar_xdr.SCSpecEntry.Any, ...] = ()) -> None:
         self._entries = tuple(entries)
 
     @property
-    def entries(self) -> tuple[stellar_xdr.SCSpecEntry, ...]:
+    def entries(self) -> tuple[stellar_xdr.SCSpecEntry.Any, ...]:
         """Returns the raw SEP-48 specification XDR entries."""
         return self._entries
 
@@ -159,7 +159,7 @@ class ContractSpec:
                 return event
         return None
 
-    def get_udt(self, name: str) -> stellar_xdr.SCSpecEntry | None:
+    def get_udt(self, name: str) -> stellar_xdr.SCSpecEntry.Any | None:
         """Returns a user-defined type by name.
 
         :param name: The type name.
@@ -172,7 +172,7 @@ class ContractSpec:
                 return entry
         return None
 
-    def __iter__(self) -> Iterator[stellar_xdr.SCSpecEntry]:
+    def __iter__(self) -> Iterator[stellar_xdr.SCSpecEntry.Any]:
         return iter(self.entries)
 
     def __len__(self) -> int:
@@ -189,7 +189,7 @@ class ContractSpec:
 
 def _decode_symbol(symbol: stellar_xdr.SCSymbol) -> str:
     try:
-        return symbol.sc_symbol.decode("utf-8")
+        return symbol.decode("utf-8")
     except UnicodeDecodeError as exc:
         raise InvalidWasmError("Contract spec contains a non-UTF-8 symbol.") from exc
 
@@ -201,7 +201,7 @@ def _decode_string(value: bytes) -> str:
         raise InvalidWasmError("Contract spec contains a non-UTF-8 string.") from exc
 
 
-def _get_udt_name(entry: stellar_xdr.SCSpecEntry) -> str | None:
+def _get_udt_name(entry: stellar_xdr.SCSpecEntry.Any) -> str | None:
     if (
         entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_STRUCT_V0
         and entry.udt_struct_v0 is not None

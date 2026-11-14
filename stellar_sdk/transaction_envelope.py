@@ -1,8 +1,6 @@
 import copy
 from collections.abc import Sequence
 
-from xdrlib3 import Packer
-
 from . import xdr as stellar_xdr
 from .base_transaction_envelope import BaseTransactionEnvelope
 from .decorated_signature import DecoratedSignature
@@ -57,10 +55,11 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         if isinstance(self.transaction, Transaction) and not self.transaction.v1:
             tx = Transaction.from_xdr_object(self.transaction.to_xdr_object(), v1=False)
             tx.v1 = True
-        packer = Packer()
-        stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX.pack(packer)
-        tx.to_xdr_object().pack(packer)
-        return network_id + packer.get_buffer()
+        return (
+            network_id
+            + stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX.to_xdr_bytes()
+            + tx.to_xdr_object().to_xdr_bytes()
+        )
 
     def sign_extra_signers_payload(self, signer: Keypair | str) -> None:
         """Sign this extra signers' payload with a given keypair.
@@ -96,7 +95,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
             else:
                 self.signatures.append(sig)
 
-    def to_xdr_object(self) -> stellar_xdr.TransactionEnvelope:
+    def to_xdr_object(self) -> stellar_xdr.TransactionEnvelope.Any:
         """Get an XDR object representation of this :class:`TransactionEnvelope`.
 
         :return: XDR TransactionEnvelope object
@@ -105,14 +104,14 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
         signatures = [signature.to_xdr_object() for signature in self.signatures]
         if self.transaction.v1:
             assert isinstance(tx, stellar_xdr.Transaction)
-            te_type = stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX
-            tx_v1_envelope = stellar_xdr.TransactionV1Envelope(tx, signatures)
-            return stellar_xdr.TransactionEnvelope(type=te_type, v1=tx_v1_envelope)
+            return stellar_xdr.TransactionEnvelope.Tx(
+                stellar_xdr.TransactionV1Envelope(tx, signatures)
+            )
         else:
             assert isinstance(tx, stellar_xdr.TransactionV0)
-            te_type = stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0
-            tx_v0_envelope = stellar_xdr.TransactionV0Envelope(tx, signatures)
-            return stellar_xdr.TransactionEnvelope(type=te_type, v0=tx_v0_envelope)
+            return stellar_xdr.TransactionEnvelope.TxV0(
+                stellar_xdr.TransactionV0Envelope(tx, signatures)
+            )
 
     def to_transaction_envelope_v1(self) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope`, if the internal tx is not v1, we will convert it to v1."""
@@ -122,7 +121,7 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
 
     @classmethod
     def from_xdr_object(
-        cls, xdr_object: stellar_xdr.TransactionEnvelope, network_passphrase: str
+        cls, xdr_object: stellar_xdr.TransactionEnvelope.Any, network_passphrase: str
     ) -> "TransactionEnvelope":
         """Create a new :class:`TransactionEnvelope` from an XDR object.
 
@@ -131,17 +130,12 @@ class TransactionEnvelope(BaseTransactionEnvelope["TransactionEnvelope"]):
 
         :return: A new :class:`TransactionEnvelope` object from the given XDR TransactionEnvelope object.
         """
-        te_type = xdr_object.type
-        if te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_V0:
-            assert xdr_object.v0 is not None
-            assert xdr_object.v0.signatures is not None
+        if isinstance(xdr_object, stellar_xdr.TransactionEnvelope.TxV0):
             tx = Transaction.from_xdr_object(xdr_object.v0.tx, v1=False)
             signatures = [
                 DecoratedSignature.from_xdr_object(s) for s in xdr_object.v0.signatures
             ]
-        elif te_type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX:
-            assert xdr_object.v1 is not None
-            assert xdr_object.v1.signatures is not None
+        elif isinstance(xdr_object, stellar_xdr.TransactionEnvelope.Tx):
             tx = Transaction.from_xdr_object(xdr_object.v1.tx, v1=True)
             signatures = [
                 DecoratedSignature.from_xdr_object(s) for s in xdr_object.v1.signatures

@@ -37,7 +37,7 @@ class TestTransaction:
         tx = Transaction(source, sequence, fee, ops, memo, cond, v1=True)
         tx_object = tx.to_xdr_object()
         assert (
-            tx_object.to_xdr()
+            tx_object.to_xdr_base64()
             == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
         )
 
@@ -65,7 +65,7 @@ class TestTransaction:
         tx_object = tx.to_xdr_object()
         xdr = "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
 
-        assert tx_object.to_xdr() == xdr
+        assert tx_object.to_xdr_base64() == xdr
 
         restore_transaction = Transaction.from_xdr(xdr, True)
         assert isinstance(restore_transaction, Transaction)
@@ -91,7 +91,7 @@ class TestTransaction:
         tx = Transaction(source, sequence, fee, ops, memo, cond, v1=True)
         tx_object = tx.to_xdr_object()
         restore_tx = Transaction.from_xdr_object(tx_object, v1=True)
-        assert restore_tx.to_xdr_object().to_xdr() == tx_object.to_xdr()
+        assert restore_tx.to_xdr_object().to_xdr_base64() == tx_object.to_xdr_base64()
         assert restore_tx.source.account_id == source
         assert restore_tx == tx
 
@@ -110,7 +110,7 @@ class TestTransaction:
         tx_object = Transaction(
             source, sequence, fee, ops, memo, cond, None, True
         ).to_xdr_object()
-        restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), True)
+        restore_transaction = Transaction.from_xdr(tx_object.to_xdr_base64(), True)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == MuxedAccount.from_account(source)
         assert restore_transaction.fee == fee
@@ -135,7 +135,7 @@ class TestTransaction:
         tx_object = Transaction(
             source, sequence, fee, ops, memo, cond, None, True
         ).to_xdr_object()
-        restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), True)
+        restore_transaction = Transaction.from_xdr(tx_object.to_xdr_base64(), True)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == source
         assert restore_transaction.fee == fee
@@ -200,7 +200,7 @@ class TestTransaction:
         #     == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
         # )
 
-        restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), False)
+        restore_transaction = Transaction.from_xdr(tx_object.to_xdr_base64(), False)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source.account_id == source
         assert restore_transaction.fee == fee
@@ -346,15 +346,14 @@ class TestTransaction:
         soroban_data = SorobanDataBuilder().set_resources(1, 2, 3).build()
         time_bounds = TimeBounds(12345, 56789)
 
-        host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
-            invoke_contract=stellar_xdr.InvokeContractArgs(
+        host_function = stellar_xdr.HostFunction.InvokeContract(
+            stellar_xdr.InvokeContractArgs(
                 contract_address=Address(
                     "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
                 ).to_xdr_sc_address(),
-                function_name=stellar_xdr.SCSymbol(sc_symbol=b"hello"),
+                function_name=stellar_xdr.SCSymbol(b"hello"),
                 args=[],
-            ),
+            )
         )
         ops = [InvokeHostFunction(host_function=host_function, auth=[])]
         cond = Preconditions(time_bounds=time_bounds)

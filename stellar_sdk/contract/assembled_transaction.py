@@ -68,7 +68,7 @@ class AssembledTransaction(Generic[T]):
         transaction_builder: TransactionBuilder,
         server: SorobanServer,
         transaction_signer: Keypair | None = None,
-        parse_result_xdr_fn: Callable[[xdr.SCVal], T] | None = None,
+        parse_result_xdr_fn: Callable[[xdr.SCVal.Any], T] | None = None,
         submit_timeout: int = 180,
         addl_resources: ResourceLeeway | None = None,
         auth_mode: AuthMode | None = None,
@@ -216,7 +216,7 @@ class AssembledTransaction(Generic[T]):
 
     def sign_and_submit(
         self, transaction_signer: Keypair | None = None, force: bool = False
-    ) -> T | xdr.SCVal:
+    ) -> T | xdr.SCVal.Any:
         """Signs and submits the transaction in one step.
 
         A convenience method combining sign() and submit().
@@ -453,12 +453,12 @@ class AssembledTransaction(Generic[T]):
         transaction.signatures = []
         if transaction.transaction.soroban_data:
             transaction.transaction.fee -= (
-                transaction.transaction.soroban_data.resource_fee.int64
+                transaction.transaction.soroban_data.resource_fee
             )
             transaction.transaction.soroban_data = None
         return transaction
 
-    def submit(self) -> T | xdr.SCVal:
+    def submit(self) -> T | xdr.SCVal.Any:
         """Submits the transaction to the network.
 
         It will send the transaction to the network and wait for the result.
@@ -470,11 +470,16 @@ class AssembledTransaction(Generic[T]):
         """
         response = self._submit()
         assert response.result_meta_xdr is not None
-        transaction_meta = TransactionMeta.from_xdr(response.result_meta_xdr)
+        transaction_meta = TransactionMeta.from_xdr_base64(response.result_meta_xdr)
+        # v4 introduced in protocol 23
+        assert isinstance(
+            transaction_meta, (xdr.TransactionMeta.V4, xdr.TransactionMeta.V3)
+        )
         transaction_meta_body = (
-            transaction_meta.v4 or transaction_meta.v3
-        )  # v4 introduced in protocol 23
-        assert transaction_meta_body is not None
+            transaction_meta.v4
+            if isinstance(transaction_meta, xdr.TransactionMeta.V4)
+            else transaction_meta.v3
+        )
         assert transaction_meta_body.soroban_meta is not None
         result_val = transaction_meta_body.soroban_meta.return_value
         assert (
@@ -554,7 +559,7 @@ class AssembledTransaction(Generic[T]):
                 result.add(Address.from_xdr_sc_address(addr_auth.address).address)
         return result
 
-    def result(self) -> T | xdr.SCVal:
+    def result(self) -> T | xdr.SCVal.Any:
         """Get the result of the function invocation from the simulation.
 
         :return: The value returned by the invoked function, parsed if parse_result_xdr_fn was set, otherwise raw XDR
@@ -566,7 +571,7 @@ class AssembledTransaction(Generic[T]):
                 self,
             )
 
-        raw_result = xdr.SCVal.from_xdr(self._simulation_data().result.xdr)
+        raw_result = xdr.SCVal.from_xdr_base64(self._simulation_data().result.xdr)
         if self.parse_result_xdr_fn:
             return self.parse_result_xdr_fn(raw_result)
         return raw_result
@@ -648,7 +653,7 @@ class AssembledTransaction(Generic[T]):
         assert self.simulation.results is not None
         assert self.simulation.transaction_data is not None
         self._simulation_result = self.simulation.results[0]
-        self._simulation_transaction_data = xdr.SorobanTransactionData.from_xdr(
+        self._simulation_transaction_data = xdr.SorobanTransactionData.from_xdr_base64(
             self.simulation.transaction_data
         )
         return SimulationData(

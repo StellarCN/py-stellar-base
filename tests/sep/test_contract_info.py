@@ -22,12 +22,11 @@ from .contract_introspection_helpers import (
 
 
 def test_contract_info_reads_env_meta():
-    env_entry = stellar_xdr.SCEnvMetaEntry(
-        stellar_xdr.SCEnvMetaKind.SC_ENV_META_KIND_INTERFACE_VERSION,
-        interface_version=stellar_xdr.SCEnvMetaEntryInterfaceVersion(
-            protocol=stellar_xdr.Uint32(23),
-            pre_release=stellar_xdr.Uint32(0),
-        ),
+    env_entry = stellar_xdr.SCEnvMetaEntry.InterfaceVersion(
+        stellar_xdr.SCEnvMetaEntryInterfaceVersion(
+            protocol=23,
+            pre_release=0,
+        )
     )
     module = wasm(
         custom_section(

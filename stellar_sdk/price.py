@@ -43,9 +43,7 @@ class Price:
 
         :return: XDR Price object
         """
-        return stellar_xdr.Price(
-            n=stellar_xdr.Int32(self.n), d=stellar_xdr.Int32(self.d)
-        )
+        return stellar_xdr.Price(n=self.n, d=self.d)
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Price) -> "Price":
@@ -54,8 +52,8 @@ class Price:
         :param xdr_object: The XDR Price object.
         :return: A new :class:`Price` object from the given XDR Price object.
         """
-        n = xdr_object.n.int32
-        d = xdr_object.d.int32
+        n = xdr_object.n
+        d = xdr_object.d
         return cls(n, d)
 
     def __lt__(self, other):

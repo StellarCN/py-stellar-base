@@ -18,31 +18,27 @@ class LiquidityPoolId:
         self.type: str = "liquidity_pool_shares"
         raise_if_not_valid_hash(self.liquidity_pool_id, "liquidity_pool_id")
 
-    def to_trust_line_asset_xdr_object(self) -> stellar_xdr.TrustLineAsset:
+    def to_trust_line_asset_xdr_object(self) -> stellar_xdr.TrustLineAsset.Any:
         """Returns the xdr object for this LiquidityPoolId object.
 
         :return: XDR TrustLineAsset object
         """
         liquidity_pool_id_bytes = binascii.unhexlify(self.liquidity_pool_id)
         liquidity_pool_id = stellar_xdr.PoolID.from_xdr_bytes(liquidity_pool_id_bytes)
-        return stellar_xdr.TrustLineAsset(
-            stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE,
-            liquidity_pool_id=liquidity_pool_id,
-        )
+        return stellar_xdr.TrustLineAsset.PoolShare(liquidity_pool_id)
 
     @classmethod
     def from_xdr_object(
-        cls, xdr_object: stellar_xdr.TrustLineAsset
+        cls, xdr_object: stellar_xdr.TrustLineAsset.Any
     ) -> "LiquidityPoolId":
         """Create a :class:`LiquidityPoolId` from an XDR Asset object.
 
         :param xdr_object: The XDR TrustLineAsset object.
         :return: A new :class:`LiquidityPoolId` object from the given XDR TrustLineAsset object.
         """
-        if xdr_object.type != stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE:
+        if not isinstance(xdr_object, stellar_xdr.TrustLineAsset.PoolShare):
             raise ValueError(f"Unexpected asset type: {xdr_object.type}")
-        assert xdr_object.liquidity_pool_id is not None
-        liquidity_pool_id = xdr_object.liquidity_pool_id.pool_id.hash.hex()
+        liquidity_pool_id = xdr_object.liquidity_pool_id.hex()
         return cls(liquidity_pool_id)
 
     def __hash__(self):

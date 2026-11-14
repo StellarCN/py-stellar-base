@@ -25,13 +25,11 @@ class RestoreFootprint(Operation):
     def __init__(self, source: MuxedAccount | str | None = None) -> None:
         super().__init__(source)
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         op = stellar_xdr.RestoreFootprintOp(
-            ext=stellar_xdr.ExtensionPoint(0),
+            ext=stellar_xdr.ExtensionPoint.V0(),
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, restore_footprint_op=op
-        )
+        body = stellar_xdr.OperationBody.RestoreFootprint(op)
         return body
 
     @classmethod
