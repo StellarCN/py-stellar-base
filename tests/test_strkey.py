@@ -227,6 +227,8 @@ class TestStrKey:
             "PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAEQAAAAAAAAAAAAAAAAAABB",
             "",
             "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY",
+            # 1-byte payload 0x01 followed by padding 0xffffff instead of zeros
+            "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAQD77777KO4",
         ],
     )
     def test_decode_ed25519_signed_payload_raise(self, key):
@@ -265,6 +267,14 @@ class TestStrKey:
             ),
             ("GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY", False),
             ("PA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAAAAAAGK7I", False),
+            (
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAQCAAAAC4DY",
+                True,
+            ),
+            (
+                "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAAQD77777KO4",
+                False,
+            ),
         ],
     )
     def test_is_valid_ed25519_signed_payload(self, key, valid):
