@@ -222,4 +222,4 @@ def from_xdr_amount(value: int) -> str:
         amount.
 
     """
-    return str(Decimal(value) / _ONE)
+    return format(Decimal(value) / _ONE, "f")
