@@ -134,7 +134,7 @@ class TestManageSellOffer:
     @pytest.mark.parametrize("offer_id", [0, 1, 2**63 - 1])
     def test_offer_id_at_bounds(self, offer_id):
         op = ManageSellOffer(native_asset, asset1, "1", "1", offer_id, kp1.public_key)
-        restored = Operation.from_xdr_object(op.to_xdr_object())
+        restored = ManageSellOffer.from_xdr_object(op.to_xdr_object())
         assert restored.offer_id == offer_id
 
     def test_from_xdr_object_keeps_negative_offer_id(self):
@@ -142,6 +142,6 @@ class TestManageSellOffer:
         xdr_object = op.to_xdr_object()
         assert xdr_object.body.manage_sell_offer_op is not None
         xdr_object.body.manage_sell_offer_op.offer_id.int64 = -1
-        restored = Operation.from_xdr_object(xdr_object)
+        restored = ManageSellOffer.from_xdr_object(xdr_object)
         assert restored.offer_id == -1
         assert restored.to_xdr_object().to_xdr() == xdr_object.to_xdr()

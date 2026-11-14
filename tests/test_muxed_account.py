@@ -86,7 +86,9 @@ class TestMuxedAccount:
         muxed_account = MuxedAccount(account_id, 2**64 - 1)
         restored = MuxedAccount.from_xdr_object(muxed_account.to_xdr_object())
         assert restored.account_muxed_id == 2**64 - 1
-        assert MuxedAccount.from_account(muxed_account.account_muxed) == muxed_account
+        account_muxed = muxed_account.account_muxed
+        assert account_muxed is not None
+        assert MuxedAccount.from_account(account_muxed) == muxed_account
 
     def test_account_muxed_id_is_negative_raise(self):
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
