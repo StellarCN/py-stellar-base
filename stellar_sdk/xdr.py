@@ -13,9 +13,10 @@ See the stellar-xdr documentation for the guide and the full API.
 """
 
 import stellar_xdr as _stellar_xdr
+
 # A wildcard import keeps this module in step with stellar-xdr as types are added.
 # Type checkers still see every name, since `__all__` below is built from stellar-xdr's.
-from stellar_xdr import *  # noqa: F403  # pyright: ignore[reportWildcardImportFromLibrary]
+from stellar_xdr import *  # pyright: ignore[reportWildcardImportFromLibrary]
 
 __all__: list[str] = []
 __all__ += _stellar_xdr.__all__

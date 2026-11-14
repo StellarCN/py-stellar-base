@@ -2256,7 +2256,7 @@ requires-dist = [
     { name = "requests-sse", specifier = ">=0.3" },
     { name = "shamir-mnemonic", marker = "extra == 'shamir'", specifier = ">=0.3.0" },
     { name = "stellar-strkey", specifier = ">=0.2.0,<0.3.0" },
-    { name = "stellar-xdr", editable = "../py-stellar-xdr" },
+    { name = "stellar-xdr", specifier = ">=0.2.0,<0.3.0" },
 ]
 provides-extras = ["aiohttp", "shamir"]
 
@@ -2291,38 +2291,14 @@ wheels = [
 [[package]]
 name = "stellar-xdr"
 version = "0.2.0"
-source = { editable = "../py-stellar-xdr" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "stellar-strkey" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "stellar-strkey", specifier = ">=0.2.0,<0.3.0" },
-    { name = "typing-extensions", marker = "python_full_version < '3.12'", specifier = ">=4.6" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "git-cliff", specifier = ">=2.14.2" },
-    { name = "hypothesis", specifier = ">=6.170" },
-    { name = "mypy", specifier = ">=2.4" },
-    { name = "prek", specifier = ">=0.5" },
-    { name = "pyright", extras = ["nodejs"], specifier = ">=1.1.414" },
-    { name = "pytest", specifier = ">=9.2" },
-    { name = "pytest-cov", specifier = ">=7.1" },
-    { name = "ruff", specifier = ">=0.17" },
-    { name = "zizmor", specifier = ">=1.32" },
-]
-docs = [
-    { name = "mkdocstrings-python", specifier = ">=2.0.10" },
-    { name = "zensical", specifier = ">=0.0.74" },
-]
-test = [
-    { name = "hypothesis", specifier = ">=6.170" },
-    { name = "pytest", specifier = ">=9.2" },
-    { name = "pytest-cov", specifier = ">=7.1" },
+sdist = { url = "https://files.pythonhosted.org/packages/52/2c/b129abbaed13f779af14d39faa2efa791bae083a9f8c907709cc0f4f5acb/stellar_xdr-0.2.0.tar.gz", hash = "sha256:72219a460e8306468539e3d9f75160875578431bf95e8117c2a4146382760af6", size = 1768929, upload-time = "2026-11-13T09:30:46.204Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/72/8bc14784418f0d70b75e0a765f0a9c06dece621876302eb70e895e0b8c6c/stellar_xdr-0.2.0-py3-none-any.whl", hash = "sha256:47d000487d949b04186c543814b7bc76bf56abc173cb5559869a32fba6e7375c", size = 271039, upload-time = "2026-11-13T09:30:44.497Z" },
 ]
 
 [[package]]

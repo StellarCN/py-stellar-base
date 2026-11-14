@@ -81,10 +81,6 @@ docs = [
     "sphinx-rtd-theme>=3.0.2",
 ]
 
-# Temporary, while stellar-xdr gaps found by this migration are fixed. Remove before merging.
-[tool.uv.sources]
-stellar-xdr = { path = "../py-stellar-xdr", editable = true }
-
 [build-system]
 requires = ["flit_core>=3.2,<5"]
 build-backend = "flit_core.buildapi"
