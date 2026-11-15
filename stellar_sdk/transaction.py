@@ -112,19 +112,15 @@ class Transaction:
                 f"must be {CreateClaimableBalance}, got {type(op)} instead"
             )
         account_id = Keypair.from_public_key(self.source.account_id).xdr_account_id()
-        operation_id = stellar_xdr.HashIDPreimage(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_OP_ID,
-            operation_id=stellar_xdr.HashIDPreimageOperationID(
+        operation_id = stellar_xdr.HashIDPreimage.OpID(
+            stellar_xdr.HashIDPreimageOperationID(
                 source_account=account_id,
-                seq_num=stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.sequence)),
-                op_num=stellar_xdr.Uint32(operation_index),
-            ),
+                seq_num=self.sequence,
+                op_num=operation_index,
+            )
         )
         operation_id_hash = sha256(operation_id.to_xdr_bytes())
-        balance_id = stellar_xdr.ClaimableBalanceID(
-            type=stellar_xdr.ClaimableBalanceIDType.CLAIMABLE_BALANCE_ID_TYPE_V0,
-            v0=stellar_xdr.Hash(operation_id_hash),
-        )
+        balance_id = stellar_xdr.ClaimableBalanceID.V0(operation_id_hash)
         return balance_id.to_xdr_bytes().hex()
 
     def to_xdr_object(
@@ -136,28 +132,22 @@ class Transaction:
         """
         memo = self.memo.to_xdr_object()
         operations = [operation.to_xdr_object() for operation in self.operations]
-        fee = stellar_xdr.Uint32(self.fee)
-        sequence = stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.sequence))
         if not self.v1:
             source_xdr_v0 = (
-                Keypair.from_public_key(self.source.account_id)
-                .xdr_account_id()
-                .account_id.ed25519
+                Keypair.from_public_key(self.source.account_id).xdr_account_id().ed25519
             )
 
             time_bounds = None
             if self.preconditions and self.preconditions.time_bounds:
                 time_bounds = self.preconditions.time_bounds.to_xdr_object()
-            assert source_xdr_v0 is not None
-            ext_v0 = stellar_xdr.TransactionV0Ext(0)
             return stellar_xdr.TransactionV0(
                 source_xdr_v0,
-                fee,
-                sequence,
+                self.fee,
+                self.sequence,
                 time_bounds,
                 memo,
                 operations,
-                ext_v0,
+                stellar_xdr.TransactionV0Ext.V0(),
             )
         preconditions = (
             self.preconditions.to_xdr_object()
@@ -166,17 +156,16 @@ class Transaction:
         )
         source_xdr = self.source.to_xdr_object()
         if self.soroban_data:
-            ext = stellar_xdr.TransactionExt(
-                1,
-                self.soroban_data,
+            ext: stellar_xdr.TransactionExt.Any = stellar_xdr.TransactionExt.V1(
+                self.soroban_data
             )
         else:
-            ext = stellar_xdr.TransactionExt(0)
+            ext = stellar_xdr.TransactionExt.V0()
 
         return stellar_xdr.Transaction(
             source_xdr,
-            fee,
-            sequence,
+            self.fee,
+            self.sequence,
             preconditions,
             memo,
             operations,
@@ -211,9 +200,7 @@ class Transaction:
                 soroban_data = xdr_object.ext.soroban_data
         else:
             assert isinstance(xdr_object, stellar_xdr.TransactionV0)
-            ed25519_key = str(
-                Ed25519PublicKey(xdr_object.source_account_ed25519.uint256)
-            )
+            ed25519_key = str(Ed25519PublicKey(xdr_object.source_account_ed25519))
             source = MuxedAccount(ed25519_key, None)
             if xdr_object.time_bounds:
                 time_bounds = TimeBounds.from_xdr_object(xdr_object.time_bounds)
@@ -221,8 +208,8 @@ class Transaction:
             else:
                 preconditions = None
 
-        sequence = xdr_object.seq_num.sequence_number.int64
-        fee = xdr_object.fee.uint32
+        sequence = int(xdr_object.seq_num)
+        fee = xdr_object.fee
         memo = Memo.from_xdr_object(xdr_object.memo)
         operations = list(map(Operation.from_xdr_object, xdr_object.operations))
 
@@ -251,9 +238,9 @@ class Transaction:
         :return: A new :class:`Transaction` object from the given XDR Transaction base64 string object.
         """
         if v1:
-            xdr_object = stellar_xdr.Transaction.from_xdr(xdr)
+            xdr_object = stellar_xdr.Transaction.from_xdr_base64(xdr)
             return cls.from_xdr_object(xdr_object, v1)
-        xdr_object_v0 = stellar_xdr.TransactionV0.from_xdr(xdr)
+        xdr_object_v0 = stellar_xdr.TransactionV0.from_xdr_base64(xdr)
         return cls.from_xdr_object(xdr_object_v0, v1)
 
     def is_soroban_transaction(self) -> bool:

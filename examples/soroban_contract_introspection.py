@@ -87,9 +87,9 @@ def print_spec(spec: ContractSpec) -> None:
             inputs = _format_function_inputs(function.inputs)
             outputs = ", ".join(_type_name(output) for output in function.outputs)
             if outputs:
-                print(f"    {_symbol(function.name)}({inputs}) -> {outputs}")
+                print(f"    {_text(function.name)}({inputs}) -> {outputs}")
             else:
-                print(f"    {_symbol(function.name)}({inputs})")
+                print(f"    {_text(function.name)}({inputs})")
 
     if spec.events:
         print("  events:")
@@ -129,16 +129,12 @@ def _format_event_params(params: Sequence[stellar_xdr.SCSpecEventParamV0]) -> st
     return ", ".join(_format_name_and_type(param.name, param.type) for param in params)
 
 
-def _format_name_and_type(name: bytes, type_def: stellar_xdr.SCSpecTypeDef) -> str:
+def _format_name_and_type(name: bytes, type_def: stellar_xdr.SCSpecTypeDef.Any) -> str:
     return f"{_text(name)}: {_type_name(type_def)}"
 
 
-def _type_name(type_def: stellar_xdr.SCSpecTypeDef) -> str:
+def _type_name(type_def: stellar_xdr.SCSpecTypeDef.Any) -> str:
     return type_def.type.name.removeprefix("SC_SPEC_TYPE_").lower()
-
-
-def _symbol(symbol: stellar_xdr.SCSymbol) -> str:
-    return _text(symbol.sc_symbol)
 
 
 def _text(value: bytes) -> str:

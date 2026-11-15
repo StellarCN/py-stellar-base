@@ -41,52 +41,57 @@ try:
 except BadRequestError as e:
     print("Failed to send payment to contract. Results:", e)
     assert e.result_xdr is not None
-    tx_result = stellar_xdr.TransactionResult.from_xdr(e.result_xdr)
+    tx_result = stellar_xdr.TransactionResult.from_xdr_base64(e.result_xdr)
     # However, it may fail due to the entry being archived; for this reason, we should try to recover the data entry and then resend the transaction.
     # See https://developers.stellar.org/docs/learn/encyclopedia/storage/state-archival
-    if (
-        tx_result.result.code == stellar_xdr.TransactionResultCode.txFAILED
-        and tx_result.result.results
-        and len(tx_result.result.results) == 1
-        and tx_result.result.results[0].tr
-        and tx_result.result.results[0].tr.invoke_host_function_result
-        and tx_result.result.results[0].tr.invoke_host_function_result.code
-        == stellar_xdr.InvokeHostFunctionResultCode.INVOKE_HOST_FUNCTION_ENTRY_ARCHIVED
-    ):
-        print("The contract has been archived, we need to restore it.")
-        # 2. Restore the contract
-        # example tx: https://stellar.expert/explorer/public/tx/6992ccd04593452cb1f236ef266e2e9691cded85722c463aee5a01a1ccc006cf
-        tx = (
-            TransactionBuilder(
-                source_account, network_passphrase=network_passphrase, base_fee=base_fee
+    match tx_result.result:
+        case stellar_xdr.TransactionResultResult.TxFailed(
+            [
+                stellar_xdr.OperationResult.OpInner(
+                    stellar_xdr.OperationResultTr.InvokeHostFunction(
+                        stellar_xdr.InvokeHostFunctionResult.EntryArchived()
+                    )
+                )
+            ]
+        ):
+            print("The contract has been archived, we need to restore it.")
+            # 2. Restore the contract
+            # example tx: https://stellar.expert/explorer/public/tx/6992ccd04593452cb1f236ef266e2e9691cded85722c463aee5a01a1ccc006cf
+            tx = (
+                TransactionBuilder(
+                    source_account,
+                    network_passphrase=network_passphrase,
+                    base_fee=base_fee,
+                )
+                .append_restore_asset_balance_entry_op(
+                    balance_owner=destination,
+                    asset=asset,
+                )
+                .set_timeout(300)
+                .build()
             )
-            .append_restore_asset_balance_entry_op(
-                balance_owner=destination,
-                asset=asset,
-            )
-            .set_timeout(300)
-            .build()
-        )
-        tx.sign(kp)
-        response = server.submit_transaction(tx)
-        print("Restore balance entry success! Results:", response)
+            tx.sign(kp)
+            response = server.submit_transaction(tx)
+            print("Restore balance entry success! Results:", response)
 
-        # 3. Try to send payment to a contract again
-        # example tx: https://stellar.expert/explorer/public/tx/7c2a77d538f803da8cf2b14250c3a41b7fa0f2cf37dd437107e3c825efe60b91
-        tx = (
-            TransactionBuilder(
-                source_account, network_passphrase=network_passphrase, base_fee=base_fee
+            # 3. Try to send payment to a contract again
+            # example tx: https://stellar.expert/explorer/public/tx/7c2a77d538f803da8cf2b14250c3a41b7fa0f2cf37dd437107e3c825efe60b91
+            tx = (
+                TransactionBuilder(
+                    source_account,
+                    network_passphrase=network_passphrase,
+                    base_fee=base_fee,
+                )
+                .append_payment_to_contract_op(
+                    destination=destination,
+                    asset=asset,
+                    amount=amount,
+                )
+                .set_timeout(300)
+                .build()
             )
-            .append_payment_to_contract_op(
-                destination=destination,
-                asset=asset,
-                amount=amount,
-            )
-            .set_timeout(300)
-            .build()
-        )
-        tx.sign(kp)
-        response = server.submit_transaction(tx)
-        print("Send payment to contract success! Results:", response)
-    else:
-        print("Unknown error:", e)
+            tx.sign(kp)
+            response = server.submit_transaction(tx)
+            print("Send payment to contract success! Results:", response)
+        case _:
+            print("Unknown error:", e)

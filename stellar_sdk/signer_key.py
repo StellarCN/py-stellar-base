@@ -1,7 +1,6 @@
 from enum import IntEnum
 
 from . import xdr as stellar_xdr
-from .__version__ import __issues__
 from .exceptions import Ed25519PublicKeyInvalidError
 from .strkey import (
     Ed25519PublicKey,
@@ -175,77 +174,50 @@ class SignerKey:
         payload = self.signer_key[36 : 36 + payload_length]
         return SignedPayloadSigner(account_id, payload)
 
-    def to_xdr_object(self) -> stellar_xdr.SignerKey:
+    def to_xdr_object(self) -> stellar_xdr.SignerKey.Any:
         """Returns the xdr object for this SignerKey object.
 
         :return: XDR Signer object
         """
         if self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519:
-            return stellar_xdr.SignerKey(
-                type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519,
-                ed25519=stellar_xdr.Uint256(self.signer_key),
-            )
+            return stellar_xdr.SignerKey.Ed25519(self.signer_key)
         elif self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
-            return stellar_xdr.SignerKey(
-                type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX,
-                pre_auth_tx=stellar_xdr.Uint256(self.signer_key),
-            )
+            return stellar_xdr.SignerKey.PreAuthTx(self.signer_key)
         elif (
             self.signer_key_type == SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
         ):
             payload_length = int.from_bytes(self.signer_key[32:36], byteorder="big")
             ed25519_signed_payload = stellar_xdr.SignerKeyEd25519SignedPayload(
-                ed25519=stellar_xdr.Uint256(self.signer_key[:32]),
+                ed25519=self.signer_key[:32],
                 payload=self.signer_key[36 : 36 + payload_length],
             )
-            return stellar_xdr.SignerKey(
-                type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD,
-                ed25519_signed_payload=ed25519_signed_payload,
-            )
+            return stellar_xdr.SignerKey.Ed25519SignedPayload(ed25519_signed_payload)
         else:
-            return stellar_xdr.SignerKey(
-                type=stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X,
-                hash_x=stellar_xdr.Uint256(self.signer_key),
-            )
+            return stellar_xdr.SignerKey.HashX(self.signer_key)
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.SignerKey) -> "SignerKey":
+    def from_xdr_object(cls, xdr_object: stellar_xdr.SignerKey.Any) -> "SignerKey":
         """Create a :class:`SignerKey` from an XDR SignerKey object.
 
         :param xdr_object: The XDR SignerKey object.
         :return: A new :class:`SignerKey` object from the given XDR SignerKey object.
         """
-        if xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519:
-            assert xdr_object.ed25519 is not None
-            return cls(
-                xdr_object.ed25519.uint256, SignerKeyType.SIGNER_KEY_TYPE_ED25519
-            )
-        elif xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX:
-            assert xdr_object.pre_auth_tx is not None
-            return cls(
-                xdr_object.pre_auth_tx.uint256,
-                SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX,
-            )
-        elif xdr_object.type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X:
-            assert xdr_object.hash_x is not None
-            return cls(xdr_object.hash_x.uint256, SignerKeyType.SIGNER_KEY_TYPE_HASH_X)
-        elif (
-            xdr_object.type
-            == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
-        ):
-            assert xdr_object.ed25519_signed_payload is not None
-            encoded_account_id = str(
-                Ed25519PublicKey(xdr_object.ed25519_signed_payload.ed25519.uint256)
-            )
-            payload = xdr_object.ed25519_signed_payload.payload
-            ed25519_signed_payload = SignedPayloadSigner(encoded_account_id, payload)
-            return cls.ed25519_signed_payload(
-                ed25519_signed_payload=ed25519_signed_payload
-            )
-        else:
-            raise ValueError(
-                f"This is an unknown signer key type, please consider creating an issuer at {__issues__}."
-            )
+        match xdr_object:
+            case stellar_xdr.SignerKey.Ed25519(key):
+                return cls(bytes(key), SignerKeyType.SIGNER_KEY_TYPE_ED25519)
+            case stellar_xdr.SignerKey.PreAuthTx(key):
+                return cls(bytes(key), SignerKeyType.SIGNER_KEY_TYPE_PRE_AUTH_TX)
+            case stellar_xdr.SignerKey.HashX(key):
+                return cls(bytes(key), SignerKeyType.SIGNER_KEY_TYPE_HASH_X)
+            case stellar_xdr.SignerKey.Ed25519SignedPayload(signed_payload):
+                return cls(
+                    Ed25519SignedPayload(
+                        bytes(signed_payload.ed25519), bytes(signed_payload.payload)
+                    ).to_bytes(),
+                    SignerKeyType.SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD,
+                )
+            case _:
+                raise ValueError(f"Unsupported signer key: {xdr_object!r}")
 
     def __hash__(self):
         return hash((self.signer_key, self.signer_key_type))

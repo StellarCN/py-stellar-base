@@ -1,7 +1,12 @@
 import pytest
 
 from stellar_sdk import LIQUIDITY_POOL_FEE_V18, Asset, LiquidityPoolAsset
-from stellar_sdk.xdr import AssetType, ChangeTrustAsset, LiquidityPoolType
+from stellar_sdk.xdr import (
+    AssetType,
+    ChangeTrustAsset,
+    LiquidityPoolConstantProductParameters,
+    LiquidityPoolParameters,
+)
 
 
 class TestLiquidityPoolAsset:
@@ -30,26 +35,19 @@ class TestLiquidityPoolAsset:
     def test_to_change_trust_asset_xdr_object(self):
         asset = LiquidityPoolAsset(self.asset_a, self.asset_b, fee=self.fee)
         xdr_object = asset.to_change_trust_asset_xdr_object()
-        assert isinstance(xdr_object, ChangeTrustAsset)
         assert xdr_object.type == AssetType.ASSET_TYPE_POOL_SHARE
-        assert xdr_object.liquidity_pool is not None
-        assert (
-            xdr_object.liquidity_pool.type
-            == LiquidityPoolType.LIQUIDITY_POOL_CONSTANT_PRODUCT
+        assert xdr_object == ChangeTrustAsset.PoolShare(
+            LiquidityPoolParameters.ConstantProduct(
+                LiquidityPoolConstantProductParameters(
+                    asset_a=self.asset_a.to_xdr_object(),
+                    asset_b=self.asset_b.to_xdr_object(),
+                    fee=self.fee,
+                )
+            )
         )
-        assert xdr_object.liquidity_pool.constant_product is not None
-        assert (
-            xdr_object.liquidity_pool.constant_product.asset_a
-            == self.asset_a.to_xdr_object()
-        )
-        assert (
-            xdr_object.liquidity_pool.constant_product.asset_b
-            == self.asset_b.to_xdr_object()
-        )
-        assert xdr_object.liquidity_pool.constant_product.fee.int32 == self.fee
         assert asset == LiquidityPoolAsset.from_xdr_object(xdr_object)
         assert (
-            xdr_object.to_xdr()
+            xdr_object.to_xdr_base64()
             == "AAAAAwAAAAAAAAABQVJTVAAAAAB/MGI0yYnp1n9p39kxGYtgDz1s5rZMIkBwH7YrCIMrhwAAAAFVU0QAAAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAHg=="
         )
 

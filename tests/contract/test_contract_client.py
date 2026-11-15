@@ -223,8 +223,7 @@ class TestContractClient:
         assert response.events.contract_events_xdr is not None
         transfer_events = []
         for event_xdr in response.events.contract_events_xdr[0]:
-            body = stellar_xdr.ContractEvent.from_xdr(event_xdr).body.v0
-            assert body is not None
+            body = stellar_xdr.ContractEvent.from_xdr_base64(event_xdr).body.v0
             if scval.to_native(body.topics[0]) == "transfer":
                 transfer_events.append(body)
         assert len(transfer_events) == 1

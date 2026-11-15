@@ -80,7 +80,7 @@ class Operation(metaclass=ABCMeta):
         return utils.from_xdr_amount(value)
 
     @abstractmethod
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         pass
 
     def to_xdr_object(self) -> stellar_xdr.Operation:

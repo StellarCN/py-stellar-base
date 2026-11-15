@@ -5,10 +5,9 @@ from collections.abc import Iterable
 from stellar_sdk import xdr as stellar_xdr
 
 
-def meta_entry(key: str, value: str) -> stellar_xdr.SCMetaEntry:
-    return stellar_xdr.SCMetaEntry(
-        stellar_xdr.SCMetaKind.SC_META_V0,
-        v0=stellar_xdr.SCMetaV0(key.encode(), value.encode()),
+def meta_entry(key: str, value: str) -> stellar_xdr.SCMetaEntry.Any:
+    return stellar_xdr.SCMetaEntry.V0(
+        stellar_xdr.SCMetaV0(key.encode(), value.encode())
     )
 
 

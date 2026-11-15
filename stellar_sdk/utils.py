@@ -152,11 +152,9 @@ def build_contract_executable_external_ref(
         raise ValueError(
             f'Value of argument "owner" must be a contract address: {owner.address}'
         )
-    if isinstance(tag, str):
-        tag = tag.encode("utf-8")
     return stellar_xdr.ContractExecutableExternalRef(
         executable_owner=owner.to_xdr_sc_address(),
-        tag=stellar_xdr.SCString(tag),
+        tag=tag,
     )
 
 

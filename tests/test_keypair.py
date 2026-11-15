@@ -669,7 +669,7 @@ class TestKeypair:
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
         kp = Keypair.from_public_key(public_key)
         assert (
-            kp.xdr_public_key().to_xdr()
+            kp.xdr_public_key().to_xdr_base64()
             == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
         )
 
@@ -677,7 +677,7 @@ class TestKeypair:
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
         kp = Keypair.from_public_key(public_key)
         assert (
-            kp.xdr_account_id().to_xdr()
+            kp.xdr_account_id().to_xdr_base64()
             == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
         )
 
@@ -685,7 +685,7 @@ class TestKeypair:
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
         kp = Keypair.from_public_key(public_key)
         assert (
-            kp.xdr_muxed_account().to_xdr()
+            kp.xdr_muxed_account().to_xdr_base64()
             == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
         )
 

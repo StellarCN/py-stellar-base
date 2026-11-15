@@ -40,7 +40,7 @@ class ContractInfo:
         self,
         meta: ContractMeta,
         spec: ContractSpec,
-        env_meta: tuple[stellar_xdr.SCEnvMetaEntry, ...] = (),
+        env_meta: tuple[stellar_xdr.SCEnvMetaEntry.Any, ...] = (),
     ) -> None:
         self._meta = meta
         self._spec = spec
@@ -57,7 +57,7 @@ class ContractInfo:
         return self._spec
 
     @property
-    def env_meta(self) -> tuple[stellar_xdr.SCEnvMetaEntry, ...]:
+    def env_meta(self) -> tuple[stellar_xdr.SCEnvMetaEntry.Any, ...]:
         """Returns the contract environment metadata entries."""
         return self._env_meta
 
@@ -69,9 +69,9 @@ class ContractInfo:
         :return: A :class:`ContractInfo` object.
         :raises InvalidWasmError: If the Wasm module or any introspection section cannot be decoded.
         """
-        meta_entries: list[stellar_xdr.SCMetaEntry] = []
+        meta_entries: list[stellar_xdr.SCMetaEntry.Any] = []
         spec_sections: list[bytes] = []
-        env_meta: list[stellar_xdr.SCEnvMetaEntry] = []
+        env_meta: list[stellar_xdr.SCEnvMetaEntry.Any] = []
         for section_name, section in iter_wasm_custom_sections(wasm):
             if section_name == CONTRACT_META_SECTION_NAME:
                 meta_entries.extend(parse_sc_meta_entries(section))

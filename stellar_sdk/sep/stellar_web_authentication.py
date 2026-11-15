@@ -185,7 +185,7 @@ def read_challenge_transaction(
             "Invalid server_account_id, multiplexed account are not supported."
         )
 
-    xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(challenge_transaction)
+    xdr_object = stellar_xdr.TransactionEnvelope.from_xdr_base64(challenge_transaction)
     if xdr_object.type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
         raise ValueError(
             "Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope."

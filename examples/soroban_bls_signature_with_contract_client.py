@@ -75,7 +75,7 @@ def bls_sign(payload32: bytes) -> bytes:
     return signature
 
 
-def bls_signer(preimage: stellar_xdr.HashIDPreimage) -> stellar_xdr.SCVal:
+def bls_signer(preimage: stellar_xdr.HashIDPreimage.Any) -> stellar_xdr.SCVal.Any:
     payload = authorization_payload_hash(preimage)
     return scval.to_bytes(bls_sign(payload))
 

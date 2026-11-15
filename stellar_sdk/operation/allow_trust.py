@@ -85,25 +85,17 @@ class AllowTrust(Operation):
         raise_if_not_valid_ed25519_public_key(self.trustor, "trustor")
         Asset.check_if_asset_code_is_valid(self.asset_code)
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         trustor = Keypair.from_public_key(self.trustor).xdr_account_id()
-        length = len(self.asset_code)
-        pad_length = 4 - length if length <= 4 else 12 - length
-        asset_code = bytes(bytearray(self.asset_code, "ascii") + b"\x00" * pad_length)
-        authorize = stellar_xdr.Uint32(self.authorize.value)
-        if len(asset_code) == 4:
-            asset_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4
-            asset_code4 = stellar_xdr.AssetCode4(asset_code)
-            asset = stellar_xdr.AssetCode(type=asset_type, asset_code4=asset_code4)
-        else:
-            asset_type = stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12
-            asset_code12 = stellar_xdr.AssetCode12(asset_code)
-            asset = stellar_xdr.AssetCode(type=asset_type, asset_code12=asset_code12)
-        allow_trust_op = stellar_xdr.AllowTrustOp(trustor, asset, authorize)
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, allow_trust_op=allow_trust_op
+        code = self.asset_code.encode("ascii")
+        asset = (
+            stellar_xdr.AssetCode.CreditAlphaNum4(code.ljust(4, b"\x00"))
+            if len(code) <= 4
+            else stellar_xdr.AssetCode.CreditAlphaNum12(code.ljust(12, b"\x00"))
         )
-        return body
+        return stellar_xdr.OperationBody.AllowTrust(
+            stellar_xdr.AllowTrustOp(trustor, asset, self.authorize.value)
+        )
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "AllowTrust":
@@ -112,36 +104,22 @@ class AllowTrust(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.allow_trust_op is not None
-        assert xdr_object.body.allow_trust_op.trustor.account_id.ed25519 is not None
-        trustor = str(
-            Ed25519PublicKey(
-                xdr_object.body.allow_trust_op.trustor.account_id.ed25519.uint256
-            )
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.AllowTrust)
+        op = body.allow_trust_op
+        match op.asset:
+            case stellar_xdr.AssetCode.CreditAlphaNum4(
+                code
+            ) | stellar_xdr.AssetCode.CreditAlphaNum12(code):
+                asset_code = code.rstrip(b"\x00").decode()
+            case asset:
+                raise ValueError(f"Unsupported asset code type: {asset.type!r}")
+        return cls(
+            source=source,
+            trustor=str(Ed25519PublicKey(op.trustor.ed25519)),
+            authorize=TrustLineEntryFlag(op.authorize),
+            asset_code=asset_code,
         )
-        authorize = xdr_object.body.allow_trust_op.authorize.uint32
-        authorize = TrustLineEntryFlag(authorize)
-        asset_type = xdr_object.body.allow_trust_op.asset.type
-        if asset_type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM4:
-            assert xdr_object.body.allow_trust_op.asset.asset_code4 is not None
-            asset_code = (
-                xdr_object.body.allow_trust_op.asset.asset_code4.asset_code4.decode()
-            )
-        elif asset_type == stellar_xdr.AssetType.ASSET_TYPE_CREDIT_ALPHANUM12:
-            assert xdr_object.body.allow_trust_op.asset.asset_code12 is not None
-            asset_code = (
-                xdr_object.body.allow_trust_op.asset.asset_code12.asset_code12.decode()
-            )
-        else:
-            raise NotImplementedError(
-                f"Operation of asset_type={asset_type} is not implemented."
-            )
-
-        asset_code = asset_code.rstrip("\x00")
-        op = cls(
-            source=source, trustor=trustor, authorize=authorize, asset_code=asset_code
-        )
-        return op
 
     def __repr__(self):
         return (

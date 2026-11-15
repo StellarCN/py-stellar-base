@@ -17,7 +17,7 @@ from .contract_introspection_helpers import custom_section, wasm
 def test_contract_spec_classifies_and_finds_entries():
     function = stellar_xdr.SCSpecFunctionV0(
         doc=b"",
-        name=stellar_xdr.SCSymbol(b"hello"),
+        name="hello",
         inputs=[],
         outputs=[],
     )
@@ -54,30 +54,12 @@ def test_contract_spec_classifies_and_finds_entries():
         cases=[],
     )
     entries = (
-        stellar_xdr.SCSpecEntry(
-            stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_FUNCTION_V0,
-            function_v0=function,
-        ),
-        stellar_xdr.SCSpecEntry(
-            stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_STRUCT_V0,
-            udt_struct_v0=struct,
-        ),
-        stellar_xdr.SCSpecEntry(
-            stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_EVENT_V0,
-            event_v0=event,
-        ),
-        stellar_xdr.SCSpecEntry(
-            stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_UNION_V0,
-            udt_union_v0=union,
-        ),
-        stellar_xdr.SCSpecEntry(
-            stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ENUM_V0,
-            udt_enum_v0=enum,
-        ),
-        stellar_xdr.SCSpecEntry(
-            stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0,
-            udt_error_enum_v0=error_enum,
-        ),
+        stellar_xdr.SCSpecEntry.FunctionV0(function),
+        stellar_xdr.SCSpecEntry.UDTStructV0(struct),
+        stellar_xdr.SCSpecEntry.EventV0(event),
+        stellar_xdr.SCSpecEntry.UDTUnionV0(union),
+        stellar_xdr.SCSpecEntry.UDTEnumV0(enum),
+        stellar_xdr.SCSpecEntry.UDTErrorEnumV0(error_enum),
     )
     module = wasm(
         custom_section(CONTRACT_SPEC_SECTION_NAME, serialize_sc_spec_entries(entries))
@@ -122,32 +104,24 @@ def test_contract_spec_empty_and_from_wasm_file(tmp_path):
 def test_contract_spec_lookup_decode_errors():
     function = stellar_xdr.SCSpecFunctionV0(
         doc=b"",
-        name=stellar_xdr.SCSymbol(b"\xff"),
+        name=b"\xff",
         inputs=[],
         outputs=[],
     )
-    spec = ContractSpec(
-        (
-            stellar_xdr.SCSpecEntry(
-                stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_FUNCTION_V0,
-                function_v0=function,
-            ),
-        )
-    )
+    spec = ContractSpec((stellar_xdr.SCSpecEntry.FunctionV0(function),))
 
     with pytest.raises(InvalidWasmError, match="non-UTF-8"):
         spec.get_function("invalid")
 
     invalid_udt = ContractSpec(
         (
-            stellar_xdr.SCSpecEntry(
-                stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_STRUCT_V0,
-                udt_struct_v0=stellar_xdr.SCSpecUDTStructV0(
+            stellar_xdr.SCSpecEntry.UDTStructV0(
+                stellar_xdr.SCSpecUDTStructV0(
                     doc=b"",
                     lib=b"",
                     name=b"\xff",
                     fields=[],
-                ),
+                )
             ),
         )
     )

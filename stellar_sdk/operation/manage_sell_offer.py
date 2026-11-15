@@ -62,31 +62,28 @@ class ManageSellOffer(Operation):
         raise_if_not_valid_amount(self.amount, "amount")
         raise_if_not_valid_offer_id(self.offer_id, "offer_id")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
         price = self.price.to_xdr_object()
-        amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
+        amount = Operation.to_xdr_amount(self.amount)
         manage_sell_offer_op = stellar_xdr.ManageSellOfferOp(
-            selling, buying, amount, price, stellar_xdr.Int64(self.offer_id)
+            selling, buying, amount, price, self.offer_id
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, manage_sell_offer_op=manage_sell_offer_op
-        )
+        body = stellar_xdr.OperationBody.ManageSellOffer(manage_sell_offer_op)
         return body
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "ManageSellOffer":
         """Creates a :class:`ManageSellOffer` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.manage_sell_offer_op is not None
-        selling = Asset.from_xdr_object(xdr_object.body.manage_sell_offer_op.selling)
-        buying = Asset.from_xdr_object(xdr_object.body.manage_sell_offer_op.buying)
-        amount = Operation.from_xdr_amount(
-            xdr_object.body.manage_sell_offer_op.amount.int64
-        )
-        price = Price.from_xdr_object(xdr_object.body.manage_sell_offer_op.price)
-        offer_id = xdr_object.body.manage_sell_offer_op.offer_id.int64
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.ManageSellOffer)
+        selling = Asset.from_xdr_object(body.manage_sell_offer_op.selling)
+        buying = Asset.from_xdr_object(body.manage_sell_offer_op.buying)
+        amount = Operation.from_xdr_amount(body.manage_sell_offer_op.amount)
+        price = Price.from_xdr_object(body.manage_sell_offer_op.price)
+        offer_id = body.manage_sell_offer_op.offer_id
 
         op = cls(
             source=source,

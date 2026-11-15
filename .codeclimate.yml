@@ -26,6 +26,5 @@ plugins:
 
 exclude_patterns:
   - "docs/"
-  - "stellar_sdk/xdr/"
   - "tests/"
 

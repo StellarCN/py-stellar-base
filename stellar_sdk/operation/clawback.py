@@ -46,14 +46,12 @@ class Clawback(Operation):
         self.amount: str = str(amount)
         raise_if_not_valid_amount(self.amount, "amount")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         asset = self.asset.to_xdr_object()
         from_ = self.from_.to_xdr_object()
         amount = Operation.to_xdr_amount(self.amount)
-        clawback_op = stellar_xdr.ClawbackOp(asset, from_, stellar_xdr.Int64(amount))
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, clawback_op=clawback_op
-        )
+        clawback_op = stellar_xdr.ClawbackOp(asset, from_, amount)
+        body = stellar_xdr.OperationBody.Clawback(clawback_op)
         return body
 
     @classmethod
@@ -62,10 +60,11 @@ class Clawback(Operation):
         object.
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.clawback_op is not None
-        asset = Asset.from_xdr_object(xdr_object.body.clawback_op.asset)
-        from_ = MuxedAccount.from_xdr_object(xdr_object.body.clawback_op.from_)
-        amount = Operation.from_xdr_amount(xdr_object.body.clawback_op.amount.int64)
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.Clawback)
+        asset = Asset.from_xdr_object(body.clawback_op.asset)
+        from_ = MuxedAccount.from_xdr_object(body.clawback_op.from_)
+        amount = Operation.from_xdr_amount(body.clawback_op.amount)
 
         op = cls(source=source, from_=from_, asset=asset, amount=amount)
         return op
