@@ -12,7 +12,7 @@ import base64
 import os
 from collections.abc import Iterable
 
-from .. import StrKey, scval
+from .. import scval
 from .. import xdr as stellar_xdr
 from ..account import Account
 from ..address import Address
@@ -21,6 +21,7 @@ from ..keypair import Keypair
 from ..soroban_rpc import SimulateTransactionResponse
 from ..soroban_server import SorobanServer
 from ..soroban_server_async import SorobanServerAsync
+from ..strkey import Contract
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
 from .exceptions import InvalidSep45ChallengeError
@@ -573,7 +574,7 @@ def _build_challenge_tx(
 
     Returns a tuple of (transaction, server_keypair, nonce).
     """
-    if not StrKey.is_valid_contract(client_account_id):
+    if not Contract.is_valid(client_account_id):
         raise ValueError("client_account_id must be a contract account.")
 
     if nonce is None:

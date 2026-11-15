@@ -1,8 +1,15 @@
 import pytest
 
-from stellar_sdk import StrKey
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.address import Address, AddressType
+from stellar_sdk.strkey import (
+    ClaimableBalance,
+    Contract,
+    Ed25519PublicKey,
+    LiquidityPool,
+    MuxedContract,
+    MuxedEd25519Account,
+)
 
 
 class TestAddress:
@@ -60,13 +67,13 @@ class TestAddress:
 
     def test_from_account_byte(self):
         account_id = "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ"
-        address = Address.from_raw_account(StrKey.decode_ed25519_public_key(account_id))
+        address = Address.from_raw_account(Ed25519PublicKey.from_string(account_id).key)
         assert address.type == AddressType.ACCOUNT
         assert address.address == account_id
 
     def test_from_contract_byte(self):
         contract_id = "CA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUWDA"
-        address = Address.from_raw_contract(StrKey.decode_contract(contract_id))
+        address = Address.from_raw_contract(Contract.from_string(contract_id).hash)
         assert address.type == AddressType.CONTRACT
         assert address.address == contract_id
 
@@ -75,7 +82,7 @@ class TestAddress:
             "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
         )
         address = Address.from_raw_muxed_account(
-            StrKey.decode_med25519_public_key(muxed_account_id)
+            MuxedEd25519Account.from_string(muxed_account_id).to_bytes()
         )
         assert address.type == AddressType.MUXED_ACCOUNT
         assert address.address == muxed_account_id
@@ -85,7 +92,7 @@ class TestAddress:
             "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4TU"
         )
         address = Address.from_raw_claimable_balance(
-            StrKey.decode_claimable_balance(claimable_balance_id)
+            ClaimableBalance.from_string(claimable_balance_id).to_bytes()
         )
         assert address.type == AddressType.CLAIMABLE_BALANCE
         assert address.address == claimable_balance_id
@@ -93,7 +100,7 @@ class TestAddress:
     def test_from_liquidity_pool_byte(self):
         liquidity_pool_id = "LA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUPJN"
         address = Address.from_raw_liquidity_pool(
-            StrKey.decode_liquidity_pool(liquidity_pool_id)
+            LiquidityPool.from_string(liquidity_pool_id).hash
         )
         assert address.type == AddressType.LIQUIDITY_POOL
         assert address.address == liquidity_pool_id
@@ -232,7 +239,7 @@ class TestAddress:
         muxed_contract_id = (
             "WA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVAAAAAAAAAAAACWJY"
         )
-        raw = StrKey.decode_muxed_contract(muxed_contract_id)
+        raw = MuxedContract.from_string(muxed_contract_id).to_bytes()
         address = Address.from_raw_muxed_contract(raw)
         assert address.type == AddressType.MUXED_CONTRACT
         assert address.address == muxed_contract_id

@@ -5,7 +5,7 @@ from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..muxed_account import MuxedAccount
 from ..price import Price
-from ..utils import raise_if_not_valid_amount
+from ..utils import raise_if_not_valid_amount, raise_if_not_valid_offer_id
 from .operation import Operation
 
 __all__ = ["ManageSellOffer"]
@@ -33,7 +33,7 @@ class ManageSellOffer(Operation):
     :param amount: The total amount you're selling. If ``0``, deletes the offer.
     :param price: Price of 1 unit of `selling` in terms of `buying`.
     :param offer_id: If ``0``, will create a new offer (default). Otherwise,
-        edits an existing offer.
+        edits an existing offer. Must be between ``0`` and ``2**63 - 1``.
     :param source: The source account for the operation. Defaults to the transaction's source account.
 
     """
@@ -60,6 +60,7 @@ class ManageSellOffer(Operation):
         self.price: Price = price
         self.offer_id: int = offer_id
         raise_if_not_valid_amount(self.amount, "amount")
+        raise_if_not_valid_offer_id(self.offer_id, "offer_id")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody:
         selling = self.selling.to_xdr_object()
@@ -93,8 +94,11 @@ class ManageSellOffer(Operation):
             buying=buying,
             amount=amount,
             price=price,
-            offer_id=offer_id,
         )
+        # Keep the ID exactly as it is in the XDR, even one the constructor
+        # rejects: stellar-core only treats a negative ID as malformed from
+        # protocol 15.
+        op.offer_id = offer_id
         return op
 
     def __repr__(self):

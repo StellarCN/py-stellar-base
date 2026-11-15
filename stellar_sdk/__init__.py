@@ -32,7 +32,6 @@ from .signer import *
 from .signer_key import *
 from .soroban_data_builder import *
 from .soroban_server import *
-from .strkey import *
 from .time_bounds import *
 from .transaction import *
 from .transaction_builder import *

@@ -2,7 +2,7 @@
 name: py-stellar-base
 description: Build Stellar blockchain applications in Python using stellar-sdk. Use for transaction building, signing, Horizon queries, Soroban RPC, smart contract deployment/invocation, XDR/SCVal conversion, async workflows, and SEP integrations.
 license: Apache-2.0
-compatibility: Requires Python >=3.10,<4.0. Async support requires stellar-sdk[aiohttp].
+compatibility: Requires Python >=3.11,<4.0. Async support requires stellar-sdk[aiohttp].
 metadata:
   sdk_package: stellar-sdk
   repository: StellarCN/py-stellar-base

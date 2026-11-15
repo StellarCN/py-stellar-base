@@ -66,16 +66,16 @@ class PoolID:
         return cls.from_json_dict(json.loads(json_str))
 
     def to_json_dict(self) -> str:
-        from ..strkey import StrKey
+        from ..strkey import LiquidityPool
 
-        return StrKey.encode_liquidity_pool(self.pool_id.hash)
+        return str(LiquidityPool(self.pool_id.hash))
 
     @classmethod
     def from_json_dict(cls, json_value: str) -> PoolID:
-        from ..strkey import StrKey
+        from ..strkey import LiquidityPool
         from .hash import Hash
 
-        raw = StrKey.decode_liquidity_pool(json_value)
+        raw = LiquidityPool.from_string(json_value).hash
         return cls(Hash(raw))
 
     def __hash__(self):

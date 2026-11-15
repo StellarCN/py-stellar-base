@@ -3,7 +3,19 @@ Release History
 
 ### Pending
 
+#### Breaking changes
+- Drop support for Python 3.10, which reached end of life in October 2026.
+- Remove `StrKey`. The SDK now uses [stellar-strkey](https://stellar-strkey.readthedocs.io/), which has a class for each strkey type, and `stellar_sdk.strkey` re-exports it. For example:
+  - `StrKey.encode_ed25519_public_key(raw)` becomes `str(Ed25519PublicKey(raw))`.
+  - `StrKey.decode_ed25519_public_key(s)` becomes `Ed25519PublicKey.from_string(s).key`.
+  - `StrKey.is_valid_contract(s)` becomes `Contract.is_valid(s)`.
+- Strkeys are checked when they are encoded as well as when they are decoded, so invalid raw data raises `ValueError` instead of producing an invalid strkey. For example, `SignerKey.ed25519_signed_payload` rejects a payload that is empty or longer than 64 bytes.
+- `Keypair.from_secret` no longer puts the rejected input in its error message, since the input may be a real secret.
+
 #### Fixes
+- `StrKey.decode_ed25519_signed_payload` and `StrKey.is_valid_ed25519_signed_payload` now reject a signed payload strkey (`P...`) whose padding bytes after the payload are not zero, as SEP-23 requires. Such a key used to decode to the same signer as the valid key.
+- `ManageSellOffer` and `ManageBuyOffer` raise `ValueError` for an `offer_id` outside `0` to `2**63 - 1`, and `MuxedAccount` raises for an `account_muxed_id` above `2**64 - 1`, instead of writing the value modulo `2**64`. Operations read from XDR keep their offer ID as it is. ([#1251](https://github.com/StellarCN/py-stellar-base/issues/1251))
+- `Operation.from_xdr_amount` (and so the `amount` of operations decoded from XDR) returned amounts below 0.000001 in scientific notation, e.g. `"1E-7"` for 1 stroop. It now returns `"0.0000001"`.
 - `scval.to_native` now raises `ValueError` when two keys of an `SCV_MAP` convert to equal Python keys, such as the string `"1"` and the symbol `"1"`, or the u32 `1` and the i64 `1`. It used to keep only the last of them and drop the others without an error. `scval.from_map` and `scval.from_struct` raise the same way when a key repeats. ([#1250](https://github.com/StellarCN/py-stellar-base/issues/1250))
 
 ### Version 17.0.1

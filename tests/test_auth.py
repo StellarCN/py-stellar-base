@@ -2,7 +2,7 @@ from typing import Any, cast
 
 import pytest
 
-from stellar_sdk import Address, Keypair, Network, StrKey, scval, utils
+from stellar_sdk import Address, Keypair, Network, scval, utils
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.auth import (
     DelegateSignature,
@@ -12,6 +12,7 @@ from stellar_sdk.auth import (
     build_authorization_preimage,
     build_with_delegates_entry,
 )
+from stellar_sdk.strkey import Contract, MuxedContract
 
 
 def _ed25519_auth_signer(signer: Keypair):
@@ -56,9 +57,13 @@ _MUXED_ACCOUNT_ID = (
 )
 _CLAIMABLE_BALANCE_ID = "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4TU"
 _LIQUIDITY_POOL_ID = "LA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUPJN"
-_MUXED_CONTRACT_ID = StrKey.encode_muxed_contract(
-    StrKey.decode_contract("CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK")
-    + (1).to_bytes(8, "big")
+_MUXED_CONTRACT_ID = str(
+    MuxedContract(
+        Contract.from_string(
+            "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+        ).hash,
+        1,
+    )
 )
 
 

@@ -6,9 +6,14 @@ from nacl.exceptions import BadSignatureError as NaclBadSignatureError
 
 from . import xdr as stellar_xdr
 from .decorated_signature import DecoratedSignature
-from .exceptions import BadSignatureError, MissingEd25519SecretSeedError
+from .exceptions import (
+    BadSignatureError,
+    Ed25519PublicKeyInvalidError,
+    Ed25519SecretSeedInvalidError,
+    MissingEd25519SecretSeedError,
+)
 from .sep.mnemonic import Language, StellarMnemonic
-from .strkey import StrKey
+from .strkey import Ed25519PrivateKey, Ed25519PublicKey, StrkeyError
 from .utils import sha256
 
 __all__ = ["Keypair"]
@@ -60,7 +65,11 @@ class Keypair:
         :raise: :exc:`Ed25519SecretSeedInvalidError <stellar_sdk.exceptions.Ed25519SecretSeedInvalidError>`:
             if `secret` is not a valid ed25519 secret seed.
         """
-        raw_secret = StrKey.decode_ed25519_secret_seed(secret)
+        try:
+            raw_secret = Ed25519PrivateKey.from_string(secret).seed
+        except StrkeyError as e:
+            # The message leaves out the input, since it may be a real secret.
+            raise Ed25519SecretSeedInvalidError("Invalid Ed25519 Secret Seed.") from e
         return cls.from_raw_ed25519_seed(raw_secret)
 
     @classmethod
@@ -72,7 +81,12 @@ class Keypair:
         :raise: :exc:`Ed25519PublicKeyInvalidError <stellar_sdk.exceptions.Ed25519PublicKeyInvalidError>`:
             if `public_key` is not a valid ed25519 public key.
         """
-        key = StrKey.decode_ed25519_public_key(public_key)
+        try:
+            key = Ed25519PublicKey.from_string(public_key).key
+        except StrkeyError as e:
+            raise Ed25519PublicKeyInvalidError(
+                f"Invalid Ed25519 Public Key: {public_key}"
+            ) from e
         return cls.from_raw_ed25519_public_key(key)
 
     @classmethod
@@ -110,7 +124,7 @@ class Keypair:
                 "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed."
             )
         # return None is a better approach
-        return StrKey.encode_ed25519_secret_seed(self.raw_secret_key())
+        return Ed25519PrivateKey(self.raw_secret_key()).reveal()
 
     @secret.setter
     def secret(self, secret: str) -> None:
@@ -124,7 +138,7 @@ class Keypair:
 
         :return: public key
         """
-        return StrKey.encode_ed25519_public_key(self.raw_public_key())
+        return str(Ed25519PublicKey(self.raw_public_key()))
 
     @public_key.setter
     def public_key(self, public_key: str) -> None:

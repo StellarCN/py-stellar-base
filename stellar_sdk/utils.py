@@ -12,7 +12,7 @@ from urllib.parse import urljoin, urlsplit, urlunsplit
 from . import xdr as stellar_xdr
 from .address import Address, AddressType
 from .exceptions import Ed25519PublicKeyInvalidError, NoApproximationError
-from .strkey import StrKey
+from .strkey import Ed25519PublicKey
 
 if TYPE_CHECKING:
     from .asset import Asset
@@ -94,8 +94,8 @@ def is_valid_hash(data: str) -> bool:
 
 def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> None:
     try:
-        StrKey.decode_ed25519_public_key(value)
-    except Exception as e:
+        Ed25519PublicKey.from_string(value)
+    except (TypeError, ValueError) as e:
         raise Ed25519PublicKeyInvalidError(
             f'Value of argument "{argument_name}" is not a valid ed25519 public key: {value}'
         ) from e
@@ -112,6 +112,15 @@ def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
         raise ValueError(
             f'Value of argument "{argument_name}" must represent a positive number '
             f"and the max valid value is {_UPPER_LIMIT}: {amount}"
+        )
+
+
+def raise_if_not_valid_offer_id(value: int, argument_name: str) -> None:
+    # stellar-core rejects a negative offer ID as malformed, and an Int64 cannot
+    # hold more than 2**63 - 1; anything else would be written modulo 2**64.
+    if not 0 <= value <= 2**63 - 1:
+        raise ValueError(
+            f'Value of argument "{argument_name}" must be an integer between 0 and 2**63 - 1: {value}'
         )
 
 
@@ -213,4 +222,4 @@ def from_xdr_amount(value: int) -> str:
         amount.
 
     """
-    return str(Decimal(value) / _ONE)
+    return format(Decimal(value) / _ONE, "f")

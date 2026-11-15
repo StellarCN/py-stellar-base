@@ -5,7 +5,7 @@ import pytest
 import shamir_mnemonic  # type: ignore[import-untyped]
 from mnemonic import Mnemonic
 
-from stellar_sdk import Keypair, StrKey
+from stellar_sdk import Keypair
 from stellar_sdk.exceptions import (
     BadSignatureError,
     Ed25519PublicKeyInvalidError,
@@ -13,6 +13,7 @@ from stellar_sdk.exceptions import (
     MissingEd25519SecretSeedError,
 )
 from stellar_sdk.sep.mnemonic import Language, StellarMnemonic
+from stellar_sdk.strkey import Ed25519PrivateKey, Ed25519PublicKey
 
 SEP_5_CASES = (
     {
@@ -253,8 +254,8 @@ class TestKeypair:
         kp = Keypair.random()
         public_key = kp.public_key
         secret = kp.secret
-        assert StrKey.is_valid_ed25519_public_key(public_key)
-        assert StrKey.is_valid_ed25519_secret_seed(secret)
+        assert Ed25519PublicKey.is_valid(public_key)
+        assert Ed25519PrivateKey.is_valid(secret)
         assert kp.can_sign() is True
 
     def test_create_from_secret(self):
@@ -278,10 +279,12 @@ class TestKeypair:
     )
     def test_create_from_invalid_secret_raise(self, invalid_secret):
         with pytest.raises(
-            Ed25519SecretSeedInvalidError,
-            match=f"Invalid Ed25519 Secret Seed: {invalid_secret}",
-        ):
+            Ed25519SecretSeedInvalidError, match=r"Invalid Ed25519 Secret Seed\."
+        ) as exc_info:
             Keypair.from_secret(invalid_secret)
+        # The input may be a real secret, so it must stay out of the message.
+        if invalid_secret:
+            assert invalid_secret not in str(exc_info.value)
 
     def test_create_from_public_key(self):
         public_key = "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
