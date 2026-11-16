@@ -73,6 +73,18 @@ response = server.submit_transaction(transaction)
 print(response)
 ```
 
+## stellar-strkey
+
+stellar-strkey encodes and decodes Stellar strkeys (SEP-23), the `G...`, `C...`, `M...` and other address strings.
+The SDK uses it and re-exports it as `stellar_sdk.strkey`, and you can also install it on its own if you only need strkeys.
+click [here](https://github.com/lightsail-network/py-stellar-strkey) for more information.
+
+## stellar-xdr
+
+stellar-xdr provides typed Python classes for every Stellar XDR type, with binary and JSON (SEP-51) encoding.
+The SDK uses it and re-exports it as `stellar_sdk.xdr`, and you can also install it on its own if you only need XDR.
+click [here](https://github.com/lightsail-network/py-stellar-xdr) for more information.
+
 ## stellar-contract-bindings
 
 stellar-contract-bindings allows you to generate Python bindings for Stellar Soroban smart contracts, it makes calling
