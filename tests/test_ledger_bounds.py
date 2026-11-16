@@ -14,8 +14,8 @@ class TestLedgerBounds:
     )
     def test_to_xdr(self, min_ledger, max_ledger):
         op_xdr_object = LedgerBounds(min_ledger, max_ledger).to_xdr_object()
-        assert op_xdr_object.min_ledger.uint32 == min_ledger
-        assert op_xdr_object.max_ledger.uint32 == max_ledger
+        assert op_xdr_object.min_ledger == min_ledger
+        assert op_xdr_object.max_ledger == max_ledger
         from_instance = LedgerBounds.from_xdr_object(op_xdr_object)
         assert isinstance(from_instance, LedgerBounds)
         assert from_instance.max_ledger == max_ledger

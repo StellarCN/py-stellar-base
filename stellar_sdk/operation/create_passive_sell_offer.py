@@ -67,17 +67,16 @@ class CreatePassiveSellOffer(Operation):
         self.price: Price = price
         raise_if_not_valid_amount(self.amount, "amount")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         selling = self.selling.to_xdr_object()
         buying = self.buying.to_xdr_object()
         price = self.price.to_xdr_object()
-        amount = stellar_xdr.Int64(Operation.to_xdr_amount(self.amount))
+        amount = Operation.to_xdr_amount(self.amount)
         create_passive_sell_offer_op = stellar_xdr.CreatePassiveSellOfferOp(
             selling, buying, amount, price
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE,
-            create_passive_sell_offer_op=create_passive_sell_offer_op,
+        body = stellar_xdr.OperationBody.CreatePassiveSellOffer(
+            create_passive_sell_offer_op
         )
         return body
 
@@ -87,19 +86,12 @@ class CreatePassiveSellOffer(Operation):
     ) -> "CreatePassiveSellOffer":
         """Creates a :class:`CreatePassiveSellOffer` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.create_passive_sell_offer_op is not None
-        selling = Asset.from_xdr_object(
-            xdr_object.body.create_passive_sell_offer_op.selling
-        )
-        buying = Asset.from_xdr_object(
-            xdr_object.body.create_passive_sell_offer_op.buying
-        )
-        amount = Operation.from_xdr_amount(
-            xdr_object.body.create_passive_sell_offer_op.amount.int64
-        )
-        price = Price.from_xdr_object(
-            xdr_object.body.create_passive_sell_offer_op.price
-        )
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.CreatePassiveSellOffer)
+        selling = Asset.from_xdr_object(body.create_passive_sell_offer_op.selling)
+        buying = Asset.from_xdr_object(body.create_passive_sell_offer_op.buying)
+        amount = Operation.from_xdr_amount(body.create_passive_sell_offer_op.amount)
+        price = Price.from_xdr_object(body.create_passive_sell_offer_op.price)
 
         op = cls(
             source=source, selling=selling, buying=buying, amount=amount, price=price

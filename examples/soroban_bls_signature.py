@@ -83,7 +83,7 @@ def bls_sign(payload32: bytes) -> bytes:
     return signature
 
 
-def bls_signer(preimage: stellar_xdr.HashIDPreimage) -> stellar_xdr.SCVal:
+def bls_signer(preimage: stellar_xdr.HashIDPreimage.Any) -> stellar_xdr.SCVal.Any:
     payload = authorization_payload_hash(preimage)
     return scval.to_bytes(bls_sign(payload))
 
@@ -158,9 +158,11 @@ if get_resp.status != GetTransactionStatus.SUCCESS:
 if get_resp.result_meta_xdr is None:
     raise RuntimeError("Successful transaction did not include result meta XDR.")
 
-meta = stellar_xdr.TransactionMeta.from_xdr(get_resp.result_meta_xdr)
-body = meta.v4 if meta.v4 is not None else meta.v3
-if body is None or body.soroban_meta is None:
+meta = stellar_xdr.TransactionMeta.from_xdr_base64(get_resp.result_meta_xdr)
+if not isinstance(meta, stellar_xdr.TransactionMeta.V4):
+    raise RuntimeError("Transaction meta is not TransactionMetaV4.")
+body = meta.v4
+if body.soroban_meta is None:
     raise RuntimeError("Transaction meta did not include Soroban metadata.")
 if body.soroban_meta.return_value is None:
     raise RuntimeError("Transaction meta did not include a Soroban return value.")

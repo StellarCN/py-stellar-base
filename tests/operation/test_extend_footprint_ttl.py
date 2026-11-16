@@ -49,7 +49,7 @@ class TestExtendFootprintTTL:
         assert op.extend_to == extend_to
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     @pytest.mark.parametrize("extend_to", [-1, 2**32])

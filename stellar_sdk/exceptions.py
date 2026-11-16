@@ -224,6 +224,8 @@ class ExternalRefNotFoundError(ContractWasmRetrievalError):
     def __init__(self, owner: str, tag: bytes) -> None:
         # The tag is shown as bytes: it need not be valid UTF-8, and it is half of what
         # identifies the code, so a lenient decode would render two distinct tags alike.
+        # An XDR SCString is a bytes subclass; keep plain bytes so the repr stays b'...'.
+        tag = bytes(tag)
         super().__init__(
             f"External executable tag entry on {owner} was not found or is archived. "
             f"Restoring the tag entry footprint may be required. tag: {tag!r}"

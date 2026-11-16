@@ -25,8 +25,8 @@ class Inflation(Operation):
     def __init__(self, source: MuxedAccount | str | None = None) -> None:
         super().__init__(source)
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        body = stellar_xdr.OperationBody(type=self._XDR_OPERATION_TYPE)
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
+        body = stellar_xdr.OperationBody.Inflation()
         return body
 
     @classmethod

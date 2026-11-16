@@ -37,11 +37,9 @@ class AccountMerge(Operation):
             destination = MuxedAccount.from_account(destination)
         self.destination: MuxedAccount = destination
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         destination = self.destination.to_xdr_object()
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, destination=destination
-        )
+        body = stellar_xdr.OperationBody.AccountMerge(destination)
         return body
 
     @classmethod
@@ -51,8 +49,9 @@ class AccountMerge(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.destination is not None
-        destination = MuxedAccount.from_xdr_object(xdr_object.body.destination)
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.AccountMerge)
+        destination = MuxedAccount.from_xdr_object(body.destination)
         op = cls(source=source, destination=destination)
         return op
 

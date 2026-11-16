@@ -39,7 +39,7 @@ async def _verify_entries(soroban_server, *args, **kwargs):
     return verify_challenge_authorization_entries(soroban_server, *args, **kwargs)
 
 
-def build_signature(public_key_hex: str, signature_hex: str) -> stellar_xdr.SCVal:
+def build_signature(public_key_hex: str, signature_hex: str) -> stellar_xdr.SCVal.Any:
     return scval.to_vec(
         [
             scval.to_map(
@@ -64,7 +64,7 @@ def build_args(
     web_auth_domain_account: str = SERVER_ACCOUNT,
     client_domain: str | None = CLIENT_DOMAIN,
     client_domain_account: str | None = CLIENT_DOMAIN_ACCOUNT,
-) -> list[stellar_xdr.SCVal]:
+) -> list[stellar_xdr.SCVal.Any]:
     args_map = {
         scval.to_symbol("account"): scval.to_string(account),
         scval.to_symbol("home_domain"): scval.to_string(home_domain),
@@ -86,19 +86,18 @@ def build_args(
 def build_root_invocation(
     contract_address: str = WEB_AUTH_CONTRACT,
     function_name: str = "web_auth_verify",
-    args: list[stellar_xdr.SCVal] | None = None,
+    args: list[stellar_xdr.SCVal.Any] | None = None,
     sub_invocations: list[stellar_xdr.SorobanAuthorizedInvocation] | None = None,
 ) -> stellar_xdr.SorobanAuthorizedInvocation:
     if args is None:
         args = build_args()
     return stellar_xdr.SorobanAuthorizedInvocation(
-        function=stellar_xdr.SorobanAuthorizedFunction(
-            type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-            contract_fn=stellar_xdr.InvokeContractArgs(
+        function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+            stellar_xdr.InvokeContractArgs(
                 contract_address=Address(contract_address).to_xdr_sc_address(),
-                function_name=stellar_xdr.SCSymbol(function_name.encode()),
+                function_name=function_name,
                 args=args,
-            ),
+            )
         ),
         sub_invocations=sub_invocations or [],
     )
@@ -111,37 +110,22 @@ def build_entry(
     public_key_hex: str,
     signature_hex: str,
     root_invocation: stellar_xdr.SorobanAuthorizedInvocation | None = None,
-    credentials_type: stellar_xdr.SorobanCredentialsType = stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+    v2: bool = False,
 ) -> stellar_xdr.SorobanAuthorizationEntry:
     if root_invocation is None:
         root_invocation = build_root_invocation()
 
     address_credentials = stellar_xdr.SorobanAddressCredentials(
         address=Address(address).to_xdr_sc_address(),
-        nonce=stellar_xdr.Int64(nonce),
-        signature_expiration_ledger=stellar_xdr.Uint32(signature_expiration_ledger),
+        nonce=nonce,
+        signature_expiration_ledger=signature_expiration_ledger,
         signature=build_signature(public_key_hex, signature_hex),
     )
-    if (
-        credentials_type
-        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
-    ):
-        credentials = stellar_xdr.SorobanCredentials(
-            type=credentials_type,
-            address=address_credentials,
-        )
-    elif (
-        credentials_type
-        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2
-    ):
-        credentials = stellar_xdr.SorobanCredentials(
-            type=credentials_type,
-            address_v2=address_credentials,
-        )
-    else:
-        credentials = stellar_xdr.SorobanCredentials(
-            type=credentials_type,
-        )
+    credentials: stellar_xdr.SorobanCredentials.Any = (
+        stellar_xdr.SorobanCredentials.AddressV2(address_credentials)
+        if v2
+        else stellar_xdr.SorobanCredentials.Address(address_credentials)
+    )
 
     return stellar_xdr.SorobanAuthorizationEntry(
         credentials=credentials,

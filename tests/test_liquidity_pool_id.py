@@ -34,7 +34,7 @@ class TestLiquidityPoolId:
         asset = LiquidityPoolId(liquidity_pool_id)
         trust_line_asset_xdr_object = asset.to_trust_line_asset_xdr_object()
         assert (
-            trust_line_asset_xdr_object.to_xdr()
+            trust_line_asset_xdr_object.to_xdr_base64()
             == "AAAAA917GrgxwnMxDdvsb5eHCqg8L714ziKt7Tfsv08zgPrK"
         )
         assert asset == LiquidityPoolId.from_xdr_object(trust_line_asset_xdr_object)

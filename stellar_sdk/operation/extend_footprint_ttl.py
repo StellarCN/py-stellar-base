@@ -35,22 +35,21 @@ class ExtendFootprintTTL(Operation):
 
         self.extend_to: int = extend_to
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         op = stellar_xdr.ExtendFootprintTTLOp(
-            ext=stellar_xdr.ExtensionPoint(0),
-            extend_to=stellar_xdr.Uint32(self.extend_to),
+            ext=stellar_xdr.ExtensionPoint.V0(),
+            extend_to=self.extend_to,
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, extend_footprint_ttl_op=op
-        )
+        body = stellar_xdr.OperationBody.ExtendFootprintTTL(op)
         return body
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "ExtendFootprintTTL":
         """Creates a :class:`ExtendFootprintTTL` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.extend_footprint_ttl_op is not None
-        extend_to = xdr_object.body.extend_footprint_ttl_op.extend_to.uint32
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.ExtendFootprintTTL)
+        extend_to = body.extend_footprint_ttl_op.extend_to
         op = cls(source=source, extend_to=extend_to)
         return op
 

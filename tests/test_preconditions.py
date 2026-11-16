@@ -1,6 +1,6 @@
 import pytest
 
-from stellar_sdk import LedgerBounds, Preconditions, SignerKey, TimeBounds
+from stellar_sdk import LedgerBounds, Preconditions, SignerKey, TimeBounds, xdr
 
 
 class TestPreconditions:
@@ -204,3 +204,8 @@ class TestPreconditions:
     )
     def test_is_v2(self, preconditions: Preconditions, is_v2: bool):
         assert preconditions._is_v2() is is_v2
+
+
+def test_from_xdr_object_rejects_other_xdr_types():
+    with pytest.raises(ValueError, match="Unsupported preconditions"):
+        Preconditions.from_xdr_object(xdr.SCVal.Void())  # type: ignore[arg-type]

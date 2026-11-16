@@ -4,6 +4,7 @@ from types import MethodType, SimpleNamespace
 
 import pytest
 
+from stellar_sdk import scval
 from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.address import Address
 from stellar_sdk.exceptions import (
@@ -26,8 +27,9 @@ def test_get_contract_wasm_by_hash(monkeypatch):
     server = SorobanServer("https://example.com")
 
     def get_ledger_entries(self, keys):
-        assert keys[0].contract_code is not None
-        assert keys[0].contract_code.hash.hash == wasm_hash
+        assert keys[0] == stellar_xdr.LedgerKey.ContractCode(
+            stellar_xdr.LedgerKeyContractCode(hash=wasm_hash)
+        )
         return SimpleNamespace(
             entries=[SimpleNamespace(xdr=_contract_code_xdr(wasm_hash, wasm))]
         )
@@ -45,8 +47,9 @@ async def test_get_contract_wasm_by_hash_async(monkeypatch):
     server = SorobanServerAsync("https://example.com")
 
     async def get_ledger_entries(self, keys):
-        assert keys[0].contract_code is not None
-        assert keys[0].contract_code.hash.hash == wasm_hash
+        assert keys[0] == stellar_xdr.LedgerKey.ContractCode(
+            stellar_xdr.LedgerKeyContractCode(hash=wasm_hash)
+        )
         return SimpleNamespace(
             entries=[SimpleNamespace(xdr=_contract_code_xdr(wasm_hash, wasm))]
         )
@@ -150,12 +153,10 @@ def test_get_external_ref_wasm_hash(monkeypatch):
 
     def get_contract_data(self, contract_id, key, durability):
         assert contract_id == CONTRACT_ID
-        assert key.type == stellar_xdr.SCValType.SCV_EXECUTABLE_TAG
-        assert key.executable_tag is not None
-        assert key.executable_tag.sc_string == tag
+        assert key == stellar_xdr.SCVal.ExecutableTag(tag)
         assert durability == Durability.PERSISTENT
         return SimpleNamespace(
-            xdr=_contract_data_xdr(CONTRACT_ID, _bytes_xdr(wasm_hash), key=key)
+            xdr=_contract_data_xdr(CONTRACT_ID, scval.to_bytes(wasm_hash), key=key)
         )
 
     monkeypatch.setattr(
@@ -175,12 +176,10 @@ async def test_get_external_ref_wasm_hash_async(monkeypatch):
 
     async def get_contract_data(self, contract_id, key, durability):
         assert contract_id == CONTRACT_ID
-        assert key.type == stellar_xdr.SCValType.SCV_EXECUTABLE_TAG
-        assert key.executable_tag is not None
-        assert key.executable_tag.sc_string == tag
+        assert key == stellar_xdr.SCVal.ExecutableTag(tag)
         assert durability == Durability.PERSISTENT
         return SimpleNamespace(
-            xdr=_contract_data_xdr(CONTRACT_ID, _bytes_xdr(wasm_hash), key=key)
+            xdr=_contract_data_xdr(CONTRACT_ID, scval.to_bytes(wasm_hash), key=key)
         )
 
     monkeypatch.setattr(
@@ -199,10 +198,9 @@ def test_get_external_ref_wasm_hash_preserves_binary_tag(monkeypatch):
     server = SorobanServer("https://example.com")
 
     def get_contract_data(self, contract_id, key, durability):
-        assert key.executable_tag is not None
-        assert key.executable_tag.sc_string == tag
+        assert key == stellar_xdr.SCVal.ExecutableTag(tag)
         return SimpleNamespace(
-            xdr=_contract_data_xdr(contract_id, _bytes_xdr(wasm_hash), key=key)
+            xdr=_contract_data_xdr(contract_id, scval.to_bytes(wasm_hash), key=key)
         )
 
     monkeypatch.setattr(
@@ -221,10 +219,9 @@ async def test_get_external_ref_wasm_hash_preserves_binary_tag_async(monkeypatch
     server = SorobanServerAsync("https://example.com")
 
     async def get_contract_data(self, contract_id, key, durability):
-        assert key.executable_tag is not None
-        assert key.executable_tag.sc_string == tag
+        assert key == stellar_xdr.SCVal.ExecutableTag(tag)
         return SimpleNamespace(
-            xdr=_contract_data_xdr(contract_id, _bytes_xdr(wasm_hash), key=key)
+            xdr=_contract_data_xdr(contract_id, scval.to_bytes(wasm_hash), key=key)
         )
 
     monkeypatch.setattr(
@@ -326,9 +323,9 @@ def test_get_external_ref_wasm_hash_rejects_invalid_hash_values(monkeypatch):
     external_ref = _external_ref_xdr(CONTRACT_ID, tag)
     invalid_values = iter(
         [
-            stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VOID),
-            _bytes_xdr(b"\x06" * 31),
-            _bytes_xdr(b"\x00" * 32),
+            stellar_xdr.SCVal.Void(),
+            scval.to_bytes(b"\x06" * 31),
+            scval.to_bytes(b"\x00" * 32),
         ]
     )
     server = SorobanServer("https://example.com")
@@ -359,9 +356,9 @@ async def test_get_external_ref_wasm_hash_rejects_invalid_hash_values_async(
     external_ref = _external_ref_xdr(CONTRACT_ID, tag)
     invalid_values = iter(
         [
-            stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VOID),
-            _bytes_xdr(b"\x06" * 31),
-            _bytes_xdr(b"\x00" * 32),
+            stellar_xdr.SCVal.Void(),
+            scval.to_bytes(b"\x06" * 31),
+            scval.to_bytes(b"\x00" * 32),
         ]
     )
     server = SorobanServerAsync("https://example.com")
@@ -403,7 +400,7 @@ def test_get_contract_wasm_uses_external_ref(monkeypatch):
 
     def get_contract_data(self, contract_id, key, durability):
         return SimpleNamespace(
-            xdr=_contract_data_xdr(contract_id, _bytes_xdr(wasm_hash), key=key)
+            xdr=_contract_data_xdr(contract_id, scval.to_bytes(wasm_hash), key=key)
         )
 
     monkeypatch.setattr(
@@ -432,7 +429,7 @@ async def test_get_contract_wasm_uses_external_ref_async(monkeypatch):
 
     async def get_contract_data(self, contract_id, key, durability):
         return SimpleNamespace(
-            xdr=_contract_data_xdr(contract_id, _bytes_xdr(wasm_hash), key=key)
+            xdr=_contract_data_xdr(contract_id, scval.to_bytes(wasm_hash), key=key)
         )
 
     async def get_contract_wasm_by_hash(self, hash):
@@ -455,6 +452,32 @@ async def test_get_contract_wasm_uses_external_ref_async(monkeypatch):
     )
 
     assert await server.get_contract_wasm(CONTRACT_ID) == wasm
+
+
+def test_get_contract_wasm_rejects_unknown_executable_kind(monkeypatch):
+    server = SorobanServer("https://example.com")
+    instance = SimpleNamespace(executable=SimpleNamespace(type="UNKNOWN"))
+    monkeypatch.setattr(
+        server, "_get_contract_instance", MethodType(lambda self, cid: instance, server)
+    )
+
+    with pytest.raises(ContractWasmRetrievalError, match="unsupported executable"):
+        server.get_contract_wasm(CONTRACT_ID)
+
+
+async def test_get_contract_wasm_rejects_unknown_executable_kind_async(monkeypatch):
+    server = SorobanServerAsync("https://example.com")
+    instance = SimpleNamespace(executable=SimpleNamespace(type="UNKNOWN"))
+
+    async def get_contract_instance(self, contract_id):
+        return instance
+
+    monkeypatch.setattr(
+        server, "_get_contract_instance", MethodType(get_contract_instance, server)
+    )
+
+    with pytest.raises(ContractWasmRetrievalError, match="unsupported executable"):
+        await server.get_contract_wasm(CONTRACT_ID)
 
 
 def test_get_contract_wasm_rejects_non_contract_external_ref_owner(monkeypatch):
@@ -527,106 +550,8 @@ def test_external_ref_not_found_error_does_not_decode_a_binary_tag(monkeypatch):
     with pytest.raises(ExternalRefNotFoundError) as exc_info:
         server.get_external_ref_wasm_hash(_external_ref_xdr(CONTRACT_ID, tag))
     assert exc_info.value.tag == tag
-    assert repr(tag) in str(exc_info.value)
-
-
-def test_get_contract_wasm_rejects_missing_external_ref(monkeypatch):
-    server = SorobanServer("https://example.com")
-
-    monkeypatch.setattr(
-        server,
-        "_get_contract_instance",
-        MethodType(lambda self, contract_id: _external_ref_instance(None), server),
-    )
-
-    with pytest.raises(
-        ContractWasmRetrievalError, match="missing its external reference"
-    ):
-        server.get_contract_wasm(CONTRACT_ID)
-
-
-async def test_get_contract_wasm_rejects_missing_external_ref_async(monkeypatch):
-    server = SorobanServerAsync("https://example.com")
-
-    async def get_contract_instance(self, contract_id):
-        return _external_ref_instance(None)
-
-    monkeypatch.setattr(
-        server,
-        "_get_contract_instance",
-        MethodType(get_contract_instance, server),
-    )
-
-    with pytest.raises(
-        ContractWasmRetrievalError, match="missing its external reference"
-    ):
-        await server.get_contract_wasm(CONTRACT_ID)
-
-
-def test_get_contract_wasm_rejects_missing_hash(monkeypatch):
-    server = SorobanServer("https://example.com")
-
-    monkeypatch.setattr(
-        server,
-        "_get_contract_instance",
-        MethodType(lambda self, contract_id: _wasm_instance(None), server),
-    )
-
-    with pytest.raises(ContractWasmRetrievalError, match="missing its Wasm hash"):
-        server.get_contract_wasm(CONTRACT_ID)
-
-
-def test_get_contract_wasm_rejects_unknown_executable_kind(monkeypatch):
-    server = SorobanServer("https://example.com")
-    instance = stellar_xdr.SCContractInstance(
-        executable=stellar_xdr.ContractExecutable(999),  # type: ignore[arg-type]
-        storage=None,
-    )
-
-    monkeypatch.setattr(
-        server,
-        "_get_contract_instance",
-        MethodType(lambda self, contract_id: instance, server),
-    )
-
-    with pytest.raises(ContractWasmRetrievalError, match="unsupported executable"):
-        server.get_contract_wasm(CONTRACT_ID)
-
-
-async def test_get_contract_wasm_rejects_missing_hash_async(monkeypatch):
-    server = SorobanServerAsync("https://example.com")
-
-    async def get_contract_instance(self, contract_id):
-        return _wasm_instance(None)
-
-    monkeypatch.setattr(
-        server,
-        "_get_contract_instance",
-        MethodType(get_contract_instance, server),
-    )
-
-    with pytest.raises(ContractWasmRetrievalError, match="missing its Wasm hash"):
-        await server.get_contract_wasm(CONTRACT_ID)
-
-
-async def test_get_contract_wasm_rejects_unknown_executable_kind_async(monkeypatch):
-    server = SorobanServerAsync("https://example.com")
-    instance = stellar_xdr.SCContractInstance(
-        executable=stellar_xdr.ContractExecutable(999),  # type: ignore[arg-type]
-        storage=None,
-    )
-
-    async def get_contract_instance(self, contract_id):
-        return instance
-
-    monkeypatch.setattr(
-        server,
-        "_get_contract_instance",
-        MethodType(get_contract_instance, server),
-    )
-
-    with pytest.raises(ContractWasmRetrievalError, match="unsupported executable"):
-        await server.get_contract_wasm(CONTRACT_ID)
+    assert type(exc_info.value.tag) is bytes
+    assert f"tag: {tag!r}" in str(exc_info.value)
 
 
 def test_get_contract_wasm_by_hash_missing_code(monkeypatch):
@@ -670,7 +595,7 @@ def test_get_contract_wasm_by_hash_rejects_non_code_entry(monkeypatch):
                     SimpleNamespace(
                         xdr=_contract_data_xdr(
                             CONTRACT_ID,
-                            stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VOID),
+                            stellar_xdr.SCVal.Void(),
                         )
                     )
                 ]
@@ -694,7 +619,7 @@ async def test_get_contract_wasm_by_hash_rejects_non_code_entry_async(monkeypatc
                 SimpleNamespace(
                     xdr=_contract_data_xdr(
                         CONTRACT_ID,
-                        stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VOID),
+                        stellar_xdr.SCVal.Void(),
                     )
                 )
             ]
@@ -778,7 +703,7 @@ def test_get_contract_instance_errors(monkeypatch):
                     SimpleNamespace(
                         xdr=_contract_data_xdr(
                             CONTRACT_ID,
-                            stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VOID),
+                            stellar_xdr.SCVal.Void(),
                         )
                     )
                 ]
@@ -823,7 +748,7 @@ async def test_get_contract_instance_errors_async(monkeypatch):
                 SimpleNamespace(
                     xdr=_contract_data_xdr(
                         CONTRACT_ID,
-                        stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_VOID),
+                        stellar_xdr.SCVal.Void(),
                     )
                 )
             ]
@@ -839,40 +764,31 @@ async def test_get_contract_instance_errors_async(monkeypatch):
 
 
 def _contract_code_xdr(wasm_hash: bytes, code: bytes) -> str:
-    return stellar_xdr.LedgerEntryData(
-        stellar_xdr.LedgerEntryType.CONTRACT_CODE,
-        contract_code=stellar_xdr.ContractCodeEntry(
-            ext=stellar_xdr.ContractCodeEntryExt(0),
-            hash=stellar_xdr.Hash(wasm_hash),
+    return stellar_xdr.LedgerEntryData.ContractCode(
+        stellar_xdr.ContractCodeEntry(
+            ext=stellar_xdr.ContractCodeEntryExt.V0(),
+            hash=wasm_hash,
             code=code,
-        ),
-    ).to_xdr()
+        )
+    ).to_xdr_base64()
 
 
 def _contract_data_xdr(
     contract_id: str,
-    val: stellar_xdr.SCVal,
-    key: stellar_xdr.SCVal | None = None,
+    val: stellar_xdr.SCVal.Any,
+    key: stellar_xdr.SCVal.Any | None = None,
 ) -> str:
     if key is None:
-        key = stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE)
-    return stellar_xdr.LedgerEntryData(
-        stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-        contract_data=stellar_xdr.ContractDataEntry(
-            ext=stellar_xdr.ExtensionPoint(0),
+        key = stellar_xdr.SCVal.LedgerKeyContractInstance()
+    return stellar_xdr.LedgerEntryData.ContractData(
+        stellar_xdr.ContractDataEntry(
+            ext=stellar_xdr.ExtensionPoint.V0(),
             contract=Address(contract_id).to_xdr_sc_address(),
             key=key,
             durability=stellar_xdr.ContractDataDurability.PERSISTENT,
             val=val,
-        ),
-    ).to_xdr()
-
-
-def _bytes_xdr(value: bytes) -> stellar_xdr.SCVal:
-    return stellar_xdr.SCVal(
-        stellar_xdr.SCValType.SCV_BYTES,
-        bytes=stellar_xdr.SCBytes(value),
-    )
+        )
+    ).to_xdr_base64()
 
 
 def _external_ref_xdr(
@@ -880,36 +796,28 @@ def _external_ref_xdr(
 ) -> stellar_xdr.ContractExecutableExternalRef:
     return stellar_xdr.ContractExecutableExternalRef(
         executable_owner=Address(owner).to_xdr_sc_address(),
-        tag=stellar_xdr.SCString(tag),
+        tag=tag,
     )
 
 
-def _wasm_instance(wasm_hash: bytes | None) -> stellar_xdr.SCContractInstance:
+def _wasm_instance(wasm_hash: bytes) -> stellar_xdr.SCContractInstance:
     return stellar_xdr.SCContractInstance(
-        executable=stellar_xdr.ContractExecutable(
-            stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_WASM,
-            wasm_hash=stellar_xdr.Hash(wasm_hash) if wasm_hash is not None else None,
-        ),
+        executable=stellar_xdr.ContractExecutable.Wasm(wasm_hash),
         storage=None,
     )
 
 
 def _external_ref_instance(
-    external_ref: stellar_xdr.ContractExecutableExternalRef | None,
+    external_ref: stellar_xdr.ContractExecutableExternalRef,
 ) -> stellar_xdr.SCContractInstance:
     return stellar_xdr.SCContractInstance(
-        executable=stellar_xdr.ContractExecutable(
-            stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_EXTERNAL_REF,
-            external_ref=external_ref,
-        ),
+        executable=stellar_xdr.ContractExecutable.ExternalRef(external_ref),
         storage=None,
     )
 
 
 def _sac_instance() -> stellar_xdr.SCContractInstance:
     return stellar_xdr.SCContractInstance(
-        executable=stellar_xdr.ContractExecutable(
-            stellar_xdr.ContractExecutableType.CONTRACT_EXECUTABLE_STELLAR_ASSET
-        ),
+        executable=stellar_xdr.ContractExecutable.StellarAsset(),
         storage=None,
     )
