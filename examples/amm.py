@@ -24,10 +24,10 @@ Operations performed:
 8. Print transaction hashes and basic responses.
 
 Official Documentation:
-- Liquidity Pools (concepts): https://developers.stellar.org/docs/learn/encyclopedia/liquidity-pools/
-- Change Trust operation: https://developers.stellar.org/docs/start/list-of-operations/#change-trust
-- Liquidity Pool Deposit operation: https://developers.stellar.org/docs/start/list-of-operations/#liquidity-pool-deposit
-- Liquidity Pool Withdraw operation: https://developers.stellar.org/docs/start/list-of-operations/#liquidity-pool-withdraw
+- Liquidity Pools (concepts): https://developers.stellar.org/docs/learn/encyclopedia/sdex/liquidity-on-stellar-sdex-liquidity-pools
+- Change Trust operation: https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#change-trust
+- Liquidity Pool Deposit operation: https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#liquidity-pool-deposit
+- Liquidity Pool Withdraw operation: https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#liquidity-pool-withdraw
 
 IMPORTANT NOTES:
 - This example uses Testnet. For Mainnet, use horizon.stellar.org and Network.PUBLIC_NETWORK_PASSPHRASE.
@@ -44,9 +44,9 @@ IMPORTANT NOTES:
 #
 #     pip install stellar-sdk
 #
-# Save this script as `liquidity_pool_example.py` and run with:
+# Save this script as `amm.py` and run with:
 #
-#     python liquidity_pool_example.py
+#     python amm.py
 #
 # ==============================================================
 # === Import Required Libraries =================================
@@ -123,9 +123,8 @@ response1 = server.submit_transaction(transaction1)
 print("Change Trust submitted successfully!")
 print(f"Trust TX hash: {response1['hash']}")
 
-# After submitting a transaction, re-load the account sequence for the next transaction.
-# (Horizon sequence number increments after each successful tx.)
-source_account = server.load_account(account_id=source_keypair.public_key)
+# No need to load the account again: `build()` has already increased the sequence
+# number of `source_account`, so the next transaction can reuse it.
 
 # ==============================================================
 # === 5. Deposit Assets into the Liquidity Pool ==================
@@ -158,9 +157,6 @@ transaction2.sign(source_keypair)
 response2 = server.submit_transaction(transaction2)
 print("Deposit submitted successfully!")
 print(f"Deposit TX hash: {response2['hash']}")
-
-# Re-load account for the next transaction
-source_account = server.load_account(account_id=source_keypair.public_key)
 
 # ==============================================================
 # === 6. Withdraw from the Liquidity Pool =======================
