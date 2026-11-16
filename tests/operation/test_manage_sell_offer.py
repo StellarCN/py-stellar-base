@@ -2,14 +2,24 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import ManageSellOffer, Operation, Price
-
-from . import *
+from stellar_sdk import (
+    ManageSellOffer,
+    Operation,
+    Price,
+)
+from stellar_sdk import xdr as stellar_xdr
+from tests.operation.helpers import (
+    asset1,
+    check_source,
+    kp1,
+    muxed1,
+    native_asset,
+)
 
 
 class TestManageSellOffer:
     @pytest.mark.parametrize(
-        "amount, price, offer_id, source, xdr",
+        ("amount", "price", "offer_id", "source", "xdr"),
         [
             pytest.param(
                 "100",
@@ -100,7 +110,7 @@ class TestManageSellOffer:
         assert op.offer_id == offer_id
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_amount_raise(self):
@@ -110,3 +120,33 @@ class TestManageSellOffer:
             match=f'Value of argument "amount" must have at most 7 digits after the decimal: {amount}',
         ):
             ManageSellOffer(native_asset, asset1, amount, "1", 0, kp1.public_key)
+
+    @pytest.mark.parametrize(
+        "offer_id",
+        [-1, -12345, 2**63, 2**64, 2**64 + 12345],
+    )
+    def test_offer_id_out_of_range_raise(self, offer_id):
+        with pytest.raises(
+            ValueError,
+            match=r'Value of argument "offer_id" must be an integer between 0 and 2\*\*63 - 1',
+        ):
+            ManageSellOffer(native_asset, asset1, "1", "1", offer_id, kp1.public_key)
+
+    @pytest.mark.parametrize("offer_id", [0, 1, 2**63 - 1])
+    def test_offer_id_at_bounds(self, offer_id):
+        op = ManageSellOffer(native_asset, asset1, "1", "1", offer_id, kp1.public_key)
+        restored = ManageSellOffer.from_xdr_object(op.to_xdr_object())
+        assert restored.offer_id == offer_id
+
+    def test_from_xdr_object_keeps_negative_offer_id(self):
+        op = ManageSellOffer(native_asset, asset1, "1", "1", 1, kp1.public_key)
+        xdr_object = op.to_xdr_object()
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.ManageSellOffer)
+        negative = stellar_xdr.replace(body.manage_sell_offer_op, offer_id=-1)
+        xdr_object = stellar_xdr.replace(
+            xdr_object, body=stellar_xdr.OperationBody.ManageSellOffer(negative)
+        )
+        restored = ManageSellOffer.from_xdr_object(xdr_object)
+        assert restored.offer_id == -1
+        assert restored.to_xdr_object() == xdr_object

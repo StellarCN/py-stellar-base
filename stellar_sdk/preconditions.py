@@ -77,7 +77,7 @@ class Preconditions:
             or self.extra_signers
         )
 
-    def to_xdr_object(self) -> stellar_xdr.Preconditions:
+    def to_xdr_object(self) -> stellar_xdr.Preconditions.Any:
         """Returns the xdr object for this Preconditions object.
 
         :return: XDR Preconditions object
@@ -87,97 +87,61 @@ class Preconditions:
             ledger_bounds = (
                 self.ledger_bounds.to_xdr_object() if self.ledger_bounds else None
             )
-            min_sequence_number = (
-                stellar_xdr.SequenceNumber(stellar_xdr.Int64(self.min_sequence_number))
-                if self.min_sequence_number is not None
-                else None
-            )
-            min_sequence_age = (
-                stellar_xdr.Duration(stellar_xdr.Uint64(self.min_sequence_age))
-                if self.min_sequence_age is not None
-                else stellar_xdr.Duration(stellar_xdr.Uint64(0))
-            )
-            min_sequence_ledger_gap = (
-                stellar_xdr.Uint32(self.min_sequence_ledger_gap)
-                if self.min_sequence_ledger_gap is not None
-                else stellar_xdr.Uint32(0)
-            )
-            extra_signers = []
-            if self.extra_signers:
-                for s in self.extra_signers:
-                    extra_signers.append(s.to_xdr_object())
             preconditions_v2 = stellar_xdr.PreconditionsV2(
                 time_bounds=time_bounds,
                 ledger_bounds=ledger_bounds,
-                min_seq_num=min_sequence_number,
-                min_seq_age=min_sequence_age,
-                min_seq_ledger_gap=min_sequence_ledger_gap,
-                extra_signers=extra_signers,
+                min_seq_num=self.min_sequence_number,
+                min_seq_age=self.min_sequence_age or 0,
+                min_seq_ledger_gap=self.min_sequence_ledger_gap or 0,
+                extra_signers=[s.to_xdr_object() for s in self.extra_signers or ()],
             )
-            preconditions = stellar_xdr.Preconditions(
-                stellar_xdr.PreconditionType.PRECOND_V2,
-                v2=preconditions_v2,
+            preconditions: stellar_xdr.Preconditions.Any = stellar_xdr.Preconditions.V2(
+                preconditions_v2
             )
         elif time_bounds:
-            preconditions = stellar_xdr.Preconditions(
-                stellar_xdr.PreconditionType.PRECOND_TIME, time_bounds=time_bounds
-            )
+            preconditions = stellar_xdr.Preconditions.Time(time_bounds)
         else:
-            preconditions = stellar_xdr.Preconditions(
-                stellar_xdr.PreconditionType.PRECOND_NONE
-            )
+            preconditions = stellar_xdr.Preconditions.None_()
         return preconditions
 
     @classmethod
-    def from_xdr_object(cls, xdr_object: stellar_xdr.Preconditions) -> "Preconditions":
+    def from_xdr_object(
+        cls, xdr_object: stellar_xdr.Preconditions.Any
+    ) -> "Preconditions":
         """Create a :class:`Preconditions` from an XDR Preconditions object.
 
         :param xdr_object: The XDR LedgerBounds object.
         :return: A new :class:`LedgerBounds` object from the given XDR LedgerBounds object.
         """
 
-        if xdr_object.type == stellar_xdr.PreconditionType.PRECOND_V2:
-            assert xdr_object.v2 is not None
-            time_bounds = (
-                TimeBounds.from_xdr_object(xdr_object.v2.time_bounds)
-                if xdr_object.v2.time_bounds
-                else None
-            )
-            ledger_bounds = (
-                LedgerBounds.from_xdr_object(xdr_object.v2.ledger_bounds)
-                if xdr_object.v2.ledger_bounds
-                else None
-            )
-            # min_sequence_number is nullable
-            min_sequence_number = (
-                xdr_object.v2.min_seq_num.sequence_number.int64
-                if xdr_object.v2.min_seq_num is not None
-                else None
-            )
-            min_sequence_age = xdr_object.v2.min_seq_age.duration.uint64
-            min_sequence_ledger_gap = xdr_object.v2.min_seq_ledger_gap.uint32
-            extra_signers: list[SignerKey] | None = [
-                SignerKey.from_xdr_object(s) for s in xdr_object.v2.extra_signers
-            ]
-            return cls(
-                time_bounds=time_bounds,
-                ledger_bounds=ledger_bounds,
-                min_sequence_number=min_sequence_number,
-                min_sequence_age=min_sequence_age,
-                min_sequence_ledger_gap=min_sequence_ledger_gap,
-                extra_signers=extra_signers,
-            )
-        elif xdr_object.type == stellar_xdr.PreconditionType.PRECOND_TIME:
-            time_bounds = (
-                TimeBounds.from_xdr_object(xdr_object.time_bounds)
-                if xdr_object.time_bounds
-                else None
-            )
-            return cls(time_bounds=time_bounds)
-        elif xdr_object.type == stellar_xdr.PreconditionType.PRECOND_NONE:
-            return cls()
-        else:
-            raise ValueError(f"Invalid PreconditionType: {xdr_object.type!r}")
+        match xdr_object:
+            case stellar_xdr.Preconditions.V2(v2):
+                return cls(
+                    time_bounds=(
+                        TimeBounds.from_xdr_object(v2.time_bounds)
+                        if v2.time_bounds
+                        else None
+                    ),
+                    ledger_bounds=(
+                        LedgerBounds.from_xdr_object(v2.ledger_bounds)
+                        if v2.ledger_bounds
+                        else None
+                    ),
+                    min_sequence_number=(
+                        None if v2.min_seq_num is None else int(v2.min_seq_num)
+                    ),
+                    min_sequence_age=int(v2.min_seq_age),
+                    min_sequence_ledger_gap=v2.min_seq_ledger_gap,
+                    extra_signers=[
+                        SignerKey.from_xdr_object(s) for s in v2.extra_signers
+                    ],
+                )
+            case stellar_xdr.Preconditions.Time(time_bounds):
+                return cls(time_bounds=TimeBounds.from_xdr_object(time_bounds))
+            case stellar_xdr.Preconditions.None_():
+                return cls()
+            case _:
+                raise ValueError(f"Unsupported preconditions: {xdr_object!r}")
 
     def __hash__(self):
         return hash(

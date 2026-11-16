@@ -8,13 +8,14 @@ if TYPE_CHECKING:
 
 __all__ = [
     "AssembledTransactionError",
-    "RestorationFailureError",
-    "NotYetSimulatedError",
-    "SimulationFailedError",
     "ExpiredStateError",
-    "NoSignatureNeededError",
     "NeedsMoreSignaturesError",
+    "NeedsPreparationError",
+    "NoSignatureNeededError",
+    "NotYetSimulatedError",
+    "RestorationFailureError",
     "SendTransactionFailedError",
+    "SimulationFailedError",
     "TransactionFailedError",
     "TransactionStillPendingError",
 ]
@@ -50,6 +51,10 @@ class ExpiredStateError(AssembledTransactionError):
 
 class NoSignatureNeededError(AssembledTransactionError):
     """Raised when no signature is needed."""
+
+
+class NeedsPreparationError(AssembledTransactionError):
+    """Raised when the transaction needs to be prepared before continuing."""
 
 
 class NeedsMoreSignaturesError(AssembledTransactionError):

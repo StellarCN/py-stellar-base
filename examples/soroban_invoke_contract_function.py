@@ -28,7 +28,7 @@ assembled: AssembledTransaction[list[str]] = ContractClient(
     rpc_server_url,
     network_passphrase,
 ).invoke("hello", [scval.to_string("world")], parse_result_xdr_fn=parse_result_xdr)
-print(f"Result from simulation: {assembled.result}")
+print(f"Result from simulation: {assembled.result()}")
 
 # hello is a read-only function, so we don't need to sign and submit the transaction.
 # You can check `soroban_auth_atomic_swap.py` for an example of a function that requires signing and submitting.

@@ -39,16 +39,15 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.11,<4.0"
 dependencies = [
     "mnemonic>=0.20",
     "pydantic>=2.0.0",
     "pynacl>=1.4.0",
     "requests>=2.0.0",
     "requests-sse>=0.3",
-    "toml>=0.10.2; python_version < '3.11'",
-    "typing-extensions>=4.0.0",
-    "xdrlib3>=0.1.1",
+    "stellar-strkey>=0.2.0,<0.3.0",
+    "stellar-xdr>=0.2.1,<0.3.0",
 ]
 
 [project.urls]
@@ -70,13 +69,10 @@ dev = [
     "pytest-timeout>=2.4.0",
     "pytest-asyncio>=0.24.0",
     "pytest-httpserver>=1.1.1",
-    "requests-mock>=1.12.1",
-    "aioresponses>=0.7.8",
     "pre-commit>=3.5.0",
     "pyright>=1.1.402",
-    "mypy>=1.14.1",
+    "mypy>=1.14.1 ; platform_python_implementation != 'PyPy'",
     "types-requests>=2.32.0.20241016",
-    "types-toml>=0.10.8.20240310; python_version < '3.11'",
 ]
 docs = [
     "autodoc-pydantic>=2.1.0",
@@ -86,8 +82,17 @@ docs = [
 ]
 
 [build-system]
-requires = ["flit_core>=3.2,<4"]
+requires = ["flit_core>=3.2,<5"]
 build-backend = "flit_core.buildapi"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: marks tests as integration tests (skipped unless --integration is passed)",
+]
 
 [tool.mypy]
 show_error_codes = true
@@ -97,7 +102,6 @@ warn_unused_configs = true
 source = ["stellar_sdk/", "tests/"]
 
 [tool.coverage.report]
-omit = ["stellar_sdk/xdr/*"]
 exclude_lines = [
     "pragma: no cover",
     "raise AssertionError",
@@ -111,8 +115,36 @@ exclude_lines = [
     "pass",
 ]
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["F", "I", "E", "W", "C4", "PIE", "RUF", "UP", "B", "SIM", "PT"]
+ignore = [
+    # Star imports are used both in package __init__ re-exports and in a
+    # handful of test files; suppress globally rather than per-file.
+    "F403",
+    "F405",
+    # Let `ruff format` own line length; the linter shouldn't double-flag.
+    "E501",
+    # Unicode lookalike warnings: the few "ambiguous" characters in this
+    # codebase live in legitimate multilingual test data and docstrings.
+    "RUF002",
+    "RUF003",
+]
+
+[tool.ruff.lint.flake8-pytest-style]
+# `pytest.raises(ValueError)` without `match=` is fine here; some tests
+# only care that *any* ValueError is raised. The default require-match
+# list includes ValueError, which we don't want.
+raises-require-match-for = ["BaseException", "Exception"]
+
+[tool.ruff.lint.per-file-ignores]
+# Re-exports in package __init__ modules (was --ignore-init-module-imports
+# under autoflake).
+"__init__.py" = ["F401"]
+# examples/* are illustrative scripts, not pytest tests.
+"examples/*" = ["PT"]
 
 [tool.pyright]
 include = ["stellar_sdk", "tests", "examples"]

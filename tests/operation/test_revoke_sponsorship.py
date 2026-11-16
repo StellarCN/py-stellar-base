@@ -1,9 +1,8 @@
 import pytest
 
 from stellar_sdk import Asset, LiquidityPoolId, Operation, RevokeSponsorship, SignerKey
-from stellar_sdk.operation.revoke_sponsorship import Data, Offer
+from stellar_sdk.operation.revoke_sponsorship import Data, Offer, TrustLine
 from stellar_sdk.operation.revoke_sponsorship import Signer as RevokeSponsorshipSigner
-from stellar_sdk.operation.revoke_sponsorship import TrustLine
 
 
 class TestRevokeSponsorship:
@@ -13,10 +12,10 @@ class TestRevokeSponsorship:
         xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAAAAAAAAB0OKzisegg6DLiIxxowYKqBRLupojJsXKjr1azOP28GQ=="
 
         op = RevokeSponsorship.revoke_account_sponsorship(account_id, source)
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr_object().to_xdr_base64() == xdr
         restore_op = Operation.from_xdr_object(op.to_xdr_object())
         assert restore_op == op
-        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr_base64() == xdr
 
     def test_account_with_invalid_account_id_raise(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -34,10 +33,10 @@ class TestRevokeSponsorship:
         xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAAAQAAAAB0OKzisegg6DLiIxxowYKqBRLupojJsXKjr1azOP28GQAAAAFDQVQAAAAAAImHF95q/7Wv0UPkh++WcIkobMpLgYu4lWqjaLYRxRCx"
 
         op = RevokeSponsorship.revoke_trustline_sponsorship(account_id, asset, source)
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr_object().to_xdr_base64() == xdr
         restore_op = Operation.from_xdr_object(op.to_xdr_object())
         assert restore_op == op
-        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr_base64() == xdr
 
     def test_trustline_xdr_with_invalid_account_id_raise(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -58,10 +57,10 @@ class TestRevokeSponsorship:
         xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAAAQAAAAB0OKzisegg6DLiIxxowYKqBRLupojJsXKjr1azOP28GQAAAAPdexq4McJzMQ3b7G+XhwqoPC+9eM4ire037L9PM4D6xw=="
 
         op = RevokeSponsorship.revoke_trustline_sponsorship(account_id, asset, source)
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr_object().to_xdr_base64() == xdr
         restore_op = Operation.from_xdr_object(op.to_xdr_object())
         assert restore_op == op
-        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr_base64() == xdr
 
     def test_offer_xdr(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -70,10 +69,10 @@ class TestRevokeSponsorship:
         xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAAAgAAAAB0OKzisegg6DLiIxxowYKqBRLupojJsXKjr1azOP28GQAAAAAAADA5"
 
         op = RevokeSponsorship.revoke_offer_sponsorship(seller_id, offer_id, source)
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr_object().to_xdr_base64() == xdr
         restore_op = Operation.from_xdr_object(op.to_xdr_object())
         assert restore_op == op
-        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr_base64() == xdr
 
     def test_offer_with_invalid_seller_id_raise(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -92,10 +91,10 @@ class TestRevokeSponsorship:
         xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAAAwAAAAB0OKzisegg6DLiIxxowYKqBRLupojJsXKjr1azOP28GQAAABJTdGVsbGFyIFB5dGhvbiBTREsAAA=="
 
         op = RevokeSponsorship.revoke_data_sponsorship(account_id, data_name, source)
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr_object().to_xdr_base64() == xdr
         restore_op = Operation.from_xdr_object(op.to_xdr_object())
         assert restore_op == op
-        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr_base64() == xdr
 
     def test_date_with_invalid_account_id_raise(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -115,10 +114,10 @@ class TestRevokeSponsorship:
         xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAAAAAAABAAAAADaDVfafUhQ5/wQ0qnQ68cx96+0BXTAM5WxfUkUm5H1vg=="
 
         op = RevokeSponsorship.revoke_claimable_balance_sponsorship(balance_id, source)
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr_object().to_xdr_base64() == xdr
         restore_op = Operation.from_xdr_object(op.to_xdr_object())
         assert restore_op == op
-        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr_base64() == xdr
 
     def test_claimable_balance_id_with_invalid_claimable_balance_id_raise(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -141,10 +140,10 @@ class TestRevokeSponsorship:
         op = RevokeSponsorship.revoke_liquidity_pool_sponsorship(
             liquidity_pool_id, source
         )
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr_object().to_xdr_base64() == xdr
         restore_op = Operation.from_xdr_object(op.to_xdr_object())
         assert restore_op == op
-        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr_base64() == xdr
 
     def test_liquidity_pool_with_invalid_liquidity_pool_id_raise(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
@@ -168,10 +167,10 @@ class TestRevokeSponsorship:
         xdr = "AAAAAQAAAADX7fRsY6KTqIc8EIDyr8M9gxGPW6ODnZoZDgo6l1ymwwAAABIAAAABAAAAAHQ4rOKx6CDoMuIjHGjBgqoFEu6miMmxcqOvVrM4/bwZAAAAAImHF95q/7Wv0UPkh++WcIkobMpLgYu4lWqjaLYRxRCx"
 
         op = RevokeSponsorship.revoke_signer_sponsorship(account_id, signer_key, source)
-        assert op.to_xdr_object().to_xdr() == xdr
+        assert op.to_xdr_object().to_xdr_base64() == xdr
         restore_op = Operation.from_xdr_object(op.to_xdr_object())
         assert restore_op == op
-        assert restore_op.to_xdr_object().to_xdr() == xdr
+        assert restore_op.to_xdr_object().to_xdr_base64() == xdr
 
     def test_signer_with_invalid_account_id_raise(self):
         source = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"

@@ -10,7 +10,7 @@ class TestAsset:
     def test_non_native_asset_without_issuer_raise(self, code):
         with pytest.raises(
             AssetIssuerInvalidError,
-            match="The issuer cannot be `None` except for the native asset.",
+            match=r"The issuer cannot be `None` except for the native asset.",
         ):
             Asset(code)
 
@@ -40,7 +40,7 @@ class TestAsset:
     )
     def test_invalid_issuer(self, issuer):
         with pytest.raises(
-            AssetIssuerInvalidError, match="The issuer should be a correct public key."
+            AssetIssuerInvalidError, match=r"The issuer should be a correct public key."
         ):
             Asset("XCN", issuer)
 
@@ -84,7 +84,7 @@ class TestAsset:
 
     def test_set_type_raise(self):
         asset = Asset.native()
-        with pytest.raises(AttributeError, match="Asset type is immutable."):
+        with pytest.raises(AttributeError, match=r"Asset type is immutable."):
             asset.type = "credit_alphanum4"
 
     def test_equals(self):
@@ -105,7 +105,7 @@ class TestAsset:
         assert asset1 != asset4
 
     @pytest.mark.parametrize(
-        "asset, xdr",
+        ("asset", "xdr"),
         [
             pytest.param(Asset.native(), "AAAAAA==", id="native"),
             pytest.param(
@@ -127,11 +127,11 @@ class TestAsset:
     )
     def test_to_xdr_object(self, asset, xdr):
         xdr_object = asset.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Asset.from_xdr_object(xdr_object) == asset
 
     @pytest.mark.parametrize(
-        "asset, xdr",
+        ("asset", "xdr"),
         [
             pytest.param(Asset.native(), "AAAAAA==", id="native"),
             pytest.param(
@@ -153,11 +153,11 @@ class TestAsset:
     )
     def test_to_xdr_trust_line_xdr_asset_object(self, asset: Asset, xdr):
         xdr_object = asset.to_trust_line_asset_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Asset.from_xdr_object(xdr_object) == asset
 
     @pytest.mark.parametrize(
-        "asset, xdr",
+        ("asset", "xdr"),
         [
             pytest.param(Asset.native(), "AAAAAA==", id="native"),
             pytest.param(
@@ -179,11 +179,11 @@ class TestAsset:
     )
     def test_to_xdr_change_trust_xdr_asset_object(self, asset, xdr):
         xdr_object = asset.to_change_trust_asset_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Asset.from_xdr_object(xdr_object) == asset
 
     @pytest.mark.parametrize(
-        "asset, network_passphrase, contract_id",
+        ("asset", "network_passphrase", "contract_id"),
         [
             pytest.param(
                 Asset.native(),

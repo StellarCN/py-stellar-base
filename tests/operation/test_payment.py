@@ -2,14 +2,25 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import Operation, Payment
-
-from . import *
+from stellar_sdk import (
+    MuxedAccount,
+    Operation,
+    Payment,
+)
+from tests.operation.helpers import (
+    asset1,
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+    muxed2,
+    native_asset,
+)
 
 
 class TestPayment:
     @pytest.mark.parametrize(
-        "destination, amount, source, xdr",
+        ("destination", "amount", "source", "xdr"),
         [
             pytest.param(
                 kp2.public_key,
@@ -72,7 +83,7 @@ class TestPayment:
         assert op.amount == str(amount)
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_amount_raise(self):

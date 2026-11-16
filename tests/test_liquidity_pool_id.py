@@ -16,7 +16,7 @@ class TestLiquidityPoolId:
     def test_init_raise(self):
         with pytest.raises(
             ValueError,
-            match=f'Value of argument "liquidity_pool_id" is not a valid hash: abc',
+            match='Value of argument "liquidity_pool_id" is not a valid hash: abc',
         ):
             LiquidityPoolId("abc")
 
@@ -34,13 +34,13 @@ class TestLiquidityPoolId:
         asset = LiquidityPoolId(liquidity_pool_id)
         trust_line_asset_xdr_object = asset.to_trust_line_asset_xdr_object()
         assert (
-            trust_line_asset_xdr_object.to_xdr()
+            trust_line_asset_xdr_object.to_xdr_base64()
             == "AAAAA917GrgxwnMxDdvsb5eHCqg8L714ziKt7Tfsv08zgPrK"
         )
         assert asset == LiquidityPoolId.from_xdr_object(trust_line_asset_xdr_object)
 
     @pytest.mark.parametrize(
-        "asset_code, asset_issuer, asset_type",
+        ("asset_code", "asset_issuer", "asset_type"),
         [
             ("XLM", None, AssetType.ASSET_TYPE_NATIVE),
             (

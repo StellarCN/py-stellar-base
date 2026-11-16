@@ -14,15 +14,23 @@ class BaseAsyncClient(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    async def get(self, url: str, params: dict[str, str] | None = None) -> Response:
+    async def get(
+        self,
+        url: str,
+        params: dict[str, str] | None = None,
+        max_content_size: int | None = None,
+    ) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
         :param params: the request params
+        :param max_content_size: the maximum allowed response content size in bytes.
+            If the response exceeds this limit, a :exc:`ContentSizeLimitExceededError` is raised.
+            If None, no limit is applied.
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+        :raise: :exc:`ContentSizeLimitExceededError <stellar_sdk.exceptions.ContentSizeLimitExceededError>`
         """
-        pass  # pragma: no cover
 
     @abstractmethod
     async def post(
@@ -39,7 +47,6 @@ class BaseAsyncClient(metaclass=ABCMeta):
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        pass  # pragma: no cover
 
     @abstractmethod
     def stream(
@@ -56,8 +63,7 @@ class BaseAsyncClient(metaclass=ABCMeta):
         :return: a dict AsyncGenerator for server response
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
         """
-        pass  # pragma: no cover
 
     @abstractmethod
     async def close(self) -> None:
-        pass  # pragma: no cover
+        pass

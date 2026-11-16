@@ -1,16 +1,18 @@
+from unittest.mock import patch
+
+import aiohttp
 import pytest
 
 from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
-from tests import HTTPBIN_URL
+from stellar_sdk.exceptions import ConnectionError, ContentSizeLimitExceededError
+from tests import _horizon_fixtures as hf
 
 
-@pytest.mark.slow
 class TestAiohttpClient:
-    @pytest.mark.asyncio
-    async def test_get(self):
+    async def test_get(self, httpbin_url):
         user_agent = "Hello/Stellar/overcat"
         client = AiohttpClient(pool_size=10, user_agent=user_agent)
-        url = HTTPBIN_URL + "get"
+        url = httpbin_url + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = await client.get(url, params=params)
         assert resp.status_code == 200
@@ -19,10 +21,9 @@ class TestAiohttpClient:
         assert json["headers"]["User-Agent"] == user_agent
         await client.close()
 
-    @pytest.mark.asyncio
-    async def test_post(self):
+    async def test_post(self, httpbin_url):
         client = AiohttpClient()
-        url = HTTPBIN_URL + "post"
+        url = httpbin_url + "post"
         data = {
             "tx": "AAAAABa3N0+hJk17vP/AnYK5xV4o/PhOnEfgi36HlYo4g+3nAAAAZQFDfjoAAaTSAAAAAA"
             "AAAAEAAAAJX3VwZGF0ZWRfAAAAAAAAAQAAAAEAAAAAFrc3T6EmTXu8/8CdgrnFXij8+E6cR+"
@@ -37,23 +38,21 @@ class TestAiohttpClient:
         assert json["form"] == data
         await client.close()
 
-    @pytest.mark.asyncio
-    @pytest.mark.timeout(30)
-    async def test_stream(self):
+    async def test_stream(self, horizon_mock):
+        horizon_mock.expect(
+            "/ledgers", body=hf.stream_body(), content_type="text/event-stream"
+        )
         async with AiohttpClient() as client:
-            resp = []
-            async for msg in client.stream(
-                "https://horizon.stellar.org/ledgers", {"cursor": "now"}
-            ):
-                assert isinstance(msg, dict)
-                resp.append(msg)
-                if len(resp) == 2:
-                    break
+            stream = client.stream(horizon_mock.url + "ledgers", {"cursor": "now"})
+            try:
+                assert await anext(stream) == {"id": "1"}
+                assert await anext(stream) == {"id": "2"}
+            finally:
+                await stream.aclose()
 
-    @pytest.mark.asyncio
-    async def test_with(self):
+    async def test_with(self, httpbin_url):
         async with AiohttpClient() as client:
-            url = HTTPBIN_URL + "get"
+            url = httpbin_url + "get"
             params = {"hello": "world", "stellar": "sdk"}
             resp = await client.get(url, params=params)
             assert resp.status_code == 200
@@ -61,14 +60,13 @@ class TestAiohttpClient:
             assert json["args"] == params
             assert json["headers"]["User-Agent"] == USER_AGENT
 
-    @pytest.mark.asyncio
-    async def test_custom_headers(self):
+    async def test_custom_headers(self, httpbin_url):
         user_agent = "Hello/Stellar/overcat"
         custom_headers = {"a": "b", "c": "d"}
         client = AiohttpClient(
             pool_size=10, user_agent=user_agent, custom_headers=custom_headers
         )
-        url = HTTPBIN_URL + "get"
+        url = httpbin_url + "get"
         params = {"hello": "world", "stellar": "sdk"}
         resp = await client.get(url, params=params)
         assert resp.status_code == 200
@@ -78,3 +76,46 @@ class TestAiohttpClient:
         assert json["headers"]["A"] == custom_headers["a"]
         assert json["headers"]["C"] == custom_headers["c"]
         await client.close()
+
+    async def test_get_with_max_content_size_success(self, httpserver):
+        content = "Hello, World!"
+        httpserver.expect_request("/data").respond_with_data(content)
+        async with AiohttpClient() as client:
+            resp = await client.get(httpserver.url_for("/data"), max_content_size=1024)
+            assert resp.status_code == 200
+            assert resp.text == content
+
+    async def test_get_with_max_content_size_exceeded(self, httpserver):
+        content = "x" * 1000
+        httpserver.expect_request("/data").respond_with_data(content)
+        async with AiohttpClient() as client:
+            with pytest.raises(ContentSizeLimitExceededError) as exc_info:
+                await client.get(httpserver.url_for("/data"), max_content_size=500)
+            assert exc_info.value.limit == 500
+            assert exc_info.value.content_size is not None
+            assert exc_info.value.content_size > 500
+
+    async def test_get_without_max_content_size(self, httpserver):
+        content = "x" * 10000
+        httpserver.expect_request("/data").respond_with_data(content)
+        async with AiohttpClient() as client:
+            resp = await client.get(httpserver.url_for("/data"))
+            assert resp.status_code == 200
+            assert resp.text == content
+
+    async def test_get_with_max_content_size_network_error_wraps_in_connection_error(
+        self,
+    ):
+        """aiohttp.ClientError (e.g. connection reset) is wrapped in ConnectionError."""
+        async with AiohttpClient() as client:
+            with (
+                patch.object(
+                    aiohttp.ClientSession,
+                    "get",
+                    side_effect=aiohttp.ClientError("connection reset"),
+                ),
+                pytest.raises(ConnectionError),
+            ):
+                # `.invalid` never resolves (RFC 2606), so should the patch ever
+                # stop applying this cannot silently turn into a real request.
+                await client.get("https://mock.invalid/data", max_content_size=1024)

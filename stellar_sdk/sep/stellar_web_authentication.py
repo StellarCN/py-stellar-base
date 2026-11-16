@@ -27,11 +27,11 @@ from .exceptions import InvalidSep10ChallengeError
 
 __all__ = [
     "build_challenge_transaction",
-    "verify_challenge_transaction_signers",
-    "verify_challenge_transaction_signed_by_client_master_key",
-    "verify_challenge_transaction_threshold",
     "read_challenge_transaction",
     "verify_challenge_transaction",
+    "verify_challenge_transaction_signed_by_client_master_key",
+    "verify_challenge_transaction_signers",
+    "verify_challenge_transaction_threshold",
 ]
 
 MUXED_ACCOUNT_STARTING_LETTER: str = "M"
@@ -185,7 +185,7 @@ def read_challenge_transaction(
             "Invalid server_account_id, multiplexed account are not supported."
         )
 
-    xdr_object = stellar_xdr.TransactionEnvelope.from_xdr(challenge_transaction)
+    xdr_object = stellar_xdr.TransactionEnvelope.from_xdr_base64(challenge_transaction)
     if xdr_object.type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
         raise ValueError(
             "Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope."
@@ -195,10 +195,10 @@ def read_challenge_transaction(
         transaction_envelope = TransactionEnvelope.from_xdr(
             challenge_transaction, network_passphrase=network_passphrase
         )
-    except Exception:
+    except Exception as e:
         raise InvalidSep10ChallengeError(
             "Importing XDR failed, please check if XDR is correct."
-        )
+        ) from e
 
     transaction = transaction_envelope.transaction
 
@@ -615,18 +615,14 @@ def _verify_transaction_signatures(
 def _verify_te_signed_by_account_id(
     transaction_envelope: TransactionEnvelope, account_id: str
 ) -> bool:
-    signers_found = _verify_transaction_signatures(
-        transaction_envelope, [Ed25519PublicKeySigner(account_id)]
+    return bool(
+        _verify_transaction_signatures(
+            transaction_envelope, [Ed25519PublicKeySigner(account_id)]
+        )
     )
-    if not signers_found:
-        return False
-    return True
 
 
 def _signer_in_signers(
     signer: Ed25519PublicKeySigner, signers: Sequence[Ed25519PublicKeySigner]
 ) -> bool:
-    for s in signers:
-        if s.account_id == signer.account_id:
-            return True
-    return False
+    return any(s.account_id == signer.account_id for s in signers)

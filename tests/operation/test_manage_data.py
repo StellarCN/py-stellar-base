@@ -1,13 +1,19 @@
 import pytest
 
-from stellar_sdk import ManageData, Operation
-
-from . import *
+from stellar_sdk import (
+    ManageData,
+    Operation,
+)
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+    muxed1,
+)
 
 
 class TestManageData:
     @pytest.mark.parametrize(
-        "key, value, source, xdr",
+        ("key", "value", "source", "xdr"),
         [
             pytest.param(
                 "hello",
@@ -78,11 +84,11 @@ class TestManageData:
             assert op.data_value == value
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     @pytest.mark.parametrize(
-        "name, value",
+        ("name", "value"),
         [
             pytest.param("name_too_long" + "-" * 64, "value", id="name_too_long"),
             pytest.param("value_too_long", "value" + "a" * 64, id="value_too_long"),

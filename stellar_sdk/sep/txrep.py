@@ -8,7 +8,7 @@ Created: 2018-08-31
 
 import json
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from enum import Enum
 
@@ -29,12 +29,12 @@ from ..preconditions import Preconditions
 from ..price import Price
 from ..signer import Signer
 from ..signer_key import SignerKey, SignerKeyType
-from ..strkey import StrKey
+from ..strkey import HashX, PreAuthTx
 from ..time_bounds import TimeBounds
 from ..transaction import Transaction
 from ..transaction_envelope import TransactionEnvelope
 
-__all__ = ["to_txrep", "from_txrep"]
+__all__ = ["from_txrep", "to_txrep"]
 
 _true = "true"
 _false = "false"
@@ -150,7 +150,7 @@ def from_txrep(
     """
     raw_data_map = _get_raw_data_map(txrep)
     tx_type = _EnvelopeType(_get_value(raw_data_map, "type"))
-    is_fee_bump = True if tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP else False
+    is_fee_bump = tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP
 
     prefix = "feeBump.tx.innerTx.tx." if is_fee_bump else "tx."
 
@@ -164,11 +164,7 @@ def from_txrep(
     prefix = "feeBump.tx.innerTx." if is_fee_bump else ""
     transaction_signatures = _get_signatures(raw_data_map, prefix)
 
-    v1 = (
-        False
-        if not is_fee_bump and tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_V0
-        else True
-    )
+    v1 = not (not is_fee_bump and tx_type == _EnvelopeType.ENVELOPE_TYPE_TX_V0)
     transaction = Transaction(
         source=source,
         sequence=sequence,
@@ -550,10 +546,10 @@ def _get_set_options_op(
         if key.startswith("G"):
             signer = Signer.ed25519_public_key(key, weight)
         elif key.startswith("X"):
-            sha256_hash = StrKey.decode_sha256_hash(key)
+            sha256_hash = HashX.from_string(key).hash
             signer = Signer.sha256_hash(sha256_hash, weight)
         elif key.startswith("T"):
-            pre_auth_tx_hash = StrKey.decode_pre_auth_tx(key)
+            pre_auth_tx_hash = PreAuthTx.from_string(key).hash
             signer = Signer.pre_auth_tx(pre_auth_tx_hash, weight)
         else:
             raise ValueError("Signer key should start with `G`, `X` or `T`.")
@@ -718,7 +714,7 @@ def _get_change_trust_op(
     source: str | None, operation_prefix: str, raw_data_map: dict[str, str]
 ) -> ChangeTrust:
     # Keep compatibility
-    line_type = raw_data_map.get(f"{operation_prefix}line.type", None)
+    line_type = raw_data_map.get(f"{operation_prefix}line.type")
     if line_type == stellar_xdr.AssetType.ASSET_TYPE_POOL_SHARE.name:
         asset_a = _get_asset(
             raw_data_map, f"{operation_prefix}line.liquidityPool.constantProduct.assetA"
@@ -938,7 +934,7 @@ def _get_revoke_sponsorship_op(
             key = _get_value(
                 raw_data_map, f"{operation_prefix}signer.signerKey.preAuthTx"
             )
-            signer_key = SignerKey.pre_auth_tx(StrKey.decode_pre_auth_tx(key))
+            signer_key = SignerKey.pre_auth_tx(PreAuthTx.from_string(key).hash)
         elif signer_key_type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_ED25519.name:
             key = _get_value(
                 raw_data_map, f"{operation_prefix}signer.signerKey.ed25519"
@@ -946,7 +942,7 @@ def _get_revoke_sponsorship_op(
             signer_key = SignerKey.ed25519_public_key(key)
         elif signer_key_type == stellar_xdr.SignerKeyType.SIGNER_KEY_TYPE_HASH_X.name:
             key = _get_value(raw_data_map, f"{operation_prefix}signer.signerKey.hashX")
-            signer_key = SignerKey.sha256_hash(StrKey.decode_sha256_hash(key))
+            signer_key = SignerKey.sha256_hash(HashX.from_string(key).hash)
         else:
             raise ValueError(
                 f"This signer key type has not been implemented yet, "
@@ -969,14 +965,8 @@ def _get_set_trust_line_flags_op(
     asset = _get_asset(raw_data_map, f"{operation_prefix}asset")
     clear_flags_raw = _get_int_value(raw_data_map, f"{operation_prefix}clearFlags")
     set_flags_raw = _get_int_value(raw_data_map, f"{operation_prefix}setFlags")
-    if clear_flags_raw == 0:
-        clear_flags = None
-    else:
-        clear_flags = TrustLineFlags(clear_flags_raw)
-    if set_flags_raw == 0:
-        set_flags = None
-    else:
-        set_flags = TrustLineFlags(set_flags_raw)
+    clear_flags = None if clear_flags_raw == 0 else TrustLineFlags(clear_flags_raw)
+    set_flags = None if set_flags_raw == 0 else TrustLineFlags(set_flags_raw)
     return SetTrustLineFlags(
         trustor=trustor,
         asset=asset,
@@ -1099,7 +1089,7 @@ def _add_preconditions(
     cond: Preconditions | None, prefix: str, lines: list[str]
 ) -> None:
     if cond is None:
-        cond_xdr = stellar_xdr.Preconditions(stellar_xdr.PreconditionType.PRECOND_NONE)
+        cond_xdr: stellar_xdr.Preconditions.Any = stellar_xdr.Preconditions.None_()
     else:
         cond_xdr = cond.to_xdr_object()
     _add_line(f"{prefix}type", cond_xdr.type.name, lines)
@@ -1261,7 +1251,7 @@ def _add_operation(
         operation_type = operation.__class__.__name__
         key = f"body.{_to_camel_case(operation_type)}Op.{key}"
         if optional:
-            present = True if value is not None else False
+            present = value is not None
             add_operation_line(f"{key}._present", _true if present else _false)
             if present:
                 assert value is not None
@@ -1506,14 +1496,14 @@ def _add_operation(
         if operation.revoke_sponsorship_type == RevokeSponsorshipType.ACCOUNT:
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.ACCOUNT.name)
             add_body_line("ledgerKey.account", operation.account_id)
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.TRUSTLINE:
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.TRUSTLINE.name)
             assert operation.trustline is not None
@@ -1526,7 +1516,7 @@ def _add_operation(
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.OFFER:
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.OFFER.name)
             assert operation.offer is not None
@@ -1535,7 +1525,7 @@ def _add_operation(
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.DATA:
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line("ledgerKey.type", stellar_xdr.LedgerEntryType.DATA.name)
             assert operation.data is not None
@@ -1546,7 +1536,7 @@ def _add_operation(
         ):
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line(
                 "ledgerKey.type", stellar_xdr.LedgerEntryType.CLAIMABLE_BALANCE.name
@@ -1557,7 +1547,7 @@ def _add_operation(
         elif operation.revoke_sponsorship_type == RevokeSponsorshipType.LIQUIDITY_POOL:
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_LEDGER_ENTRY.name,
             )
             add_body_line(
                 "ledgerKey.type", stellar_xdr.LedgerEntryType.LIQUIDITY_POOL.name
@@ -1569,7 +1559,7 @@ def _add_operation(
             assert operation.signer is not None
             add_body_line(
                 "type",
-                stellar_xdr.revoke_sponsorship_type.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER.name,
+                stellar_xdr.RevokeSponsorshipType.REVOKE_SPONSORSHIP_SIGNER.name,
             )
             add_body_line("signer.accountID", operation.signer.account_id)
             signer_key_xdr = operation.signer.signer_key.to_xdr_object()
@@ -1651,8 +1641,7 @@ def _add_operation(
         )
     else:
         raise ValueError(
-            f"This operation has not been implemented yet, "
-            f"operation type: {operation}."
+            f"This operation has not been implemented yet, operation type: {operation}."
         )
 
 
@@ -1681,7 +1670,7 @@ def _to_asset(asset: Asset | LiquidityPoolAsset | LiquidityPoolId) -> str:
 
 
 def _to_readable_utc_time_comment(timestamp: int) -> str:
-    utc_time = datetime.utcfromtimestamp(timestamp)
+    utc_time = datetime.fromtimestamp(timestamp, UTC)
     return utc_time.strftime("%Y-%m-%d %H:%M:%S.%f+00:00 (UTC)")
 
 
@@ -1698,11 +1687,7 @@ def _to_amount(amount: Decimal | str) -> int:
 
 
 def _to_price(price: Price | str | Decimal) -> Price:
-    if isinstance(price, Price):
-        price_fraction = price
-    else:
-        price_fraction = Price.from_raw_price(price)
-    return price_fraction
+    return price if isinstance(price, Price) else Price.from_raw_price(price)
 
 
 def _to_camel_case(cap_words: str) -> str:

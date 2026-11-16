@@ -4,12 +4,10 @@ from random import choice
 from string import ascii_uppercase
 
 import pytest
-import requests
 
 from stellar_sdk import (
     Asset,
     Keypair,
-    Network,
     SorobanServerAsync,
     TransactionBuilder,
     scval,
@@ -17,15 +15,9 @@ from stellar_sdk import (
 from stellar_sdk.contract import ContractClientAsync
 from stellar_sdk.contract.exceptions import NoSignatureNeededError
 from stellar_sdk.soroban_rpc import GetTransactionStatus
+from tests.integration_utils import NETWORK_PASSPHRASE, RPC_URL, fund_account
 
-RPC_URL = "http://127.0.0.1:8000/soroban/rpc"
 SOURCE = Keypair.random()
-NETWORK_PASSPHRASE = Network.STANDALONE_NETWORK_PASSPHRASE
-
-
-def fund_account(account_id: str):
-    resp = requests.get(f"http://127.0.0.1:8000/friendbot?addr={account_id}")
-    resp.raise_for_status()
 
 
 async def create_contract_from_file(filename):
@@ -47,7 +39,7 @@ async def create_contract_from_asset(asset: Asset):
             return await ContractClientAsync.create_stellar_asset_contract_from_asset(
                 asset, SOURCE.public_key, SOURCE, client
             )
-    except Exception as e:
+    except Exception:
         pass
     return asset.contract_id(NETWORK_PASSPHRASE)
 
@@ -73,7 +65,6 @@ class TestContractClientAsync:
     def teardown_class(cls):
         "Runs at end of class"
 
-    @pytest.mark.asyncio
     async def test_upload_contract_wasm(self):
         wasm_file = os.path.join(
             os.path.dirname(__file__), "wasm_files", "soroban_hello_world_contract.wasm"
@@ -85,7 +76,6 @@ class TestContractClientAsync:
             assert isinstance(wasm_id, bytes)
             assert len(wasm_id) == 32
 
-    @pytest.mark.asyncio
     async def test_create_contract(self):
         async with SorobanServerAsync(RPC_URL) as client:
             wasm_id = await ContractClientAsync.upload_contract_wasm(
@@ -104,7 +94,6 @@ class TestContractClientAsync:
             assert isinstance(contract_id, str)
             assert len(contract_id) == 56
 
-    @pytest.mark.asyncio
     async def test_create_stellar_asset_contract_from_asset(self):
         async with SorobanServerAsync(RPC_URL) as client:
             asset_code = "".join(choice(ascii_uppercase) for _ in range(8))
@@ -119,7 +108,6 @@ class TestContractClientAsync:
             assert isinstance(contract_id, str)
             assert len(contract_id) == 56
 
-    @pytest.mark.asyncio
     async def test_invoke_hello_world_contract(self):
         assemble_tx = await ContractClientAsync(
             self.hello_world_contract_id, RPC_URL, NETWORK_PASSPHRASE
@@ -139,7 +127,6 @@ class TestContractClientAsync:
         result = await assemble_tx.sign_and_submit(SOURCE, True)
         assert result == ["Hello", "world"]
 
-    @pytest.mark.asyncio
     async def test_invoke_atomic_swap_contract(self):
         alice_kp = Keypair.random()
         bob_kp = Keypair.random()

@@ -2,77 +2,84 @@ name: Test and Deploy
 
 on:
   push:
+    branches:
+      - main
   pull_request:
   release:
     types:
       - created
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 env:
-  DEFAULT_PYTHON_VERSION: "3.13"
+  DEFAULT_PYTHON_VERSION: "3.14"
 
 jobs:
-  pre-commit:
+  lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - name: Install the latest version of uv and set the python version to ${{ env.DEFAULT_PYTHON_VERSION }}
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7.0.1
+      - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v10.3.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Run pre-commit
         run: make pre-commit
 
+  type-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v10.3.0
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
+      - name: Run type check
+        run: make type-check
+
   test:
-    needs: pre-commit
     strategy:
       fail-fast: false
       matrix:
         # https://endoflife.date/python
         platform:
           [
-            { os: "ubuntu-latest", python-version: "3.10" },
             { os: "ubuntu-latest", python-version: "3.11" },
             { os: "ubuntu-latest", python-version: "3.12" },
             { os: "ubuntu-latest", python-version: "3.13" },
             { os: "ubuntu-latest", python-version: "3.14" },
-            { os: "ubuntu-latest", python-version: "pypy3.10" },
+            { os: "ubuntu-latest", python-version: "3.15" },
             { os: "ubuntu-latest", python-version: "pypy3.11" },
-            { os: "macos-latest", python-version: "3.10" },
             { os: "macos-latest", python-version: "3.11" },
             { os: "macos-latest", python-version: "3.12" },
             { os: "macos-latest", python-version: "3.13" },
             { os: "macos-latest", python-version: "3.14" },
-            { os: "macos-latest", python-version: "pypy3.10" },
+            { os: "macos-latest", python-version: "3.15" },
             { os: "macos-latest", python-version: "pypy3.11" },
-            { os: "windows-latest", python-version: "3.10" },
             { os: "windows-latest", python-version: "3.11" },
             { os: "windows-latest", python-version: "3.12" },
             { os: "windows-latest", python-version: "3.13" },
             { os: "windows-latest", python-version: "3.14" },
+            { os: "windows-latest", python-version: "3.15" },
           ]
     runs-on: ${{ matrix.platform.os }}
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Wake up httpbin server
-        run: |
-          curl https://httpbinx.fly.dev/ip
-
-      - name: Install the latest version of uv and set the python version to ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7.0.1
+      - name: Install uv and Python ${{ matrix.platform.python-version }} on ${{ matrix.platform.os }}
+        uses: astral-sh/setup-uv@v10.3.0
         with:
           python-version: ${{ matrix.platform.python-version }}
-
-      - name: Echo installed packages
-        run: uv tree
-
-      - name: Run type check
-        run: make type-check
-
-      - name: Test with pytest
-        run: make full-unit-test
+      - name: Run unit tests
+        run: make unit-test
 
   integration:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     services:
       rpc:
         image: stellar/quickstart:latest
@@ -81,30 +88,23 @@ jobs:
         env:
           ENABLE_LOGS: true
           NETWORK: local
-          ENABLE_SOROBAN_RPC: true
-          PROTOCOL_VERSION: 24
+          ENABLE: core,rpc
+          PROTOCOL_VERSION: 30
         options: >-
-          --health-cmd "curl --no-progress-meter --fail-with-body -X POST \"http://localhost:8000/soroban/rpc\" -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":8675309,\"method\":\"getNetwork\"}' && curl --no-progress-meter \"http://localhost:8000/friendbot\" | grep '\"invalid_field\": \"addr\"'"
+          --health-cmd "curl --no-progress-meter -X POST \"http://localhost:8000/rpc\" -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":8675309,\"method\":\"getHealth\"}' | grep '\"status\":\"healthy\"' && curl --no-progress-meter \"http://localhost:8000/friendbot\" | grep '\"invalid_field\": \"addr\"'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 50
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Wake up httpbin server
-        run: |
-          curl https://httpbinx.fly.dev/ip
-
-      - name: Install the latest version of uv and set the python version to ${{ env.DEFAULT_PYTHON_VERSION }}
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7.0.1
+      - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v10.3.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-
-      - name: Test with pytest
+      - name: Run integration tests
         run: make integration-test
-
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
@@ -112,29 +112,28 @@ jobs:
           name: codecov-umbrella
 
   deploy:
-    needs: [test, integration]
+    needs: [lint, type-check, test, integration]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.event_name == 'release' && github.event.action == 'created'
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install the latest version of uv and set the python version to ${{ env.DEFAULT_PYTHON_VERSION }}
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7.0.1
+      - name: Install uv and Python ${{ env.DEFAULT_PYTHON_VERSION }}
+        uses: astral-sh/setup-uv@v10.3.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
-
-      - name: Build Packages
+      - name: Build packages
         run: make package
-
       - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        run: uv publish --trusted-publishing automatic
 
   complete:
     if: always()
-    needs: [pre-commit, test, deploy]
+    needs: [lint, type-check, test, integration, deploy]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: exit 1

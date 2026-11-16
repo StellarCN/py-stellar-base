@@ -54,19 +54,10 @@ class ManageData(Operation):
         if not valid_data_name_len or not valid_data_val_len:
             raise ValueError("Data and value should be <= 64 bytes (ascii encoded).")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        data_name = stellar_xdr.String64(bytes(self.data_name, encoding="utf-8"))
-        if self.data_value is None:
-            data_value = None
-        else:
-            data_value = stellar_xdr.DataValue(self.data_value)
-
-        manage_data_op = stellar_xdr.ManageDataOp(data_name, data_value)
-
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, manage_data_op=manage_data_op
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
+        return stellar_xdr.OperationBody.ManageData(
+            stellar_xdr.ManageDataOp(self.data_name, self.data_value)
         )
-        return body
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "ManageData":
@@ -75,13 +66,14 @@ class ManageData(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.manage_data_op is not None
-        data_name = xdr_object.body.manage_data_op.data_name.string64.decode()
-        data_value_xdr = xdr_object.body.manage_data_op.data_value
-        data_value = None if data_value_xdr is None else data_value_xdr.data_value
-
-        op = cls(data_name=data_name, data_value=data_value, source=source)
-        return op
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.ManageData)
+        op = body.manage_data_op
+        return cls(
+            data_name=op.data_name.decode(),
+            data_value=None if op.data_value is None else bytes(op.data_value),
+            source=source,
+        )
 
     def __repr__(self):
         return f"<ManageData [data_name={self.data_name}, data_value={self.data_value}, source={self.source}]>"

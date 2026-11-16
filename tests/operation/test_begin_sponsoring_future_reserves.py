@@ -1,13 +1,20 @@
 import pytest
 
-from stellar_sdk import BeginSponsoringFutureReserves, Operation
-
-from . import *
+from stellar_sdk import (
+    BeginSponsoringFutureReserves,
+    Operation,
+)
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+)
 
 
 class TestBeginSponsoringFutureReserves:
     @pytest.mark.parametrize(
-        "source, xdr",
+        ("source", "xdr"),
         [
             pytest.param(
                 None,
@@ -36,7 +43,7 @@ class TestBeginSponsoringFutureReserves:
         assert op.sponsored_id == kp2.public_key
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_sponsored_id_raise(self):

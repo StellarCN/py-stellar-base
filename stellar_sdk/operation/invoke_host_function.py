@@ -28,7 +28,7 @@ class InvokeHostFunction(Operation):
 
     def __init__(
         self,
-        host_function: stellar_xdr.HostFunction,
+        host_function: stellar_xdr.HostFunction.Any,
         auth: Sequence[stellar_xdr.SorobanAuthorizationEntry] | None = None,
         source: MuxedAccount | str | None = None,
     ):
@@ -38,23 +38,21 @@ class InvokeHostFunction(Operation):
             list(auth) if auth else []
         )
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         invoke_host_function_op = stellar_xdr.InvokeHostFunctionOp(
             host_function=self.host_function, auth=self.auth
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE,
-            invoke_host_function_op=invoke_host_function_op,
-        )
+        body = stellar_xdr.OperationBody.InvokeHostFunction(invoke_host_function_op)
         return body
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.Operation) -> "InvokeHostFunction":
         """Creates a :class:`InvokeHostFunction` object from an XDR Operation object."""
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.invoke_host_function_op is not None
-        host_function = xdr_object.body.invoke_host_function_op.host_function
-        auth = xdr_object.body.invoke_host_function_op.auth
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.InvokeHostFunction)
+        host_function = body.invoke_host_function_op.host_function
+        auth = body.invoke_host_function_op.auth
         return cls(
             host_function=host_function,
             auth=auth,

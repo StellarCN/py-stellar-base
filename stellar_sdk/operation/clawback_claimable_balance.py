@@ -1,5 +1,3 @@
-import base64
-import binascii
 from typing import ClassVar
 
 from .. import xdr as stellar_xdr
@@ -36,17 +34,13 @@ class ClawbackClaimableBalance(Operation):
         self.balance_id: str = balance_id
         raise_if_not_valid_balance_id(self.balance_id, "balance_id")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        balance_id_bytes: bytes = binascii.unhexlify(self.balance_id)
-        balance_id = stellar_xdr.ClaimableBalanceID.from_xdr_bytes(balance_id_bytes)
-        clawback_claimable_balance_op = stellar_xdr.ClawbackClaimableBalanceOp(
-            balance_id=balance_id
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
+        balance_id = stellar_xdr.ClaimableBalanceID.from_xdr_bytes(
+            bytes.fromhex(self.balance_id)
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE,
-            clawback_claimable_balance_op=clawback_claimable_balance_op,
+        return stellar_xdr.OperationBody.ClawbackClaimableBalance(
+            stellar_xdr.ClawbackClaimableBalanceOp(balance_id=balance_id)
         )
-        return body
 
     @classmethod
     def from_xdr_object(
@@ -56,13 +50,10 @@ class ClawbackClaimableBalance(Operation):
         object.
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.clawback_claimable_balance_op is not None
-        balance_id_bytes = base64.b64decode(
-            xdr_object.body.clawback_claimable_balance_op.to_xdr()
-        )
-        balance_id = binascii.hexlify(balance_id_bytes).decode()
-        op = cls(balance_id=balance_id, source=source)
-        return op
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.ClawbackClaimableBalance)
+        balance_id = body.clawback_claimable_balance_op.balance_id.to_xdr_bytes().hex()
+        return cls(balance_id=balance_id, source=source)
 
     def __repr__(self):
         return f"<ClawbackClaimableBalance [balance_id={self.balance_id}, source={self.source}]>"

@@ -21,7 +21,7 @@ from stellar_sdk.transaction_builder import TransactionBuilder
 def get_txrep_file(filename):
     current_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(current_dir, "txrep_data", filename)
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         content = f.read()
         return content.strip()
 
@@ -1078,7 +1078,7 @@ class TestTxrep:
             _get_bool_value(raw_data_map, key)
 
     def test_decode_asset_raise(self):
-        with pytest.raises(ValueError, match="Failed to decode asset string."):
+        with pytest.raises(ValueError, match=r"Failed to decode asset string."):
             _decode_asset("bad:assert:string")
 
     def test_get_memo_raise(self):
@@ -1093,7 +1093,7 @@ class TestTxrep:
             _get_memo(raw_data_map, prefix)
 
     @pytest.mark.parametrize(
-        "k, v",
+        ("k", "v"),
         [
             ('"hello world"', "hello world"),
             ("", ""),
@@ -1106,7 +1106,7 @@ class TestTxrep:
         assert _get_string_value(raw_data_map, key) == v
 
     @pytest.mark.parametrize(
-        "k, v",
+        ("k", "v"),
         [
             ("", ""),
             ("  ", ""),

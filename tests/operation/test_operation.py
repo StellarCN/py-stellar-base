@@ -5,7 +5,7 @@ from stellar_sdk import Operation
 
 class TestOperation:
     @pytest.mark.parametrize(
-        "origin_amount, expect_value",
+        ("origin_amount", "expect_value"),
         [
             ("10", 100000000),
             ("0.10", 1000000),
@@ -17,7 +17,7 @@ class TestOperation:
         assert Operation.to_xdr_amount(origin_amount) == expect_value
 
     @pytest.mark.parametrize(
-        "origin_amount, exception, reason",
+        ("origin_amount", "exception", "reason"),
         [
             (
                 "-0.1",
@@ -41,11 +41,12 @@ class TestOperation:
             Operation.to_xdr_amount(origin_amount)
 
     @pytest.mark.parametrize(
-        "origin_amount, expect_value",
+        ("origin_amount", "expect_value"),
         [
             (100000000, "10"),
             (1000000, "0.1"),
             (1234567, "0.1234567"),
+            (1, "0.0000001"),
             (9223372036854775807, "922337203685.4775807"),
         ],
     )

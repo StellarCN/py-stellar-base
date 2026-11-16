@@ -94,11 +94,11 @@ class TestTransactionEnvelope:
         )
         te.sign_hashx(hashx)
         with pytest.raises(
-            SignatureExistError, match="The keypair has already signed."
+            SignatureExistError, match=r"The keypair has already signed."
         ):
             te.sign(source)
         with pytest.raises(
-            SignatureExistError, match="The preimage has already signed."
+            SignatureExistError, match=r"The preimage has already signed."
         ):
             te.sign_hashx(hashx)
 

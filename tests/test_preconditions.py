@@ -1,6 +1,6 @@
 import pytest
 
-from stellar_sdk import LedgerBounds, Preconditions, SignerKey, TimeBounds
+from stellar_sdk import LedgerBounds, Preconditions, SignerKey, TimeBounds, xdr
 
 
 class TestPreconditions:
@@ -80,7 +80,7 @@ class TestPreconditions:
             ),
         ]
         with pytest.raises(
-            ValueError, match='"extra_signers" cannot be longer than 2 elements.'
+            ValueError, match=r'"extra_signers" cannot be longer than 2 elements.'
         ):
             Preconditions(extra_signers=extra_signers)
 
@@ -150,7 +150,7 @@ class TestPreconditions:
         assert cond.extra_signers == restore_cond.extra_signers == []
 
     @pytest.mark.parametrize(
-        "preconditions, is_null",
+        ("preconditions", "is_null"),
         [
             (Preconditions(), True),
             (Preconditions(time_bounds=TimeBounds(0, 1)), False),
@@ -178,7 +178,7 @@ class TestPreconditions:
         assert preconditions._is_empty_preconditions() is is_null
 
     @pytest.mark.parametrize(
-        "preconditions, is_v2",
+        ("preconditions", "is_v2"),
         [
             (Preconditions(), False),
             (Preconditions(time_bounds=TimeBounds(0, 1)), False),
@@ -204,3 +204,8 @@ class TestPreconditions:
     )
     def test_is_v2(self, preconditions: Preconditions, is_v2: bool):
         assert preconditions._is_v2() is is_v2
+
+
+def test_from_xdr_object_rejects_other_xdr_types():
+    with pytest.raises(ValueError, match="Unsupported preconditions"):
+        Preconditions.from_xdr_object(xdr.SCVal.Void())  # type: ignore[arg-type]

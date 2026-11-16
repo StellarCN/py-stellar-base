@@ -2,14 +2,24 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import LiquidityPoolWithdraw, Operation
-
-from . import *
+from stellar_sdk import (
+    LIQUIDITY_POOL_FEE_V18,
+    LiquidityPoolAsset,
+    LiquidityPoolWithdraw,
+    Operation,
+)
+from tests.operation.helpers import (
+    asset1,
+    asset2,
+    check_source,
+    kp1,
+    muxed1,
+)
 
 
 class TestLiquidityPoolWithdraw:
     @pytest.mark.parametrize(
-        "amount, min_amount_a, min_amount_b, source, xdr",
+        ("amount", "min_amount_a", "min_amount_b", "source", "xdr"),
         [
             pytest.param(
                 "5",
@@ -66,7 +76,7 @@ class TestLiquidityPoolWithdraw:
         assert op.min_amount_b == str(min_amount_b)
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_liquidity_pool_id_raise(self):

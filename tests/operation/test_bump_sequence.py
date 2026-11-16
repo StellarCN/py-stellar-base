@@ -1,13 +1,19 @@
 import pytest
 
-from stellar_sdk import BumpSequence, Operation
-
-from . import *
+from stellar_sdk import (
+    BumpSequence,
+    Operation,
+)
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+    muxed1,
+)
 
 
 class TestBumpSequence:
     @pytest.mark.parametrize(
-        "bump_to, source, xdr",
+        ("bump_to", "source", "xdr"),
         [
             pytest.param(
                 1234567890, None, "AAAAAAAAAAsAAAAASZYC0g==", id="without_source"
@@ -43,5 +49,5 @@ class TestBumpSequence:
         assert op.bump_to == bump_to
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op

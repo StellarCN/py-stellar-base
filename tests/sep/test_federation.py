@@ -1,14 +1,21 @@
+import re
+from collections.abc import AsyncIterator, Callable
+from typing import Any, NamedTuple
+from unittest import mock
+
 import pytest
-import requests_mock
-from aioresponses import aioresponses
+from pytest_httpserver import HTTPServer
 
 from stellar_sdk.client.aiohttp_client import AiohttpClient
+from stellar_sdk.client.requests_client import RequestsClient
+from stellar_sdk.exceptions import ContentSizeLimitExceededError
 from stellar_sdk.sep.exceptions import (
     BadFederationResponseError,
     FederationServerNotFoundError,
     InvalidFederationAddress,
 )
 from stellar_sdk.sep.federation import (
+    FEDERATION_RESPONSE_MAX_SIZE,
     FederationRecord,
     _split_stellar_address,
     resolve_account_id,
@@ -16,191 +23,261 @@ from stellar_sdk.sep.federation import (
     resolve_stellar_address,
     resolve_stellar_address_async,
 )
+from tests.helpers import resolve
+
+ACCOUNT_ID = "GAWCQ74PIJO2NH6F3KZ4AMX27UAKBXWC7KG3FLYJOFIMRQF3RSZHCOVN"
+
+
+class FederationApi(NamedTuple):
+    resolve_stellar_address: Any
+    resolve_account_id: Any
+    make_spy_client: Callable[[], Any]
+
+
+@pytest.fixture(params=["sync", "async"])
+async def federation_api(
+    request: pytest.FixtureRequest,
+    close_internal_aiohttp_clients: None,
+) -> AsyncIterator[FederationApi]:
+    """The federation API of one flavor, plus a factory for spy clients.
+
+    ``make_spy_client`` returns a ``Mock`` wrapping a real client of the same
+    flavor, so tests can assert how many requests the *injected* client served.
+    Passing a plain client would prove nothing: it is exactly what the SDK
+    builds when ``client=None``, so an implementation that ignored the argument
+    would behave identically.
+    """
+    clients: list[RequestsClient | AiohttpClient] = []
+
+    def make_spy_client() -> Any:
+        client: RequestsClient | AiohttpClient = (
+            RequestsClient() if request.param == "sync" else AiohttpClient()
+        )
+        clients.append(client)
+        return mock.Mock(wraps=client)
+
+    if request.param == "sync":
+        yield FederationApi(
+            resolve_stellar_address, resolve_account_id, make_spy_client
+        )
+    else:
+        yield FederationApi(
+            resolve_stellar_address_async, resolve_account_id_async, make_spy_client
+        )
+    for client in clients:
+        await resolve(client.close())
+
+
+def _local_domain(httpserver: HTTPServer) -> str:
+    return f"{httpserver.host}:{httpserver.port}"
+
+
+def _expect_toml(httpserver: HTTPServer, body: str | None = None) -> None:
+    """Serve a stellar.toml whose FEDERATION_SERVER points back at httpserver."""
+    if body is None:
+        body = f'FEDERATION_SERVER="{httpserver.url_for("/federation")}"\n'
+    httpserver.expect_request("/.well-known/stellar.toml").respond_with_data(body)
 
 
 class TestFederation:
-    ACCOUNT_ID = "GAWCQ74PIJO2NH6F3KZ4AMX27UAKBXWC7KG3FLYJOFIMRQF3RSZHCOVN"
-    STELLAR_ADDRESS = "hello*example.com"
-    DOMAIN = "example.com"
-    FEDERATION_SERVER = "https://federation.example.com"
-    FEDERATION_RECORD = FederationRecord(
-        stellar_address=STELLAR_ADDRESS,
-        account_id=ACCOUNT_ID,
-        memo_type="text",
-        memo="Nice to meet you :-)",
-    )
-    TOML_CONTENT = """FEDERATION_SERVER="https://federation.example.com"
-    WEB_AUTH_ENDPOINT="https://stellar-auth.example.com/auth"
-    SIGNING_KEY="GDSDOGLZALK6V6DUTHNTACGTR3GI3OSVXK6OQCHDLSAGWXQRUBQVI2KM"
-    NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
-    """
+    async def test_resolve_by_stellar_address(self, federation_api, httpserver):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        _expect_toml(httpserver)
+        httpserver.expect_request(
+            "/federation", query_string={"type": "name", "q": stellar_address}
+        ).respond_with_json(
+            {
+                "account_id": ACCOUNT_ID,
+                "memo_type": "text",
+                "memo": "Nice to meet you :-)",
+            }
+        )
+        record = await resolve(
+            federation_api.resolve_stellar_address(stellar_address, use_http=True)
+        )
+        assert record == FederationRecord(
+            stellar_address=stellar_address,
+            account_id=ACCOUNT_ID,
+            memo_type="text",
+            memo="Nice to meet you :-)",
+        )
 
-    def test_resolve_by_stellar_address_sync(self):
-        with requests_mock.Mocker() as m:
-            m.get(
-                "https://example.com/.well-known/stellar.toml", text=self.TOML_CONTENT
-            )
-            m.get(
-                "https://federation.example.com/?type=name&q=hello%2Aexample.com",
-                json={
-                    "account_id": self.ACCOUNT_ID,
-                    "memo_type": "text",
-                    "memo": "Nice to meet you :-)",
-                },
-            )
-            record = resolve_stellar_address(self.STELLAR_ADDRESS)
-            assert record == self.FEDERATION_RECORD
-
-    @pytest.mark.asyncio
-    async def test_resolve_by_stellar_address_async(self):
-        with aioresponses() as m:
-            m.get(
-                "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
-            )
-            m.get(
-                "https://federation.example.com/?type=name&q=hello%2Aexample.com",
-                payload={
-                    "account_id": self.ACCOUNT_ID,
-                    "memo_type": "text",
-                    "memo": "Nice to meet you :-)",
-                },
-            )
-            record = await resolve_stellar_address_async(self.STELLAR_ADDRESS)
-            assert record == self.FEDERATION_RECORD
-
-    def test_resolve_by_stellar_address_federation_not_found_sync(self):
-        with requests_mock.Mocker() as m:
-            m.get("https://example.com/.well-known/stellar.toml", text="")
-            with pytest.raises(
-                FederationServerNotFoundError,
-                match="Unable to find federation server at example.com",
-            ):
-                resolve_stellar_address(self.STELLAR_ADDRESS)
-
-    @pytest.mark.asyncio
-    async def test_resolve_by_stellar_address_federation_not_found_async(self):
-        with aioresponses() as m:
-            m.get("https://example.com/.well-known/stellar.toml", body="")
-            with pytest.raises(
-                FederationServerNotFoundError,
-                match="Unable to find federation server at example.com.",
-            ):
-                await resolve_stellar_address_async(
-                    self.STELLAR_ADDRESS, client=AiohttpClient()
-                )
-
-    def test_resolve_by_stellar_address_with_federation_url_sync(self):
-        with requests_mock.Mocker() as m:
-            m.get(
-                "https://federation.example.com/?type=name&q=hello%2Aexample.com",
-                json={
-                    "account_id": self.ACCOUNT_ID,
-                    "memo_type": "text",
-                    "memo": "Nice to meet you :-)",
-                },
-            )
-
-            record = resolve_stellar_address(
-                "hello*example.com", federation_url=self.FEDERATION_SERVER
-            )
-            assert record.account_id == self.ACCOUNT_ID
-
-    @pytest.mark.asyncio
-    async def test_resolve_by_stellar_address_with_federation_url_async(self):
-        with aioresponses() as m:
-            m.get(
-                "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
-            )
-            m.get(
-                "https://federation.example.com/?type=name&q=hello%2Aexample.com",
-                payload={
-                    "account_id": self.ACCOUNT_ID,
-                    "memo_type": "text",
-                    "memo": "Nice to meet you :-)",
-                },
-            )
-            record = await resolve_stellar_address_async(
-                "hello*example.com", federation_url=self.FEDERATION_SERVER
-            )
-            assert record.account_id == self.ACCOUNT_ID
-
-    def test_resolve_by_account_id_with_domain_sync(self):
-        with requests_mock.Mocker() as m:
-            m.get(
-                "https://example.com/.well-known/stellar.toml", text=self.TOML_CONTENT
-            )
-            m.get(
-                "https://federation.example.com/?type=id&q=GAWCQ74PIJO2NH6F3KZ4AMX27UAKBXWC7KG3FLYJOFIMRQF3RSZHCOVN",
-                json={
-                    "stellar_address": "hello*example.com",
-                    "memo_type": "text",
-                    "memo": "Nice to meet you :-)",
-                },
-            )
-            record = resolve_account_id(self.ACCOUNT_ID, domain=self.DOMAIN)
-            assert record == self.FEDERATION_RECORD
-
-    @pytest.mark.asyncio
-    async def test_resolve_by_account_id_with_domain_async(self):
-        with aioresponses() as m:
-            m.get(
-                "https://example.com/.well-known/stellar.toml", body=self.TOML_CONTENT
-            )
-            m.get(
-                "https://federation.example.com/?type=id&q=GAWCQ74PIJO2NH6F3KZ4AMX27UAKBXWC7KG3FLYJOFIMRQF3RSZHCOVN",
-                payload={
-                    "stellar_address": "hello*example.com",
-                    "memo_type": "text",
-                    "memo": "Nice to meet you :-)",
-                },
-            )
-            record = await resolve_account_id_async(self.ACCOUNT_ID, domain=self.DOMAIN)
-            assert record == self.FEDERATION_RECORD
-
-    def test_resolve_by_account_id_without_domain_and_federation_url(self):
+    async def test_resolve_by_stellar_address_federation_not_found(
+        self, federation_api, httpserver
+    ):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        _expect_toml(httpserver, body="")
         with pytest.raises(
-            ValueError, match="You should provide either `domain` or `federation_url`."
+            FederationServerNotFoundError,
+            match=rf"Unable to find federation server at {re.escape(_local_domain(httpserver))}\.",
         ):
-            resolve_account_id(self.ACCOUNT_ID)
+            await resolve(
+                federation_api.resolve_stellar_address(stellar_address, use_http=True)
+            )
 
-    def test_resolve_by_account_id_federation_not_found_sync(self):
-        with requests_mock.Mocker() as m:
-            m.get("https://example.com/.well-known/stellar.toml", text="")
-            with pytest.raises(
-                FederationServerNotFoundError,
-                match="Unable to find federation server at example.com.",
-            ):
-                resolve_account_id(self.ACCOUNT_ID, domain="example.com")
+    async def test_resolve_by_stellar_address_with_federation_url(
+        self, federation_api, httpserver
+    ):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        httpserver.expect_request(
+            "/federation", query_string={"type": "name", "q": stellar_address}
+        ).respond_with_json(
+            {
+                "account_id": ACCOUNT_ID,
+                "memo_type": "text",
+                "memo": "Nice to meet you :-)",
+            }
+        )
+        record = await resolve(
+            federation_api.resolve_stellar_address(
+                stellar_address, federation_url=httpserver.url_for("/federation")
+            )
+        )
+        assert record.account_id == ACCOUNT_ID
 
-    @pytest.mark.asyncio
-    async def test_resolve_by_account_id_federation_not_found_async(self):
-        with aioresponses() as m:
-            m.get("https://example.com/.well-known/stellar.toml", body="")
-            with pytest.raises(
-                FederationServerNotFoundError,
-                match="Unable to find federation server at example.com.",
-            ):
-                await resolve_account_id_async(
-                    self.ACCOUNT_ID, domain="example.com", client=AiohttpClient()
+    async def test_resolve_by_stellar_address_uses_supplied_client(
+        self, federation_api, httpserver
+    ):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        _expect_toml(httpserver)
+        httpserver.expect_request(
+            "/federation", query_string={"type": "name", "q": stellar_address}
+        ).respond_with_json(
+            {
+                "account_id": ACCOUNT_ID,
+                "memo_type": "text",
+                "memo": "Nice to meet you :-)",
+            }
+        )
+        client = federation_api.make_spy_client()
+        record = await resolve(
+            federation_api.resolve_stellar_address(
+                stellar_address, client=client, use_http=True
+            )
+        )
+        assert record.account_id == ACCOUNT_ID
+        # Both the stellar.toml lookup and the federation request go through the
+        # injected client.
+        assert client.get.call_count == 2
+
+    async def test_resolve_by_account_id_with_domain(self, federation_api, httpserver):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        _expect_toml(httpserver)
+        httpserver.expect_request(
+            "/federation", query_string={"type": "id", "q": ACCOUNT_ID}
+        ).respond_with_json(
+            {
+                "stellar_address": stellar_address,
+                "memo_type": "text",
+                "memo": "Nice to meet you :-)",
+            }
+        )
+        record = await resolve(
+            federation_api.resolve_account_id(
+                ACCOUNT_ID, domain=_local_domain(httpserver), use_http=True
+            )
+        )
+        assert record == FederationRecord(
+            stellar_address=stellar_address,
+            account_id=ACCOUNT_ID,
+            memo_type="text",
+            memo="Nice to meet you :-)",
+        )
+
+    async def test_resolve_by_account_id_uses_supplied_client(
+        self, federation_api, httpserver
+    ):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        _expect_toml(httpserver)
+        httpserver.expect_request(
+            "/federation", query_string={"type": "id", "q": ACCOUNT_ID}
+        ).respond_with_json(
+            {
+                "stellar_address": stellar_address,
+                "memo_type": "text",
+                "memo": "Nice to meet you :-)",
+            }
+        )
+        client = federation_api.make_spy_client()
+        record = await resolve(
+            federation_api.resolve_account_id(
+                ACCOUNT_ID,
+                domain=_local_domain(httpserver),
+                client=client,
+                use_http=True,
+            )
+        )
+        assert record.stellar_address == stellar_address
+        # Both the stellar.toml lookup and the federation request go through the
+        # injected client.
+        assert client.get.call_count == 2
+
+    async def test_resolve_by_account_id_without_domain_and_federation_url(
+        self, federation_api
+    ):
+        with pytest.raises(
+            ValueError, match=r"You should provide either `domain` or `federation_url`."
+        ):
+            await resolve(federation_api.resolve_account_id(ACCOUNT_ID))
+
+    async def test_resolve_by_account_id_federation_not_found(
+        self, federation_api, httpserver
+    ):
+        _expect_toml(httpserver, body="")
+        with pytest.raises(
+            FederationServerNotFoundError,
+            match=rf"Unable to find federation server at {re.escape(_local_domain(httpserver))}\.",
+        ):
+            await resolve(
+                federation_api.resolve_account_id(
+                    ACCOUNT_ID, domain=_local_domain(httpserver), use_http=True
                 )
+            )
 
-    def test_not_found_record_at_federation(self):
+    async def test_not_found_record_at_federation(self, federation_api, httpserver):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        _expect_toml(httpserver)
+        httpserver.expect_request(
+            "/federation", query_string={"type": "name", "q": stellar_address}
+        ).respond_with_data("", status=404)
         with pytest.raises(BadFederationResponseError) as err:
-            with requests_mock.Mocker() as m:
-                m.get(
-                    "https://example.com/.well-known/stellar.toml",
-                    text=self.TOML_CONTENT,
-                )
-                m.get(
-                    "https://federation.example.com/?type=name&q=hello%2Aexample.com",
-                    status_code=404,
-                )
-                record = resolve_stellar_address(self.STELLAR_ADDRESS)
-                assert record == self.FEDERATION_RECORD
+            await resolve(
+                federation_api.resolve_stellar_address(stellar_address, use_http=True)
+            )
         assert err.value.status == 404
 
+    async def test_federation_response_size_limit_exceeded(
+        self, federation_api, httpserver
+    ):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        large_content = "x" * (FEDERATION_RESPONSE_MAX_SIZE + 1)
+        _expect_toml(httpserver)
+        httpserver.expect_request(
+            "/federation", query_string={"type": "name", "q": stellar_address}
+        ).respond_with_data(large_content)
+        with pytest.raises(ContentSizeLimitExceededError):
+            await resolve(
+                federation_api.resolve_stellar_address(stellar_address, use_http=True)
+            )
+
+    @pytest.mark.parametrize(
+        "field", ["account_id", "stellar_address", "memo_type", "memo"]
+    )
+    def test_federation_record_differing_in_one_field_is_not_equal(self, field):
+        # The tests above assert `record == FederationRecord(...)`, which is only
+        # meaningful if every field takes part in the comparison.
+        fields = {
+            "account_id": ACCOUNT_ID,
+            "stellar_address": "hello*example.com",
+            "memo_type": "text",
+            "memo": "Nice to meet you :-)",
+        }
+        assert FederationRecord(**fields) != FederationRecord(
+            **{**fields, field: "different"}
+        )
+
     def test_split_address(self):
-        assert _split_stellar_address(self.STELLAR_ADDRESS) == {
+        assert _split_stellar_address("hello*example.com") == {
             "name": "hello",
             "domain": "example.com",
         }

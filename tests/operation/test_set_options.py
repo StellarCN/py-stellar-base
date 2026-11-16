@@ -11,7 +11,19 @@ class TestSetOptions:
     AUTHORIZATION_CLAWBACK_ENABLED = 8
 
     @pytest.mark.parametrize(
-        "inflation_dest, clear_flags, set_flags, master_weight, low_threshold, med_threshold, high_threshold, home_domain, signer, source, xdr",
+        (
+            "inflation_dest",
+            "clear_flags",
+            "set_flags",
+            "master_weight",
+            "low_threshold",
+            "med_threshold",
+            "high_threshold",
+            "home_domain",
+            "signer",
+            "source",
+            "xdr",
+        ),
         [
             (
                 "GDGU5OAPHNPU5UCLE5RDJHG7PXZFQYWKCFOEXSXNMR6KRQRI5T6XXCD7",
@@ -112,7 +124,7 @@ class TestSetOptions:
             source,
         )
         xdr_obj = op.to_xdr_object()
-        assert xdr_obj.to_xdr() == xdr
+        assert xdr_obj.to_xdr_base64() == xdr
         from_instance = Operation.from_xdr_object(xdr_obj)
         assert isinstance(from_instance, SetOptions)
         if source:

@@ -6,7 +6,7 @@ from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..signer import Signer
-from ..strkey import StrKey
+from ..strkey import Ed25519PublicKey
 from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
@@ -100,6 +100,7 @@ class SetOptions(Operation):
             warnings.warn(
                 "`set_flags` is a int, we recommend using AuthorizationFlag.",
                 DeprecationWarning,
+                stacklevel=2,
             )
             set_flags = AuthorizationFlag(set_flags)
 
@@ -107,6 +108,7 @@ class SetOptions(Operation):
             warnings.warn(
                 "`clear_flags` is a int, we recommend using AuthorizationFlag.",
                 DeprecationWarning,
+                stacklevel=2,
             )
             clear_flags = AuthorizationFlag(clear_flags)
 
@@ -122,62 +124,26 @@ class SetOptions(Operation):
         if self.inflation_dest is not None:
             raise_if_not_valid_ed25519_public_key(self.inflation_dest, "inflation_dest")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        inflation_dest = (
-            Keypair.from_public_key(self.inflation_dest).xdr_account_id()
-            if self.inflation_dest is not None
-            else None
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
+        return stellar_xdr.OperationBody.SetOptions(
+            stellar_xdr.SetOptionsOp(
+                inflation_dest=(
+                    None
+                    if self.inflation_dest is None
+                    else Keypair.from_public_key(self.inflation_dest).xdr_account_id()
+                ),
+                clear_flags=None
+                if self.clear_flags is None
+                else self.clear_flags.value,
+                set_flags=None if self.set_flags is None else self.set_flags.value,
+                master_weight=self.master_weight,
+                low_threshold=self.low_threshold,
+                med_threshold=self.med_threshold,
+                high_threshold=self.high_threshold,
+                home_domain=self.home_domain,
+                signer=None if self.signer is None else self.signer.to_xdr_object(),
+            )
         )
-        home_domain = (
-            stellar_xdr.String32(bytes(self.home_domain, encoding="utf-8"))
-            if self.home_domain is not None
-            else None
-        )
-        clear_flags = (
-            None
-            if self.clear_flags is None
-            else stellar_xdr.Uint32(self.clear_flags.value)
-        )
-        set_flags = (
-            None if self.set_flags is None else stellar_xdr.Uint32(self.set_flags.value)
-        )
-        master_weight = (
-            None
-            if self.master_weight is None
-            else stellar_xdr.Uint32(self.master_weight)
-        )
-        low_threshold = (
-            None
-            if self.low_threshold is None
-            else stellar_xdr.Uint32(self.low_threshold)
-        )
-        med_threshold = (
-            None
-            if self.med_threshold is None
-            else stellar_xdr.Uint32(self.med_threshold)
-        )
-        high_threshold = (
-            None
-            if self.high_threshold is None
-            else stellar_xdr.Uint32(self.high_threshold)
-        )
-        signer = None if self.signer is None else self.signer.to_xdr_object()
-
-        set_options_op = stellar_xdr.SetOptionsOp(
-            inflation_dest,
-            clear_flags,
-            set_flags,
-            master_weight,
-            low_threshold,
-            med_threshold,
-            high_threshold,
-            home_domain,
-            signer,
-        )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE, set_options_op=set_options_op
-        )
-        return body
 
     @classmethod
     def from_xdr_object(cls, xdr_object) -> "SetOptions":
@@ -186,58 +152,25 @@ class SetOptions(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-
-        inflation_dest = None
-        assert xdr_object.body.set_options_op is not None
-        if xdr_object.body.set_options_op.inflation_dest:
-            assert (
-                xdr_object.body.set_options_op.inflation_dest.account_id.ed25519
-                is not None
-            )
-            inflation_dest = StrKey.encode_ed25519_public_key(
-                xdr_object.body.set_options_op.inflation_dest.account_id.ed25519.uint256
-            )
-
-        clear_flags_xdr = xdr_object.body.set_options_op.clear_flags
-        set_flags_xdr = xdr_object.body.set_options_op.set_flags
-        master_weight_xdr = xdr_object.body.set_options_op.master_weight
-        low_threshold_xdr = xdr_object.body.set_options_op.low_threshold
-        med_threshold_xdr = xdr_object.body.set_options_op.med_threshold
-        high_threshold_xdr = xdr_object.body.set_options_op.high_threshold
-        home_domain_xdr = xdr_object.body.set_options_op.home_domain
-        signer_xdr_object = xdr_object.body.set_options_op.signer
-
-        clear_flags = None if clear_flags_xdr is None else clear_flags_xdr.uint32
-        set_flags = None if set_flags_xdr is None else set_flags_xdr.uint32
-        master_weight = None if master_weight_xdr is None else master_weight_xdr.uint32
-        low_threshold = None if low_threshold_xdr is None else low_threshold_xdr.uint32
-        med_threshold = None if med_threshold_xdr is None else med_threshold_xdr.uint32
-        high_threshold = (
-            None if high_threshold_xdr is None else high_threshold_xdr.uint32
-        )
-        home_domain = None if home_domain_xdr is None else home_domain_xdr.string32
-        signer = (
-            None
-            if signer_xdr_object is None
-            else Signer.from_xdr_object(signer_xdr_object)
-        )
-
-        if home_domain is not None:
-            home_domain = home_domain.decode("utf-8")
-
-        op = cls(
-            inflation_dest=inflation_dest,
-            clear_flags=clear_flags,
-            set_flags=set_flags,
-            master_weight=master_weight,
-            low_threshold=low_threshold,
-            med_threshold=med_threshold,
-            high_threshold=high_threshold,
-            home_domain=home_domain,
-            signer=signer,
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.SetOptions)
+        op = body.set_options_op
+        return cls(
+            inflation_dest=(
+                None
+                if op.inflation_dest is None
+                else str(Ed25519PublicKey(op.inflation_dest.ed25519))
+            ),
+            clear_flags=op.clear_flags,
+            set_flags=op.set_flags,
+            master_weight=op.master_weight,
+            low_threshold=op.low_threshold,
+            med_threshold=op.med_threshold,
+            high_threshold=op.high_threshold,
+            home_domain=None if op.home_domain is None else op.home_domain.decode(),
+            signer=None if op.signer is None else Signer.from_xdr_object(op.signer),
             source=source,
         )
-        return op
 
     def __repr__(self):
         return (
