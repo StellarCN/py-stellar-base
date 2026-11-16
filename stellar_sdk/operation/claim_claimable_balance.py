@@ -1,5 +1,3 @@
-import base64
-import binascii
 from typing import ClassVar
 
 from .. import xdr as stellar_xdr
@@ -37,17 +35,13 @@ class ClaimClaimableBalance(Operation):
         self.balance_id: str = balance_id
         raise_if_not_valid_balance_id(self.balance_id, "balance_id")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
-        balance_id_bytes: bytes = binascii.unhexlify(self.balance_id)
-        balance_id = stellar_xdr.ClaimableBalanceID.from_xdr_bytes(balance_id_bytes)
-        claim_claimable_balance_op = stellar_xdr.ClaimClaimableBalanceOp(
-            balance_id=balance_id
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
+        balance_id = stellar_xdr.ClaimableBalanceID.from_xdr_bytes(
+            bytes.fromhex(self.balance_id)
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE,
-            claim_claimable_balance_op=claim_claimable_balance_op,
+        return stellar_xdr.OperationBody.ClaimClaimableBalance(
+            stellar_xdr.ClaimClaimableBalanceOp(balance_id=balance_id)
         )
-        return body
 
     @classmethod
     def from_xdr_object(
@@ -57,13 +51,10 @@ class ClaimClaimableBalance(Operation):
         object.
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.claim_claimable_balance_op is not None
-        balance_id_bytes = base64.b64decode(
-            xdr_object.body.claim_claimable_balance_op.to_xdr()
-        )
-        balance_id = binascii.hexlify(balance_id_bytes).decode()
-        op = cls(balance_id=balance_id, source=source)
-        return op
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.ClaimClaimableBalance)
+        balance_id = body.claim_claimable_balance_op.balance_id.to_xdr_bytes().hex()
+        return cls(balance_id=balance_id, source=source)
 
     def __repr__(self):
         return f"<ClaimClaimableBalance [balance_id={self.balance_id}, source={self.source}]>"

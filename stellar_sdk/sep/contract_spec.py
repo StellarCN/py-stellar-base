@@ -23,11 +23,11 @@ class ContractSpec:
 
     __slots__ = ("_entries",)
 
-    def __init__(self, entries: tuple[stellar_xdr.SCSpecEntry, ...] = ()) -> None:
+    def __init__(self, entries: tuple[stellar_xdr.SCSpecEntry.Any, ...] = ()) -> None:
         self._entries = tuple(entries)
 
     @property
-    def entries(self) -> tuple[stellar_xdr.SCSpecEntry, ...]:
+    def entries(self) -> tuple[stellar_xdr.SCSpecEntry.Any, ...]:
         """Returns the raw SEP-48 specification XDR entries."""
         return self._entries
 
@@ -81,8 +81,7 @@ class ContractSpec:
         return tuple(
             entry.function_v0
             for entry in self.entries
-            if entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_FUNCTION_V0
-            and entry.function_v0 is not None
+            if isinstance(entry, stellar_xdr.SCSpecEntry.FunctionV0)
         )
 
     @property
@@ -91,8 +90,7 @@ class ContractSpec:
         return tuple(
             entry.event_v0
             for entry in self.entries
-            if entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_EVENT_V0
-            and entry.event_v0 is not None
+            if isinstance(entry, stellar_xdr.SCSpecEntry.EventV0)
         )
 
     @property
@@ -101,8 +99,7 @@ class ContractSpec:
         return tuple(
             entry.udt_struct_v0
             for entry in self.entries
-            if entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_STRUCT_V0
-            and entry.udt_struct_v0 is not None
+            if isinstance(entry, stellar_xdr.SCSpecEntry.UDTStructV0)
         )
 
     @property
@@ -111,8 +108,7 @@ class ContractSpec:
         return tuple(
             entry.udt_union_v0
             for entry in self.entries
-            if entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_UNION_V0
-            and entry.udt_union_v0 is not None
+            if isinstance(entry, stellar_xdr.SCSpecEntry.UDTUnionV0)
         )
 
     @property
@@ -121,8 +117,7 @@ class ContractSpec:
         return tuple(
             entry.udt_enum_v0
             for entry in self.entries
-            if entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ENUM_V0
-            and entry.udt_enum_v0 is not None
+            if isinstance(entry, stellar_xdr.SCSpecEntry.UDTEnumV0)
         )
 
     @property
@@ -131,8 +126,7 @@ class ContractSpec:
         return tuple(
             entry.udt_error_enum_v0
             for entry in self.entries
-            if entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0
-            and entry.udt_error_enum_v0 is not None
+            if isinstance(entry, stellar_xdr.SCSpecEntry.UDTErrorEnumV0)
         )
 
     def get_function(self, name: str) -> stellar_xdr.SCSpecFunctionV0 | None:
@@ -159,7 +153,7 @@ class ContractSpec:
                 return event
         return None
 
-    def get_udt(self, name: str) -> stellar_xdr.SCSpecEntry | None:
+    def get_udt(self, name: str) -> stellar_xdr.SCSpecEntry.Any | None:
         """Returns a user-defined type by name.
 
         :param name: The type name.
@@ -172,7 +166,7 @@ class ContractSpec:
                 return entry
         return None
 
-    def __iter__(self) -> Iterator[stellar_xdr.SCSpecEntry]:
+    def __iter__(self) -> Iterator[stellar_xdr.SCSpecEntry.Any]:
         return iter(self.entries)
 
     def __len__(self) -> int:
@@ -189,7 +183,7 @@ class ContractSpec:
 
 def _decode_symbol(symbol: stellar_xdr.SCSymbol) -> str:
     try:
-        return symbol.sc_symbol.decode("utf-8")
+        return symbol.decode("utf-8")
     except UnicodeDecodeError as exc:
         raise InvalidWasmError("Contract spec contains a non-UTF-8 symbol.") from exc
 
@@ -201,25 +195,14 @@ def _decode_string(value: bytes) -> str:
         raise InvalidWasmError("Contract spec contains a non-UTF-8 string.") from exc
 
 
-def _get_udt_name(entry: stellar_xdr.SCSpecEntry) -> str | None:
-    if (
-        entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_STRUCT_V0
-        and entry.udt_struct_v0 is not None
-    ):
-        return _decode_string(entry.udt_struct_v0.name)
-    if (
-        entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_UNION_V0
-        and entry.udt_union_v0 is not None
-    ):
-        return _decode_string(entry.udt_union_v0.name)
-    if (
-        entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ENUM_V0
-        and entry.udt_enum_v0 is not None
-    ):
-        return _decode_string(entry.udt_enum_v0.name)
-    if (
-        entry.kind == stellar_xdr.SCSpecEntryKind.SC_SPEC_ENTRY_UDT_ERROR_ENUM_V0
-        and entry.udt_error_enum_v0 is not None
-    ):
-        return _decode_string(entry.udt_error_enum_v0.name)
-    return None
+def _get_udt_name(entry: stellar_xdr.SCSpecEntry.Any) -> str | None:
+    match entry:
+        case (
+            stellar_xdr.SCSpecEntry.UDTStructV0(udt)
+            | stellar_xdr.SCSpecEntry.UDTUnionV0(udt)
+            | stellar_xdr.SCSpecEntry.UDTEnumV0(udt)
+            | stellar_xdr.SCSpecEntry.UDTErrorEnumV0(udt)
+        ):
+            return _decode_string(udt.name)
+        case _:
+            return None

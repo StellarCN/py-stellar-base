@@ -65,14 +65,13 @@ print(f"transaction: {get_transaction_data}")
 
 if get_transaction_data.status == GetTransactionStatus.SUCCESS:
     assert get_transaction_data.result_meta_xdr is not None
-    transaction_meta = stellar_xdr.TransactionMeta.from_xdr(
+    transaction_meta = stellar_xdr.TransactionMeta.from_xdr_base64(
         get_transaction_data.result_meta_xdr
     )
     # Protocol 23+ networks return TransactionMetaV4.
-    body = (
-        transaction_meta.v4 if transaction_meta.v4 is not None else transaction_meta.v3
-    )
-    assert body is not None and body.soroban_meta is not None
+    assert isinstance(transaction_meta, stellar_xdr.TransactionMeta.V4)
+    body = transaction_meta.v4
+    assert body.soroban_meta is not None
     assert body.soroban_meta.return_value is not None
     output = [
         scval.from_string(s).decode()

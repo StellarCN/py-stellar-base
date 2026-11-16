@@ -23,11 +23,11 @@ class ContractMeta:
 
     __slots__ = ("_entries",)
 
-    def __init__(self, entries: tuple[stellar_xdr.SCMetaEntry, ...] = ()) -> None:
+    def __init__(self, entries: tuple[stellar_xdr.SCMetaEntry.Any, ...] = ()) -> None:
         self._entries = tuple(entries)
 
     @property
-    def entries(self) -> tuple[stellar_xdr.SCMetaEntry, ...]:
+    def entries(self) -> tuple[stellar_xdr.SCMetaEntry.Any, ...]:
         """Returns the raw SEP-46 metadata XDR entries."""
         return self._entries
 
@@ -39,7 +39,7 @@ class ContractMeta:
         :return: A :class:`ContractMeta` object.
         :raises InvalidWasmError: If the Wasm module or metadata section cannot be decoded.
         """
-        entries: list[stellar_xdr.SCMetaEntry] = []
+        entries: list[stellar_xdr.SCMetaEntry.Any] = []
         for section in get_wasm_custom_sections(wasm, CONTRACT_META_SECTION_NAME):
             entries.extend(parse_sc_meta_entries(section))
         return cls(tuple(entries))
@@ -77,14 +77,11 @@ class ContractMeta:
         :return: The decoded key/value pairs.
         :raises InvalidWasmError: If a key or value is not UTF-8.
         """
-        items: list[tuple[str, str]] = []
-        for entry in self.entries:
-            if entry.kind != stellar_xdr.SCMetaKind.SC_META_V0 or entry.v0 is None:
-                continue
-            items.append(
-                (_decode_meta_string(entry.v0.key), _decode_meta_string(entry.v0.val))
-            )
-        return tuple(items)
+        return tuple(
+            (_decode_meta_string(entry.v0.key), _decode_meta_string(entry.v0.val))
+            for entry in self.entries
+            if isinstance(entry, stellar_xdr.SCMetaEntry.V0)
+        )
 
     def get(self, key: str, default: str | None = None) -> str | None:
         """Returns the first ``SC_META_V0`` value for ``key``.
@@ -151,7 +148,7 @@ class ContractMeta:
             raise TypeError("sep must be int")
         return sep in self.supported_seps()
 
-    def __iter__(self) -> Iterator[stellar_xdr.SCMetaEntry]:
+    def __iter__(self) -> Iterator[stellar_xdr.SCMetaEntry.Any]:
         return iter(self.entries)
 
     def __len__(self) -> int:

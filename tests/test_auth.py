@@ -40,13 +40,12 @@ def _sample_invocation(
     contract_id: str = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
 ) -> stellar_xdr.SorobanAuthorizedInvocation:
     return stellar_xdr.SorobanAuthorizedInvocation(
-        function=stellar_xdr.SorobanAuthorizedFunction(
-            type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-            contract_fn=stellar_xdr.InvokeContractArgs(
+        function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+            stellar_xdr.InvokeContractArgs(
                 contract_address=Address(contract_id).to_xdr_sc_address(),
-                function_name=stellar_xdr.SCSymbol(b"increment"),
+                function_name="increment",
                 args=[],
-            ),
+            )
         ),
         sub_invocations=[],
     )
@@ -67,6 +66,12 @@ _MUXED_CONTRACT_ID = str(
 )
 
 
+def _signature_bytes(signature: stellar_xdr.SCVal.Any) -> bytes:
+    """The signature bytes of a default account signature, Vec<Map{public_key, signature}>."""
+    entries = scval.from_map(scval.from_vec(signature)[0])
+    return scval.from_bytes(entries[scval.to_symbol("signature")])
+
+
 class TestAuth:
     def test_sign_authorize_entry_with_base64_entry_and_keypair_signer(self):
         contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
@@ -76,54 +81,51 @@ class TestAuth:
         valid_until_ledger_sequence = 654656
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
-        credentials = stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-            address=stellar_xdr.SorobanAddressCredentials(
-                address=Address(signer.public_key).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-            ),
+        credentials: stellar_xdr.SorobanCredentials.Any = (
+            stellar_xdr.SorobanCredentials.Address(
+                stellar_xdr.SorobanAddressCredentials(
+                    address=Address(signer.public_key).to_xdr_sc_address(),
+                    nonce=123456789,
+                    signature_expiration_ledger=0,
+                    signature=stellar_xdr.SCVal.Void(),
+                )
+            )
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
         entry = stellar_xdr.SorobanAuthorizationEntry(credentials, invocation)
 
         signed_entry = authorize_entry(
-            entry.to_xdr(), signer, valid_until_ledger_sequence, network_passphrase
+            entry.to_xdr_base64(),
+            signer,
+            valid_until_ledger_sequence,
+            network_passphrase,
         )
 
-        preimage = stellar_xdr.HashIDPreimage(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION,
-            soroban_authorization=stellar_xdr.HashIDPreimageSorobanAuthorization(
-                network_id=stellar_xdr.Hash(Network(network_passphrase).network_id()),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(
-                    valid_until_ledger_sequence
-                ),
+        preimage = stellar_xdr.HashIDPreimage.SorobanAuthorization(
+            stellar_xdr.HashIDPreimageSorobanAuthorization(
+                network_id=Network(network_passphrase).network_id(),
+                nonce=123456789,
+                signature_expiration_ledger=valid_until_ledger_sequence,
                 invocation=invocation,
-            ),
+            )
         )
         signature = signer.sign(utils.sha256(preimage.to_xdr_bytes()))
 
         expected_entry = stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-                address=stellar_xdr.SorobanAddressCredentials(
+            credentials=stellar_xdr.SorobanCredentials.Address(
+                stellar_xdr.SorobanAddressCredentials(
                     address=Address(signer.public_key).to_xdr_sc_address(),
-                    nonce=stellar_xdr.Int64(123456789),
-                    signature_expiration_ledger=stellar_xdr.Uint32(
-                        valid_until_ledger_sequence
-                    ),
+                    nonce=123456789,
+                    signature_expiration_ledger=valid_until_ledger_sequence,
                     signature=scval.to_vec(
                         [
                             scval.to_map(
@@ -138,13 +140,12 @@ class TestAuth:
                             )
                         ]
                     ),
-                ),
+                )
             ),
             root_invocation=invocation,
         )
 
         assert expected_entry == signed_entry
-        assert id(expected_entry) != id(signed_entry)
 
     def test_sign_authorize_entry_with_xdr_entry_and_keypair_signer(self):
         contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
@@ -154,23 +155,21 @@ class TestAuth:
         valid_until_ledger_sequence = 654656
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
-        credentials = stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-            address=stellar_xdr.SorobanAddressCredentials(
+        credentials = stellar_xdr.SorobanCredentials.Address(
+            stellar_xdr.SorobanAddressCredentials(
                 address=Address(signer.public_key).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-            ),
+                nonce=123456789,
+                signature_expiration_ledger=0,
+                signature=stellar_xdr.SCVal.Void(),
+            )
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
@@ -180,28 +179,22 @@ class TestAuth:
             entry, signer, valid_until_ledger_sequence, network_passphrase
         )
 
-        preimage = stellar_xdr.HashIDPreimage(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION,
-            soroban_authorization=stellar_xdr.HashIDPreimageSorobanAuthorization(
-                network_id=stellar_xdr.Hash(Network(network_passphrase).network_id()),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(
-                    valid_until_ledger_sequence
-                ),
+        preimage = stellar_xdr.HashIDPreimage.SorobanAuthorization(
+            stellar_xdr.HashIDPreimageSorobanAuthorization(
+                network_id=Network(network_passphrase).network_id(),
+                nonce=123456789,
+                signature_expiration_ledger=valid_until_ledger_sequence,
                 invocation=invocation,
-            ),
+            )
         )
         signature = signer.sign(utils.sha256(preimage.to_xdr_bytes()))
 
         expected_entry = stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-                address=stellar_xdr.SorobanAddressCredentials(
+            credentials=stellar_xdr.SorobanCredentials.Address(
+                stellar_xdr.SorobanAddressCredentials(
                     address=Address(signer.public_key).to_xdr_sc_address(),
-                    nonce=stellar_xdr.Int64(123456789),
-                    signature_expiration_ledger=stellar_xdr.Uint32(
-                        valid_until_ledger_sequence
-                    ),
+                    nonce=123456789,
+                    signature_expiration_ledger=valid_until_ledger_sequence,
                     signature=scval.to_vec(
                         [
                             scval.to_map(
@@ -216,13 +209,12 @@ class TestAuth:
                             )
                         ]
                     ),
-                ),
+                )
             ),
             root_invocation=invocation,
         )
 
         assert expected_entry == signed_entry
-        assert id(expected_entry) != id(signed_entry)
 
     def test_sign_authorize_entry_with_base64_entry_and_function_signer(self):
         contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
@@ -234,54 +226,49 @@ class TestAuth:
         valid_until_ledger_sequence = 654656
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
-        credentials = stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-            address=stellar_xdr.SorobanAddressCredentials(
+        credentials = stellar_xdr.SorobanCredentials.Address(
+            stellar_xdr.SorobanAddressCredentials(
                 address=Address(signer.public_key).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-            ),
+                nonce=123456789,
+                signature_expiration_ledger=0,
+                signature=stellar_xdr.SCVal.Void(),
+            )
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
         entry = stellar_xdr.SorobanAuthorizationEntry(credentials, invocation)
 
         signed_entry = authorize_entry(
-            entry.to_xdr(), signer_fn, valid_until_ledger_sequence, network_passphrase
+            entry.to_xdr_base64(),
+            signer_fn,
+            valid_until_ledger_sequence,
+            network_passphrase,
         )
 
-        preimage = stellar_xdr.HashIDPreimage(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION,
-            soroban_authorization=stellar_xdr.HashIDPreimageSorobanAuthorization(
-                network_id=stellar_xdr.Hash(Network(network_passphrase).network_id()),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(
-                    valid_until_ledger_sequence
-                ),
+        preimage = stellar_xdr.HashIDPreimage.SorobanAuthorization(
+            stellar_xdr.HashIDPreimageSorobanAuthorization(
+                network_id=Network(network_passphrase).network_id(),
+                nonce=123456789,
+                signature_expiration_ledger=valid_until_ledger_sequence,
                 invocation=invocation,
-            ),
+            )
         )
         signature = signer.sign(utils.sha256(preimage.to_xdr_bytes()))
 
         expected_entry = stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-                address=stellar_xdr.SorobanAddressCredentials(
+            credentials=stellar_xdr.SorobanCredentials.Address(
+                stellar_xdr.SorobanAddressCredentials(
                     address=Address(signer.public_key).to_xdr_sc_address(),
-                    nonce=stellar_xdr.Int64(123456789),
-                    signature_expiration_ledger=stellar_xdr.Uint32(
-                        valid_until_ledger_sequence
-                    ),
+                    nonce=123456789,
+                    signature_expiration_ledger=valid_until_ledger_sequence,
                     signature=scval.to_vec(
                         [
                             scval.to_map(
@@ -296,13 +283,12 @@ class TestAuth:
                             )
                         ]
                     ),
-                ),
+                )
             ),
             root_invocation=invocation,
         )
 
         assert expected_entry == signed_entry
-        assert id(expected_entry) != id(signed_entry)
 
     def test_sign_authorize_entry_with_xdr_entry_and_function_signer(self):
         contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
@@ -313,23 +299,21 @@ class TestAuth:
         valid_until_ledger_sequence = 654656
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
-        credentials = stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-            address=stellar_xdr.SorobanAddressCredentials(
+        credentials = stellar_xdr.SorobanCredentials.Address(
+            stellar_xdr.SorobanAddressCredentials(
                 address=Address(signer.public_key).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-            ),
+                nonce=123456789,
+                signature_expiration_ledger=0,
+                signature=stellar_xdr.SCVal.Void(),
+            )
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
@@ -339,28 +323,22 @@ class TestAuth:
             entry, signer_fn, valid_until_ledger_sequence, network_passphrase
         )
 
-        preimage = stellar_xdr.HashIDPreimage(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION,
-            soroban_authorization=stellar_xdr.HashIDPreimageSorobanAuthorization(
-                network_id=stellar_xdr.Hash(Network(network_passphrase).network_id()),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(
-                    valid_until_ledger_sequence
-                ),
+        preimage = stellar_xdr.HashIDPreimage.SorobanAuthorization(
+            stellar_xdr.HashIDPreimageSorobanAuthorization(
+                network_id=Network(network_passphrase).network_id(),
+                nonce=123456789,
+                signature_expiration_ledger=valid_until_ledger_sequence,
                 invocation=invocation,
-            ),
+            )
         )
         signature = signer.sign(utils.sha256(preimage.to_xdr_bytes()))
 
         expected_entry = stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-                address=stellar_xdr.SorobanAddressCredentials(
+            credentials=stellar_xdr.SorobanCredentials.Address(
+                stellar_xdr.SorobanAddressCredentials(
                     address=Address(signer.public_key).to_xdr_sc_address(),
-                    nonce=stellar_xdr.Int64(123456789),
-                    signature_expiration_ledger=stellar_xdr.Uint32(
-                        valid_until_ledger_sequence
-                    ),
+                    nonce=123456789,
+                    signature_expiration_ledger=valid_until_ledger_sequence,
                     signature=scval.to_vec(
                         [
                             scval.to_map(
@@ -375,13 +353,12 @@ class TestAuth:
                             )
                         ]
                     ),
-                ),
+                )
             ),
             root_invocation=invocation,
         )
 
         assert expected_entry == signed_entry
-        assert id(expected_entry) != id(signed_entry)
 
     def test_sign_authorize_entry_with_source_credential_entry(self):
         contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
@@ -391,35 +368,32 @@ class TestAuth:
         valid_until_ledger_sequence = 654656
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
-        credentials = stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT,
-        )
+        credentials = stellar_xdr.SorobanCredentials.SourceAccount()
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
         entry = stellar_xdr.SorobanAuthorizationEntry(credentials, invocation)
 
         signed_entry = authorize_entry(
-            entry.to_xdr(), signer, valid_until_ledger_sequence, network_passphrase
+            entry.to_xdr_base64(),
+            signer,
+            valid_until_ledger_sequence,
+            network_passphrase,
         )
 
         expected_entry = stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT,
-            ),
+            credentials=stellar_xdr.SorobanCredentials.SourceAccount(),
             root_invocation=invocation,
         )
 
         assert expected_entry == signed_entry
-        assert id(expected_entry) != id(signed_entry)
 
     def test_sign_authorize_entry_with_legacy_tuple_signer_raise(self):
         contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
@@ -436,23 +410,21 @@ class TestAuth:
         valid_until_ledger_sequence = 654656
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
-        credentials = stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-            address=stellar_xdr.SorobanAddressCredentials(
+        credentials = stellar_xdr.SorobanCredentials.Address(
+            stellar_xdr.SorobanAddressCredentials(
                 address=Address(Keypair.random().public_key).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-            ),
+                nonce=123456789,
+                signature_expiration_ledger=0,
+                signature=stellar_xdr.SCVal.Void(),
+            )
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
@@ -463,7 +435,7 @@ class TestAuth:
             match=r"Authorization signer must return a stellar_sdk\.xdr\.SCVal",
         ):
             authorize_entry(
-                entry.to_xdr(),
+                entry.to_xdr_base64(),
                 cast(Any, signer_fn),
                 valid_until_ledger_sequence,
                 network_passphrase,
@@ -478,13 +450,12 @@ class TestAuth:
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
@@ -499,25 +470,13 @@ class TestAuth:
         )
 
         assert signed_entry.root_invocation == invocation
-        assert (
-            signed_entry.credentials.type
-            == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
+        assert isinstance(
+            signed_entry.credentials, stellar_xdr.SorobanCredentials.Address
         )
-        assert signed_entry.credentials.address is not None
-        assert (
-            signed_entry.credentials.address.address
-            == Address(signer.public_key).to_xdr_sc_address()
-        )
-        assert (
-            signed_entry.credentials.address.signature_expiration_ledger.uint32
-            == valid_until_ledger_sequence
-        )
-        assert (
-            signed_entry.credentials.address.signature.type
-            == stellar_xdr.SCValType.SCV_VEC
-        )
-        assert signed_entry.credentials.address.signature.vec is not None
-        assert len(signed_entry.credentials.address.signature.vec.sc_vec) == 1
+        credentials = signed_entry.credentials.address
+        assert credentials.address == Address(signer.public_key).to_xdr_sc_address()
+        assert credentials.signature_expiration_ledger == valid_until_ledger_sequence
+        assert len(scval.from_vec(credentials.signature)) == 1
 
     def test_sign_authorize_invocation_with_function_signer(self):
         contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
@@ -529,13 +488,12 @@ class TestAuth:
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
@@ -550,25 +508,13 @@ class TestAuth:
         )
 
         assert signed_entry.root_invocation == invocation
-        assert (
-            signed_entry.credentials.type
-            == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
+        assert isinstance(
+            signed_entry.credentials, stellar_xdr.SorobanCredentials.Address
         )
-        assert signed_entry.credentials.address is not None
-        assert (
-            signed_entry.credentials.address.address
-            == Address(signer.public_key).to_xdr_sc_address()
-        )
-        assert (
-            signed_entry.credentials.address.signature_expiration_ledger.uint32
-            == valid_until_ledger_sequence
-        )
-        assert (
-            signed_entry.credentials.address.signature.type
-            == stellar_xdr.SCValType.SCV_VEC
-        )
-        assert signed_entry.credentials.address.signature.vec is not None
-        assert len(signed_entry.credentials.address.signature.vec.sc_vec) == 1
+        credentials = signed_entry.credentials.address
+        assert credentials.address == Address(signer.public_key).to_xdr_sc_address()
+        assert credentials.signature_expiration_ledger == valid_until_ledger_sequence
+        assert len(scval.from_vec(credentials.signature)) == 1
 
     def test_sign_authorize_entry_with_keypair_signer_not_equal_credential_address(
         self,
@@ -581,54 +527,49 @@ class TestAuth:
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
         credential_address = "GADBBY4WFXKKFJ7CMTG3J5YAUXMQDBILRQ6W3U5IWN5TQFZU4MWZ5T4K"
-        credentials = stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-            address=stellar_xdr.SorobanAddressCredentials(
+        credentials = stellar_xdr.SorobanCredentials.Address(
+            stellar_xdr.SorobanAddressCredentials(
                 address=Address(credential_address).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-            ),
+                nonce=123456789,
+                signature_expiration_ledger=0,
+                signature=stellar_xdr.SCVal.Void(),
+            )
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
         entry = stellar_xdr.SorobanAuthorizationEntry(credentials, invocation)
 
         signed_entry = authorize_entry(
-            entry.to_xdr(), signer, valid_until_ledger_sequence, network_passphrase
+            entry.to_xdr_base64(),
+            signer,
+            valid_until_ledger_sequence,
+            network_passphrase,
         )
 
-        preimage = stellar_xdr.HashIDPreimage(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION,
-            soroban_authorization=stellar_xdr.HashIDPreimageSorobanAuthorization(
-                network_id=stellar_xdr.Hash(Network(network_passphrase).network_id()),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(
-                    valid_until_ledger_sequence
-                ),
+        preimage = stellar_xdr.HashIDPreimage.SorobanAuthorization(
+            stellar_xdr.HashIDPreimageSorobanAuthorization(
+                network_id=Network(network_passphrase).network_id(),
+                nonce=123456789,
+                signature_expiration_ledger=valid_until_ledger_sequence,
                 invocation=invocation,
-            ),
+            )
         )
         signature = signer.sign(utils.sha256(preimage.to_xdr_bytes()))
 
         expected_entry = stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-                address=stellar_xdr.SorobanAddressCredentials(
+            credentials=stellar_xdr.SorobanCredentials.Address(
+                stellar_xdr.SorobanAddressCredentials(
                     address=Address(credential_address).to_xdr_sc_address(),
-                    nonce=stellar_xdr.Int64(123456789),
-                    signature_expiration_ledger=stellar_xdr.Uint32(
-                        valid_until_ledger_sequence
-                    ),
+                    nonce=123456789,
+                    signature_expiration_ledger=valid_until_ledger_sequence,
                     signature=scval.to_vec(
                         [
                             scval.to_map(
@@ -643,13 +584,12 @@ class TestAuth:
                             )
                         ]
                     ),
-                ),
+                )
             ),
             root_invocation=invocation,
         )
 
         assert expected_entry == signed_entry
-        assert id(expected_entry) != id(signed_entry)
 
     def test_sign_authorize_entry_with_function_signer_not_equal_credential_address(
         self,
@@ -664,54 +604,49 @@ class TestAuth:
         network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 
         credential_address = "GADBBY4WFXKKFJ7CMTG3J5YAUXMQDBILRQ6W3U5IWN5TQFZU4MWZ5T4K"
-        credentials = stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-            address=stellar_xdr.SorobanAddressCredentials(
+        credentials = stellar_xdr.SorobanCredentials.Address(
+            stellar_xdr.SorobanAddressCredentials(
                 address=Address(credential_address).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-            ),
+                nonce=123456789,
+                signature_expiration_ledger=0,
+                signature=stellar_xdr.SCVal.Void(),
+            )
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
         entry = stellar_xdr.SorobanAuthorizationEntry(credentials, invocation)
 
         signed_entry = authorize_entry(
-            entry.to_xdr(), signer_fn, valid_until_ledger_sequence, network_passphrase
+            entry.to_xdr_base64(),
+            signer_fn,
+            valid_until_ledger_sequence,
+            network_passphrase,
         )
 
-        preimage = stellar_xdr.HashIDPreimage(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION,
-            soroban_authorization=stellar_xdr.HashIDPreimageSorobanAuthorization(
-                network_id=stellar_xdr.Hash(Network(network_passphrase).network_id()),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(
-                    valid_until_ledger_sequence
-                ),
+        preimage = stellar_xdr.HashIDPreimage.SorobanAuthorization(
+            stellar_xdr.HashIDPreimageSorobanAuthorization(
+                network_id=Network(network_passphrase).network_id(),
+                nonce=123456789,
+                signature_expiration_ledger=valid_until_ledger_sequence,
                 invocation=invocation,
-            ),
+            )
         )
         signature = signer.sign(utils.sha256(preimage.to_xdr_bytes()))
 
         expected_entry = stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-                address=stellar_xdr.SorobanAddressCredentials(
+            credentials=stellar_xdr.SorobanCredentials.Address(
+                stellar_xdr.SorobanAddressCredentials(
                     address=Address(credential_address).to_xdr_sc_address(),
-                    nonce=stellar_xdr.Int64(123456789),
-                    signature_expiration_ledger=stellar_xdr.Uint32(
-                        valid_until_ledger_sequence
-                    ),
+                    nonce=123456789,
+                    signature_expiration_ledger=valid_until_ledger_sequence,
                     signature=scval.to_vec(
                         [
                             scval.to_map(
@@ -726,13 +661,12 @@ class TestAuth:
                             )
                         ]
                     ),
-                ),
+                )
             ),
             root_invocation=invocation,
         )
 
         assert expected_entry == signed_entry
-        assert id(expected_entry) != id(signed_entry)
 
     def test_sign_authorize_entry_with_custom_contract_signature(self):
         contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
@@ -757,28 +691,26 @@ class TestAuth:
             }
         )
 
-        credentials = stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-            address=stellar_xdr.SorobanAddressCredentials(
+        credentials = stellar_xdr.SorobanCredentials.Address(
+            stellar_xdr.SorobanAddressCredentials(
                 address=Address(contract_id).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-            ),
+                nonce=123456789,
+                signature_expiration_ledger=0,
+                signature=stellar_xdr.SCVal.Void(),
+            )
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(contract_id), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
         entry = stellar_xdr.SorobanAuthorizationEntry(credentials, invocation)
-        seen_preimages: list[stellar_xdr.HashIDPreimage] = []
+        seen_preimages: list[stellar_xdr.HashIDPreimage.Any] = []
 
         signed_entry = authorize_entry(
             entry,
@@ -787,10 +719,12 @@ class TestAuth:
             network_passphrase,
         )
 
-        assert signed_entry.credentials.address is not None
+        assert isinstance(
+            signed_entry.credentials, stellar_xdr.SorobanCredentials.Address
+        )
         assert signed_entry.credentials.address.signature == custom_signature
         assert (
-            signed_entry.credentials.address.signature_expiration_ledger.uint32
+            signed_entry.credentials.address.signature_expiration_ledger
             == valid_until_ledger_sequence
         )
         assert len(seen_preimages) == 1
@@ -808,13 +742,12 @@ class TestAuth:
             ]
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(contract_id), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
@@ -828,7 +761,9 @@ class TestAuth:
             credentials_type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
         )
 
-        assert signed_entry.credentials.address is not None
+        assert isinstance(
+            signed_entry.credentials, stellar_xdr.SorobanCredentials.Address
+        )
         assert (
             signed_entry.credentials.address.address
             == Address(contract_id).to_xdr_sc_address()
@@ -838,13 +773,12 @@ class TestAuth:
     def test_sign_authorize_invocation_accepts_address_instance(self):
         contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(contract_id).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
@@ -858,7 +792,9 @@ class TestAuth:
             credentials_type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
         )
 
-        assert signed_entry.credentials.address is not None
+        assert isinstance(
+            signed_entry.credentials, stellar_xdr.SorobanCredentials.Address
+        )
         assert (
             signed_entry.credentials.address.address
             == Address(contract_id).to_xdr_sc_address()
@@ -866,15 +802,14 @@ class TestAuth:
 
     def test_sign_authorize_invocation_requires_address_for_callable(self):
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(
                         "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
                     ).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[],
-                ),
+                )
             ),
             sub_invocations=[],
         )
@@ -912,14 +847,13 @@ class TestAuth:
     def test_sign_authorize_entry_rejects_non_account_contract_credential_address(
         self,
     ):
-        credentials = stellar_xdr.SorobanCredentials(
-            type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
-            address=stellar_xdr.SorobanAddressCredentials(
+        credentials = stellar_xdr.SorobanCredentials.Address(
+            stellar_xdr.SorobanAddressCredentials(
                 address=Address(_MUXED_ACCOUNT_ID).to_xdr_sc_address(),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(0),
-                signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
-            ),
+                nonce=123456789,
+                signature_expiration_ledger=0,
+                signature=stellar_xdr.SCVal.Void(),
+            )
         )
         entry = stellar_xdr.SorobanAuthorizationEntry(credentials, _sample_invocation())
 
@@ -937,9 +871,9 @@ def _address_credentials(
 ) -> stellar_xdr.SorobanAddressCredentials:
     return stellar_xdr.SorobanAddressCredentials(
         address=Address(address).to_xdr_sc_address(),
-        nonce=stellar_xdr.Int64(nonce),
-        signature_expiration_ledger=stellar_xdr.Uint32(0),
-        signature=stellar_xdr.SCVal(type=stellar_xdr.SCValType.SCV_VOID),
+        nonce=nonce,
+        signature_expiration_ledger=0,
+        signature=stellar_xdr.SCVal.Void(),
     )
 
 
@@ -953,13 +887,11 @@ def _unsigned_entry(
         credentials_type
         == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
     ):
-        credentials = stellar_xdr.SorobanCredentials(
-            type=credentials_type, address=address_credentials
+        credentials: stellar_xdr.SorobanCredentials.Any = (
+            stellar_xdr.SorobanCredentials.Address(address_credentials)
         )
     else:
-        credentials = stellar_xdr.SorobanCredentials(
-            type=credentials_type, address_v2=address_credentials
-        )
+        credentials = stellar_xdr.SorobanCredentials.AddressV2(address_credentials)
     return stellar_xdr.SorobanAuthorizationEntry(
         credentials=credentials,
         root_invocation=invocation if invocation is not None else _sample_invocation(),
@@ -982,9 +914,11 @@ def _delegates_entry(
 
 
 def _stored_expiration(entry: stellar_xdr.SorobanAuthorizationEntry) -> int:
-    assert entry.credentials.address_with_delegates is not None
+    assert isinstance(
+        entry.credentials, stellar_xdr.SorobanCredentials.AddressWithDelegates
+    )
     credentials = entry.credentials.address_with_delegates.address_credentials
-    return credentials.signature_expiration_ledger.uint32
+    return credentials.signature_expiration_ledger
 
 
 class TestCap71Auth:
@@ -1005,11 +939,10 @@ class TestCap71Auth:
             preimage.type
             == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS
         )
-        assert preimage.soroban_authorization_with_address is not None
         with_address = preimage.soroban_authorization_with_address
         assert with_address.address == Address(signer.public_key).to_xdr_sc_address()
-        assert with_address.nonce == stellar_xdr.Int64(123456789)
-        assert with_address.signature_expiration_ledger == stellar_xdr.Uint32(654656)
+        assert with_address.nonce == 123456789
+        assert with_address.signature_expiration_ledger == 654656
         assert with_address.invocation == entry.root_invocation
 
     def test_address_and_v2_payloads_differ(self):
@@ -1074,24 +1007,24 @@ class TestCap71Auth:
             entry, signer, valid_until_ledger_sequence, network_passphrase
         )
 
-        preimage = stellar_xdr.HashIDPreimage(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS,
-            soroban_authorization_with_address=stellar_xdr.HashIDPreimageSorobanAuthorizationWithAddress(
-                network_id=stellar_xdr.Hash(Network(network_passphrase).network_id()),
-                nonce=stellar_xdr.Int64(123456789),
-                signature_expiration_ledger=stellar_xdr.Uint32(
-                    valid_until_ledger_sequence
-                ),
+        preimage = stellar_xdr.HashIDPreimage.SorobanAuthorizationWithAddress(
+            stellar_xdr.HashIDPreimageSorobanAuthorizationWithAddress(
+                network_id=Network(network_passphrase).network_id(),
+                nonce=123456789,
+                signature_expiration_ledger=valid_until_ledger_sequence,
                 address=Address(signer.public_key).to_xdr_sc_address(),
                 invocation=entry.root_invocation,
-            ),
+            )
         )
         signature = signer.sign(utils.sha256(preimage.to_xdr_bytes()))
 
-        assert signed_entry.credentials.address_v2 is not None
+        assert isinstance(
+            signed_entry.credentials, stellar_xdr.SorobanCredentials.AddressV2
+        )
         signed_credentials = signed_entry.credentials.address_v2
-        assert signed_credentials.signature_expiration_ledger == stellar_xdr.Uint32(
-            valid_until_ledger_sequence
+        assert (
+            signed_credentials.signature_expiration_ledger
+            == valid_until_ledger_sequence
         )
         assert signed_credentials.signature == scval.to_vec(
             [
@@ -1106,10 +1039,9 @@ class TestCap71Auth:
             ]
         )
         # the input entry is left untouched
-        assert entry.credentials.address_v2 is not None
-        assert (
-            entry.credentials.address_v2.signature.type
-            == stellar_xdr.SCValType.SCV_VOID
+        assert entry == _unsigned_entry(
+            signer.public_key,
+            stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
         )
 
     def test_authorize_entry_v2_with_function_signer_receives_with_address_preimage(
@@ -1135,10 +1067,11 @@ class TestCap71Auth:
             seen_preimages[0].type
             == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS
         )
-        assert signed_entry.credentials.address_v2 is not None
-        assert (
-            signed_entry.credentials.address_v2.signature.type
-            == stellar_xdr.SCValType.SCV_VEC
+        assert isinstance(
+            signed_entry.credentials, stellar_xdr.SorobanCredentials.AddressV2
+        )
+        assert isinstance(
+            signed_entry.credentials.address_v2.signature, stellar_xdr.SCVal.Vec
         )
 
     def test_authorize_entry_with_delegates_signs_top_level_by_default(self):
@@ -1157,15 +1090,15 @@ class TestCap71Auth:
             entry, signer, 654656, Network.TESTNET_NETWORK_PASSPHRASE
         )
 
-        assert signed_entry.credentials.address_with_delegates is not None
+        assert isinstance(
+            signed_entry.credentials,
+            stellar_xdr.SorobanCredentials.AddressWithDelegates,
+        )
         with_delegates = signed_entry.credentials.address_with_delegates
-        assert (
-            with_delegates.address_credentials.signature.type
-            == stellar_xdr.SCValType.SCV_VEC
+        assert isinstance(
+            with_delegates.address_credentials.signature, stellar_xdr.SCVal.Vec
         )
-        assert (
-            with_delegates.delegates[0].signature.type == stellar_xdr.SCValType.SCV_VOID
-        )
+        assert with_delegates.delegates[0].signature == stellar_xdr.SCVal.Void()
 
     def test_authorize_entry_for_address_fills_matching_delegate(self):
         signer = Keypair.random()
@@ -1193,19 +1126,17 @@ class TestCap71Auth:
             for_address=nested_delegate.public_key,
         )
 
-        assert signed_entry.credentials.address_with_delegates is not None
+        assert isinstance(
+            signed_entry.credentials,
+            stellar_xdr.SorobanCredentials.AddressWithDelegates,
+        )
         with_delegates = signed_entry.credentials.address_with_delegates
         # only the nested delegate node was signed
-        assert (
-            with_delegates.address_credentials.signature.type
-            == stellar_xdr.SCValType.SCV_VOID
-        )
-        assert (
-            with_delegates.delegates[0].signature.type == stellar_xdr.SCValType.SCV_VOID
-        )
-        assert (
-            with_delegates.delegates[0].nested_delegates[0].signature.type
-            == stellar_xdr.SCValType.SCV_VEC
+        assert with_delegates.address_credentials.signature == stellar_xdr.SCVal.Void()
+        assert with_delegates.delegates[0].signature == stellar_xdr.SCVal.Void()
+        assert isinstance(
+            with_delegates.delegates[0].nested_delegates[0].signature,
+            stellar_xdr.SCVal.Vec,
         )
 
     def test_authorize_entry_for_address_without_match_raises(self):
@@ -1323,15 +1254,17 @@ class TestCap71Auth:
         entry = authorize_entry(entry, top, 654656, Network.TESTNET_NETWORK_PASSPHRASE)
 
         assert _stored_expiration(entry) == 654656
+        assert isinstance(
+            entry.credentials, stellar_xdr.SorobanCredentials.AddressWithDelegates
+        )
         with_delegates = entry.credentials.address_with_delegates
-        assert with_delegates is not None
         delegate_node = with_delegates.delegates[0]
         for node in (
             with_delegates.address_credentials,
             delegate_node,
             delegate_node.nested_delegates[0],
         ):
-            assert node.signature.type == stellar_xdr.SCValType.SCV_VEC
+            assert isinstance(node.signature, stellar_xdr.SCVal.Vec)
 
     def test_authorize_entry_allows_resigning_the_same_delegate_node(self):
         # Replacing the only signature on the entry invalidates nothing.
@@ -1355,9 +1288,11 @@ class TestCap71Auth:
         )
 
         assert _stored_expiration(resigned) == 2000
-        assert resigned.credentials.address_with_delegates is not None
+        assert isinstance(
+            resigned.credentials, stellar_xdr.SorobanCredentials.AddressWithDelegates
+        )
         delegate_node = resigned.credentials.address_with_delegates.delegates[0]
-        assert delegate_node.signature.type == stellar_xdr.SCValType.SCV_VEC
+        assert isinstance(delegate_node.signature, stellar_xdr.SCVal.Vec)
 
     @pytest.mark.parametrize(
         "credentials_type",
@@ -1379,15 +1314,15 @@ class TestCap71Auth:
             signed, signer, 2000, Network.TESTNET_NETWORK_PASSPHRASE
         )
 
-        credentials = (
-            resigned.credentials.address
-            if credentials_type
-            == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
-            else resigned.credentials.address_v2
-        )
-        assert credentials is not None
-        assert credentials.signature_expiration_ledger == stellar_xdr.Uint32(2000)
-        assert credentials.signature.type == stellar_xdr.SCValType.SCV_VEC
+        match resigned.credentials:
+            case stellar_xdr.SorobanCredentials.Address(
+                credentials
+            ) | stellar_xdr.SorobanCredentials.AddressV2(credentials):
+                pass
+            case _:
+                pytest.fail(f"unexpected credentials {resigned.credentials!r}")
+        assert credentials.signature_expiration_ledger == 2000
+        assert isinstance(credentials.signature, stellar_xdr.SCVal.Vec)
 
     def test_expiration_committed_into_signed_payload(self):
         signer = Keypair.random()
@@ -1403,8 +1338,8 @@ class TestCap71Auth:
             entry, signer, 654657, Network.TESTNET_NETWORK_PASSPHRASE
         )
 
-        assert first.credentials.address_v2 is not None
-        assert second.credentials.address_v2 is not None
+        assert isinstance(first.credentials, stellar_xdr.SorobanCredentials.AddressV2)
+        assert isinstance(second.credentials, stellar_xdr.SorobanCredentials.AddressV2)
         assert (
             first.credentials.address_v2.signature
             != second.credentials.address_v2.signature
@@ -1427,20 +1362,15 @@ class TestCap71Auth:
             entry.credentials.type
             == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2
         )
-        assert entry.credentials.address_v2 is not None
         credentials = entry.credentials.address_v2
         assert credentials.address == Address(signer.public_key).to_xdr_sc_address()
-        assert credentials.signature_expiration_ledger == stellar_xdr.Uint32(654656)
+        assert credentials.signature_expiration_ledger == 654656
         # the signature verifies against the address-bound payload
         preimage = build_authorization_preimage(
             entry, 654656, Network.TESTNET_NETWORK_PASSPHRASE
         )
-        assert credentials.signature.vec is not None
-        signature_map = credentials.signature.vec.sc_vec[0].map
-        assert signature_map is not None
-        signature_bytes = signature_map.sc_map[1].val.bytes
-        assert signature_bytes is not None
-        signer.verify(authorization_payload_hash(preimage), signature_bytes.sc_bytes)
+        signature_bytes = _signature_bytes(credentials.signature)
+        signer.verify(authorization_payload_hash(preimage), signature_bytes)
 
     def test_authorize_invocation_legacy_opt_out(self):
         signer = Keypair.random()
@@ -1458,15 +1388,11 @@ class TestCap71Auth:
             entry.credentials.type
             == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
         )
-        assert entry.credentials.address is not None
         assert (
             entry.credentials.address.address
             == Address(signer.public_key).to_xdr_sc_address()
         )
-        assert (
-            entry.credentials.address.signature_expiration_ledger
-            == stellar_xdr.Uint32(654656)
-        )
+        assert entry.credentials.address.signature_expiration_ledger == 654656
         # the signature verifies against the legacy, non-address-bound payload
         preimage = build_authorization_preimage(
             entry, 654656, Network.TESTNET_NETWORK_PASSPHRASE
@@ -1475,12 +1401,9 @@ class TestCap71Auth:
             preimage.type
             == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_SOROBAN_AUTHORIZATION
         )
-        assert entry.credentials.address.signature.vec is not None
-        signature_map = entry.credentials.address.signature.vec.sc_vec[0].map
-        assert signature_map is not None
-        signature_bytes = signature_map.sc_map[1].val.bytes
-        assert signature_bytes is not None
-        signer.verify(authorization_payload_hash(preimage), signature_bytes.sc_bytes)
+        assert isinstance(entry.credentials, stellar_xdr.SorobanCredentials.Address)
+        signature_bytes = _signature_bytes(entry.credentials.address.signature)
+        signer.verify(authorization_payload_hash(preimage), signature_bytes)
 
     def test_authorize_invocation_rejects_with_delegates_credentials_type(self):
         with pytest.raises(ValueError, match=r"build_with_delegates_entry"):
@@ -1505,38 +1428,28 @@ class TestCap71Auth:
             entry, 654656, [DelegateSignature(delegate.public_key)]
         )
 
-        assert (
-            wrapped.credentials.type
-            == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES
+        assert wrapped == stellar_xdr.SorobanAuthorizationEntry(
+            credentials=stellar_xdr.SorobanCredentials.AddressWithDelegates(
+                stellar_xdr.SorobanAddressCredentialsWithDelegates(
+                    address_credentials=stellar_xdr.replace(
+                        _address_credentials(signer.public_key),
+                        signature_expiration_ledger=654656,
+                    ),
+                    delegates=[
+                        stellar_xdr.SorobanDelegateSignature(
+                            address=Address(delegate.public_key).to_xdr_sc_address(),
+                            signature=stellar_xdr.SCVal.Void(),
+                            nested_delegates=[],
+                        )
+                    ],
+                )
+            ),
+            root_invocation=entry.root_invocation,
         )
-        assert wrapped.credentials.address_with_delegates is not None
-        with_delegates = wrapped.credentials.address_with_delegates
-        assert (
-            with_delegates.address_credentials.address
-            == Address(signer.public_key).to_xdr_sc_address()
-        )
-        assert with_delegates.address_credentials.nonce == stellar_xdr.Int64(123456789)
-        assert with_delegates.address_credentials.signature_expiration_ledger == (
-            stellar_xdr.Uint32(654656)
-        )
-        assert (
-            with_delegates.address_credentials.signature.type
-            == stellar_xdr.SCValType.SCV_VOID
-        )
-        assert len(with_delegates.delegates) == 1
-        assert (
-            with_delegates.delegates[0].address
-            == Address(delegate.public_key).to_xdr_sc_address()
-        )
-        assert (
-            with_delegates.delegates[0].signature.type == stellar_xdr.SCValType.SCV_VOID
-        )
-        assert with_delegates.delegates[0].nested_delegates == []
-        assert wrapped.root_invocation == entry.root_invocation
         # the input entry is left untouched
-        assert (
-            entry.credentials.type
-            == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2
+        assert entry == _unsigned_entry(
+            signer.public_key,
+            stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
         )
 
     def test_build_with_delegates_entry_sorts_each_level(self):
@@ -1560,7 +1473,9 @@ class TestCap71Auth:
             ],
         )
 
-        assert wrapped.credentials.address_with_delegates is not None
+        assert isinstance(
+            wrapped.credentials, stellar_xdr.SorobanCredentials.AddressWithDelegates
+        )
         top_level = wrapped.credentials.address_with_delegates.delegates
         top_level_keys = [node.address.to_xdr_bytes() for node in top_level]
         assert top_level_keys == sorted(top_level_keys)
@@ -1603,9 +1518,7 @@ class TestCap71Auth:
             build_with_delegates_entry(wrapped, 654656, [])
 
         source_account_entry = stellar_xdr.SorobanAuthorizationEntry(
-            credentials=stellar_xdr.SorobanCredentials(
-                type=stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
-            ),
+            credentials=stellar_xdr.SorobanCredentials.SourceAccount(),
             root_invocation=_sample_invocation(),
         )
         with pytest.raises(ValueError, match=r"SOROBAN_CREDENTIALS_ADDRESS"):
@@ -1654,15 +1567,14 @@ class TestCap71Auth:
             "SAEZSI6DY7AXJFIYA4PM6SIBNEYYXIEM2MSOTHFGKHDW32MBQ7KVO6EN"
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(
                         "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
                     ).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
@@ -1683,7 +1595,7 @@ class TestCap71Auth:
         signed_entry = authorize_entry(
             entry, signer, 654656, Network.TESTNET_NETWORK_PASSPHRASE
         )
-        assert signed_entry.to_xdr() == (
+        assert signed_entry.to_xdr_base64() == (
             "AAAAAgAAAAAAAAAAWLfEosjyl6qPPSRxKB/fzOyv5I5WYzE+wY4Spz7KmKEAAAAAB1vNFQAJ/UAAAAAQ"
             "AAAAAQAAAAEAAAARAAAAAQAAAAIAAAAPAAAACnB1YmxpY19rZXkAAAAAAA0AAAAgWLfEosjyl6qPPSRx"
             "KB/fzOyv5I5WYzE+wY4Spz7KmKEAAAAPAAAACXNpZ25hdHVyZQAAAAAAAA0AAABAXZWzTbs45F1lXnl1"
@@ -1716,15 +1628,14 @@ class TestCap71Auth:
             == "GDWUSKGGFDI4FRXK5EBTRECZSVQSSWJHHJOGH6JWG3AUMFFMQ435DIAG"
         )
         invocation = stellar_xdr.SorobanAuthorizedInvocation(
-            function=stellar_xdr.SorobanAuthorizedFunction(
-                type=stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN,
-                contract_fn=stellar_xdr.InvokeContractArgs(
+            function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+                stellar_xdr.InvokeContractArgs(
                     contract_address=Address(
                         "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
                     ).to_xdr_sc_address(),
-                    function_name=stellar_xdr.SCSymbol(b"increment"),
+                    function_name="increment",
                     args=[scval.to_address(signer.public_key), scval.to_uint32(10)],
-                ),
+                )
             ),
             sub_invocations=[],
         )
@@ -1745,7 +1656,7 @@ class TestCap71Auth:
                 ),
             ],
         )
-        assert wrapped.to_xdr() == (
+        assert wrapped.to_xdr_base64() == (
             "AAAAAwAAAAAAAAAAWLfEosjyl6qPPSRxKB/fzOyv5I5WYzE+wY4Spz7KmKEAAAAAB1vNFQAJ/UAAAAAB"
             "AAAAAgAAAAAAAAAAgTl3Dqh9F19Wo1Rmw0x+zMuNipG07jeiXfYPW4/Js5QAAAABAAAAAAAAAAAAAAAA"
             "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1wAAAABAAAAAQAAAAAAAAAA7UkoxijRwsbq6QM4"
@@ -1773,7 +1684,7 @@ class TestCap71Auth:
                 Network.TESTNET_NETWORK_PASSPHRASE,
                 for_address=delegate.public_key,
             )
-        assert signed_entry.to_xdr() == (
+        assert signed_entry.to_xdr_base64() == (
             "AAAAAwAAAAAAAAAAWLfEosjyl6qPPSRxKB/fzOyv5I5WYzE+wY4Spz7KmKEAAAAAB1vNFQAJ/UAAAAAQ"
             "AAAAAQAAAAEAAAARAAAAAQAAAAIAAAAPAAAACnB1YmxpY19rZXkAAAAAAA0AAAAgWLfEosjyl6qPPSRx"
             "KB/fzOyv5I5WYzE+wY4Spz7KmKEAAAAPAAAACXNpZ25hdHVyZQAAAAAAAA0AAABAXZWzTbs45F1lXnl1"

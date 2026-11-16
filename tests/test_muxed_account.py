@@ -12,28 +12,26 @@ class TestMuxedAccount:
         account_id_muxed = (
             "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
         )
-        med25519 = stellar_xdr.MuxedAccountMed25519(
-            id=stellar_xdr.Uint64(account_id_id),
-            ed25519=stellar_xdr.Uint256(Ed25519PublicKey.from_string(account_id).key),
-        )
-        muxed_account_xdr = stellar_xdr.MuxedAccount(
-            type=stellar_xdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519
+        muxed_account_xdr = stellar_xdr.MuxedAccount.MuxedEd25519(
+            stellar_xdr.MuxedAccountMed25519(
+                id=account_id_id,
+                ed25519=Ed25519PublicKey.from_string(account_id).key,
+            )
         )
         muxed_account = MuxedAccount(account_id, account_id_id)
         assert muxed_account.account_muxed == account_id_muxed
         assert muxed_account.universal_account_id == account_id_muxed
-        assert muxed_account.to_xdr_object().to_xdr() == muxed_account_xdr.to_xdr()
+        assert muxed_account.to_xdr_object() == muxed_account_xdr
         assert MuxedAccount.from_xdr_object(muxed_account_xdr) == muxed_account
 
     def test_init_without_account_id_id(self):
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
         account_id_id = None
-        muxed_account_xdr = stellar_xdr.MuxedAccount(
-            type=stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519,
-            ed25519=stellar_xdr.Uint256(Ed25519PublicKey.from_string(account_id).key),
+        muxed_account_xdr = stellar_xdr.MuxedAccount.Ed25519(
+            Ed25519PublicKey.from_string(account_id).key
         )
         muxed_account = MuxedAccount(account_id, account_id_id)
-        assert muxed_account.to_xdr_object().to_xdr() == muxed_account_xdr.to_xdr()
+        assert muxed_account.to_xdr_object() == muxed_account_xdr
         assert MuxedAccount.from_xdr_object(muxed_account_xdr) == muxed_account
         assert muxed_account.account_muxed is None
         assert muxed_account.universal_account_id == account_id
@@ -99,3 +97,8 @@ class TestMuxedAccount:
             match=r"`account_muxed_id` must be a non-negative integer if provided.",
         ):
             MuxedAccount(account_id, account_id_id)
+
+
+def test_from_xdr_object_rejects_other_xdr_types():
+    with pytest.raises(ValueError, match="Unsupported muxed account"):
+        MuxedAccount.from_xdr_object(stellar_xdr.SCVal.Void())  # type: ignore[arg-type]

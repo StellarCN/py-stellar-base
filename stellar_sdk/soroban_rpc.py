@@ -537,12 +537,13 @@ class GetSACBalanceResponse(BaseModel):
         ledger_entry_result: LedgerEntryResult,
         latest_ledger: int,
     ) -> Self:
-        entry_data = stellar_xdr.LedgerEntryData.from_xdr(ledger_entry_result.xdr)
+        entry_data = stellar_xdr.LedgerEntryData.from_xdr_base64(
+            ledger_entry_result.xdr
+        )
 
-        if entry_data.type != stellar_xdr.LedgerEntryType.CONTRACT_DATA:
+        if not isinstance(entry_data, stellar_xdr.LedgerEntryData.ContractData):
             return cls(latest_ledger=latest_ledger, balance_entry=None)
 
-        assert entry_data.contract_data is not None
         contract_data = scval.to_native(entry_data.contract_data.val)
         assert isinstance(contract_data, dict)
         return cls(
