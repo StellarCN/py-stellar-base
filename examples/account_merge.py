@@ -9,11 +9,11 @@ using the Stellar Python SDK.
 What "Account Merge" does:
 - Transfers the *entire remaining XLM balance* from the source account to the destination.
 - Removes (deletes) the source account from the ledger.
-- The source account must have:
-  - No trustlines
-  - No offers
-  - No signers/subentries that prevent removal
-  - Enough XLM to cover fees and minimum requirements until the merge is submitted
+- The source account must:
+  - Have no subentries: trustlines, offers, data entries or additional signers
+  - Not sponsor any ledger entry or account
+  - Not have the AUTH_IMMUTABLE flag set
+- The destination account must already exist.
 
 Operations performed:
 1. Connect to Stellar Horizon (Testnet).
@@ -24,9 +24,7 @@ Operations performed:
 
 Official Documentation:
 - Account Merge operation:
-  https://developers.stellar.org/docs/start/list-of-operations/#account-merge
-- Account Merge tutorial/reference:
-  https://developers.stellar.org/docs/learn/encyclopedia/transactions-specialized/account-merge/
+  https://developers.stellar.org/docs/learn/fundamentals/transactions/list-of-operations#account-merge
 
 IMPORTANT NOTES:
 - After a successful merge, the source account will no longer exist on the ledger.
@@ -56,8 +54,9 @@ from stellar_sdk import Keypair, Network, Server, TransactionBuilder
 # ==============================================================
 
 # Connect to the Stellar Testnet Horizon server
+# To use the public network, set it to "https://horizon.stellar.org/"
 horizon_url = "https://horizon-testnet.stellar.org/"
-server = Server(horizon_url="https://horizon-testnet.stellar.org")
+server = Server(horizon_url=horizon_url)
 
 # Choose the network passphrase:
 # - Testnet: Network.TESTNET_NETWORK_PASSPHRASE
@@ -68,6 +67,9 @@ network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
 # === 2. Define Source and Destination Accounts =================
 # ==============================================================
 
+# The following source key was created by the friendbot at https://laboratory.stellar.org/#account-creator?network=test
+# before running this example create a new account, fund it and then copy and paste the
+# secret key where the current key is.
 source_secret_key = "SC7AUS23UKVZQL5KMIK4ZK3EZJUS6ZVMTQSVLH3VIK42W6RBQAQXOVQX"
 
 # This is the public key of another account created by the friendbot. When I wrote this
@@ -94,7 +96,7 @@ source_account = server.load_account(source_public_key)
 transaction = (
     TransactionBuilder(
         source_account=source_account,
-        network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+        network_passphrase=network_passphrase,
         base_fee=100,
     )
     .append_account_merge_op(destination=destination_public_key)
