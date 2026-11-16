@@ -59,7 +59,7 @@ class TestFeeBumpTransaction:
         assert restore_te == fee_bump_tx
         assert restore_te.transaction == fee_bump_tx.transaction
         assert restore_te.transaction == FeeBumpTransaction.from_xdr(
-            fee_bump_tx.transaction.to_xdr_object().to_xdr(),
+            fee_bump_tx.transaction.to_xdr_object().to_xdr_base64(),
             Network.TESTNET_NETWORK_PASSPHRASE,
         )
         restore_tx = restore_te.transaction
@@ -89,9 +89,6 @@ class TestFeeBumpTransaction:
         fee_source = Keypair.from_secret(
             "SB7ZMPZB3YMMK5CUWENXVLZWBK4KYX4YU5JBXQNZSK2DP2Q7V3LVTO5V"
         )
-        fee_source2 = Keypair.from_secret(
-            "SCVFDAOOXWR5TSPZF5U2MIE6V7M4LTOCNCD624Q6AEVBZ2XMH7HOWFZL"
-        )
         base_fee = 200
         fee_bump_tx = TransactionBuilder.build_fee_bump_transaction(
             fee_source.public_key,
@@ -109,7 +106,7 @@ class TestFeeBumpTransaction:
         assert restore_te == fee_bump_tx
         assert restore_te.transaction == fee_bump_tx.transaction
         assert restore_te.transaction == FeeBumpTransaction.from_xdr(
-            fee_bump_tx.transaction.to_xdr_object().to_xdr(),
+            fee_bump_tx.transaction.to_xdr_object().to_xdr_base64(),
             Network.TESTNET_NETWORK_PASSPHRASE,
         )
         assert (
@@ -308,7 +305,7 @@ class TestFeeBumpTransaction:
         assert restore_te == fee_bump_tx
         assert restore_te.transaction == fee_bump_tx.transaction
         assert restore_te.transaction == FeeBumpTransaction.from_xdr(
-            fee_bump_tx.transaction.to_xdr_object().to_xdr(),
+            fee_bump_tx.transaction.to_xdr_object().to_xdr_base64(),
             Network.TESTNET_NETWORK_PASSPHRASE,
         )
         assert (
@@ -350,7 +347,7 @@ class TestFeeBumpTransaction:
         base_fee = 150
         with pytest.raises(
             ValueError,
-            match="Invalid `base_fee`, it should be at least 200 stroops.",
+            match=r"Invalid `base_fee`, it should be at least 200 stroops.",
         ):
             TransactionBuilder.build_fee_bump_transaction(
                 fee_source.public_key,
@@ -383,7 +380,7 @@ class TestFeeBumpTransaction:
         base_fee = 60
         with pytest.raises(
             ValueError,
-            match="Invalid `base_fee`, it should be at least 100 stroops.",
+            match=r"Invalid `base_fee`, it should be at least 100 stroops.",
         ):
             TransactionBuilder.build_fee_bump_transaction(
                 fee_source.public_key,
@@ -393,7 +390,7 @@ class TestFeeBumpTransaction:
             )
 
     @pytest.mark.parametrize(
-        "xdr, is_fee_bump_te",
+        ("xdr", "is_fee_bump_te"),
         [
             (
                 "AAAAAMvXcdYjKhx0qxnsDsczxKuqa/65lZz6sjjHHczyh50JAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAAAAAAAvKHnQkAAABAM4dg0J1LEFBmbDESJ5d+60WCuZC8lnA80g45qyEgz2oRBSNw1mOfZETnL/BgrebkG/K03oI2Wqcs9lvDKrDGDE0sOBsAAAAglOgiOlGKwWqMsRCrGVLvFNosELJkZFw4yLPYK9KyAAA=",

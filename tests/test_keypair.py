@@ -3,8 +3,9 @@ import itertools
 
 import pytest
 import shamir_mnemonic  # type: ignore[import-untyped]
+from mnemonic import Mnemonic
 
-from stellar_sdk import Keypair, StrKey
+from stellar_sdk import Keypair
 from stellar_sdk.exceptions import (
     BadSignatureError,
     Ed25519PublicKeyInvalidError,
@@ -12,6 +13,7 @@ from stellar_sdk.exceptions import (
     MissingEd25519SecretSeedError,
 )
 from stellar_sdk.sep.mnemonic import Language, StellarMnemonic
+from stellar_sdk.strkey import Ed25519PrivateKey, Ed25519PublicKey
 
 SEP_5_CASES = (
     {
@@ -252,8 +254,8 @@ class TestKeypair:
         kp = Keypair.random()
         public_key = kp.public_key
         secret = kp.secret
-        assert StrKey.is_valid_ed25519_public_key(public_key)
-        assert StrKey.is_valid_ed25519_secret_seed(secret)
+        assert Ed25519PublicKey.is_valid(public_key)
+        assert Ed25519PrivateKey.is_valid(secret)
         assert kp.can_sign() is True
 
     def test_create_from_secret(self):
@@ -277,10 +279,12 @@ class TestKeypair:
     )
     def test_create_from_invalid_secret_raise(self, invalid_secret):
         with pytest.raises(
-            Ed25519SecretSeedInvalidError,
-            match="Invalid Ed25519 Secret Seed: {}".format(invalid_secret),
-        ):
+            Ed25519SecretSeedInvalidError, match=r"Invalid Ed25519 Secret Seed\."
+        ) as exc_info:
             Keypair.from_secret(invalid_secret)
+        # The input may be a real secret, so it must stay out of the message.
+        if invalid_secret:
+            assert invalid_secret not in str(exc_info.value)
 
     def test_create_from_public_key(self):
         public_key = "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
@@ -298,7 +302,8 @@ class TestKeypair:
         "invalid_public_key",
         [
             "",
-            "hello" "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DFBAD",
+            "hello",
+            "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DFBAD",
             "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5Z"
             "masterpassphrasemasterpassphrase",
             "gsYRSEQhTffqA9opPepAENCr2WG6z5iBHHubxxbRzWaHf8FBWcu",
@@ -307,7 +312,7 @@ class TestKeypair:
     def test_create_from_invalid_public_key_raise(self, invalid_public_key):
         with pytest.raises(
             Ed25519PublicKeyInvalidError,
-            match="Invalid Ed25519 Public Key: {}".format(invalid_public_key),
+            match=f"Invalid Ed25519 Public Key: {invalid_public_key}",
         ):
             Keypair.from_public_key(invalid_public_key)
 
@@ -328,7 +333,7 @@ class TestKeypair:
         )
         with pytest.raises(
             MissingEd25519SecretSeedError,
-            match="The keypair does not contain secret seed. Use Keypair.from_secret, "
+            match=r"The keypair does not contain secret seed. Use Keypair.from_secret, "
             "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed.",
         ):
             can_not_sign_kp.sign(data)
@@ -339,7 +344,7 @@ class TestKeypair:
         )
         with pytest.raises(
             MissingEd25519SecretSeedError,
-            match="The keypair does not contain secret seed. Use Keypair.from_secret, "
+            match=r"The keypair does not contain secret seed. Use Keypair.from_secret, "
             "Keypair.random or Keypair.from_mnemonic_phrase to create a new keypair with a secret seed.",
         ):
             can_not_sign_kp.raw_secret_key()
@@ -363,13 +368,13 @@ class TestKeypair:
         )
         data = b"Hello, Stellar!"
         signature = kp.sign(data)
-        with pytest.raises(BadSignatureError, match="Signature verification failed."):
+        with pytest.raises(BadSignatureError, match=r"Signature verification failed."):
             kp.verify(data, signature + b"failed")
-        with pytest.raises(BadSignatureError, match="Signature verification failed."):
+        with pytest.raises(BadSignatureError, match=r"Signature verification failed."):
             kp.verify(b"test_verify_failed", signature)
 
     @pytest.mark.parametrize(
-        "secret, hint",
+        ("secret", "hint"),
         [
             ("SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36", "0bfad134"),
             ("SAQVS3IPN6U3TBMTXQH32ZESY7SUOZGLEFBH6XWMA6DVNPJ4CLO5M54B", "4ab84399"),
@@ -380,7 +385,7 @@ class TestKeypair:
         assert Keypair.from_secret(secret).signature_hint().hex() == hint
 
     @pytest.mark.parametrize(
-        "public_key, hint",
+        ("public_key", "hint"),
         [
             ("GDFQVQCYYB7GKCGSCUSIQYXTPLV5YJ3XWDMWGQMDNM4EAXAL7LITIBQ7", "0bfad134"),
             ("GD4UGX3TOGNPUOFHT64JR65P6CYIEGDOJKY234UGCNMB2ASKXBBZTAM6", "4ab84399"),
@@ -402,18 +407,18 @@ class TestKeypair:
         kp = Keypair.from_secret(secret)
         with pytest.raises(
             AttributeError,
-            match="Please use `Keypair.from_secret` to generate a new Keypair object.",
+            match=r"Please use `Keypair.from_secret` to generate a new Keypair object.",
         ):
             kp.secret = "SAMWF63FZ5ZNHY75SNYNAFMWTL5FPBMIV7DLB3UDAVLL7DKPI5ZFS2S6"
 
         with pytest.raises(
             AttributeError,
-            match="Please use `Keypair.from_public_key` to generate a new Keypair object.",
+            match=r"Please use `Keypair.from_public_key` to generate a new Keypair object.",
         ):
             kp.public_key = "GAXDYNIBA5E4DXR5TJN522RRYESFQ5UNUXHIPTFGVLLD5O5K552DF5ZH"
 
     @pytest.mark.parametrize(
-        "kp1, kp2, equal",
+        ("kp1", "kp2", "equal"),
         [
             (
                 "SD7X7LEHBNMUIKQGKPARG5TDJNBHKC346OUARHGZL5ITC6IJPXHILY36",
@@ -453,7 +458,7 @@ class TestKeypair:
         assert kp4 != kp6
 
     @pytest.mark.parametrize(
-        "language, strength, length",
+        ("language", "strength", "length"),
         [
             (Language.CHINESE_SIMPLIFIED, 128, 12),
             ("english", 128, 12),
@@ -466,20 +471,20 @@ class TestKeypair:
         ],
     )
     def test_generate_mnemonic_phrase(self, language, strength, length):
-        # TODO: assert language type
         mnemonic_phrase = Keypair.generate_mnemonic_phrase(language, strength)
         assert len(mnemonic_phrase.split(" ")) == length
+        language_name = language.value if isinstance(language, Language) else language
+        assert Mnemonic(language_name).check(mnemonic_phrase)
 
     def test_generate_mnemonic_phrase_unsupported_language_raise(self):
-        with pytest.raises(ValueError, match="This language is not supported."):
+        with pytest.raises(ValueError, match=r"This language is not supported."):
             Keypair.generate_mnemonic_phrase("unsupported_language")
 
     def test_generate_mnemonic_phrase_invalid_strength_raise(self):
         strength = 1024
         with pytest.raises(
             ValueError,
-            match=r"Strength should be one of the following \(128, 160, 192, 224, 256\), but it is not \(%d\)."
-            % strength,
+            match=rf"Strength should be one of the following \(128, 160, 192, 224, 256\), but it is not \({strength}\).",
         ):
             Keypair.generate_mnemonic_phrase(strength=strength)
 
@@ -494,7 +499,7 @@ class TestKeypair:
                 assert data["accounts"][i] == (kp.public_key, kp.secret)
 
     @pytest.mark.parametrize(
-        "mnemonic, language",
+        ("mnemonic", "language"),
         [
             (
                 "usual canvas judge video wall ride rookie together enhance able evoke one",
@@ -517,7 +522,7 @@ class TestKeypair:
     def test_invalid_mnemonic_raise(self, mnemonic, language):
         with pytest.raises(
             ValueError,
-            match="Invalid mnemonic, please check if the mnemonic is correct, "
+            match=r"Invalid mnemonic, please check if the mnemonic is correct, "
             "or if the language is set correctly.",
         ):
             assert Keypair.from_mnemonic_phrase(
@@ -525,7 +530,7 @@ class TestKeypair:
             )
 
     @pytest.mark.parametrize(
-        "public_key, index",
+        ("public_key", "index"),
         [
             (
                 "GDZ4GYLVRLM2E6CGCOVYXAYMXJJAV3IHDXU6RUHX5AJVYS4AE6R6CHPJ",
@@ -558,27 +563,27 @@ class TestKeypair:
         ]
         _ = Keypair.from_shamir_mnemonic_phrases(shares[:-1])  # validate good run
 
-        with pytest.raises(ValueError, match="Wrong number of mnemonics"):
+        with pytest.raises(ValueError, match=r"Wrong number of mnemonics"):
             Keypair.from_shamir_mnemonic_phrases(shares)
 
-        with pytest.raises(ValueError, match="Wrong number of mnemonics"):
+        with pytest.raises(ValueError, match=r"Wrong number of mnemonics"):
             Keypair.from_shamir_mnemonic_phrases([shares[0]])
 
-        with pytest.raises(ValueError, match="mnemonic word"):
+        with pytest.raises(ValueError, match=r"mnemonic word"):
             Keypair.from_shamir_mnemonic_phrases([shares[0], shares[1] + "a"])
 
         # remove first word
         shares_1 = "buyer academic agency burden payroll alpha oven large amount smear forward pharmacy symbolic junk axle exercise segment frequent axle"
-        with pytest.raises(ValueError, match="mnemonic length"):
+        with pytest.raises(ValueError, match=r"mnemonic length"):
             Keypair.from_shamir_mnemonic_phrases([shares[0], shares_1])
 
         # another first word
         shares_1 = "acid buyer academic agency burden payroll alpha oven large amount smear forward pharmacy symbolic junk axle exercise segment frequent axle"
-        with pytest.raises(ValueError, match="mnemonic checksum"):
+        with pytest.raises(ValueError, match=r"mnemonic checksum"):
             Keypair.from_shamir_mnemonic_phrases([shares[0], shares_1])
 
     @pytest.mark.parametrize(
-        "member_threshold, member_count, strength, n_words, passphrase",
+        ("member_threshold", "member_count", "strength", "n_words", "passphrase"),
         [
             (1, 1, 128, 20, ""),
             (1, 1, 128, 20, "abcde"),
@@ -606,7 +611,7 @@ class TestKeypair:
             )
 
     @pytest.mark.parametrize(
-        "member_threshold, member_count, strength, err_msg",
+        ("member_threshold", "member_count", "strength", "err_msg"),
         [
             (0, 1, 128, "threshold must be a positive"),
             (1, 2, 128, "multiple member shares with member threshold 1"),
@@ -664,7 +669,7 @@ class TestKeypair:
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
         kp = Keypair.from_public_key(public_key)
         assert (
-            kp.xdr_public_key().to_xdr()
+            kp.xdr_public_key().to_xdr_base64()
             == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
         )
 
@@ -672,7 +677,7 @@ class TestKeypair:
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
         kp = Keypair.from_public_key(public_key)
         assert (
-            kp.xdr_account_id().to_xdr()
+            kp.xdr_account_id().to_xdr_base64()
             == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
         )
 
@@ -680,7 +685,7 @@ class TestKeypair:
         public_key = "GBRF6PKZYP4J4WI2A3NF4CGF23SL34GRKA5LTQZCQFEUT2YJDZO2COXH"
         kp = Keypair.from_public_key(public_key)
         assert (
-            kp.xdr_muxed_account().to_xdr()
+            kp.xdr_muxed_account().to_xdr_base64()
             == "AAAAAGJfPVnD+J5ZGgbaXgjF1uS98NFQOrnDIoFJSesJHl2h"
         )
 
@@ -694,7 +699,7 @@ class TestKeypair:
         assert sign_decorated.signature == kp.sign(data)
 
     @pytest.mark.parametrize(
-        "payload, hint",
+        ("payload", "hint"),
         [
             (b"cat!!!", [0x22, 0xDD, 0x24, 0xD6]),
             (b"cat!", [0x35, 0x9D, 0x71, 0xD6]),
@@ -711,14 +716,14 @@ class TestKeypair:
         assert sign_decorated.signature == kp.sign(payload)
 
     @pytest.mark.parametrize(
-        "message, expected_signature",
+        ("message", "expected_signature"),
         [
             (
                 "Hello, World!",
                 "fO5dbYhXUhBMhe6kId/cuVq/AfEnHRHEvsP8vXh03M1uLpi5e46yO2Q8rEBzu3feXQewcQE5GArp88u6ePK6BA==",
             ),
             (
-                "こんにちは、世界！",
+                "こんにちは、世界！",  # noqa: RUF001
                 "CDU265Xs8y3OWbB/56H9jPgUss5G9A0qFuTqH2zs2YDgTm+++dIfmAEceFqB7bhfN3am59lCtDXrCtwH2k1GBA==",
             ),
             (
@@ -750,5 +755,5 @@ class TestKeypair:
         )
         message = "Hello, World!"
 
-        with pytest.raises(BadSignatureError, match="Signature verification failed."):
+        with pytest.raises(BadSignatureError, match=r"Signature verification failed."):
             kp.verify_message(message, base64.b64decode(signature))

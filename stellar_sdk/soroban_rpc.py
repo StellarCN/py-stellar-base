@@ -1,10 +1,12 @@
 from collections.abc import Callable, Sequence
 from datetime import datetime
 from enum import Enum
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, Self, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from typing_extensions import Self
+
+from . import scval
+from . import xdr as stellar_xdr
 
 T = TypeVar("T")
 
@@ -64,11 +66,6 @@ class EventInfo(BaseModel):
     id: str = Field(alias="id")
     topic: list[str] = Field(alias="topic")
     value: str = Field(alias="value")
-    in_successful_contract_call: bool = Field(
-        alias="inSuccessfulContractCall",
-        deprecated=True,
-        description="This field is deprecated and will be removed in the future.",
-    )
     operation_index: int = Field(alias="operationIndex")
     transaction_index: int = Field(alias="transactionIndex")
     transaction_hash: str = Field(alias="txHash")
@@ -207,6 +204,7 @@ class SimulateTransactionRequest(BaseModel):
     transaction: str
     resource_config: ResourceConfig | None = Field(alias="resourceConfig", default=None)
     auth_mode: AuthMode | None = Field(alias="authMode", default=None)
+    use_upgraded_auth: bool = Field(alias="useUpgradedAuth", default=True)
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -388,6 +386,11 @@ class GetLatestLedgerResponse(BaseModel):
     id: str
     protocol_version: int = Field(alias="protocolVersion")
     sequence: int
+    close_time: int = Field(alias="closeTime")
+    # LedgerHeader XDR in base64
+    header_xdr: str = Field(alias="headerXdr")
+    # LedgerCloseMeta XDR in base64
+    metadata_xdr: str = Field(alias="metadataXdr")
 
 
 # get_fee_stats
@@ -527,6 +530,32 @@ class GetSACBalanceResponse(BaseModel):
     balance_entry: SACBalanceEntry | None = Field(
         description="The balance entry for the account. If there is not a valid balance entry, this will be None."
     )
+
+    @classmethod
+    def from_ledger_entry_result(
+        cls,
+        ledger_entry_result: LedgerEntryResult,
+        latest_ledger: int,
+    ) -> Self:
+        entry_data = stellar_xdr.LedgerEntryData.from_xdr_base64(
+            ledger_entry_result.xdr
+        )
+
+        if not isinstance(entry_data, stellar_xdr.LedgerEntryData.ContractData):
+            return cls(latest_ledger=latest_ledger, balance_entry=None)
+
+        contract_data = scval.to_native(entry_data.contract_data.val)
+        assert isinstance(contract_data, dict)
+        return cls(
+            latest_ledger=latest_ledger,
+            balance_entry=SACBalanceEntry(
+                amount=contract_data["amount"],
+                authorized=contract_data["authorized"],
+                clawback=contract_data["clawback"],
+                last_modified_ledger=ledger_entry_result.last_modified_ledger,
+                live_until_ledger=ledger_entry_result.live_until_ledger,
+            ),
+        )
 
 
 DEFAULT_POLLING_ATTEMPTS: int = 30

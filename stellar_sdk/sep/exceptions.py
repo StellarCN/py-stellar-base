@@ -33,6 +33,10 @@ class InvalidSep45ChallengeError(SdkError):
     """If the SEP 0045 validation fails, the exception will be thrown."""
 
 
+class InvalidWasmError(SdkError, ValueError):
+    """Raised when a contract Wasm file or section cannot be decoded."""
+
+
 class AccountRequiresMemoError(SdkError):
     """AccountRequiresMemoError is raised when a transaction is trying to submit an
     operation to an account which requires a memo.

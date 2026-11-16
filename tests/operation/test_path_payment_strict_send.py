@@ -2,14 +2,27 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import Operation, PathPaymentStrictSend
-
-from . import *
+from stellar_sdk import (
+    MuxedAccount,
+    Operation,
+    PathPaymentStrictSend,
+)
+from tests.operation.helpers import (
+    asset1,
+    asset2,
+    asset3,
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+    muxed2,
+    native_asset,
+)
 
 
 class TestPathPaymentStrictSend:
     @pytest.mark.parametrize(
-        "destination, send_amount, dest_min, path, source, xdr",
+        ("destination", "send_amount", "dest_min", "path", "source", "xdr"),
         [
             pytest.param(
                 kp2.public_key,
@@ -104,7 +117,7 @@ class TestPathPaymentStrictSend:
         assert op.path == path
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_send_amount_raise(self):

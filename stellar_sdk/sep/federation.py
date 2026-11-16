@@ -23,12 +23,16 @@ from .stellar_toml import fetch_stellar_toml, fetch_stellar_toml_async
 SEPARATOR = "*"
 FEDERATION_SERVER_KEY = "FEDERATION_SERVER"
 
+# Maximum allowed size for federation response (100 KB).
+# This limit helps prevent denial-of-service attacks via memory exhaustion.
+FEDERATION_RESPONSE_MAX_SIZE = 100 * 1024
+
 __all__ = [
     "FederationRecord",
-    "resolve_stellar_address",
-    "resolve_stellar_address_async",
     "resolve_account_id",
     "resolve_account_id_async",
+    "resolve_stellar_address",
+    "resolve_stellar_address_async",
 ]
 
 
@@ -95,14 +99,18 @@ def resolve_stellar_address(
     parts = _split_stellar_address(stellar_address)
     domain = parts["domain"]
     if federation_url is None:
-        federation_url = fetch_stellar_toml(domain, use_http=use_http).get(
-            FEDERATION_SERVER_KEY
-        )
+        federation_url = fetch_stellar_toml(
+            domain, client=client, use_http=use_http
+        ).get(FEDERATION_SERVER_KEY)
     if federation_url is None:
         raise FederationServerNotFoundError(
             f"Unable to find federation server at {domain}."
         )
-    raw_resp = client.get(federation_url, {"type": "name", "q": stellar_address})
+    raw_resp = client.get(
+        federation_url,
+        {"type": "name", "q": stellar_address},
+        max_content_size=FEDERATION_RESPONSE_MAX_SIZE,
+    )
     return _handle_raw_response(raw_resp, stellar_address=stellar_address)
 
 
@@ -134,7 +142,11 @@ async def resolve_stellar_address_async(
         raise FederationServerNotFoundError(
             f"Unable to find federation server at {domain}."
         )
-    raw_resp = await client.get(federation_url, {"type": "name", "q": stellar_address})
+    raw_resp = await client.get(
+        federation_url,
+        {"type": "name", "q": stellar_address},
+        max_content_size=FEDERATION_RESPONSE_MAX_SIZE,
+    )
     return _handle_raw_response(raw_resp, stellar_address=stellar_address)
 
 
@@ -169,7 +181,11 @@ def resolve_account_id(
                 f"Unable to find federation server at {domain}."
             )
     assert federation_url is not None
-    raw_resp = client.get(federation_url, {"type": "id", "q": account_id})
+    raw_resp = client.get(
+        federation_url,
+        {"type": "id", "q": account_id},
+        max_content_size=FEDERATION_RESPONSE_MAX_SIZE,
+    )
     return _handle_raw_response(raw_resp, account_id=account_id)
 
 
@@ -204,7 +220,11 @@ async def resolve_account_id_async(
                 f"Unable to find federation server at {domain}."
             )
     assert federation_url is not None
-    raw_resp = await client.get(federation_url, {"type": "id", "q": account_id})
+    raw_resp = await client.get(
+        federation_url,
+        {"type": "id", "q": account_id},
+        max_content_size=FEDERATION_RESPONSE_MAX_SIZE,
+    )
     return _handle_raw_response(raw_resp, account_id=account_id)
 
 

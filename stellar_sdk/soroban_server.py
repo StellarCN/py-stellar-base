@@ -2,45 +2,50 @@ from __future__ import annotations
 
 import json
 import time
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
 from . import scval
 from . import xdr as stellar_xdr
 from .account import Account
-from .address import Address
 from .asset import Asset
 from .base_soroban_server import (
     Durability,
     ResourceLeeway,
     _assemble_transaction,
+    _build_contract_data_key,
+    _build_contract_instance_key,
+    _build_sac_balance_ledger_key,
     _generate_unique_request_id,
+    _validate_contract_id,
+    _validate_wasm_hash,
 )
 from .client.requests_client import RequestsClient
 from .exceptions import (
     AccountNotFoundException,
+    ContractCodeNotFoundError,
+    ContractInstanceNotFoundError,
+    ContractWasmRetrievalError,
+    ExternalRefNotFoundError,
     PrepareTransactionException,
+    SACHasNoWasmError,
     SorobanRpcErrorResponse,
     raise_request_exception,
 )
 from .keypair import Keypair
+from .sep.contract_info import ContractInfo
+from .sep.contract_meta import ContractMeta
+from .sep.contract_spec import ContractSpec
 from .soroban_rpc import *
-from .strkey import StrKey
-from .xdr import (
-    ContractDataDurability,
-    LedgerEntryData,
-    LedgerEntryType,
-    LedgerKey,
-    LedgerKeyContractData,
-)
+from .utils import external_ref_owner_address
 
 if TYPE_CHECKING:
     from .client.base_sync_client import BaseSyncClient
     from .fee_bump_transaction_envelope import FeeBumpTransactionEnvelope
     from .transaction_envelope import TransactionEnvelope
 
-__all__ = ["SorobanServer", "Durability"]
+__all__ = ["Durability", "SorobanServer"]
 
 V = TypeVar("V", bound=BaseModel)
 
@@ -146,7 +151,7 @@ class SorobanServer:
         return self._post(request, GetLatestLedgerResponse)
 
     def get_ledger_entries(
-        self, keys: list[stellar_xdr.LedgerKey]
+        self, keys: list[stellar_xdr.LedgerKey.Any]
     ) -> GetLedgerEntriesResponse:
         """For reading the current value of ledger entries directly.
 
@@ -164,7 +169,7 @@ class SorobanServer:
         request = Request[GetLedgerEntriesRequest](
             id=_generate_unique_request_id(),
             method="getLedgerEntries",
-            params=GetLedgerEntriesRequest(keys=[key.to_xdr() for key in keys]),
+            params=GetLedgerEntriesRequest(keys=[key.to_xdr_base64() for key in keys]),
         )
         return self._post(request, GetLedgerEntriesResponse)
 
@@ -190,6 +195,7 @@ class SorobanServer:
         transaction_envelope: TransactionEnvelope,
         addl_resources: ResourceLeeway | None = None,
         auth_mode: AuthMode | None = None,
+        use_upgraded_auth: bool = True,
     ) -> SimulateTransactionResponse:
         """Submit a trial contract invocation to get back return values, expected ledger footprint, and expected costs.
 
@@ -202,6 +208,14 @@ class SorobanServer:
             Any provided footprint will be ignored.
         :param addl_resources: Additional resource include in the simulation.
         :param auth_mode: Explicitly allows users to opt-in to non-root authorization in recording mode.
+        :param use_upgraded_auth: Whether simulation records ``ADDRESS_V2`` ("upgraded") authorization
+            credentials (CAP-71) instead of the legacy ``ADDRESS`` credentials. Defaults to ``True``; pass
+            ``False`` to ask for the legacy format. This is best-effort: it only affects the recording auth
+            modes and is silently ignored by RPC servers (or protocol versions) whose host cannot emit
+            ``ADDRESS_V2``, so inspect the returned credential arm to confirm the response type. This flag is
+            transitional — once the RPC returns ``ADDRESS_V2`` credentials unconditionally it becomes a no-op,
+            so do not rely on passing ``False`` to keep receiving the legacy ``ADDRESS`` format. Requires
+            Stellar RPC v27.1.0 or later.
         :return: A :class:`SimulateTransactionResponse <stellar_sdk.soroban_rpc.SimulateTransactionResponse>` object
             contains the cost, footprint, result/auth requirements (if applicable), and error of the transaction.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
@@ -222,7 +236,10 @@ class SorobanServer:
             id=_generate_unique_request_id(),
             method="simulateTransaction",
             params=SimulateTransactionRequest(
-                transaction=xdr, resourceConfig=resource_config, authMode=auth_mode
+                transaction=xdr,
+                resourceConfig=resource_config,
+                authMode=auth_mode,
+                useUpgradedAuth=use_upgraded_auth,
             ),
         )
         return self._post(request, SimulateTransactionResponse)
@@ -367,23 +384,22 @@ class SorobanServer:
         :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
         account_id_xdr = Keypair.from_public_key(account_id).xdr_account_id()
-        key = stellar_xdr.LedgerKey(
-            stellar_xdr.LedgerEntryType.ACCOUNT,
-            account=stellar_xdr.LedgerKeyAccount(account_id=account_id_xdr),
+        key = stellar_xdr.LedgerKey.Account(
+            stellar_xdr.LedgerKeyAccount(account_id=account_id_xdr)
         )
 
         resp = self.get_ledger_entries([key])
         if not resp.entries:
             raise AccountNotFoundException(account_id)
         assert len(resp.entries) == 1
-        data = stellar_xdr.LedgerEntryData.from_xdr(resp.entries[0].xdr)
-        assert data.account is not None
-        return Account(account_id, data.account.seq_num.sequence_number.int64)
+        data = stellar_xdr.LedgerEntryData.from_xdr_base64(resp.entries[0].xdr)
+        assert isinstance(data, stellar_xdr.LedgerEntryData.Account)
+        return Account(account_id, int(data.account.seq_num))
 
     def get_contract_data(
         self,
         contract_id: str,
-        key: stellar_xdr.SCVal,
+        key: stellar_xdr.SCVal.Any,
         durability: Durability = Durability.PERSISTENT,
     ) -> LedgerEntryResult | None:
         """Reads the current value of contract data ledger entries directly.
@@ -394,28 +410,146 @@ class SorobanServer:
         :param durability: The "durability keyspace" that this ledger key belongs to, which is either
             :class:`Durability.TEMPORARY` or :class:`Durability.PERSISTENT`. Defaults to :class:`Durability.PERSISTENT`.
         :return: A :class:`LedgerEntryResult <stellar_sdk.soroban_rpc.LedgerEntryResult>` object contains the ledger entry result or ``None`` if not found.
+        :raises ValueError: If ``contract_id`` is not a contract address (``C...``), or if ``key``
+            contains a muxed address (``M...`` or ``W...``), which the host never stores.
         :raises: :exc:`SorobanRpcErrorResponse <stellar_sdk.exceptions.SorobanRpcErrorResponse>` - If the Soroban-RPC instance returns an error response.
         :raises: :exc:`BadResponseError <stellar_sdk.exceptions.BadResponseError>` - If a non-JSON error response is returned, possibly by a CDN or reverse proxy.
         """
-        sc_address = Address(contract_id).to_xdr_sc_address()
-        xdr_durability = (
-            stellar_xdr.ContractDataDurability.PERSISTENT
-            if durability == Durability.PERSISTENT
-            else stellar_xdr.ContractDataDurability.TEMPORARY
-        )
-        contract_key = stellar_xdr.LedgerKey(
-            stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-            contract_data=stellar_xdr.LedgerKeyContractData(
-                contract=sc_address,
-                key=key,
-                durability=xdr_durability,
-            ),
-        )
+        contract_key = _build_contract_data_key(contract_id, key, durability)
         resp = self.get_ledger_entries([contract_key])
         entries = resp.entries
         if not entries:
             return None
         return entries[0]
+
+    def get_external_ref_wasm_hash(
+        self, external_ref: stellar_xdr.ContractExecutableExternalRef
+    ) -> bytes:
+        """Resolve a `CAP-85 <https://stellar.org/protocol/cap-85>`_ external executable
+        reference to the Wasm hash it names.
+
+        A contract created from an external reference does not carry its own Wasm hash.
+        Instead the reference names an owner contract and a tag, and the owner holds a
+        *persistent* contract data entry keyed by that tag whose value is the 32-byte hash
+        of an existing Wasm. This performs exactly that lookup; the owner contract is not
+        invoked.
+
+        :param external_ref: The external executable reference, for example the
+            ``external_ref`` arm of a contract instance's executable.
+        :return: The 32-byte Wasm hash the reference resolves to.
+        :raises ValueError: If the owner of ``external_ref`` is not a contract, and so cannot
+            hold the tag entry that names the Wasm.
+        :raises: :exc:`ExternalRefNotFoundError <stellar_sdk.exceptions.ExternalRefNotFoundError>` - If the tag entry is not found or is archived.
+        :raises: :exc:`ContractWasmRetrievalError <stellar_sdk.exceptions.ContractWasmRetrievalError>` - If the tag entry does not hold a valid 32-byte Wasm hash.
+        """
+        owner = external_ref_owner_address(external_ref)
+        tag = external_ref.tag
+        # The tag is an unbounded SCString and may be binary, so it is reused as-is
+        # rather than decoded; a lenient decode would build the key of a different entry.
+        entry = self.get_contract_data(
+            owner.address,
+            scval.to_executable_tag(tag),
+            Durability.PERSISTENT,
+        )
+        if entry is None:
+            raise ExternalRefNotFoundError(owner.address, tag)
+        data = stellar_xdr.LedgerEntryData.from_xdr_base64(entry.xdr)
+        if not isinstance(data, stellar_xdr.LedgerEntryData.ContractData):
+            raise ContractWasmRetrievalError(
+                f"Ledger entry response did not contain contract data: {owner.address}."
+            )
+        val = data.contract_data.val
+        if (
+            not isinstance(val, stellar_xdr.SCVal.Bytes)
+            or len(val.bytes) != 32
+            or val.bytes == b"\x00" * 32
+        ):
+            raise ContractWasmRetrievalError(
+                f"External executable tag entry on {owner.address} does not hold a valid 32-byte Wasm hash."
+            )
+        return bytes(val.bytes)
+
+    def get_contract_wasm(self, contract_id: str) -> bytes:
+        """Fetch a contract's Wasm code.
+
+        :param contract_id: The contract ID encoded as a Stellar contract address.
+        :return: The raw Wasm code.
+        :raises: :exc:`ContractInstanceNotFoundError <stellar_sdk.exceptions.ContractInstanceNotFoundError>` - If the contract instance ledger entry is not found.
+        :raises: :exc:`SACHasNoWasmError <stellar_sdk.exceptions.SACHasNoWasmError>` - If the contract is a Stellar Asset Contract.
+        :raises: :exc:`ExternalRefNotFoundError <stellar_sdk.exceptions.ExternalRefNotFoundError>` - If the contract follows a CAP-85 external executable reference whose tag entry is not found or archived.
+        :raises: :exc:`ContractCodeNotFoundError <stellar_sdk.exceptions.ContractCodeNotFoundError>` - If the contract code ledger entry is not found or archived.
+        :raises ValueError: If ``contract_id`` is not a contract address (``C...``), or if the ledger entry is structurally unusable, such as a CAP-85 external executable reference whose owner is not a contract.
+        :raises: :exc:`ContractWasmRetrievalError <stellar_sdk.exceptions.ContractWasmRetrievalError>` - If the executable kind is not supported.
+        """
+        instance = self._get_contract_instance(contract_id)
+        match instance.executable:
+            case stellar_xdr.ContractExecutable.Wasm(wasm_hash):
+                return self.get_contract_wasm_by_hash(wasm_hash)
+            case stellar_xdr.ContractExecutable.StellarAsset():
+                raise SACHasNoWasmError(
+                    f"Contract {contract_id} is a Stellar Asset Contract and has no Wasm code."
+                )
+            case stellar_xdr.ContractExecutable.ExternalRef(external_ref):
+                # A CAP-85 reference names its code indirectly; resolve the tag entry on
+                # the owner contract to get the hash it currently points at.
+                return self.get_contract_wasm_by_hash(
+                    self.get_external_ref_wasm_hash(external_ref)
+                )
+            case executable:
+                raise ContractWasmRetrievalError(
+                    f"Contract {contract_id} uses unsupported executable kind: {executable.type!r}."
+                )
+
+    def get_contract_wasm_by_hash(self, wasm_hash: bytes) -> bytes:
+        """Fetch raw contract Wasm code by its 32-byte hash.
+
+        :param wasm_hash: The 32-byte Wasm hash.
+        :return: The raw Wasm code.
+        :raises ValueError: If ``wasm_hash`` is not 32 bytes or is all zero bytes.
+        :raises TypeError: If ``wasm_hash`` is not bytes.
+        :raises: :exc:`ContractCodeNotFoundError <stellar_sdk.exceptions.ContractCodeNotFoundError>` - If the contract code ledger entry is not found or archived.
+        :raises: :exc:`ContractWasmRetrievalError <stellar_sdk.exceptions.ContractWasmRetrievalError>` - If the ledger entry response does not contain contract code.
+        """
+        _validate_wasm_hash(wasm_hash)
+        key = stellar_xdr.LedgerKey.ContractCode(
+            stellar_xdr.LedgerKeyContractCode(hash=wasm_hash)
+        )
+        resp = self.get_ledger_entries([key])
+        if not resp.entries:
+            raise ContractCodeNotFoundError(
+                "Contract code ledger entry was not found or is archived. "
+                "Restoring the contract code footprint may be required."
+            )
+        data = stellar_xdr.LedgerEntryData.from_xdr_base64(resp.entries[0].xdr)
+        if not isinstance(data, stellar_xdr.LedgerEntryData.ContractCode):
+            raise ContractWasmRetrievalError(
+                "Ledger entry response did not contain contract code."
+            )
+        return data.contract_code.code
+
+    def get_contract_meta(self, contract_id: str) -> ContractMeta:
+        """Fetch and parse a contract's SEP-46 metadata.
+
+        :param contract_id: The contract ID encoded as a Stellar contract address.
+        :return: The contract metadata.
+        """
+        return ContractMeta.from_wasm(self.get_contract_wasm(contract_id))
+
+    def get_contract_spec(self, contract_id: str) -> ContractSpec:
+        """Fetch and parse a contract's SEP-48 interface specification.
+
+        :param contract_id: The contract ID encoded as a Stellar contract address.
+        :return: The contract interface specification.
+        """
+        return ContractSpec.from_wasm(self.get_contract_wasm(contract_id))
+
+    def get_contract_info(self, contract_id: str) -> ContractInfo:
+        """Fetch and parse a contract's metadata, spec, and environment metadata.
+
+        :param contract_id: The contract ID encoded as a Stellar contract address.
+        :return: The contract metadata, interface specification, and environment metadata.
+        """
+        return ContractInfo.from_wasm(self.get_contract_wasm(contract_id))
 
     def get_version_info(self) -> GetVersionInfoResponse:
         """Version information about the RPC and Captive core.
@@ -447,54 +581,26 @@ class SorobanServer:
         :return: A :class:`GetSACBalanceResponse <stellar_sdk.soroban_rpc.GetSACBalanceResponse>` which will contain the balance entry details if and only if the request returned a valid balance ledger
             entry. If it doesn't, the `balance_entry` field will not exist.
         """
-        if not StrKey.is_valid_contract(contract_id):
-            raise ValueError(f"Invalid contract ID: {contract_id}")
+        _validate_contract_id(contract_id)
 
         if network_passphrase is None:
             network_passphrase = self.get_network().passphrase
 
-        sac_id = sac.contract_id(network_passphrase)
-        key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(sac_id)])
-        ledger_key = LedgerKey(
-            LedgerEntryType.CONTRACT_DATA,
-            contract_data=LedgerKeyContractData(
-                contract=Address(sac_id).to_xdr_sc_address(),
-                key=key,
-                durability=ContractDataDurability.PERSISTENT,
-            ),
-        )
+        ledger_key = _build_sac_balance_ledger_key(sac, contract_id, network_passphrase)
         response = self.get_ledger_entries([ledger_key])
-        if not response.entries:
+        if not response.entries or len(response.entries) != 1:
             return GetSACBalanceResponse(
                 latest_ledger=response.latest_ledger, balance_entry=None
             )
-
-        raw_entry = response.entries[0]
-        entry_data = LedgerEntryData.from_xdr(raw_entry.xdr)
-
-        if entry_data.type != LedgerEntryType.CONTRACT_DATA:
-            return GetSACBalanceResponse(
-                latest_ledger=response.latest_ledger, balance_entry=None
-            )
-
-        assert entry_data.contract_data is not None
-        contract_data = scval.to_native(entry_data.contract_data.val)
-        assert isinstance(contract_data, dict)
-        return GetSACBalanceResponse(
-            latest_ledger=response.latest_ledger,
-            balance_entry=SACBalanceEntry(
-                amount=contract_data["amount"],
-                authorized=contract_data["authorized"],
-                clawback=contract_data["clawback"],
-                last_modified_ledger=raw_entry.last_modified_ledger,
-                live_until_ledger=raw_entry.live_until_ledger,
-            ),
+        return GetSACBalanceResponse.from_ledger_entry_result(
+            response.entries[0], response.latest_ledger
         )
 
     def prepare_transaction(
         self,
         transaction_envelope: TransactionEnvelope,
         simulate_transaction_response: SimulateTransactionResponse | None = None,
+        use_upgraded_auth: bool = True,
     ) -> TransactionEnvelope:
         """Submit a trial contract invocation, first run a simulation of the contract
         invocation as defined on the incoming transaction, and apply the results to
@@ -523,6 +629,10 @@ class SorobanServer:
             as normal.
         :param simulate_transaction_response: The response of the simulation of the transaction,
             typically you don't need to pass this parameter, it will be automatically called if you don't pass it.
+        :param use_upgraded_auth: Whether the underlying simulation records ``ADDRESS_V2``
+            ("upgraded") authorization credentials (CAP-71) instead of the legacy ``ADDRESS``
+            credentials. Defaults to ``True``; pass ``False`` to ask for the legacy format.
+            See :meth:`simulate_transaction` for the full caveats.
         :return: A copy of the :class:`TransactionEnvelope <stellar_sdk.transaction_envelope.TransactionEnvelope>`,
             with the expected authorizations (in the case of invocation) and ledger footprint added.
             The transaction fee will also automatically be padded with the contract's minimum resource fees
@@ -530,7 +640,7 @@ class SorobanServer:
         """
         if not simulate_transaction_response:
             simulate_transaction_response = self.simulate_transaction(
-                transaction_envelope
+                transaction_envelope, use_upgraded_auth=use_upgraded_auth
             )
         if simulate_transaction_response.error:
             raise PrepareTransactionException(
@@ -544,7 +654,7 @@ class SorobanServer:
         """Close underlying connector, and release all acquired resources."""
         self._client.close()
 
-    def _post(self, request_body: Request, response_body_type: Type[V]) -> V:
+    def _post(self, request_body: Request, response_body_type: type[V]) -> V:
         json_data = request_body.model_dump_json(by_alias=True)
         data = self._client.post(
             self.server_url,
@@ -566,7 +676,7 @@ class SorobanServer:
         assert raw_response.result is not None
         return response_body_type.model_validate(raw_response.result)
 
-    def __enter__(self) -> "SorobanServer":
+    def __enter__(self) -> SorobanServer:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -574,3 +684,24 @@ class SorobanServer:
 
     def __repr__(self):
         return f"<SorobanServer [server_url={self.server_url}, client={self._client}]>"
+
+    def _get_contract_instance(
+        self, contract_id: str
+    ) -> stellar_xdr.SCContractInstance:
+        key = _build_contract_instance_key(contract_id)
+        resp = self.get_ledger_entries([key])
+        if not resp.entries:
+            raise ContractInstanceNotFoundError(
+                f"Contract instance ledger entry was not found: {contract_id}."
+            )
+        data = stellar_xdr.LedgerEntryData.from_xdr_base64(resp.entries[0].xdr)
+        if not isinstance(data, stellar_xdr.LedgerEntryData.ContractData):
+            raise ContractWasmRetrievalError(
+                f"Ledger entry response did not contain contract data: {contract_id}."
+            )
+        val = data.contract_data.val
+        if not isinstance(val, stellar_xdr.SCVal.ContractInstance):
+            raise ContractWasmRetrievalError(
+                f"Contract data entry did not contain a contract instance: {contract_id}."
+            )
+        return val.instance

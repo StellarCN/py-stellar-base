@@ -12,27 +12,36 @@ import base64
 import os
 from collections.abc import Iterable
 
-from .. import StrKey, scval
+from .. import scval
 from .. import xdr as stellar_xdr
 from ..account import Account
 from ..address import Address
-from ..auth import authorize_entry
+from ..auth import _get_address_credentials, authorize_entry
 from ..keypair import Keypair
 from ..soroban_rpc import SimulateTransactionResponse
 from ..soroban_server import SorobanServer
 from ..soroban_server_async import SorobanServerAsync
+from ..strkey import Contract
 from ..transaction_builder import TransactionBuilder
 from ..transaction_envelope import TransactionEnvelope
 from .exceptions import InvalidSep45ChallengeError
 
 __all__ = [
+    "ChallengeAuthorizationEntries",
     "build_challenge_authorization_entries",
     "build_challenge_authorization_entries_async",
     "read_challenge_authorization_entries",
     "verify_challenge_authorization_entries",
     "verify_challenge_authorization_entries_async",
-    "ChallengeAuthorizationEntries",
 ]
+
+# Credential types accepted in SEP-45 challenge entries. Delegated credentials
+# (SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES) are rejected until the ecosystem
+# defines how they interact with SEP-45.
+_ALLOWED_CREDENTIAL_TYPES = (
+    stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+    stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+)
 
 # A null account used for simulation purposes
 NULL_ACCOUNT = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF"
@@ -84,7 +93,7 @@ class ChallengeAuthorizationEntries:
     def __hash__(self):
         return hash(
             (
-                self.authorization_entries.to_xdr(),
+                self.authorization_entries,
                 self.client_account_id,
                 self.matched_home_domain,
                 self.nonce,
@@ -114,7 +123,7 @@ class ChallengeAuthorizationEntries:
     def __repr__(self):
         return (
             f"<ChallengeAuthorizationEntries ["
-            f"authorization_entries={self.authorization_entries.to_xdr()}, "
+            f"authorization_entries={self.authorization_entries.to_xdr_base64()}, "
             f"client_account_id={self.client_account_id}, "
             f"matched_home_domain={self.matched_home_domain}, "
             f"nonce={self.nonce}, "
@@ -151,9 +160,9 @@ def read_challenge_authorization_entries(
     :return: A ChallengeAuthorizationEntries object containing the parsed data.
     """
     try:
-        entries = stellar_xdr.SorobanAuthorizationEntries.from_xdr(
+        entries = stellar_xdr.SorobanAuthorizationEntries.from_xdr_base64(
             challenge_authorization_entries
-        ).soroban_authorization_entries
+        )
     except Exception as e:
         raise InvalidSep45ChallengeError(
             "Invalid challenge_authorization_entries XDR format."
@@ -178,16 +187,12 @@ def read_challenge_authorization_entries(
             "Authorization entry must not have sub-invocations."
         )
 
-    if (
-        first_root_invocation.function.type
-        != stellar_xdr.SorobanAuthorizedFunctionType.SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN
-    ):
+    function = first_root_invocation.function
+    if not isinstance(function, stellar_xdr.SorobanAuthorizedFunction.ContractFn):
         raise InvalidSep45ChallengeError(
             "Authorization entry must invoke a contract function."
         )
-
-    assert first_root_invocation.function.contract_fn is not None
-    contract_fn = first_root_invocation.function.contract_fn
+    contract_fn = function.contract_fn
 
     contract_address = Address.from_xdr_sc_address(contract_fn.contract_address).address
     if contract_address != web_auth_contract:
@@ -195,7 +200,7 @@ def read_challenge_authorization_entries(
             f"Contract address does not match. Expected {web_auth_contract}, got {contract_address}."
         )
 
-    function_name = contract_fn.function_name.sc_symbol.decode("utf-8")
+    function_name = contract_fn.function_name.decode("utf-8")
     if function_name != WEB_AUTH_VERIFY_FUNCTION_NAME:
         raise InvalidSep45ChallengeError(
             f"Function name does not match. Expected {WEB_AUTH_VERIFY_FUNCTION_NAME}, got {function_name}."
@@ -273,18 +278,14 @@ def read_challenge_authorization_entries(
     client_domain_entry_found = False
 
     for entry in entries:
-        if (
-            entry.credentials.type
-            != stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
-        ):
+        if entry.credentials.type not in _ALLOWED_CREDENTIAL_TYPES:
             raise InvalidSep45ChallengeError(
                 f"Unsupported SorobanCredentialsType: {entry.credentials.type}."
             )
 
-        assert entry.credentials.address is not None
-        entry_address = Address.from_xdr_sc_address(
-            entry.credentials.address.address
-        ).address
+        addr_auth = _get_address_credentials(entry.credentials)
+        assert addr_auth is not None
+        entry_address = Address.from_xdr_sc_address(addr_auth.address).address
 
         if entry_address == server_account_id:
             server_entry_found = True
@@ -338,6 +339,7 @@ def build_challenge_authorization_entries(
     client_domain: str | None = None,
     client_domain_account: str | None = None,
     simulate_tx_account: str = NULL_ACCOUNT,
+    use_upgraded_auth: bool = True,
 ) -> str:
     """Returns a valid `SEP-0045 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0045.md>`_
     challenge which you can use for Stellar Soroban Web Authentication.
@@ -356,6 +358,12 @@ def build_challenge_authorization_entries(
     :param client_domain: The domain of the client application requesting authentication.
     :param client_domain_account: The Stellar account listed as the SIGNING_KEY on the client domain's TOML file.
     :param simulate_tx_account: The account to use for simulating the transaction (default is NULL_ACCOUNT).
+    :param use_upgraded_auth: Whether the challenge carries address-bound ``ADDRESS_V2`` (CAP-71)
+        credentials instead of the legacy ``ADDRESS`` credentials. Defaults to ``True``. Unlike the
+        other simulating APIs, the entries are signed by a remote client rather than by the caller,
+        and SEP-45 does not specify a credential format: pass ``False`` to keep issuing legacy
+        challenges to clients whose SDK cannot sign the address-bound payload. Transitional; once
+        the network returns ``ADDRESS_V2`` credentials by default (protocol 28) it becomes a no-op.
     :return: A base64 encoded XDR string of SorobanAuthorizationEntries.
     :raises ValueError: If client_domain is provided without client_domain_account, or if simulation fails.
     """
@@ -371,7 +379,10 @@ def build_challenge_authorization_entries(
         client_domain_account,
         simulate_tx_account,
     )
-    resp = soroban_server.simulate_transaction(tx)
+    # Simulation records the auth entries the challenge is made of, so this flag decides
+    # which credential arm the remote client is asked to sign. Parsing accepts both arms,
+    # see _ALLOWED_CREDENTIAL_TYPES.
+    resp = soroban_server.simulate_transaction(tx, use_upgraded_auth=use_upgraded_auth)
     return _process_build_challenge_response(
         resp, server_kp, expire_in_ledgers, network_passphrase
     )
@@ -390,6 +401,7 @@ async def build_challenge_authorization_entries_async(
     client_domain: str | None = None,
     client_domain_account: str | None = None,
     simulate_tx_account: str = NULL_ACCOUNT,
+    use_upgraded_auth: bool = True,
 ) -> str:
     """Returns a valid `SEP-0045 <https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0045.md>`_
     challenge which you can use for Stellar Soroban Web Authentication.
@@ -410,6 +422,12 @@ async def build_challenge_authorization_entries_async(
     :param client_domain: The domain of the client application requesting authentication.
     :param client_domain_account: The Stellar account listed as the SIGNING_KEY on the client domain's TOML file.
     :param simulate_tx_account: The account to use for simulating the transaction (default is NULL_ACCOUNT).
+    :param use_upgraded_auth: Whether the challenge carries address-bound ``ADDRESS_V2`` (CAP-71)
+        credentials instead of the legacy ``ADDRESS`` credentials. Defaults to ``True``. Unlike the
+        other simulating APIs, the entries are signed by a remote client rather than by the caller,
+        and SEP-45 does not specify a credential format: pass ``False`` to keep issuing legacy
+        challenges to clients whose SDK cannot sign the address-bound payload. Transitional; once
+        the network returns ``ADDRESS_V2`` credentials by default (protocol 28) it becomes a no-op.
     :return: A base64 encoded XDR string of SorobanAuthorizationEntries.
     :raises ValueError: If client_domain is provided without client_domain_account, or if simulation fails.
     """
@@ -425,7 +443,12 @@ async def build_challenge_authorization_entries_async(
         client_domain_account,
         simulate_tx_account,
     )
-    resp = await soroban_server.simulate_transaction(tx)
+    # Simulation records the auth entries the challenge is made of, so this flag decides
+    # which credential arm the remote client is asked to sign. Parsing accepts both arms,
+    # see _ALLOWED_CREDENTIAL_TYPES.
+    resp = await soroban_server.simulate_transaction(
+        tx, use_upgraded_auth=use_upgraded_auth
+    )
     return _process_build_challenge_response(
         resp, server_kp, expire_in_ledgers, network_passphrase
     )
@@ -472,6 +495,9 @@ def verify_challenge_authorization_entries(
     tx = _build_verify_tx(
         parsed_challenge, web_auth_contract, network_passphrase, simulate_tx_account
     )
+    # No use_upgraded_auth choice is needed here: the transaction already carries the
+    # client's signed auth entries, so RPC simulates in enforce mode, where the flag has no
+    # effect. Both credential arms verify the same way.
     resp = soroban_server.simulate_transaction(tx)
     _check_verify_response(resp)
     return parsed_challenge
@@ -520,6 +546,9 @@ async def verify_challenge_authorization_entries_async(
     tx = _build_verify_tx(
         parsed_challenge, web_auth_contract, network_passphrase, simulate_tx_account
     )
+    # No use_upgraded_auth choice is needed here: the transaction already carries the
+    # client's signed auth entries, so RPC simulates in enforce mode, where the flag has no
+    # effect. Both credential arms verify the same way.
     resp = await soroban_server.simulate_transaction(tx)
     _check_verify_response(resp)
     return parsed_challenge
@@ -541,7 +570,7 @@ def _build_challenge_tx(
 
     Returns a tuple of (transaction, server_keypair, nonce).
     """
-    if not StrKey.is_valid_contract(client_account_id):
+    if not Contract.is_valid(client_account_id):
         raise ValueError("client_account_id must be a contract account.")
 
     if nonce is None:
@@ -550,7 +579,7 @@ def _build_challenge_tx(
     server_kp = Keypair.from_secret(server_secret)
     web_auth_domain_account = server_kp.public_key
 
-    args: dict[str, stellar_xdr.SCVal] = {
+    args: dict[str, stellar_xdr.SCVal.Any] = {
         "account": scval.to_string(client_account_id),
         "home_domain": scval.to_string(home_domain),
         "nonce": scval.to_string(nonce),
@@ -602,18 +631,14 @@ def _process_build_challenge_response(
 
     authorization_entries = []
     for raw_entry in raw_entries:
-        entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr(raw_entry)
-        if (
-            entry.credentials.type
-            != stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
-        ):
+        entry = stellar_xdr.SorobanAuthorizationEntry.from_xdr_base64(raw_entry)
+        if entry.credentials.type not in _ALLOWED_CREDENTIAL_TYPES:
             raise ValueError(
                 f"Unsupported SorobanCredentialsType: {entry.credentials.type}."
             )
-        assert entry.credentials.address is not None
-        entry_address = Address.from_xdr_sc_address(
-            entry.credentials.address.address
-        ).address
+        addr_auth = _get_address_credentials(entry.credentials)
+        assert addr_auth is not None
+        entry_address = Address.from_xdr_sc_address(addr_auth.address).address
         if entry_address == web_auth_domain_account:
             # Sign with server
             entry = authorize_entry(
@@ -624,7 +649,9 @@ def _process_build_challenge_response(
             )
         authorization_entries.append(entry)
 
-    return stellar_xdr.SorobanAuthorizationEntries(authorization_entries).to_xdr()
+    return stellar_xdr.SorobanAuthorizationEntries(
+        authorization_entries
+    ).to_xdr_base64()
 
 
 def _build_verify_tx(
@@ -634,7 +661,7 @@ def _build_verify_tx(
     simulate_tx_account: str,
 ) -> TransactionEnvelope:
     """Build the verification transaction for simulation."""
-    args: dict[str, stellar_xdr.SCVal] = {
+    args: dict[str, stellar_xdr.SCVal.Any] = {
         "account": scval.to_string(parsed_challenge.client_account_id),
         "home_domain": scval.to_string(parsed_challenge.matched_home_domain),
         "nonce": scval.to_string(parsed_challenge.nonce),
@@ -656,7 +683,7 @@ def _build_verify_tx(
             contract_id=web_auth_contract,
             function_name=WEB_AUTH_VERIFY_FUNCTION_NAME,
             parameters=[scval.to_struct(args)],
-            auth=parsed_challenge.authorization_entries.soroban_authorization_entries,
+            auth=parsed_challenge.authorization_entries,
         )
         .build()
     )

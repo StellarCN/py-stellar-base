@@ -14,7 +14,11 @@ from urllib3.util import Retry
 from ..__version__ import __version__
 from ..client.base_sync_client import BaseSyncClient
 from ..client.response import Response
-from ..exceptions import ConnectionError, StreamClientError
+from ..exceptions import (
+    ConnectionError,
+    ContentSizeLimitExceededError,
+    StreamClientError,
+)
 from . import defines
 
 DEFAULT_NUM_RETRIES = 3
@@ -62,7 +66,7 @@ class RequestsClient(BaseSyncClient):
         self.backoff_factor: float = backoff_factor
 
         # adding 504 to the tuple of statuses to retry
-        self.status_forcelist = tuple(Retry.RETRY_AFTER_STATUS_CODES) + (504,)
+        self.status_forcelist = (*Retry.RETRY_AFTER_STATUS_CODES, 504)
 
         # configure standard session
 
@@ -99,24 +103,61 @@ class RequestsClient(BaseSyncClient):
         self._session: Session = session
         self._stream_session: Session | None = stream_session
 
-    def get(self, url: str, params: dict[str, str] | None = None) -> Response:
+    def get(
+        self,
+        url: str,
+        params: dict[str, str] | None = None,
+        max_content_size: int | None = None,
+    ) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
         :param params: the request params
+        :param max_content_size: the maximum allowed response content size in bytes.
+            If the response exceeds this limit, a :exc:`ContentSizeLimitExceededError` is raised.
+            If None, no limit is applied.
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+        :raise: :exc:`ContentSizeLimitExceededError <stellar_sdk.exceptions.ContentSizeLimitExceededError>`
         """
         try:
-            resp = self._session.get(url, params=params, timeout=self.request_timeout)
+            resp = self._session.get(
+                url,
+                params=params,
+                timeout=self.request_timeout,
+                stream=max_content_size is not None,
+            )
+            if max_content_size is not None:
+                text = self._read_with_limit(resp, max_content_size)
+            else:
+                text = resp.text
         except (RequestException, NewConnectionError) as err:
-            raise ConnectionError(err)
+            raise ConnectionError(err) from err
+
         return Response(
             status_code=resp.status_code,
-            text=resp.text,
+            text=text,
             headers=dict(resp.headers),
             url=resp.url,
         )
+
+    def _read_with_limit(self, resp: requests.Response, max_content_size: int) -> str:
+        """Read response content with size limit using streaming."""
+        chunks = []
+        total_size = 0
+        try:
+            for chunk in resp.iter_content(chunk_size=8192, decode_unicode=False):
+                total_size += len(chunk)
+                if total_size > max_content_size:
+                    raise ContentSizeLimitExceededError(
+                        limit=max_content_size, content_size=total_size
+                    )
+                chunks.append(chunk)
+        finally:
+            resp.close()
+        content = b"".join(chunks)
+        encoding = resp.encoding or "utf-8"
+        return content.decode(encoding)
 
     def post(
         self,
@@ -137,7 +178,7 @@ class RequestsClient(BaseSyncClient):
                 url, data=data, json=json_data, timeout=self.post_timeout
             )
         except (RequestException, NewConnectionError) as err:
-            raise ConnectionError(err)
+            raise ConnectionError(err) from err
         return Response(
             status_code=resp.status_code,
             text=resp.text,
@@ -159,7 +200,7 @@ class RequestsClient(BaseSyncClient):
         :return: a Generator for server response
         :raise: :exc:`StreamClientError <stellar_sdk.exceptions.StreamClientError>`
         """
-        query_params = params.copy() if params else dict()
+        query_params = params.copy() if params else {}
 
         query_params |= IDENTIFICATION_HEADERS
         retry = 0.1
@@ -191,7 +232,7 @@ class RequestsClient(BaseSyncClient):
                                 yield json.loads(data)
                         except json.JSONDecodeError:
                             # Content was not json-decodable
-                            pass  # pragma: no cover
+                            pass
             except requests.Timeout:
                 logger.warning(
                     f"We have encountered an timeout error and we will try to reconnect, cursor = {query_params.get('cursor')}"

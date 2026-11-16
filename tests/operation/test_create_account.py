@@ -2,14 +2,21 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import CreateAccount, Operation
-
-from . import *
+from stellar_sdk import (
+    CreateAccount,
+    Operation,
+)
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+)
 
 
 class TestCreateAccount:
     @pytest.mark.parametrize(
-        "starting_balance, source, xdr",
+        ("starting_balance", "source", "xdr"),
         [
             pytest.param(
                 "100",
@@ -49,7 +56,7 @@ class TestCreateAccount:
         assert op.starting_balance == str(starting_balance)
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_destination_raise(self):

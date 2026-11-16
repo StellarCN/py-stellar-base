@@ -40,7 +40,7 @@ class StellarMnemonic(Mnemonic):
         if isinstance(language, Language):
             language = language.value
         else:
-            if language not in set(item.value for item in Language):
+            if language not in {item.value for item in Language}:
                 raise ValueError("This language is not supported.")
 
         super().__init__(language)

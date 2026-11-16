@@ -14,13 +14,22 @@ class BaseSyncClient(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def get(self, url: str, params: dict[str, str] | None = None) -> Response:
+    def get(
+        self,
+        url: str,
+        params: dict[str, str] | None = None,
+        max_content_size: int | None = None,
+    ) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
         :param params: the request params
+        :param max_content_size: the maximum allowed response content size in bytes.
+            If the response exceeds this limit, a :exc:`ContentSizeLimitExceededError` is raised.
+            If None, no limit is applied.
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+        :raise: :exc:`ContentSizeLimitExceededError <stellar_sdk.exceptions.ContentSizeLimitExceededError>`
         """
 
     @abstractmethod

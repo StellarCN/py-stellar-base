@@ -1,13 +1,21 @@
 import pytest
 
-from stellar_sdk import AllowTrust, Operation, TrustLineEntryFlag
-
-from . import *
+from stellar_sdk import (
+    AllowTrust,
+    Operation,
+    TrustLineEntryFlag,
+)
+from tests.operation.helpers import (
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+)
 
 
 class TestAllowTrust:
     @pytest.mark.parametrize(
-        "asset_code, authorize, source, xdr",
+        ("asset_code", "authorize", "source", "xdr"),
         [
             pytest.param(
                 "USD",
@@ -92,7 +100,7 @@ class TestAllowTrust:
         op = AllowTrust(kp2.public_key, asset_code, authorize, source)
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
         assert op.asset_code == asset_code
         if isinstance(authorize, bool):

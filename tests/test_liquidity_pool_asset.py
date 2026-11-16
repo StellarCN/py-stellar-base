@@ -1,7 +1,12 @@
 import pytest
 
 from stellar_sdk import LIQUIDITY_POOL_FEE_V18, Asset, LiquidityPoolAsset
-from stellar_sdk.xdr import AssetType, ChangeTrustAsset, LiquidityPoolType
+from stellar_sdk.xdr import (
+    AssetType,
+    ChangeTrustAsset,
+    LiquidityPoolConstantProductParameters,
+    LiquidityPoolParameters,
+)
 
 
 class TestLiquidityPoolAsset:
@@ -17,7 +22,7 @@ class TestLiquidityPoolAsset:
         assert asset.type == "liquidity_pool_shares"
 
     @pytest.mark.parametrize(
-        "asset_a, asset_b, fee, msg",
+        ("asset_a", "asset_b", "fee", "msg"),
         [
             (asset_b, asset_a, fee, "Assets are not in lexicographic order."),
             (asset_a, asset_b, fee + 10, "`fee` is invalid."),
@@ -30,26 +35,19 @@ class TestLiquidityPoolAsset:
     def test_to_change_trust_asset_xdr_object(self):
         asset = LiquidityPoolAsset(self.asset_a, self.asset_b, fee=self.fee)
         xdr_object = asset.to_change_trust_asset_xdr_object()
-        assert isinstance(xdr_object, ChangeTrustAsset)
         assert xdr_object.type == AssetType.ASSET_TYPE_POOL_SHARE
-        assert xdr_object.liquidity_pool is not None
-        assert (
-            xdr_object.liquidity_pool.type
-            == LiquidityPoolType.LIQUIDITY_POOL_CONSTANT_PRODUCT
+        assert xdr_object == ChangeTrustAsset.PoolShare(
+            LiquidityPoolParameters.ConstantProduct(
+                LiquidityPoolConstantProductParameters(
+                    asset_a=self.asset_a.to_xdr_object(),
+                    asset_b=self.asset_b.to_xdr_object(),
+                    fee=self.fee,
+                )
+            )
         )
-        assert xdr_object.liquidity_pool.constant_product is not None
-        assert (
-            xdr_object.liquidity_pool.constant_product.asset_a
-            == self.asset_a.to_xdr_object()
-        )
-        assert (
-            xdr_object.liquidity_pool.constant_product.asset_b
-            == self.asset_b.to_xdr_object()
-        )
-        assert xdr_object.liquidity_pool.constant_product.fee.int32 == self.fee
         assert asset == LiquidityPoolAsset.from_xdr_object(xdr_object)
         assert (
-            xdr_object.to_xdr()
+            xdr_object.to_xdr_base64()
             == "AAAAAwAAAAAAAAABQVJTVAAAAAB/MGI0yYnp1n9p39kxGYtgDz1s5rZMIkBwH7YrCIMrhwAAAAFVU0QAAAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAHg=="
         )
 
@@ -61,7 +59,7 @@ class TestLiquidityPoolAsset:
         )
 
     @pytest.mark.parametrize(
-        "asset_code, asset_issuer, asset_type",
+        ("asset_code", "asset_issuer", "asset_type"),
         [
             ("XLM", None, AssetType.ASSET_TYPE_NATIVE),
             (
@@ -86,7 +84,7 @@ class TestLiquidityPoolAsset:
     anum12 = Asset("BANANA", "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ")
 
     @pytest.mark.parametrize(
-        "asset_a, asset_b, result",
+        ("asset_a", "asset_b", "result"),
         [
             (xlm, xlm, False),
             (xlm, anum4, True),
@@ -112,7 +110,7 @@ class TestLiquidityPoolAsset:
     )
 
     @pytest.mark.parametrize(
-        "asset_a, asset_b, result",
+        ("asset_a", "asset_b", "result"),
         [
             (asset_arst, asset_arst, False),
             (asset_arst, asset_usdx, True),
@@ -132,16 +130,45 @@ class TestLiquidityPoolAsset:
         "ARST", "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
     )
 
+    # Issuers whose strkey string order differs from their key byte order.
+    asset_issuer_letter = Asset(
+        "USD", "GDRQL6EF772CANMYX55HXMU463OLAX46ZRCPCWS4KVL66ZS4BYA7OYDL"
+    )
+    asset_issuer_digit = Asset(
+        "USD", "GD32JQHFWLIROCNQ564GLCB2M7T4GMQAP5UKHMVT64OQISWL2LHYK2HO"
+    )
+
     @pytest.mark.parametrize(
-        "asset_a, asset_b, result",
+        ("asset_a", "asset_b", "result"),
         [
             (asset_issuer_a, asset_issuer_b, True),
             (asset_issuer_a, asset_issuer_a, False),
             (asset_issuer_b, asset_issuer_a, False),
             (asset_issuer_b, asset_issuer_b, False),
+            (asset_issuer_letter, asset_issuer_digit, True),
+            (asset_issuer_digit, asset_issuer_letter, False),
         ],
     )
     def test_is_valid_lexicographic_order_asset_issuer(self, asset_a, asset_b, result):
         assert (
             LiquidityPoolAsset.is_valid_lexicographic_order(asset_a, asset_b) == result
         )
+
+    def test_init_issuers_ordered_by_key_bytes(self):
+        pool = LiquidityPoolAsset(self.asset_issuer_letter, self.asset_issuer_digit)
+        assert pool.asset_a == self.asset_issuer_letter
+        assert pool.asset_b == self.asset_issuer_digit
+        assert (
+            pool.liquidity_pool_id
+            == "c2a730127d006897b021d6fcb279da68b4f65f9b6a408c74eb2cdd85ea862d5e"
+        )
+
+        with pytest.raises(
+            ValueError, match=r"Assets are not in lexicographic order\."
+        ):
+            LiquidityPoolAsset(self.asset_issuer_digit, self.asset_issuer_letter)
+
+    def test_from_xdr_issuers_ordered_by_key_bytes(self):
+        pool = LiquidityPoolAsset(self.asset_issuer_letter, self.asset_issuer_digit)
+        xdr_object = pool.to_change_trust_asset_xdr_object()
+        assert LiquidityPoolAsset.from_xdr_object(xdr_object) == pool

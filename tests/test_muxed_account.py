@@ -1,7 +1,8 @@
 import pytest
 
-from stellar_sdk import MuxedAccount, StrKey
+from stellar_sdk import MuxedAccount
 from stellar_sdk import xdr as stellar_xdr
+from stellar_sdk.strkey import Ed25519PublicKey
 
 
 class TestMuxedAccount:
@@ -11,28 +12,26 @@ class TestMuxedAccount:
         account_id_muxed = (
             "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
         )
-        med25519 = stellar_xdr.MuxedAccountMed25519(
-            id=stellar_xdr.Uint64(account_id_id),
-            ed25519=stellar_xdr.Uint256(StrKey.decode_ed25519_public_key(account_id)),
-        )
-        muxed_account_xdr = stellar_xdr.MuxedAccount(
-            type=stellar_xdr.CryptoKeyType.KEY_TYPE_MUXED_ED25519, med25519=med25519
+        muxed_account_xdr = stellar_xdr.MuxedAccount.MuxedEd25519(
+            stellar_xdr.MuxedAccountMed25519(
+                id=account_id_id,
+                ed25519=Ed25519PublicKey.from_string(account_id).key,
+            )
         )
         muxed_account = MuxedAccount(account_id, account_id_id)
         assert muxed_account.account_muxed == account_id_muxed
         assert muxed_account.universal_account_id == account_id_muxed
-        assert muxed_account.to_xdr_object().to_xdr() == muxed_account_xdr.to_xdr()
+        assert muxed_account.to_xdr_object() == muxed_account_xdr
         assert MuxedAccount.from_xdr_object(muxed_account_xdr) == muxed_account
 
     def test_init_without_account_id_id(self):
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
         account_id_id = None
-        muxed_account_xdr = stellar_xdr.MuxedAccount(
-            type=stellar_xdr.CryptoKeyType.KEY_TYPE_ED25519,
-            ed25519=stellar_xdr.Uint256(StrKey.decode_ed25519_public_key(account_id)),
+        muxed_account_xdr = stellar_xdr.MuxedAccount.Ed25519(
+            Ed25519PublicKey.from_string(account_id).key
         )
         muxed_account = MuxedAccount(account_id, account_id_id)
-        assert muxed_account.to_xdr_object().to_xdr() == muxed_account_xdr.to_xdr()
+        assert muxed_account.to_xdr_object() == muxed_account_xdr
         assert MuxedAccount.from_xdr_object(muxed_account_xdr) == muxed_account
         assert muxed_account.account_muxed is None
         assert muxed_account.universal_account_id == account_id
@@ -56,7 +55,7 @@ class TestMuxedAccount:
 
     def test_from_account_invalid_account_raise(self):
         invalid_account = "A" * 100
-        with pytest.raises(ValueError, match="This is not a valid account"):
+        with pytest.raises(ValueError, match=r"This is not a valid account"):
             MuxedAccount.from_account(invalid_account)
 
     def test_set_account_muxed_raise(self):
@@ -66,17 +65,40 @@ class TestMuxedAccount:
         muxed_account = MuxedAccount(account_id, account_id_id)
         with pytest.raises(
             AttributeError,
-            match="Can't set attribute, use `MuxedAccount.from_account` instead.",
+            match=r"Can't set attribute, use `MuxedAccount.from_account` instead.",
         ):
             muxed_account.account_muxed = (
                 "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
             )
+
+    @pytest.mark.parametrize("account_muxed_id", [2**64, 2**64 + 7])
+    def test_account_muxed_id_too_large_raise(self, account_muxed_id):
+        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        with pytest.raises(
+            ValueError,
+            match=r"`account_muxed_id` must be at most 2\*\*64 - 1 if provided.",
+        ):
+            MuxedAccount(account_id, account_muxed_id)
+
+    def test_account_muxed_id_max(self):
+        account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
+        muxed_account = MuxedAccount(account_id, 2**64 - 1)
+        restored = MuxedAccount.from_xdr_object(muxed_account.to_xdr_object())
+        assert restored.account_muxed_id == 2**64 - 1
+        account_muxed = muxed_account.account_muxed
+        assert account_muxed is not None
+        assert MuxedAccount.from_account(account_muxed) == muxed_account
 
     def test_account_muxed_id_is_negative_raise(self):
         account_id = "GAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSTVY"
         account_id_id = -1
         with pytest.raises(
             ValueError,
-            match="`account_muxed_id` must be a non-negative integer if provided.",
+            match=r"`account_muxed_id` must be a non-negative integer if provided.",
         ):
             MuxedAccount(account_id, account_id_id)
+
+
+def test_from_xdr_object_rejects_other_xdr_types():
+    with pytest.raises(ValueError, match="Unsupported muxed account"):
+        MuxedAccount.from_xdr_object(stellar_xdr.SCVal.Void())  # type: ignore[arg-type]

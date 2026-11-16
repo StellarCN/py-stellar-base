@@ -2,14 +2,24 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import Clawback, Operation
-
-from . import *
+from stellar_sdk import (
+    Clawback,
+    MuxedAccount,
+    Operation,
+)
+from tests.operation.helpers import (
+    asset1,
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+    muxed2,
+)
 
 
 class TestClawback:
     @pytest.mark.parametrize(
-        "from_, amount, source, xdr",
+        ("from_", "amount", "source", "xdr"),
         [
             pytest.param(
                 kp2.public_key,
@@ -72,7 +82,7 @@ class TestClawback:
         else:
             assert op.from_ == from_
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_amount_raise(self):

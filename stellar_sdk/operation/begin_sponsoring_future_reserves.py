@@ -3,7 +3,7 @@ from typing import ClassVar
 from .. import xdr as stellar_xdr
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
-from ..strkey import StrKey
+from ..strkey import Ed25519PublicKey
 from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
@@ -36,14 +36,13 @@ class BeginSponsoringFutureReserves(Operation):
         self.sponsored_id: str = sponsored_id
         raise_if_not_valid_ed25519_public_key(self.sponsored_id, "sponsored_id")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         sponsored_id = Keypair.from_public_key(self.sponsored_id).xdr_account_id()
         begin_sponsoring_future_reserves_op = (
             stellar_xdr.BeginSponsoringFutureReservesOp(sponsored_id=sponsored_id)
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE,
-            begin_sponsoring_future_reserves_op=begin_sponsoring_future_reserves_op,
+        body = stellar_xdr.OperationBody.BeginSponsoringFutureReserves(
+            begin_sponsoring_future_reserves_op
         )
         return body
 
@@ -55,13 +54,12 @@ class BeginSponsoringFutureReserves(Operation):
         object.
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.begin_sponsoring_future_reserves_op is not None
-        assert (
-            xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519
-            is not None
-        )
-        sponsored_id = StrKey.encode_ed25519_public_key(
-            xdr_object.body.begin_sponsoring_future_reserves_op.sponsored_id.account_id.ed25519.uint256
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.BeginSponsoringFutureReserves)
+        sponsored_id = str(
+            Ed25519PublicKey(
+                body.begin_sponsoring_future_reserves_op.sponsored_id.ed25519
+            )
         )
         op = cls(source=source, sponsored_id=sponsored_id)
         return op

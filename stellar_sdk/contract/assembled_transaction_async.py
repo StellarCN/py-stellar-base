@@ -1,13 +1,27 @@
 import asyncio
+import copy
 import dataclasses
 import time
-from typing import Callable, Generic, TypeVar
+from collections.abc import Callable
+from typing import Generic, TypeVar, cast
 
-from .. import Address, Keypair, SorobanDataBuilder, SorobanServerAsync, xdr
-from ..auth import authorize_entry
-from ..base_soroban_server import _assemble_transaction
+from .. import (
+    Address,
+    AddressType,
+    Keypair,
+    SorobanServerAsync,
+    xdr,
+)
+from ..auth import (
+    AuthorizationSigner,
+    _get_address_credentials,
+    _resolve_account_or_contract_address,
+    authorize_entry,
+)
+from ..base_soroban_server import ResourceLeeway, _assemble_transaction
 from ..operation import InvokeHostFunction
 from ..soroban_rpc import (
+    AuthMode,
     GetTransactionResponse,
     GetTransactionStatus,
     RestorePreamble,
@@ -40,6 +54,19 @@ class AssembledTransactionAsync(Generic[T]):
     :param transaction_signer: Optional keypair for signing transactions, if you don't need to submit the transaction, you can set this to `None`.
     :param parse_result_xdr_fn: Optional function to parse XDR results, keep `None` for raw XDR
     :param submit_timeout: Timeout in seconds for transaction submission (default: 180s)
+    :param addl_resources: Additional resource leeway forwarded to every internal
+        simulation call (initial simulate, prepare, and the post-restore
+        re-simulation). Not applied to the inner ``RestoreFootprint`` transaction
+        created by automatic state restoration.
+    :param auth_mode: Authorization mode forwarded to every internal simulation
+        call. Use :class:`AuthMode.RECORD_ALL_NOROOT <stellar_sdk.soroban_rpc.AuthMode>`
+        to opt into non-root authorization in recording mode.
+    :param use_upgraded_auth: Forwarded to every internal simulation call. Whether
+        simulation records ``ADDRESS_V2`` ("upgraded") authorization credentials (CAP-71)
+        instead of the legacy ``ADDRESS`` credentials. Defaults to ``True``; pass ``False``
+        to ask for the legacy format. Best-effort and transitional; requires Stellar RPC
+        v27.1.0 or later. See
+        :meth:`SorobanServerAsync.simulate_transaction <stellar_sdk.SorobanServerAsync.simulate_transaction>`.
     """
 
     def __init__(
@@ -47,8 +74,11 @@ class AssembledTransactionAsync(Generic[T]):
         transaction_builder: TransactionBuilder,
         server: SorobanServerAsync,
         transaction_signer: Keypair | None = None,
-        parse_result_xdr_fn: Callable[[xdr.SCVal], T] | None = None,
+        parse_result_xdr_fn: Callable[[xdr.SCVal.Any], T] | None = None,
         submit_timeout: int = 180,
+        addl_resources: ResourceLeeway | None = None,
+        auth_mode: AuthMode | None = None,
+        use_upgraded_auth: bool = True,
     ):
         self.server = server
         self.submit_timeout = submit_timeout
@@ -59,9 +89,15 @@ class AssembledTransactionAsync(Generic[T]):
         self.transaction_builder: TransactionBuilder = transaction_builder
         self.built_transaction: TransactionEnvelope | None = None
 
+        self.addl_resources = addl_resources
+        self.auth_mode = auth_mode
+        self.use_upgraded_auth = use_upgraded_auth
+
         self.simulation: SimulateTransactionResponse | None = None
         self._simulation_result: SimulateHostFunctionResult | None = None
         self._simulation_transaction_data: xdr.SorobanTransactionData | None = None
+        self._needs_preparation: bool = False
+        self._preparation_reason: str | None = None
 
         self.send_transaction_response: SendTransactionResponse | None = None
         self.get_transaction_response: GetTransactionResponse | None = None
@@ -86,9 +122,18 @@ class AssembledTransactionAsync(Generic[T]):
         self.transaction_builder.source_account.sequence = source.sequence
 
         built_tx = self.transaction_builder.build()
-        self.simulation = await self.server.simulate_transaction(built_tx)
+        self.simulation = await self.server.simulate_transaction(
+            built_tx,
+            addl_resources=self.addl_resources,
+            auth_mode=self.auth_mode,
+            use_upgraded_auth=self.use_upgraded_auth,
+        )
 
-        if restore and self.simulation.restore_preamble and not self.is_read_call():
+        if (
+            restore
+            and self.simulation.restore_preamble
+            and not self._is_current_simulation_read_call()
+        ):
             try:
                 await self.restore_footprint(self.simulation.restore_preamble)
             except (
@@ -107,11 +152,77 @@ class AssembledTransactionAsync(Generic[T]):
                 f"Transaction simulation failed: {self.simulation.error}", self
             )
         self.built_transaction = _assemble_transaction(built_tx, self.simulation)
+        self._needs_preparation = False
+        self._preparation_reason = None
+        return self
+
+    async def prepare(self, restore: bool = True) -> "AssembledTransactionAsync":
+        """Prepare the current built transaction for signing and submission.
+
+        Unlike :meth:`simulate`, this method simulates ``built_transaction`` as it
+        currently exists, including any authorization entries that were signed
+        after the initial simulation.
+
+        :param restore: Whether to automatically restore contract state if needed, defaults to True
+        :return: Self for chaining
+        :raises: :exc:`NotYetSimulatedError <stellar_sdk.contract.exceptions.NotYetSimulatedError>`: If the transaction has not been simulated
+        :raises: :exc:`NeedsMoreSignaturesError <stellar_sdk.contract.exceptions.NeedsMoreSignaturesError>`: If authorization entries still require signatures
+        :raises: :exc:`SimulationFailedError <stellar_sdk.contract.exceptions.SimulationFailedError>`: If the simulation fails
+        """
+        if not self.built_transaction:
+            raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
+
+        if self.built_transaction.signatures:
+            raise ValueError("Prepare must happen before transaction signing.")
+
+        sigs_needed = list(self.needs_non_invoker_signing_by())
+        if sigs_needed:
+            raise NeedsMoreSignaturesError(
+                f"`Transaction requires signatures from {sigs_needed}`. See `needs_non_invoker_signing_by` for details.",
+                self,
+            )
+
+        simulation_tx = self._transaction_for_simulation()
+        self.simulation = await self.server.simulate_transaction(
+            simulation_tx,
+            addl_resources=self.addl_resources,
+            auth_mode=self.auth_mode,
+            use_upgraded_auth=self.use_upgraded_auth,
+        )
+        self._simulation_result = None
+        self._simulation_transaction_data = None
+
+        if (
+            restore
+            and self.simulation.restore_preamble
+            and not self._is_current_simulation_read_call()
+        ):
+            try:
+                await self.restore_footprint(self.simulation.restore_preamble)
+            except (
+                SimulationFailedError,
+                TransactionStillPendingError,
+                SendTransactionFailedError,
+                TransactionFailedError,
+            ) as e:
+                raise RestorationFailureError(
+                    "Failed to restore contract data.", self
+                ) from e
+            return await self.prepare(restore)
+
+        if self.simulation.error is not None:
+            raise SimulationFailedError(
+                f"Transaction simulation failed: {self.simulation.error}", self
+            )
+
+        self.built_transaction = _assemble_transaction(simulation_tx, self.simulation)
+        self._needs_preparation = False
+        self._preparation_reason = None
         return self
 
     async def sign_and_submit(
         self, transaction_signer: Keypair | None = None, force: bool = False
-    ) -> T | xdr.SCVal:
+    ) -> T | xdr.SCVal.Any:
         """Signs and submits the transaction in one step.
 
         A convenience method combining sign() and submit().
@@ -120,6 +231,8 @@ class AssembledTransactionAsync(Generic[T]):
         :param force: Whether to sign and submit even if the transaction is a read call
         :return: The value returned by the invoked function, parsed if parse_result_xdr_fn was set, otherwise raw XDR
         """
+        if self._needs_preparation:
+            await self.prepare()
         self.sign(force=force, transaction_signer=transaction_signer)
         return await self.submit()
 
@@ -138,6 +251,13 @@ class AssembledTransactionAsync(Generic[T]):
         if not self.built_transaction:
             raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
 
+        if self._needs_preparation:
+            raise NeedsPreparationError(
+                self._preparation_reason
+                or "Transaction must be prepared before signing.",
+                self,
+            )
+
         if not force and self.is_read_call():
             raise NoSignatureNeededError(
                 "This is a read call. It requires no signature or submitting. Set force=True to sign and submit anyway.",
@@ -155,12 +275,10 @@ class AssembledTransactionAsync(Generic[T]):
         transaction_signer = transaction_signer or self.transaction_signer
         if not transaction_signer:
             raise ValueError(
-                "You must provide a sign_transaction_func to sign the transaction, either here or in the constructor."
+                "You must provide a transaction_signer to sign the transaction, either here or in the constructor."
             )
 
-        sigs_needed = [
-            s for s in self.needs_non_invoker_signing_by() if not s.startswith("C")
-        ]
+        sigs_needed = list(self.needs_non_invoker_signing_by())
         if sigs_needed:
             raise NeedsMoreSignaturesError(
                 f"`Transaction requires signatures from {sigs_needed}`. See `needs_non_invoker_signing_by` for details.",
@@ -170,49 +288,185 @@ class AssembledTransactionAsync(Generic[T]):
         self.built_transaction.sign(transaction_signer)
         return self
 
-    async def sign_auth_entries(
+    async def authorize(
         self,
-        auth_entries_signer: Keypair,
+        address: Address | str | Keypair | AuthorizationSigner | None = None,
+        signer: Keypair | AuthorizationSigner | None = None,
         valid_until_ledger_sequence: int | None = None,
+        *,
+        valid_for_ledger_count: int | None = None,
     ) -> "AssembledTransactionAsync":
-        """Signs the transaction's authorization entries.
+        """Authorize matching Soroban authorization entries.
 
-        :param auth_entries_signer: The keypair to sign the authorization entries.
-        :param valid_until_ledger_sequence: Optional ledger sequence until which the authorization is valid, if not set, defaults to 100 ledgers from the current ledger.
+        :param address: Classic account (``G...``) or contract (``C...``) address whose authorization entries should be signed. Required when ``signer`` is not a :class:`Keypair`; otherwise inferred from the keypair's public key. For convenience, a :class:`Keypair` or custom signer may be passed as the first positional argument when the address can be inferred.
+        :param signer: A :class:`Keypair`, or any custom :data:`AuthorizationSigner <stellar_sdk.auth.AuthorizationSigner>` for non-default account contracts (BLS, WebAuthn, ...).
+        :param valid_until_ledger_sequence: Optional ledger sequence until which the authorization is valid.
+        :param valid_for_ledger_count: Optional number of ledgers from the latest simulation ledger for which the authorization remains valid. Defaults to 100 when ``valid_until_ledger_sequence`` is not provided.
         :return: Self for chaining
         :raises: :exc:`NotYetSimulatedError <stellar_sdk.contract.exceptions.NotYetSimulatedError>`: If the transaction has not been simulated
         """
-        if valid_until_ledger_sequence is None:
+        address, signer = self._normalize_authorize_args(address, signer)
+        valid_until_ledger_sequence = await self._resolve_valid_until_ledger_sequence(
+            valid_until_ledger_sequence, valid_for_ledger_count
+        )
+        self._authorize_entries(signer, address, valid_until_ledger_sequence)
+        return self
+
+    async def sign_auth_entries(
+        self,
+        auth_entries_signer: Keypair | AuthorizationSigner,
+        address: Address | str | None = None,
+        valid_until_ledger_sequence: int | None = None,
+        *,
+        valid_for_ledger_count: int | None = None,
+    ) -> "AssembledTransactionAsync":
+        """Signs the transaction's authorization entries.
+
+        This method is kept for backwards compatibility. New code can use
+        :meth:`authorize`, which also supports relative expiration via
+        ``valid_for_ledger_count``.
+
+        :param auth_entries_signer: A :class:`Keypair`, or any custom :data:`AuthorizationSigner <stellar_sdk.auth.AuthorizationSigner>` for non-default account contracts (BLS, WebAuthn, ...).
+        :param address: Classic account (``G...``) or contract (``C...``) address whose authorization entries should be signed. Required when ``auth_entries_signer`` is not a :class:`Keypair`; otherwise inferred from the keypair's public key.
+        :param valid_until_ledger_sequence: Optional ledger sequence until which the authorization is valid, if not set, defaults to 100 ledgers from the current ledger.
+        :param valid_for_ledger_count: Optional number of ledgers from the latest simulation ledger for which the authorization remains valid.
+        :return: Self for chaining
+        :raises: :exc:`NotYetSimulatedError <stellar_sdk.contract.exceptions.NotYetSimulatedError>`: If the transaction has not been simulated
+        """
+        if valid_until_ledger_sequence is None and valid_for_ledger_count is None:
+            # Preserve the legacy default for sign_auth_entries(); authorize()
+            # defaults relative expiration to the latest simulation ledger.
             valid_until_ledger_sequence = (
                 await self.server.get_latest_ledger()
             ).sequence + 100
 
+        return await self.authorize(
+            address=address,
+            signer=auth_entries_signer,
+            valid_until_ledger_sequence=valid_until_ledger_sequence,
+            valid_for_ledger_count=valid_for_ledger_count,
+        )
+
+    def _normalize_authorize_args(
+        self,
+        address: Address | str | Keypair | AuthorizationSigner | None,
+        signer: Keypair | AuthorizationSigner | None,
+    ) -> tuple[Address | str | None, Keypair | AuthorizationSigner]:
+        if (
+            signer is None
+            and address is not None
+            and (isinstance(address, Keypair) or callable(address))
+        ):
+            signer = cast(Keypair | AuthorizationSigner, address)
+            address = None
+
+        if signer is None:
+            raise ValueError("`signer` is required.")
+        return cast(Address | str | None, address), signer
+
+    async def _resolve_valid_until_ledger_sequence(
+        self,
+        valid_until_ledger_sequence: int | None,
+        valid_for_ledger_count: int | None,
+    ) -> int:
+        if (
+            valid_until_ledger_sequence is not None
+            and valid_for_ledger_count is not None
+        ):
+            raise ValueError(
+                "`valid_until_ledger_sequence` and `valid_for_ledger_count` are mutually exclusive."
+            )
+        if valid_until_ledger_sequence is not None:
+            return valid_until_ledger_sequence
+
+        valid_for_ledger_count = (
+            100 if valid_for_ledger_count is None else valid_for_ledger_count
+        )
+        if self.simulation is not None:
+            latest_ledger = self.simulation.latest_ledger
+        else:
+            latest_ledger = (await self.server.get_latest_ledger()).sequence
+        return latest_ledger + valid_for_ledger_count
+
+    def _authorize_entries(
+        self,
+        signer: Keypair | AuthorizationSigner,
+        address: Address | str | None,
+        valid_until_ledger_sequence: int,
+    ) -> None:
         if not self.built_transaction:
             raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
 
+        if address is None:
+            if isinstance(signer, Keypair):
+                address = signer.public_key
+            else:
+                raise ValueError(
+                    "`address` is required when `signer` is not a Keypair."
+                )
+
+        target_address = _resolve_account_or_contract_address(address)
+
+        if self.built_transaction.signatures:
+            raise ValueError(
+                "Authorization entries must be signed before transaction signing."
+            )
+
         op = self.built_transaction.transaction.operations[0]
         assert isinstance(op, InvokeHostFunction)
-        for i, e in enumerate(op.auth):
-            if (
-                e.credentials.type
-                == xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_SOURCE_ACCOUNT
-            ):
-                continue
-            assert e.credentials.address is not None
-            if (
-                Address.from_xdr_sc_address(e.credentials.address.address).address
-                != auth_entries_signer.public_key
-            ):
-                continue
-            op.auth[i] = authorize_entry(
-                e,
-                auth_entries_signer,
-                valid_until_ledger_sequence,
-                self.built_transaction.network_passphrase,
-            )
-        return self
 
-    async def submit(self) -> T | xdr.SCVal:
+        signed: list[tuple[int, xdr.SorobanAuthorizationEntry]] = []
+        for i, e in enumerate(op.auth):
+            addr_auth = _get_address_credentials(e.credentials)
+            if addr_auth is None:
+                continue
+            entry_address = Address.from_xdr_sc_address(addr_auth.address).address
+            if entry_address != target_address.address:
+                continue
+            signed.append(
+                (
+                    i,
+                    authorize_entry(
+                        e,
+                        signer,
+                        valid_until_ledger_sequence,
+                        self.built_transaction.network_passphrase,
+                    ),
+                )
+            )
+        # Write back only once every matching entry has signed, so an entry
+        # that `authorize_entry` rejects (e.g. an expiration ledger another
+        # signature already commits to) leaves the transaction untouched.
+        for i, entry in signed:
+            op.auth[i] = entry
+
+        if signed and self._authorization_requires_preparation(target_address):
+            self._mark_needs_preparation(
+                "Authorization entries changed in a way that may affect Soroban "
+                "resources; call prepare() before signing or exporting XDR."
+            )
+
+    def _authorization_requires_preparation(self, address: Address) -> bool:
+        return address.type == AddressType.CONTRACT
+
+    def _mark_needs_preparation(self, reason: str) -> None:
+        self._needs_preparation = True
+        self._preparation_reason = reason
+
+    def _transaction_for_simulation(self) -> TransactionEnvelope:
+        if not self.built_transaction:
+            raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
+
+        transaction = copy.deepcopy(self.built_transaction)
+        transaction.signatures = []
+        if transaction.transaction.soroban_data:
+            transaction.transaction.fee -= (
+                transaction.transaction.soroban_data.resource_fee
+            )
+            transaction.transaction.soroban_data = None
+        return transaction
+
+    async def submit(self) -> T | xdr.SCVal.Any:
         """Submits the transaction to the network.
 
         It will send the transaction to the network and wait for the result.
@@ -224,13 +478,17 @@ class AssembledTransactionAsync(Generic[T]):
         """
         response = await self._submit()
         assert response.result_meta_xdr is not None
-        transaction_meta = TransactionMeta.from_xdr(response.result_meta_xdr)
-        transaction_meta_body = (
-            transaction_meta.v4 or transaction_meta.v3
-        )  # v4 introduced in protocol 23
-        assert transaction_meta_body is not None
-        assert transaction_meta_body.soroban_meta is not None
-        result_val = transaction_meta_body.soroban_meta.return_value
+        transaction_meta = TransactionMeta.from_xdr_base64(response.result_meta_xdr)
+        match transaction_meta:
+            # v4 introduced in protocol 23
+            case xdr.TransactionMeta.V3(body) | xdr.TransactionMeta.V4(body):
+                soroban_meta = body.soroban_meta
+            case _:
+                raise AssertionError(
+                    f"Unexpected TransactionMeta: v{transaction_meta.v}"
+                )
+        assert soroban_meta is not None
+        result_val = soroban_meta.return_value
         assert (
             result_val is not None
         )  # In SorobanTransactionMetaV2, it is defined as possibly null.
@@ -274,7 +532,7 @@ class AssembledTransactionAsync(Generic[T]):
                 self,
             )
         elif self.get_transaction_response.status == GetTransactionStatus.FAILED:
-            raise TransactionFailedError(f"Transaction failed.", self)
+            raise TransactionFailedError("Transaction failed.", self)
         else:
             raise ValueError("Unexpected transaction status.")
 
@@ -282,6 +540,10 @@ class AssembledTransactionAsync(Generic[T]):
         self, include_already_signed: bool = False
     ) -> set[str]:
         """Get the addresses that need to sign the authorization entries.
+
+        Only the top-level address credentials of each entry are considered;
+        delegate signers (CAP-71-01) are account-specific policy and are not
+        reported.
 
         :param include_already_signed: Whether to include addresses that have already signed the authorization entries.
         :return: The addresses that need to sign the authorization entries.
@@ -296,29 +558,29 @@ class AssembledTransactionAsync(Generic[T]):
 
         result = set()
         for entry in invoke_host_function_op.auth or []:
+            addr_auth = _get_address_credentials(entry.credentials)
+            if addr_auth is None:
+                continue
             if (
-                entry.credentials.type
-                == xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
+                include_already_signed
+                or addr_auth.signature.type == xdr.SCValType.SCV_VOID
             ):
-                assert entry.credentials.address is not None
-
-                if (
-                    include_already_signed
-                    or entry.credentials.address.signature.type
-                    == xdr.SCValType.SCV_VOID
-                ):
-                    address = Address.from_xdr_sc_address(
-                        entry.credentials.address.address
-                    ).address
-                    result.add(address)
+                result.add(Address.from_xdr_sc_address(addr_auth.address).address)
         return result
 
-    def result(self) -> T | xdr.SCVal:
+    def result(self) -> T | xdr.SCVal.Any:
         """Get the result of the function invocation from the simulation.
 
         :return: The value returned by the invoked function, parsed if parse_result_xdr_fn was set, otherwise raw XDR
         """
-        raw_result = xdr.SCVal.from_xdr(self._simulation_data().result.xdr)
+        if self._needs_preparation:
+            raise NeedsPreparationError(
+                self._preparation_reason
+                or "Transaction must be prepared before reading the result.",
+                self,
+            )
+
+        raw_result = xdr.SCVal.from_xdr_base64(self._simulation_data().result.xdr)
         if self.parse_result_xdr_fn:
             return self.parse_result_xdr_fn(raw_result)
         return raw_result
@@ -329,10 +591,14 @@ class AssembledTransactionAsync(Generic[T]):
         :return: True if the transaction is a read call, False otherwise
         :raises: :exc:`NotYetSimulatedError <stellar_sdk.contract.exceptions.NotYetSimulatedError>`: If the transaction has not been simulated
         """
-        simulation_data = self._simulation_data
-        auths = simulation_data().result.auth
-        writes = simulation_data().transaction_data.resources.footprint.read_write
-        return not auths and not writes
+        if self._needs_preparation:
+            raise NeedsPreparationError(
+                self._preparation_reason
+                or "Transaction must be prepared before checking read-call status.",
+                self,
+            )
+
+        return self._is_current_simulation_read_call()
 
     def to_xdr(self):
         """Get the XDR representation of the transaction envelope.
@@ -341,6 +607,13 @@ class AssembledTransactionAsync(Generic[T]):
         """
         if not self.built_transaction:
             raise NotYetSimulatedError("Transaction has not yet been simulated.", self)
+
+        if self._needs_preparation:
+            raise NeedsPreparationError(
+                self._preparation_reason
+                or "Transaction must be prepared before exporting XDR.",
+                self,
+            )
 
         return self.built_transaction.to_xdr()
 
@@ -356,17 +629,19 @@ class AssembledTransactionAsync(Generic[T]):
                 self.transaction_builder.base_fee,
             )
             .append_restore_footprint_op()
-            .set_soroban_data(
-                SorobanDataBuilder.from_xdr(restore_preamble.transaction_data).build()
-            )
+            .set_soroban_data(restore_preamble.transaction_data)
             .add_time_bounds(0, 0)
         )
+        # The restore transaction records no authorization entries of its own, so the
+        # choice does not change the restore; it keeps the derived transaction consistent
+        # with the one it is restoring state for.
         restore_assembled: AssembledTransactionAsync = AssembledTransactionAsync(
             restore_tx,
             self.server,
             self.transaction_signer,
             None,
             submit_timeout=self.submit_timeout,
+            use_upgraded_auth=self.use_upgraded_auth,
         )
         await restore_assembled.simulate(restore=False)
         restore_assembled.sign(force=True)
@@ -387,12 +662,18 @@ class AssembledTransactionAsync(Generic[T]):
         assert self.simulation.results is not None
         assert self.simulation.transaction_data is not None
         self._simulation_result = self.simulation.results[0]
-        self._simulation_transaction_data = xdr.SorobanTransactionData.from_xdr(
+        self._simulation_transaction_data = xdr.SorobanTransactionData.from_xdr_base64(
             self.simulation.transaction_data
         )
         return SimulationData(
             self._simulation_result, self._simulation_transaction_data
         )
+
+    def _is_current_simulation_read_call(self) -> bool:
+        simulation_data = self._simulation_data()
+        auths = simulation_data.result.auth
+        writes = simulation_data.transaction_data.resources.footprint.read_write
+        return not auths and not writes
 
 
 @dataclasses.dataclass

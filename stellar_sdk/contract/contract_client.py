@@ -1,9 +1,11 @@
-from collections.abc import Sequence
-from typing import Callable, TypeVar
+from collections.abc import Callable, Sequence
+from typing import TypeVar
 
-from .. import Account, Asset, Keypair, MuxedAccount, scval
+from .. import Account, Address, Asset, Keypair, MuxedAccount, scval
 from .. import xdr as stellar_xdr
+from ..base_soroban_server import ResourceLeeway
 from ..client.base_sync_client import BaseSyncClient
+from ..soroban_rpc import AuthMode
 from ..soroban_server import SorobanServer
 from ..transaction_builder import TransactionBuilder
 from .assembled_transaction import AssembledTransaction
@@ -45,15 +47,18 @@ class ContractClient:
     def invoke(
         self,
         function_name: str,
-        parameters: Sequence[stellar_xdr.SCVal] | None = None,
+        parameters: Sequence[stellar_xdr.SCVal.Any] | None = None,
         source: str | MuxedAccount = NULL_ACCOUNT,
         signer: Keypair | None = None,
-        parse_result_xdr_fn: Callable[[stellar_xdr.SCVal], T] | None = None,
+        parse_result_xdr_fn: Callable[[stellar_xdr.SCVal.Any], T] | None = None,
         base_fee: int = 100,
         transaction_timeout: int = 300,
         submit_timeout: int = 30,
         simulate: bool = True,
         restore: bool = True,
+        addl_resources: ResourceLeeway | None = None,
+        auth_mode: AuthMode | None = None,
+        use_upgraded_auth: bool = True,
     ) -> AssembledTransaction[T]:
         """Build an :py:class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>` to invoke a contract function.
 
@@ -67,6 +72,9 @@ class ContractClient:
         :param submit_timeout: The timeout for submitting the transaction.
         :param simulate: Whether to simulate the transaction.
         :param restore: Whether to restore the transaction, only valid when simulate is True, and the signer is provided.
+        :param addl_resources: Additional resource leeway forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>`.
+        :param auth_mode: Authorization mode forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>`.
+        :param use_upgraded_auth: Forwarded to every simulation performed by the returned :class:`AssembledTransaction <stellar_sdk.contract.AssembledTransaction>`. Whether simulation records ``ADDRESS_V2`` ("upgraded") authorization credentials (CAP-71) instead of the legacy ``ADDRESS`` credentials. Defaults to ``True``; pass ``False`` to ask for the legacy format. Best-effort and transitional; requires Stellar RPC v27.1.0 or later.
         :return:
         """
         builder = (
@@ -79,7 +87,14 @@ class ContractClient:
             .set_timeout(transaction_timeout)
         )
         assembled = AssembledTransaction(
-            builder, self.server, signer, parse_result_xdr_fn, submit_timeout
+            builder,
+            self.server,
+            signer,
+            parse_result_xdr_fn,
+            submit_timeout,
+            addl_resources=addl_resources,
+            auth_mode=auth_mode,
+            use_upgraded_auth=use_upgraded_auth,
         )
         if simulate:
             assembled = assembled.simulate(restore)
@@ -137,7 +152,7 @@ class ContractClient:
         source: str | MuxedAccount,
         signer: Keypair,
         soroban_server: SorobanServer,
-        constructor_args: Sequence[stellar_xdr.SCVal] | None = None,
+        constructor_args: Sequence[stellar_xdr.SCVal.Any] | None = None,
         salt: bytes | None = None,
         network_passphrase: str | None = None,
         base_fee: int = 100,
@@ -168,6 +183,68 @@ class ContractClient:
                 Account(source, 0), network_passphrase, base_fee=base_fee
             )
             .append_create_contract_op(wasm_id, address, constructor_args, salt)
+            .set_timeout(transaction_timeout)
+        )
+        contract_id = (
+            AssembledTransaction[str](
+                builder,
+                soroban_server,
+                signer,
+                lambda v: scval.from_address(v).address,
+                submit_timeout,
+            )
+            .simulate(restore)
+            .sign_and_submit(force=True)
+        )
+        assert isinstance(contract_id, str)
+        return contract_id
+
+    @staticmethod
+    def create_contract_from_external_ref(
+        owner: str | Address,
+        tag: str | bytes,
+        source: str | MuxedAccount,
+        signer: Keypair,
+        soroban_server: SorobanServer,
+        constructor_args: Sequence[stellar_xdr.SCVal.Any] | None = None,
+        salt: bytes | None = None,
+        network_passphrase: str | None = None,
+        base_fee: int = 100,
+        transaction_timeout: int = 300,
+        submit_timeout: int = 120,
+        restore: bool = True,
+    ) -> str:
+        """Create a contract from a `CAP-85 <https://stellar.org/protocol/cap-85>`_ external
+        executable reference.
+
+        The created contract has no Wasm hash of its own: it follows the Wasm hash that
+        ``owner`` publishes under ``tag``, so the owner can upgrade every contract
+        referencing that tag at once.
+
+        :param owner: The contract that owns the executable, which must be a contract address.
+        :param tag: The owner-scoped tag naming the executable.
+        :param source: The source account for the transaction.
+        :param signer: The signer for the transaction.
+        :param soroban_server: The Soroban server.
+        :param constructor_args: The constructor arguments.
+        :param salt: The salt.
+        :param network_passphrase: The network passphrase, default to the network of the Soroban server.
+        :param base_fee: The base fee for the transaction.
+        :param transaction_timeout: The timeout for the transaction.
+        :param submit_timeout: The timeout for submitting the transaction.
+        :param restore: Whether to restore the transaction.
+        :return: The contract ID.
+        """
+        if network_passphrase is None:
+            network_passphrase = soroban_server.get_network().passphrase
+        address = source if isinstance(source, str) else source.account_id
+        builder = (
+            TransactionBuilder(
+                Account(source, 0), network_passphrase, base_fee=base_fee
+            )
+            .append_create_contract_from_external_ref_op(
+                owner, tag, address, constructor_args, salt
+            )
             .set_timeout(transaction_timeout)
         )
         contract_id = (

@@ -6,12 +6,13 @@ import uuid
 from enum import Enum
 from typing import TYPE_CHECKING
 
+from . import scval
 from . import xdr as stellar_xdr
+from .address import Address
+from .asset import Asset
 from .operation import InvokeHostFunction
 from .soroban_rpc import *
-
-if TYPE_CHECKING:
-    from .transaction_envelope import TransactionEnvelope
+from .strkey import Contract
 
 if TYPE_CHECKING:
     from .transaction_envelope import TransactionEnvelope
@@ -33,6 +34,98 @@ def _generate_unique_request_id() -> str:
     return uuid.uuid4().hex
 
 
+_MUXED_SC_ADDRESS_TYPES = (
+    stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_ACCOUNT,
+    stellar_xdr.SCAddressType.SC_ADDRESS_TYPE_MUXED_CONTRACT,
+)
+
+
+def _validate_contract_id(contract_id: str) -> None:
+    # Only a contract (C...) owns contract data; a muxed contract (W...) is just a
+    # payment destination and has no storage of its own.
+    if not Contract.is_valid(contract_id):
+        raise ValueError(f"Invalid contract ID: {contract_id}")
+
+
+def _contains_muxed_address(val: stellar_xdr.SCVal.Any) -> bool:
+    match val:
+        case stellar_xdr.SCVal.Address(address):
+            return address.type in _MUXED_SC_ADDRESS_TYPES
+        case stellar_xdr.SCVal.Vec(items):
+            return items is not None and any(_contains_muxed_address(i) for i in items)
+        case stellar_xdr.SCVal.Map(entries):
+            return entries is not None and any(
+                _contains_muxed_address(e.key) or _contains_muxed_address(e.val)
+                for e in entries
+            )
+        case _:
+            return False
+
+
+def _build_contract_data_key(
+    contract_id: str, key: stellar_xdr.SCVal.Any, durability: Durability
+) -> stellar_xdr.LedgerKey.Any:
+    _validate_contract_id(contract_id)
+    # The host rejects muxed addresses (M... or W...) anywhere in a storage key,
+    # so no entry under such a key can exist.
+    if _contains_muxed_address(key):
+        raise ValueError(
+            "Contract data keys cannot contain muxed addresses (M... or W...)."
+        )
+    xdr_durability = (
+        stellar_xdr.ContractDataDurability.PERSISTENT
+        if durability == Durability.PERSISTENT
+        else stellar_xdr.ContractDataDurability.TEMPORARY
+    )
+    return stellar_xdr.LedgerKey.ContractData(
+        stellar_xdr.LedgerKeyContractData(
+            contract=Address(contract_id).to_xdr_sc_address(),
+            key=key,
+            durability=xdr_durability,
+        )
+    )
+
+
+def _build_contract_instance_key(contract_id: str) -> stellar_xdr.LedgerKey.Any:
+    return _build_contract_data_key(
+        contract_id,
+        stellar_xdr.SCVal.LedgerKeyContractInstance(),
+        Durability.PERSISTENT,
+    )
+
+
+def _build_sac_balance_ledger_key(
+    asset: Asset,
+    contract_id: str,
+    network_passphrase: str,
+) -> stellar_xdr.LedgerKey.Any:
+    """Build the ledger key for an SAC asset balance held by a contract.
+
+    :param asset: The SAC asset whose balance ledger entry should be looked up.
+    :param contract_id: The contract ID that holds the asset balance.
+    :param network_passphrase: The network passphrase used to derive the SAC contract ID.
+    :return: The persistent contract-data ledger key for the balance entry.
+    """
+    sac_id = asset.contract_id(network_passphrase)
+    key = scval.to_vec([scval.to_symbol("Balance"), scval.to_address(contract_id)])
+    return stellar_xdr.LedgerKey.ContractData(
+        stellar_xdr.LedgerKeyContractData(
+            contract=Address(sac_id).to_xdr_sc_address(),
+            key=key,
+            durability=stellar_xdr.ContractDataDurability.PERSISTENT,
+        )
+    )
+
+
+def _validate_wasm_hash(wasm_hash: bytes) -> None:
+    if not isinstance(wasm_hash, bytes):
+        raise TypeError("wasm_hash must be bytes")
+    if len(wasm_hash) != 32:
+        raise ValueError(f"wasm_hash must be 32 bytes, got {len(wasm_hash)}.")
+    if wasm_hash == b"\x00" * 32:
+        raise ValueError("wasm_hash must not be all zero bytes.")
+
+
 def _assemble_transaction(
     transaction_envelope: TransactionEnvelope,
     simulation: SimulateTransactionResponse,
@@ -46,7 +139,7 @@ def _assemble_transaction(
 
     min_resource_fee = simulation.min_resource_fee
     assert simulation.transaction_data is not None
-    soroban_data = stellar_xdr.SorobanTransactionData.from_xdr(
+    soroban_data = stellar_xdr.SorobanTransactionData.from_xdr_base64(
         simulation.transaction_data
     )
     te = copy.deepcopy(transaction_envelope)
@@ -54,7 +147,7 @@ def _assemble_transaction(
 
     # Reset fee to the original value, excluding the resource fee
     if te.transaction.soroban_data:
-        te.transaction.fee -= te.transaction.soroban_data.resource_fee.int64
+        te.transaction.fee -= te.transaction.soroban_data.resource_fee
 
     assert min_resource_fee is not None
     te.transaction.fee += min_resource_fee
@@ -68,7 +161,7 @@ def _assemble_transaction(
 
         if not op.auth and simulation.results[0].auth:
             op.auth = [
-                stellar_xdr.SorobanAuthorizationEntry.from_xdr(xdr)
+                stellar_xdr.SorobanAuthorizationEntry.from_xdr_base64(xdr)
                 for xdr in simulation.results[0].auth
             ]
     return te

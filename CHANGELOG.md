@@ -3,6 +3,218 @@ Release History
 
 ### Pending
 
+#### Breaking changes
+- Drop support for Python 3.10, which reached end of life in October 2026. ([#1266](https://github.com/StellarCN/py-stellar-base/pull/1266))
+- Remove `StrKey`. The SDK now uses [stellar-strkey](https://stellar-strkey.readthedocs.io/), which has a class for each strkey type, and `stellar_sdk.strkey` re-exports it. For example: ([#1265](https://github.com/StellarCN/py-stellar-base/pull/1265))
+  - `StrKey.encode_ed25519_public_key(raw)` becomes `str(Ed25519PublicKey(raw))`.
+  - `StrKey.decode_ed25519_public_key(s)` becomes `Ed25519PublicKey.from_string(s).key`.
+  - `StrKey.is_valid_contract(s)` becomes `Contract.is_valid(s)`.
+- Strkeys are checked when they are encoded as well as when they are decoded, so invalid raw data raises `ValueError` instead of producing an invalid strkey. For example, `SignerKey.ed25519_signed_payload` rejects a payload that is empty or longer than 64 bytes. ([#1265](https://github.com/StellarCN/py-stellar-base/pull/1265))
+- `Keypair.from_secret` no longer puts the rejected input in its error message, since the input may be a real secret. ([#1265](https://github.com/StellarCN/py-stellar-base/pull/1265))
+- Replace the generated XDR classes with [stellar-xdr](https://stellar-xdr.readthedocs.io/), which `stellar_sdk.xdr` now re-exports. The SDK's own methods, such as `to_xdr_object()` and `TransactionEnvelope.from_xdr()`, keep their names and use the new types. Code that uses `stellar_sdk.xdr` directly changes as follows, and the pull request has a full migration guide. ([#1268](https://github.com/StellarCN/py-stellar-base/pull/1268))
+  - Import types from `stellar_sdk.xdr` itself, since its submodules, such as `stellar_sdk.xdr.claim_predicate`, are gone. `LedgerKeyTtl` and `PeerAddressIp` are renamed `LedgerKeyTTL` and `PeerAddressIP`. `Integer`, `UnsignedInteger`, `Hyper`, `UnsignedHyper`, `Boolean`, `Float`, `Double`, `String`, `Opaque` and `DEFAULT_XDR_MAX_DEPTH` are removed.
+  - A union value is built from one of its arms: `xdr.SCVal(xdr.SCValType.SCV_U32, u32=xdr.Uint32(7))` becomes `xdr.SCVal.U32(7)`. Annotate with `xdr.SCVal.Any`, and read with `match`, `isinstance` or `.type`. `isinstance(value, xdr.SCVal)` and `xdr.SCVal(...)` raise `TypeError`, and reading a field of another arm raises `AttributeError` instead of returning `None`.
+  - `AccountID` and `NodeID` are `PublicKey` itself, so `account_id.account_id.ed25519.uint256` becomes `account_id.ed25519`.
+  - Fields take and hold plain values. `Uint32`, `Int32`, `Uint64` and `Int64` are aliases of `int` for annotations only, and the other typedefs, such as `Hash` and `TimePoint`, extend `bytes`, `int` or `tuple`. So `sc_val.u32.uint32` becomes `sc_val.u32`, and `xdr.Hash(hash=h)` becomes `xdr.Hash(h)`. A zero or empty typedef value is now falsy.
+  - `to_xdr()` and `from_xdr()` on XDR types become `to_xdr_base64()` and `from_xdr_base64()`. `value.to_json()` becomes `json.dumps(value.to_json_value())`, and `T.from_json(text)` becomes `T.from_json_value(json.loads(text))`. `pack()` and `unpack()` are removed; `xdr.encode_stream()` and `xdr.decode_stream()` handle values written back to back.
+  - Values are immutable: assigning to a field raises `AttributeError`, so use `xdr.replace(value, field=...)`. Arrays are tuples and no longer equal lists. Generated classes can't be subclassed, and pickles of the old classes can't be loaded.
+  - Decoding is strict. Input that is not canonical, such as base64 with a trailing newline or XDR with non-zero padding, raises `xdr.XdrDecodeError`, and invalid SEP-51 JSON raises `xdr.XdrJsonError`. Nesting deeper than `max_depth`, by default 500 levels of recursive types, raises `xdr.XdrDepthError`. All three are an `xdr.XdrError`, which is a `ValueError`.
+- SDK objects are checked when they are converted to XDR, as stellar-xdr's constructors check their fields, and the `scval.to_*` functions and `SorobanDataBuilder` setters when they are called. An integer out of the range of its XDR type, such as a sequence number above `2**63 - 1` or a time bound above `2**64 - 1`, raises `ValueError`; it used to be written modulo `2**64`, or raise xdrlib3's `ConversionError`, which is not a `ValueError`. An XDR integer field no longer accepts `bool`, an XDR boolean field requires one, and an XDR bytes field rejects `bytearray`: each raises `TypeError`. ([#1268](https://github.com/StellarCN/py-stellar-base/pull/1268))
+- `scval.from_vec()` and `scval.from_tuple_struct()` return a copy of the vector's items, so changing the list no longer changes the `SCVal`. `SorobanDataBuilder.build()` returns the builder's value rather than a copy, and `SorobanDataBuilder.from_xdr()` raises `TypeError` for anything but a `SorobanTransactionData` or its base64. The `xdrlib3` dependency is replaced by `stellar-xdr`. ([#1268](https://github.com/StellarCN/py-stellar-base/pull/1268))
+
+#### Fixes
+- `StrKey.decode_ed25519_signed_payload` and `StrKey.is_valid_ed25519_signed_payload` now reject a signed payload strkey (`P...`) whose padding bytes after the payload are not zero, as SEP-23 requires. Such a key used to decode to the same signer as the valid key.
+- `ManageSellOffer` and `ManageBuyOffer` raise `ValueError` for an `offer_id` outside `0` to `2**63 - 1`, and `MuxedAccount` raises for an `account_muxed_id` above `2**64 - 1`, instead of writing the value modulo `2**64`. Operations read from XDR keep their offer ID as it is. ([#1251](https://github.com/StellarCN/py-stellar-base/issues/1251))
+- `Operation.from_xdr_amount` (and so the `amount` of operations decoded from XDR) returned amounts below 0.000001 in scientific notation, e.g. `"1E-7"` for 1 stroop. It now returns `"0.0000001"`.
+- `scval.to_native` now raises `ValueError` when two keys of an `SCV_MAP` convert to equal Python keys, such as the string `"1"` and the symbol `"1"`, or the u32 `1` and the i64 `1`. It used to keep only the last of them and drop the others without an error. `scval.from_map` and `scval.from_struct` raise the same way when a key repeats. ([#1252](https://github.com/StellarCN/py-stellar-base/pull/1252))
+
+### Version 17.0.1
+
+Released on November 9, 2026
+
+#### Fixes
+- `LiquidityPoolAsset` now orders same-code assets by their issuers' raw key bytes, as stellar-core does, instead of by strkey string. ([#1247](https://github.com/StellarCN/py-stellar-base/pull/1247))
+
+### Version 17.0.0
+
+Released on October 30, 2026
+
+**This release adds support for Protocol 30.**
+
+#### Breaking changes
+- Remove the deprecated `EventInfo.in_successful_contract_call`. Stellar RPC v30 no longer returns `inSuccessfulContractCall`, and since 16.1.1 the field was `None` for its responses. Responses from older RPC servers that still include it parse as before; the value is ignored. ([#1237](https://github.com/StellarCN/py-stellar-base/pull/1237))
+- Several APIs now raise `ValueError` up front for addresses the Soroban host never accepts there. They used to build a ledger key that matches no entry, or an entry the host can never authorize, so the mistake only showed up later as a missing result or a failed simulation. ([#1244](https://github.com/StellarCN/py-stellar-base/pull/1244))
+  - `SorobanServer[Async].get_contract_data` requires a contract address (`C...`), and rejects a `key` that contains a muxed address (`M...` or `W...`) anywhere, since the host never stores such keys.
+  - `SorobanServer[Async].get_contract_wasm`, and so `get_contract_meta`, `get_contract_spec` and `get_contract_info`, require a contract address (`C...`).
+  - `TransactionBuilder.append_restore_asset_balance_entry_op` requires `balance_owner` to be a contract address (`C...`). Only contracts hold SAC balances in contract data; an account's balance lives in its trustline.
+  - `auth.build_with_delegates_entry` requires the address of the entry it wraps to be an account (`G...`) or a contract (`C...`), as the other `auth` helpers already do. It used to check only the delegate addresses.
+
+#### Update
+- Upgrade the generated XDR definitions to Protocol 30 ([stellar-xdr v30.0](https://github.com/stellar/stellar-xdr/releases/tag/v30.0)). ([#1228](https://github.com/StellarCN/py-stellar-base/pull/1228))
+- Support CAP-84 muxed contract addresses (`W...`, SEP-23 `STRKEY_MUXED_CONTRACT`): a contract ID plus a 64-bit muxed ID. Like a muxed account (`M...`), it is only valid as a payment destination, such as the `to` of a SAC `transfer` or `mint`. ([#1238](https://github.com/StellarCN/py-stellar-base/pull/1238))
+  - New `StrKey.encode_muxed_contract` / `decode_muxed_contract` / `is_valid_muxed_contract`. The raw data is 40 bytes: the 32-byte contract ID followed by the big-endian 8-byte muxed ID, the same layout as a muxed account.
+  - `Address` accepts `W...` addresses as the new `AddressType.MUXED_CONTRACT`, converts them to and from `SC_ADDRESS_TYPE_MUXED_CONTRACT`, and gains `Address.from_raw_muxed_contract`. `scval.to_address` / `from_address` handle them through `Address`, so contract return values and events that hold a muxed contract address now decode.
+  - `scval.to_map` sorts muxed contract address keys like the Soroban host, by `(id, contract ID)`.
+  - Cover CAP-84 in the `py-stellar-base` agent skill. ([#1239](https://github.com/StellarCN/py-stellar-base/pull/1239))
+
+#### Fixes
+- `StrKey.decode_claimable_balance` / `is_valid_claimable_balance` now reject a claimable balance strkey (`B...`) whose type byte is not 0, as SEP-23 requires; `CLAIMABLE_BALANCE_ID_TYPE_V0` is the only type. Such a key used to be accepted, so `Address(...)` took it and the error only surfaced in `Address.to_xdr_sc_address`. `Address(...)` now raises `ValueError` up front. ([#1241](https://github.com/StellarCN/py-stellar-base/pull/1241))
+
+### Version 16.1.1
+
+Released on October 22, 2026
+
+#### Fixes
+- `SorobanServer[Async].get_events` no longer fails against Stellar RPC v30. RPC v30 stopped returning the `inSuccessfulContractCall` field (deprecated since Protocol 23), which `EventInfo.in_successful_contract_call` required, so every response was rejected with a `ValidationError`. The field is now optional and is `None` when the server omits it. It is still deprecated and will be removed in the next major release. ([#1235](https://github.com/StellarCN/py-stellar-base/pull/1235))
+- `auth.authorize_entry` now raises `ValueError` instead of silently invalidating signatures already on the entry. A CAP-71-01 (`SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES`) entry stores one `signature_expiration_ledger`, and every signature on it — the top-level account's and each (nested) delegate's — commits to that value. Signing one node with a different `valid_until_ledger_sequence` re-stamped it and left the other signatures unverifiable, with nothing raised until the host rejected the entry. The error names the stored expiration ledger; pass that value to add a signature, or start from an entry whose other nodes are unsigned. Re-signing only the targeted node(s), and refreshing a plain `ADDRESS` / `ADDRESS_V2` entry, still work as before. ([#1215](https://github.com/StellarCN/py-stellar-base/issues/1215), [#1218](https://github.com/StellarCN/py-stellar-base/pull/1218))
+  - `AssembledTransaction[Async].authorize` / `sign_auth_entries` sign only the top-level node, but the expiration they stamp (`latest_ledger + 100` by default) is the shared one, so they reach the same guard: signing the top level of an entry whose delegates already signed now raises unless their `valid_until_ledger_sequence` is passed explicitly. A rejected entry now leaves the transaction untouched; previously entries signed earlier in the same call were kept.
+
+### Version 16.1.0
+
+Released on September 02, 2026
+
+#### Update
+- Round out the CAP-85 (Protocol 28) external executable reference support added in 16.0.0: ([#1216](https://github.com/StellarCN/py-stellar-base/pull/1216))
+  - New `stellar_sdk.scval.to_executable_tag` / `from_executable_tag` build and read an `SCV_EXECUTABLE_TAG` value — the pair that was missing for the one `SCVal` variant CAP-85 introduced. Wrapped in that value, a tag is the key of the persistent contract data entry on the owner contract that holds the Wasm hash, so `to_executable_tag` is what you pass to `SorobanServer[Async].get_contract_data` to read a tag entry directly. It encodes a `str` as UTF-8 and passes `bytes` through undecoded; `from_executable_tag` returns the raw bytes, since a lenient decode would render two distinct tags identically.
+  - `ExternalRefNotFoundError` now carries the `owner` and `tag` it looked up and names them in its message, showing the tag as `bytes` rather than lenient-decoded text. Its constructor takes those two values in place of a message string — a source-incompatible change to a class introduced in 16.0.0, although the SDK raises it and nothing is expected to construct it.
+  - `SorobanServer[Async].get_contract_wasm` now documents the `ValueError` it raises for a ledger entry that is structurally unusable, such as an external executable reference whose owner is not a contract. Behavior is unchanged.
+  - Document the `ContractWasmRetrievalError` family in the API reference, where none of it appeared, and cover CAP-85 in the `py-stellar-base` agent skill, which had no mention of it.
+- Add a `use_upgraded_auth` opt-out to `sep.stellar_soroban_web_authentication.build_challenge_authorization_entries[_async]`, defaulting to `True`. A SEP-45 challenge is made of the entries simulation records, so 16.0.0's `useUpgradedAuth` flip also flipped challenges to `ADDRESS_V2` — with no way to decline, even though it is the remote client, not the anchor, that has to sign them. Pass `use_upgraded_auth=False` to keep issuing legacy challenges.
+
+#### Fixes
+- `AssembledTransaction[Async].restore_footprint` now simulates the restore transaction with the caller's `use_upgraded_auth` instead of the default. The restore itself is unaffected — a `RestoreFootprint` operation records no authorization entries — but an explicit opt-out is no longer silently dropped. ([#1216](https://github.com/StellarCN/py-stellar-base/pull/1216))
+
+### Version 16.0.0
+
+Released on Aug 28, 2026
+
+#### Breaking changes
+- CAP-71 authorization now defaults to the address-bound `ADDRESS_V2` credentials, with a legacy opt-out on each end: ([#1213](https://github.com/StellarCN/py-stellar-base/pull/1213))
+  - `stellar_sdk.auth.authorize_invocation` builds `SOROBAN_CREDENTIALS_ADDRESS_V2` entries; pass `credentials_type=SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS` for the legacy format.
+  - `SorobanServer[Async].simulate_transaction` sends `useUpgradedAuth: true`, so simulation records `ADDRESS_V2` credentials; pass `use_upgraded_auth=False` for the legacy format. `AssembledTransaction[Async]` and `ContractClient[Async].invoke` follow the same default, and `SorobanServer[Async].prepare_transaction` gains a `use_upgraded_auth` parameter it forwards to simulation.
+
+#### Update
+- Add CAP-85 (Protocol 28) external executable reference support across the high-level API. A contract created from an external executable reference carries no Wasm hash of its own: the reference names an owner contract and an owner-scoped tag, and the contract follows whatever Wasm hash the owner publishes under that tag. Updating the tag therefore upgrades every contract following it at once. ([#1211](https://github.com/StellarCN/py-stellar-base/pull/1211))
+  - New `TransactionBuilder.append_create_contract_from_external_ref_op` builds the creation operation. `owner` must be a contract address, since only a contract can hold the persistent tag entry that names the Wasm; `tag` is an unbounded `SCString`, so a binary tag is passed through undecoded.
+  - New `ContractClient[Async].create_contract_from_external_ref` wraps that operation, mirroring `create_contract`.
+  - New `SorobanServer[Async].get_external_ref_wasm_hash` returns the Wasm hash a reference currently names by reading the owner's persistent tag entry. The owner contract is not invoked.
+  - `SorobanServer[Async].get_contract_wasm` — and so `get_contract_meta`, `get_contract_spec` and `get_contract_info` — resolves external references instead of rejecting them as an unsupported executable kind.
+  - New `ExternalRefNotFoundError` (a `ContractWasmRetrievalError`) reports a tag entry that is missing or archived.
+  - `stellar_sdk.scval.to_native` converts `SCV_EXECUTABLE_TAG` the way it converts `SCV_STRING`: to `str`, or to the raw `bytes` when the tag is not valid UTF-8.
+  - The SCVal comparator behind `stellar_sdk.scval.to_map` key ordering handles the new variants; it previously raised `ValueError` for `SCV_EXECUTABLE_TAG` and treated every non-Wasm executable as equal.
+- chore: upgrade generated XDR definitions to Protocol 28. ([#1209](https://github.com/StellarCN/py-stellar-base/pull/1209))
+
+#### Fixes
+- Forward the supplied `client` to the `stellar.toml` lookup in `federation.resolve_stellar_address`; it previously used a default `RequestsClient` for that request.
+
+### Version 15.0.0
+
+Released on July 04, 2026
+
+**This release adds support for Protocol 27.**
+
+This release contains the same content as 15.0.0-beta0, plus the `use_upgraded_auth` simulation flag. Below is the changelog since 14.1.1.
+
+#### Update
+- Add CAP-71 (Protocol 27) Soroban authorization support across the high-level API. ([#1189](https://github.com/StellarCN/py-stellar-base/pull/1189))
+  - New credential types (from the Protocol 27 XDR):
+    - `SOROBAN_CREDENTIALS_ADDRESS_V2` (CAP-71-02) — same fields as the legacy `SOROBAN_CREDENTIALS_ADDRESS`, but the signed payload is bound to the signer's address.
+    - `SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES` (CAP-71-01) — delegated / multi-party signing via a (possibly nested) tree of delegate signatures.
+  - `stellar_sdk.auth.authorize_entry` (and `stellar_sdk.auth.build_authorization_preimage`):
+    - Sign all three address-based credential types, selecting the signature payload from the credential type: legacy `ADDRESS` keeps the non-address-bound preimage; `ADDRESS_V2` and `ADDRESS_WITH_DELEGATES` use the address-bound `ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS` preimage. `authorize_entry` previously returned entries with non-`ADDRESS` credentials unchanged, without signing them.
+    - `authorize_entry` gains a keyword-only `for_address` parameter that writes the signature into a specific (possibly nested) delegate node. All signers of one delegated entry sign the same payload, bound to the top-level address, and must use the same `valid_until_ledger_sequence`.
+  - `stellar_sdk.auth.authorize_invocation`:
+    - Still builds legacy `ADDRESS` entries by default, so its output stays valid on every network regardless of Protocol 27 activation.
+    - Gains a keyword-only `credentials_type` parameter to opt in to `ADDRESS_V2`. The default will flip to V2 once Protocol 28 makes it mandatory.
+  - New `stellar_sdk.auth.build_with_delegates_entry` / `stellar_sdk.auth.DelegateSignature` wrap an `ADDRESS`/`ADDRESS_V2` entry together with delegate signers (CAP-71-01), sorting each delegates level by address and rejecting duplicates, as the protocol requires.
+  - `AssembledTransaction`: `sign_auth_entries` and `needs_non_invoker_signing_by` (and the async variants) handle all address-based credential types; V2 entries previously crashed with `AssertionError`.
+  - SEP-45 (`stellar_sdk.sep.stellar_soroban_web_authentication`): challenge parsing and building accept `ADDRESS_V2` entries in addition to the legacy type; delegated entries are rejected.
+- feat: add `use_upgraded_auth` to `SorobanServer[Async].simulate_transaction` and the contract clients, mapping to the `useUpgradedAuth` flag from [Stellar RPC v27.1.0](https://github.com/stellar/stellar-rpc/releases/tag/v27.1.0) to opt simulation into recording `ADDRESS_V2` (CAP-71) auth credentials. Best-effort and transitional; older RPC servers ignore it. ([#1198](https://github.com/StellarCN/py-stellar-base/pull/1198))
+- chore: upgrade generated XDR definitions to Protocol 27. ([#1186](https://github.com/StellarCN/py-stellar-base/pull/1186))
+
+### Version 15.0.0-beta0
+
+Released on June 03, 2026
+
+#### Update
+- Add CAP-71 (Protocol 27) Soroban authorization support across the high-level API. ([#1189](https://github.com/StellarCN/py-stellar-base/pull/1189))
+  - New credential types (from the Protocol 27 XDR):
+    - `SOROBAN_CREDENTIALS_ADDRESS_V2` (CAP-71-02) — same fields as the legacy `SOROBAN_CREDENTIALS_ADDRESS`, but the signed payload is bound to the signer's address.
+    - `SOROBAN_CREDENTIALS_ADDRESS_WITH_DELEGATES` (CAP-71-01) — delegated / multi-party signing via a (possibly nested) tree of delegate signatures.
+  - `stellar_sdk.auth.authorize_entry` (and `stellar_sdk.auth.build_authorization_preimage`):
+    - Sign all three address-based credential types, selecting the signature payload from the credential type: legacy `ADDRESS` keeps the non-address-bound preimage; `ADDRESS_V2` and `ADDRESS_WITH_DELEGATES` use the address-bound `ENVELOPE_TYPE_SOROBAN_AUTHORIZATION_WITH_ADDRESS` preimage. `authorize_entry` previously returned entries with non-`ADDRESS` credentials unchanged, without signing them.
+    - `authorize_entry` gains a keyword-only `for_address` parameter that writes the signature into a specific (possibly nested) delegate node. All signers of one delegated entry sign the same payload, bound to the top-level address, and must use the same `valid_until_ledger_sequence`.
+  - `stellar_sdk.auth.authorize_invocation`:
+    - Still builds legacy `ADDRESS` entries by default, so its output stays valid on every network regardless of Protocol 27 activation.
+    - Gains a keyword-only `credentials_type` parameter to opt in to `ADDRESS_V2`. The default will flip to V2 once Protocol 28 makes it mandatory.
+  - New `stellar_sdk.auth.build_with_delegates_entry` / `stellar_sdk.auth.DelegateSignature` wrap an `ADDRESS`/`ADDRESS_V2` entry together with delegate signers (CAP-71-01), sorting each delegates level by address and rejecting duplicates, as the protocol requires.
+  - `AssembledTransaction`: `sign_auth_entries` and `needs_non_invoker_signing_by` (and the async variants) handle all address-based credential types; V2 entries previously crashed with `AssertionError`.
+  - SEP-45 (`stellar_sdk.sep.stellar_soroban_web_authentication`): challenge parsing and building accept `ADDRESS_V2` entries in addition to the legacy type; delegated entries are rejected.
+- chore: upgrade generated XDR definitions to Protocol 27. ([#1186](https://github.com/StellarCN/py-stellar-base/pull/1186))
+
+### Version 14.1.1
+
+Released on June 28, 2026
+
+#### Update
+- fix: `SorobanServer[Async].get_sac_balance` now returns the SAC balance held by the *requested contract* instead of the balance the SAC holds of itself. ([#1196](https://github.com/StellarCN/py-stellar-base/pull/1196))
+
+### Version 14.1.0
+
+Released on June 03, 2026
+
+#### Update
+- Add SEP-46 contract metadata, SEP-47 contract interface discovery, and SEP-48 contract interface specification introspection APIs for Soroban contract Wasm, including `ContractMeta`, `ContractSpec`, `ContractInfo`, and `SorobanServer[Async].get_contract_*` helpers.
+- Add an Agent Skills compatible `stellar-sdk` skill with Claude Code plugin marketplace metadata and topic references for transactions, Horizon, Soroban, XDR/SCVal, async workflows, SEP integrations, security, and troubleshooting.
+
+### Version 14.0.0
+
+Released on May 03, 2026
+
+#### Breaking changes
+- Redesign `stellar_sdk.auth` so any account contract (default Stellar Account, BLS, WebAuthn, threshold, etc.) can authorize Soroban entries. ([#1160](https://github.com/StellarCN/py-stellar-base/pull/1160))
+  - `stellar_sdk.auth.authorize_entry(entry, signer, valid_until_ledger_sequence, network_passphrase)`: the `signer` callable is now `Callable[[HashIDPreimage], SCVal]` (alias `stellar_sdk.auth.AuthorizationSigner`) and returns the signature `SCVal` accepted by the account contract. It was previously `Callable[[HashIDPreimage], tuple[str, bytes]]` returning `(public_key, signature)`. Passing a `Keypair` continues to produce the default Stellar Account signature shape.
+  - `stellar_sdk.auth.authorize_invocation(signer, address, valid_until_ledger_sequence, invocation, network_passphrase)`: the second positional parameter was renamed from `public_key` to `address`. It accepts only classic account (`G...`) or contract (`C...`) addresses, including matching `Address` instances. It remains optional when `signer` is a `Keypair`.
+  - `AssembledTransaction.sign_auth_entries(auth_entries_signer, address=None, valid_until_ledger_sequence=None)` and `AssembledTransactionAsync.sign_auth_entries(...)`: `auth_entries_signer` now also accepts an `AuthorizationSigner` callable. The new `address` parameter selects which `G...` or `C...` entries to sign, is required for non-`Keypair` signers, and is inferred from the keypair otherwise. The parameter order is now `(signer, address, valid_until_ledger_sequence)`.
+  - `AssembledTransaction.sign()` and `AssembledTransactionAsync.sign()` now refuse to sign the transaction envelope while any non-invoker authorization entry is still unsigned, including `C...` contract account entries.
+  - New public helpers: `AuthorizationSigner`, `authorization_payload_hash(preimage)`, and `build_authorization_preimage(entry, valid_until_ledger_sequence, network_passphrase)`.
+- Add `max_content_size` to `BaseSyncClient.get()` and `BaseAsyncClient.get()` to prevent memory exhaustion from oversized responses. Custom client implementations must update their `get()` signature to include `max_content_size: int | None = None`. `fetch_stellar_toml`, `fetch_stellar_toml_async`, and federation resolve functions now enforce response size limits. ([#1131](https://github.com/StellarCN/py-stellar-base/pull/1131))
+- Remove deprecated `StrKey.encode_muxed_account` and `StrKey.decode_muxed_account`; use `stellar_sdk.MuxedAccount` instead. ([#1135](https://github.com/StellarCN/py-stellar-base/pull/1135))
+- Remove `TransactionBuilder.append_create_stellar_asset_contract_from_address_op`; use `TransactionBuilder.append_create_contract_op` instead. ([#1127](https://github.com/StellarCN/py-stellar-base/pull/1127))
+- Drop support for PyPy 3.10. ([#1159](https://github.com/StellarCN/py-stellar-base/pull/1159))
+
+#### Update
+- Upgrade generated Stellar XDR definitions to Protocol 26 through `stellar-xdr` v26.0. ([#1149](https://github.com/StellarCN/py-stellar-base/pull/1149))
+- Improve the `stellar_sdk.contract.AssembledTransaction` authorization lifecycle for contract account authorization. ([#1162](https://github.com/StellarCN/py-stellar-base/pull/1162))
+  - Add `AssembledTransaction.authorize(...)` and `AssembledTransactionAsync.authorize(...)` as clearer aliases for signing Soroban authorization entries. They support `valid_for_ledger_count` for relative authorization expiration.
+  - Add `AssembledTransaction.prepare()` and `AssembledTransactionAsync.prepare()` to re-simulate and prepare the current built transaction after authorization entries have changed.
+  - `sign_and_submit()` now automatically prepares when a `C...` contract account authorization was signed, while ordinary `G...` account authorizations keep the existing single-simulation flow.
+  - Raise `NeedsPreparationError` when exporting XDR, reading the result, checking read-call status, or signing the transaction envelope before required preparation has happened.
+- Expose `addl_resources` (`ResourceLeeway`) and `auth_mode` (`AuthMode`) parameters on `AssembledTransaction`, `AssembledTransactionAsync`, `ContractClient.invoke`, and `ContractClientAsync.invoke`. They are forwarded to the assembled transaction's internal simulation calls, including `simulate()`, `prepare()`, and post-restore re-simulation. The inner `RestoreFootprint` transaction created by automatic state restoration intentionally does not receive them. ([#1164](https://github.com/StellarCN/py-stellar-base/pull/1164))
+- Add `close_time`, `header_xdr`, and `metadata_xdr` to `GetLatestLedgerResponse`. ([#1136](https://github.com/StellarCN/py-stellar-base/pull/1136))
+- Add SEP-0051 XDR-JSON support to the XDR generator. ([#1134](https://github.com/StellarCN/py-stellar-base/pull/1134))
+- Sort `SCMap` entries by key in `scval.to_map` following Soroban runtime ordering. ([#1141](https://github.com/StellarCN/py-stellar-base/pull/1141))
+
+#### Fixes
+- Correct method call for simulation result output. ([#1163](https://github.com/StellarCN/py-stellar-base/pull/1163))
+- Correct equality checks for `SignedPayloadSigner` and `SignerKey`. ([#1153](https://github.com/StellarCN/py-stellar-base/pull/1153))
+- Harden XDR parsing and generation:
+  - validate `Opaque` and `String` max sizes on unpack.
+  - add remaining-input-length checks for variable-length arrays.
+  - raise on unmatched union discriminants in `pack()`.
+  - raise on unknown union discriminants in `unpack()`.
+  - check for trailing data in `from_xdr_bytes()`.
+  - add length validation for opaque/string typedef and struct constructors.
+  - fix `CIRCLE_IMPORT_UNION` lazy import tracking.
+  - add decoding depth limit (`DEFAULT_XDR_MAX_DEPTH = 512`) to prevent stack overflow from deeply nested XDR.
+
+#### Maintenance
+- Migrate the Python XDR generator from `xdrgen` into this SDK. ([#1113](https://github.com/StellarCN/py-stellar-base/pull/1113))
+- Regenerate XDR classes using the latest generator. ([#1137](https://github.com/StellarCN/py-stellar-base/pull/1137))
+- Add XDR-JSON tests and a script to compare Python XDR-JSON output against the Rust Stellar CLI. ([#1139](https://github.com/StellarCN/py-stellar-base/pull/1139), [#1140](https://github.com/StellarCN/py-stellar-base/pull/1140))
+- Add SBOM submission workflow for PG Atlas. ([#1143](https://github.com/StellarCN/py-stellar-base/pull/1143))
+- Update dependencies and test tooling, including Python 3.14 updates.
+
 ### Version 13.2.1
 
 #### Update:

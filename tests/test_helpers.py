@@ -9,7 +9,7 @@ from stellar_sdk import (
 
 class TestHelpers:
     @pytest.mark.parametrize(
-        "xdr, te_type",
+        ("xdr", "te_type"),
         [
             (
                 pytest.param(

@@ -6,7 +6,11 @@ from collections.abc import AsyncGenerator
 from typing import Any
 
 from ..__version__ import __version__
-from ..exceptions import ConnectionError, StreamClientError
+from ..exceptions import (
+    ConnectionError,
+    ContentSizeLimitExceededError,
+    StreamClientError,
+)
 from . import defines
 from .base_async_client import BaseAsyncClient
 from .response import Response
@@ -61,7 +65,7 @@ try:
     import aiohttp
     from aiohttp_sse_client.client import EventSource  # type: ignore[import-untyped]
 
-    aiohttp.streams.StreamReader.readline = __readline  # type: ignore[method-assign]
+    aiohttp.streams.StreamReader.readline = __readline  # type: ignore[method-assign,assignment]
     _AIOHTTP_DEPS_INSTALLED = True
 except ImportError:
     _AIOHTTP_DEPS_INSTALLED = False
@@ -114,26 +118,59 @@ class AiohttpClient(BaseAsyncClient):
         self._session: aiohttp.ClientSession | None = None
         self._sse_session: aiohttp.ClientSession | None = None
 
-    async def get(self, url: str, params: dict[str, str] | None = None) -> Response:
+    async def get(
+        self,
+        url: str,
+        params: dict[str, str] | None = None,
+        max_content_size: int | None = None,
+    ) -> Response:
         """Perform HTTP GET request.
 
         :param url: the request url
         :param params: the request params
+        :param max_content_size: the maximum allowed response content size in bytes.
+            If the response exceeds this limit, a :exc:`ContentSizeLimitExceededError` is raised.
+            If None, no limit is applied.
         :return: the response from server
         :raise: :exc:`ConnectionError <stellar_sdk.exceptions.ConnectionError>`
+        :raise: :exc:`ContentSizeLimitExceededError <stellar_sdk.exceptions.ContentSizeLimitExceededError>`
         """
         await self.__init_session()
         assert self._session is not None
         try:
             response = await self._session.get(url, params=params)
+            if max_content_size is not None:
+                text = await self._read_with_limit(response, max_content_size)
+            else:
+                text = await response.text()
             return Response(
                 status_code=response.status,
-                text=await response.text(),
+                text=text,
                 headers=dict(response.headers),
                 url=str(response.url),
             )
         except aiohttp.ClientError as e:  # TODO: need more research
-            raise ConnectionError(e)
+            raise ConnectionError(e) from e
+
+    async def _read_with_limit(
+        self, response: "aiohttp.ClientResponse", max_content_size: int
+    ) -> str:
+        """Read response content with size limit using streaming."""
+        chunks = []
+        total_size = 0
+        try:
+            async for chunk in response.content.iter_chunked(8192):
+                total_size += len(chunk)
+                if total_size > max_content_size:
+                    raise ContentSizeLimitExceededError(
+                        limit=max_content_size, content_size=total_size
+                    )
+                chunks.append(chunk)
+        finally:
+            response.release()
+        content = b"".join(chunks)
+        encoding = response.charset or "utf-8"
+        return content.decode(encoding)
 
     async def post(
         self,
@@ -165,7 +202,7 @@ class AiohttpClient(BaseAsyncClient):
                 url=str(response.url),
             )
         except aiohttp.ClientError as e:
-            raise ConnectionError(e)
+            raise ConnectionError(e) from e
 
     async def stream(
         self, url: str, params: dict[str, str] | None = None
@@ -185,7 +222,7 @@ class AiohttpClient(BaseAsyncClient):
             timeout = aiohttp.ClientTimeout(total=60 * 5)
             self._sse_session = aiohttp.ClientSession(timeout=timeout)
 
-        query_params = params.copy() if params else dict()
+        query_params = params.copy() if params else {}
 
         query_params |= IDENTIFICATION_HEADERS
         retry = 0.1
@@ -225,12 +262,12 @@ class AiohttpClient(BaseAsyncClient):
                                 yield json.loads(data)
                         except json.JSONDecodeError:
                             # Content was not json-decodable
-                            pass  # pragma: no cover
+                            pass
             except aiohttp.ClientError as e:
                 raise StreamClientError(
                     query_params["cursor"], "Failed to get stream message."
                 ) from e
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 logger.warning(
                     f"We have encountered an timeout error and we will try to reconnect, cursor = {query_params.get('cursor')}"
                 )

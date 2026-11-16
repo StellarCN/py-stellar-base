@@ -1,32 +1,38 @@
+import contextlib
 from json import JSONDecodeError
 
 from .client.response import Response
 
 __all__ = [
-    "SdkError",
-    "BadSignatureError",
-    "Ed25519PublicKeyInvalidError",
-    "Ed25519SecretSeedInvalidError",
-    "MissingEd25519SecretSeedError",
-    "MuxedEd25519AccountInvalidError",
-    "MemoInvalidException",
+    "AccountNotFoundException",
     "AssetCodeInvalidError",
     "AssetIssuerInvalidError",
-    "NoApproximationError",
-    "SignatureExistError",
-    "BaseRequestError",
-    "BaseHorizonError",
-    "ConnectionError",
-    "NotFoundError",
     "BadRequestError",
     "BadResponseError",
-    "UnknownRequestError",
-    "NotPageableError",
-    "StreamClientError",
+    "BadSignatureError",
+    "BaseHorizonError",
+    "BaseRequestError",
+    "ConnectionError",
+    "ContentSizeLimitExceededError",
+    "ContractCodeNotFoundError",
+    "ContractInstanceNotFoundError",
+    "ContractWasmRetrievalError",
+    "Ed25519PublicKeyInvalidError",
+    "Ed25519SecretSeedInvalidError",
+    "ExternalRefNotFoundError",
     "FeatureNotEnabledError",
-    "SorobanRpcErrorResponse",
-    "AccountNotFoundException",
+    "MemoInvalidException",
+    "MissingEd25519SecretSeedError",
+    "NoApproximationError",
+    "NotFoundError",
+    "NotPageableError",
     "PrepareTransactionException",
+    "SACHasNoWasmError",
+    "SdkError",
+    "SignatureExistError",
+    "SorobanRpcErrorResponse",
+    "StreamClientError",
+    "UnknownRequestError",
 ]
 
 from .soroban_rpc import SimulateTransactionResponse
@@ -50,10 +56,6 @@ class Ed25519SecretSeedInvalidError(SdkError, ValueError):
 
 class MissingEd25519SecretSeedError(SdkError, ValueError):
     """Missing Ed25519 secret seed in the keypair"""
-
-
-class MuxedEd25519AccountInvalidError(SdkError, ValueError):
-    """Muxed Ed25519 public key is incorrect."""
 
 
 class MemoInvalidException(SdkError, ValueError):
@@ -97,10 +99,8 @@ class BaseHorizonError(BaseRequestError):
         self.status: int = response.status_code
 
         message = {}
-        try:
+        with contextlib.suppress(JSONDecodeError):
             message = response.json()
-        except JSONDecodeError:
-            pass  # pragma: no cover
         self.type: str | None = message.get("type")
         self.title: str | None = message.get("title")
         self.detail: str | None = message.get("detail")
@@ -195,10 +195,68 @@ class PrepareTransactionException(SdkError):
         self.simulate_transaction_response = simulate_transaction_response
 
 
+class ContractWasmRetrievalError(SdkError):
+    """Raised when contract Wasm code cannot be retrieved from Stellar RPC."""
+
+
+class ContractInstanceNotFoundError(ContractWasmRetrievalError):
+    """Raised when a contract instance ledger entry cannot be found."""
+
+
+class SACHasNoWasmError(ContractWasmRetrievalError):
+    """Raised when a Stellar Asset Contract has no Wasm code."""
+
+
+class ContractCodeNotFoundError(ContractWasmRetrievalError):
+    """Raised when a contract code ledger entry cannot be found."""
+
+
+class ExternalRefNotFoundError(ContractWasmRetrievalError):
+    """Raised when the `CAP-85 <https://stellar.org/protocol/cap-85>`_ tag entry that an
+    external executable reference points at cannot be found.
+
+    The entry may have been archived; restoring the tag entry footprint may be required.
+
+    :param owner: The contract that owns the executable, encoded as a Stellar contract address.
+    :param tag: The owner-scoped tag that was looked up.
+    """
+
+    def __init__(self, owner: str, tag: bytes) -> None:
+        # The tag is shown as bytes: it need not be valid UTF-8, and it is half of what
+        # identifies the code, so a lenient decode would render two distinct tags alike.
+        # An XDR SCString is a bytes subclass; keep plain bytes so the repr stays b'...'.
+        tag = bytes(tag)
+        super().__init__(
+            f"External executable tag entry on {owner} was not found or is archived. "
+            f"Restoring the tag entry footprint may be required. tag: {tag!r}"
+        )
+        self.owner = owner
+        self.tag = tag
+
+
+class ContentSizeLimitExceededError(BaseRequestError):
+    """The exception is thrown when the response content size exceeds the specified limit.
+
+    This is a security measure to prevent denial-of-service attacks via memory exhaustion.
+
+    :param limit: The maximum allowed content size in bytes.
+    :param content_size: The actual content size in bytes (may be approximate if streaming).
+    """
+
+    def __init__(self, limit: int, content_size: int | None = None) -> None:
+        if content_size is not None:
+            message = f"Response content size ({content_size} bytes) exceeds the limit ({limit} bytes)"
+        else:
+            message = f"Response content size exceeds the limit ({limit} bytes)"
+        super().__init__(message)
+        self.limit = limit
+        self.content_size = content_size
+
+
 def raise_request_exception(response: Response) -> None:
     status_code = response.status_code
     if 200 <= status_code < 300:
-        pass  # pragma: no cover
+        pass
     elif status_code == 404:
         raise NotFoundError(response)
     elif 400 <= status_code < 500:

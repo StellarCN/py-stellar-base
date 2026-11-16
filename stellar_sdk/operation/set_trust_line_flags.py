@@ -5,11 +5,11 @@ from .. import xdr as stellar_xdr
 from ..asset import Asset
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
-from ..strkey import StrKey
+from ..strkey import Ed25519PublicKey
 from ..utils import raise_if_not_valid_ed25519_public_key
 from .operation import Operation
 
-__all__ = ["TrustLineFlags", "SetTrustLineFlags"]
+__all__ = ["SetTrustLineFlags", "TrustLineFlags"]
 
 
 class TrustLineFlags(IntFlag):
@@ -66,20 +66,17 @@ class SetTrustLineFlags(Operation):
         self.set_flags: TrustLineFlags | None = set_flags
         raise_if_not_valid_ed25519_public_key(self.trustor, "trustor")
 
-    def _to_operation_body(self) -> stellar_xdr.OperationBody:
+    def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:
         trustor = Keypair.from_public_key(self.trustor).xdr_account_id()
         clear_flags = 0 if self.clear_flags is None else self.clear_flags.value
         set_flags = 0 if self.set_flags is None else self.set_flags.value
         set_trust_line_flags_op = stellar_xdr.SetTrustLineFlagsOp(
             trustor,
             self.asset.to_xdr_object(),
-            stellar_xdr.Uint32(clear_flags),
-            stellar_xdr.Uint32(set_flags),
+            clear_flags,
+            set_flags,
         )
-        body = stellar_xdr.OperationBody(
-            type=self._XDR_OPERATION_TYPE,
-            set_trust_line_flags_op=set_trust_line_flags_op,
-        )
+        body = stellar_xdr.OperationBody.SetTrustLineFlags(set_trust_line_flags_op)
         return body
 
     @classmethod
@@ -89,17 +86,12 @@ class SetTrustLineFlags(Operation):
 
         """
         source = Operation.get_source_from_xdr_obj(xdr_object)
-        assert xdr_object.body.set_trust_line_flags_op is not None
-        assert (
-            xdr_object.body.set_trust_line_flags_op.trustor.account_id.ed25519
-            is not None
-        )
-        trustor = StrKey.encode_ed25519_public_key(
-            xdr_object.body.set_trust_line_flags_op.trustor.account_id.ed25519.uint256
-        )
-        asset = Asset.from_xdr_object(xdr_object.body.set_trust_line_flags_op.asset)
-        clear_flags_xdr = xdr_object.body.set_trust_line_flags_op.clear_flags.uint32
-        set_flags_xdr = xdr_object.body.set_trust_line_flags_op.set_flags.uint32
+        body = xdr_object.body
+        assert isinstance(body, stellar_xdr.OperationBody.SetTrustLineFlags)
+        trustor = str(Ed25519PublicKey(body.set_trust_line_flags_op.trustor.ed25519))
+        asset = Asset.from_xdr_object(body.set_trust_line_flags_op.asset)
+        clear_flags_xdr = body.set_trust_line_flags_op.clear_flags
+        set_flags_xdr = body.set_trust_line_flags_op.set_flags
         clear_flags = None if clear_flags_xdr == 0 else TrustLineFlags(clear_flags_xdr)
         set_flags = None if set_flags_xdr == 0 else TrustLineFlags(set_flags_xdr)
 

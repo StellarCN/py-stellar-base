@@ -46,14 +46,13 @@ class FeeBumpTransaction:
         """
 
         fee_source = self.fee_source.to_xdr_object()
-        ext = stellar_xdr.FeeBumpTransactionExt(0)
-        inner_tx = stellar_xdr.FeeBumpTransactionInnerTx(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX,
-            v1=self.inner_transaction_envelope.to_xdr_object().v1,
-        )
+        ext = stellar_xdr.FeeBumpTransactionExt.V0()
+        inner = self.inner_transaction_envelope.to_xdr_object()
+        assert isinstance(inner, stellar_xdr.TransactionEnvelope.Tx)
+        inner_tx = stellar_xdr.FeeBumpTransactionInnerTx.Tx(inner.v1)
         return stellar_xdr.FeeBumpTransaction(
             fee_source=fee_source,
-            fee=stellar_xdr.Int64(self.fee),
+            fee=self.fee,
             inner_tx=inner_tx,
             ext=ext,
         )
@@ -70,15 +69,13 @@ class FeeBumpTransaction:
         :return: A new :class:`FeeBumpTransaction` object from the given XDR Transaction object.
         """
         source = MuxedAccount.from_xdr_object(xdr_object.fee_source)
-        te = stellar_xdr.TransactionEnvelope(
-            type=stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX, v1=xdr_object.inner_tx.v1
-        )
+        te = stellar_xdr.TransactionEnvelope.Tx(xdr_object.inner_tx.v1)
         inner_transaction_envelope = TransactionEnvelope.from_xdr_object(
             te, network_passphrase
         )
         tx = cls(
             fee_source=source,
-            fee=xdr_object.fee.int64,
+            fee=xdr_object.fee,
             inner_transaction_envelope=inner_transaction_envelope,
         )
         return tx
@@ -92,7 +89,7 @@ class FeeBumpTransaction:
 
         :return: A new :class:`FeeBumpTransaction` object from the given XDR FeeBumpTransaction base64 string object.
         """
-        xdr_object = stellar_xdr.FeeBumpTransaction.from_xdr(xdr)
+        xdr_object = stellar_xdr.FeeBumpTransaction.from_xdr_base64(xdr)
         return cls.from_xdr_object(xdr_object, network_passphrase)
 
     def __hash__(self):

@@ -1,14 +1,19 @@
 import pytest
 
-from stellar_sdk import Operation
+from stellar_sdk import (
+    MuxedAccount,
+    Operation,
+)
 from stellar_sdk.operation import RestoreFootprint
-
-from . import *
+from tests.operation.helpers import (
+    check_source,
+    muxed1,
+)
 
 
 class TestRestoreFootprint:
     @pytest.mark.parametrize(
-        "source, xdr",
+        ("source", "xdr"),
         [
             pytest.param(None, "AAAAAAAAABoAAAAA", id="without_source"),
             pytest.param(
@@ -22,5 +27,5 @@ class TestRestoreFootprint:
         op = RestoreFootprint(source)
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op

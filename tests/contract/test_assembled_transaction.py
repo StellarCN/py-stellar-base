@@ -1,0 +1,764 @@
+from types import SimpleNamespace
+from typing import Any, cast
+
+import pytest
+
+from stellar_sdk import (
+    Account,
+    Address,
+    Keypair,
+    Network,
+    SorobanDataBuilder,
+    TransactionBuilder,
+    scval,
+)
+from stellar_sdk import xdr as stellar_xdr
+from stellar_sdk.auth import (
+    DelegateSignature,
+    authorize_entry,
+    build_with_delegates_entry,
+)
+from stellar_sdk.contract import (
+    AssembledTransaction,
+    AssembledTransactionAsync,
+)
+from stellar_sdk.contract import assembled_transaction as assembled_transaction_module
+from stellar_sdk.contract import (
+    assembled_transaction_async as assembled_transaction_async_module,
+)
+from stellar_sdk.contract.exceptions import (
+    NeedsMoreSignaturesError,
+    NeedsPreparationError,
+)
+from stellar_sdk.operation import InvokeHostFunction
+
+_MUXED_ACCOUNT_ID = (
+    "MAQAA5L65LSYH7CQ3VTJ7F3HHLGCL3DSLAR2Y47263D56MNNGHSQSAAAAAAAAAAE2LP26"
+)
+_CLAIMABLE_BALANCE_ID = "BAAD6DBUX6J22DMZOHIEZTEQ64CVCHEDRKWZONFEUL5Q26QD7R76RGR4TU"
+
+
+def _sample_invocation(
+    contract_id: str = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
+) -> stellar_xdr.SorobanAuthorizedInvocation:
+    return stellar_xdr.SorobanAuthorizedInvocation(
+        function=stellar_xdr.SorobanAuthorizedFunction.ContractFn(
+            stellar_xdr.InvokeContractArgs(
+                contract_address=Address(contract_id).to_xdr_sc_address(),
+                function_name="increment",
+                args=[],
+            )
+        ),
+        sub_invocations=[],
+    )
+
+
+def _sample_auth_entry(
+    address: str,
+    credentials_type: stellar_xdr.SorobanCredentialsType = stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS,
+) -> stellar_xdr.SorobanAuthorizationEntry:
+    address_credentials = stellar_xdr.SorobanAddressCredentials(
+        address=Address(address).to_xdr_sc_address(),
+        nonce=123456789,
+        signature_expiration_ledger=0,
+        signature=stellar_xdr.SCVal.Void(),
+    )
+    if (
+        credentials_type
+        == stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS
+    ):
+        credentials: stellar_xdr.SorobanCredentials.Any = (
+            stellar_xdr.SorobanCredentials.Address(address_credentials)
+        )
+    else:
+        credentials = stellar_xdr.SorobanCredentials.AddressV2(address_credentials)
+    return stellar_xdr.SorobanAuthorizationEntry(
+        credentials=credentials,
+        root_invocation=_sample_invocation(),
+    )
+
+
+class _FakeSorobanServer:
+    def __init__(self, restore_preambles: list[Any] | None = None) -> None:
+        self.simulated_transactions: list[Any] = []
+        self.use_upgraded_auth_values: list[bool] = []
+        self.restore_preambles = restore_preambles or []
+
+    def get_latest_ledger(self) -> SimpleNamespace:
+        return SimpleNamespace(sequence=100)
+
+    def load_account(self, account_id) -> SimpleNamespace:
+        return SimpleNamespace(sequence=1)
+
+    def simulate_transaction(
+        self, transaction, addl_resources=None, auth_mode=None, use_upgraded_auth=True
+    ) -> SimpleNamespace:
+        self.simulated_transactions.append(transaction)
+        self.use_upgraded_auth_values.append(use_upgraded_auth)
+        restore_preamble = (
+            self.restore_preambles.pop(0) if self.restore_preambles else None
+        )
+        return SimpleNamespace(
+            error=None,
+            restore_preamble=restore_preamble,
+            latest_ledger=101,
+            min_resource_fee=100,
+            transaction_data=SorobanDataBuilder().build().to_xdr_base64(),
+            results=[SimpleNamespace(auth=[], xdr=scval.to_uint32(1).to_xdr_base64())],
+        )
+
+
+class _FakeSorobanServerAsync:
+    def __init__(self, restore_preambles: list[Any] | None = None) -> None:
+        self.simulated_transactions: list[Any] = []
+        self.use_upgraded_auth_values: list[bool] = []
+        self.restore_preambles = restore_preambles or []
+
+    async def get_latest_ledger(self) -> SimpleNamespace:
+        return SimpleNamespace(sequence=100)
+
+    async def load_account(self, account_id) -> SimpleNamespace:
+        return SimpleNamespace(sequence=1)
+
+    async def simulate_transaction(
+        self, transaction, addl_resources=None, auth_mode=None, use_upgraded_auth=True
+    ) -> SimpleNamespace:
+        self.simulated_transactions.append(transaction)
+        self.use_upgraded_auth_values.append(use_upgraded_auth)
+        restore_preamble = (
+            self.restore_preambles.pop(0) if self.restore_preambles else None
+        )
+        return SimpleNamespace(
+            error=None,
+            restore_preamble=restore_preamble,
+            latest_ledger=101,
+            min_resource_fee=100,
+            transaction_data=SorobanDataBuilder().build().to_xdr_base64(),
+            results=[SimpleNamespace(auth=[], xdr=scval.to_uint32(1).to_xdr_base64())],
+        )
+
+
+def _assembled_with_auth(address: str, server=None, *, entries=None):
+    source = Keypair.random()
+    server = cast(Any, server or _FakeSorobanServer())
+    builder = (
+        TransactionBuilder(
+            Account(source.public_key, 1),
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        .set_timeout(300)
+        .append_invoke_contract_function_op(
+            contract_id="CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
+            function_name="increment",
+            parameters=[],
+            auth=entries if entries is not None else [_sample_auth_entry(address)],
+        )
+    )
+    assembled: AssembledTransaction[Any] = AssembledTransaction(builder, server, source)
+    assembled.built_transaction = builder.build()
+    cast(Any, assembled).simulation = SimpleNamespace(
+        latest_ledger=100, restore_preamble=None
+    )
+    return assembled, source, server
+
+
+def _assembled_async_with_auth(address: str, server=None, *, entries=None):
+    source = Keypair.random()
+    server = cast(Any, server or _FakeSorobanServerAsync())
+    builder = (
+        TransactionBuilder(
+            Account(source.public_key, 1),
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        .set_timeout(300)
+        .append_invoke_contract_function_op(
+            contract_id="CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
+            function_name="increment",
+            parameters=[],
+            auth=entries if entries is not None else [_sample_auth_entry(address)],
+        )
+    )
+    assembled: AssembledTransactionAsync[Any] = AssembledTransactionAsync(
+        builder, server, source
+    )
+    assembled.built_transaction = builder.build()
+    cast(Any, assembled).simulation = SimpleNamespace(
+        latest_ledger=100, restore_preamble=None
+    )
+    return assembled, source, server
+
+
+def test_authorize_contract_address_requires_preparation():
+    contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+    assembled, _, _ = _assembled_with_auth(contract_id)
+    seen_preimages: list[stellar_xdr.HashIDPreimage.Any] = []
+
+    assembled.authorize(
+        address=contract_id,
+        signer=lambda preimage: (
+            seen_preimages.append(preimage) or scval.to_bytes(b"sig")
+        ),
+        valid_for_ledger_count=20,
+    )
+
+    assert assembled._needs_preparation is True
+    assert len(seen_preimages) == 1
+    assert isinstance(
+        seen_preimages[0], stellar_xdr.HashIDPreimage.SorobanAuthorization
+    )
+    assert seen_preimages[0].soroban_authorization.signature_expiration_ledger == 120
+    with pytest.raises(NeedsPreparationError, match="Authorization entries"):
+        assembled.sign(force=True)
+    with pytest.raises(NeedsPreparationError, match="Authorization entries"):
+        assembled.to_xdr()
+
+
+def test_sign_auth_entries_rejects_non_account_contract_address():
+    assembled, _, _ = _assembled_with_auth(Keypair.random().public_key)
+
+    with pytest.raises(ValueError, match=r"classic account .* contract"):
+        assembled.sign_auth_entries(
+            Keypair.random(),
+            _MUXED_ACCOUNT_ID,
+            654656,
+        )
+
+
+async def test_async_sign_auth_entries_rejects_non_account_contract_address():
+    assembled, _, _ = _assembled_async_with_auth(Keypair.random().public_key)
+
+    with pytest.raises(ValueError, match=r"classic account .* contract"):
+        await assembled.sign_auth_entries(
+            Keypair.random(),
+            Address(_CLAIMABLE_BALANCE_ID),
+            654656,
+        )
+
+
+def test_sign_requires_unsigned_contract_account_auth_entry():
+    contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+    assembled, _, _ = _assembled_with_auth(contract_id)
+
+    with pytest.raises(NeedsMoreSignaturesError, match=contract_id):
+        assembled.sign(transaction_signer=Keypair.random(), force=True)
+
+
+def test_async_sign_requires_unsigned_contract_account_auth_entry():
+    contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+    assembled, _, _ = _assembled_async_with_auth(contract_id)
+
+    with pytest.raises(NeedsMoreSignaturesError, match=contract_id):
+        assembled.sign(transaction_signer=Keypair.random(), force=True)
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "expected"), [({}, True), ({"use_upgraded_auth": False}, False)]
+)
+def test_simulate_forwards_use_upgraded_auth(kwargs, expected):
+    source = Keypair.random()
+    server = _FakeSorobanServer()
+    builder = (
+        TransactionBuilder(
+            Account(source.public_key, 1),
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        .set_timeout(300)
+        .append_invoke_contract_function_op(
+            contract_id="CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
+            function_name="increment",
+            parameters=[],
+        )
+    )
+    assembled: AssembledTransaction[Any] = AssembledTransaction(
+        builder, cast(Any, server), source, **kwargs
+    )
+    assembled.simulate(restore=False)
+
+    assert server.use_upgraded_auth_values == [expected]
+
+
+def _restore_builder(source: Keypair) -> TransactionBuilder:
+    return (
+        TransactionBuilder(
+            Account(source.public_key, 1),
+            Network.TESTNET_NETWORK_PASSPHRASE,
+            base_fee=100,
+        )
+        .set_timeout(300)
+        .append_invoke_contract_function_op(
+            contract_id="CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK",
+            function_name="increment",
+            parameters=[],
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "expected"), [({}, True), ({"use_upgraded_auth": False}, False)]
+)
+def test_restore_footprint_inherits_use_upgraded_auth(monkeypatch, kwargs, expected):
+    # The derived restore transaction must simulate with the caller's choice rather than
+    # falling back to the default.
+    source = Keypair.random()
+    server = _FakeSorobanServer()
+    assembled: AssembledTransaction[Any] = AssembledTransaction(
+        _restore_builder(source), cast(Any, server), source, **kwargs
+    )
+    submitted: list[Any] = []
+    monkeypatch.setattr(
+        assembled_transaction_module.AssembledTransaction,
+        "_submit",
+        lambda self: submitted.append(self),
+    )
+
+    assembled.restore_footprint(
+        cast(
+            Any,
+            SimpleNamespace(
+                transaction_data=SorobanDataBuilder().build().to_xdr_base64()
+            ),
+        )
+    )
+
+    assert len(submitted) == 1
+    assert server.use_upgraded_auth_values == [expected]
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "expected"), [({}, True), ({"use_upgraded_auth": False}, False)]
+)
+async def test_restore_footprint_inherits_use_upgraded_auth_async(
+    monkeypatch, kwargs, expected
+):
+    source = Keypair.random()
+    server = _FakeSorobanServerAsync()
+    assembled: AssembledTransactionAsync[Any] = AssembledTransactionAsync(
+        _restore_builder(source), cast(Any, server), source, **kwargs
+    )
+    submitted: list[Any] = []
+
+    async def fake_submit(self):
+        submitted.append(self)
+
+    monkeypatch.setattr(
+        assembled_transaction_async_module.AssembledTransactionAsync,
+        "_submit",
+        fake_submit,
+    )
+
+    await assembled.restore_footprint(
+        cast(
+            Any,
+            SimpleNamespace(
+                transaction_data=SorobanDataBuilder().build().to_xdr_base64()
+            ),
+        )
+    )
+
+    assert len(submitted) == 1
+    assert server.use_upgraded_auth_values == [expected]
+
+
+def test_sign_and_submit_auto_prepares_contract_address_auth(monkeypatch):
+    contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+    server = _FakeSorobanServer()
+    assembled, _, _ = _assembled_with_auth(contract_id, server)
+
+    assembled.authorize(
+        address=contract_id,
+        signer=lambda _: scval.to_bytes(b"sig"),
+        valid_until_ledger_sequence=120,
+    )
+
+    def fake_assemble(transaction, simulation):
+        return transaction
+
+    monkeypatch.setattr(
+        assembled_transaction_module, "_assemble_transaction", fake_assemble
+    )
+    monkeypatch.setattr(AssembledTransaction, "submit", lambda self: scval.to_void())
+
+    assert assembled.sign_and_submit(force=True) == scval.to_void()
+    assert len(server.simulated_transactions) == 1
+    op = server.simulated_transactions[0].transaction.operations[0]
+    credentials = op.auth[0].credentials
+    assert isinstance(credentials, stellar_xdr.SorobanCredentials.Address)
+    assert credentials.address.signature != stellar_xdr.SCVal.Void()
+    assert assembled._needs_preparation is False
+
+
+def test_keypair_account_auth_does_not_prepare_again(monkeypatch):
+    auth_signer = Keypair.random()
+    server = _FakeSorobanServer()
+    assembled, _, _ = _assembled_with_auth(auth_signer.public_key, server)
+
+    assembled.sign_auth_entries(auth_signer, valid_until_ledger_sequence=120)
+
+    monkeypatch.setattr(AssembledTransaction, "submit", lambda self: scval.to_void())
+
+    assert assembled._needs_preparation is False
+    assert assembled.sign_and_submit(force=True) == scval.to_void()
+    assert server.simulated_transactions == []
+
+
+def test_prepare_restores_footprint_after_contract_address_auth(monkeypatch):
+    contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+    restore_preamble = object()
+    server = _FakeSorobanServer([restore_preamble])
+    assembled, _, _ = _assembled_with_auth(contract_id, server)
+    restored = []
+
+    assembled.authorize(
+        address=contract_id,
+        signer=lambda _: scval.to_bytes(b"sig"),
+        valid_until_ledger_sequence=120,
+    )
+
+    def fake_assemble(transaction, simulation):
+        return transaction
+
+    monkeypatch.setattr(
+        assembled_transaction_module, "_assemble_transaction", fake_assemble
+    )
+    monkeypatch.setattr(
+        assembled,
+        "_is_current_simulation_read_call",
+        lambda: False,
+    )
+    monkeypatch.setattr(
+        assembled,
+        "restore_footprint",
+        lambda preamble: restored.append(preamble),
+    )
+
+    assert assembled.prepare() is assembled
+    assert restored == [restore_preamble]
+    assert len(server.simulated_transactions) == 2
+    assert assembled._needs_preparation is False
+
+
+def test_authorize_rejects_conflicting_expiration_options():
+    contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+    assembled, _, _ = _assembled_with_auth(contract_id)
+
+    with pytest.raises(ValueError, match="mutually exclusive"):
+        assembled.authorize(
+            address=contract_id,
+            signer=lambda _: scval.to_bytes(b"sig"),
+            valid_until_ledger_sequence=120,
+            valid_for_ledger_count=20,
+        )
+
+
+def test_authorize_accepts_keypair_as_first_argument():
+    auth_signer = Keypair.random()
+    assembled, _, _ = _assembled_with_auth(auth_signer.public_key)
+
+    assembled.authorize(auth_signer, valid_until_ledger_sequence=120)
+
+    op = _invoke_op(assembled)
+    assert isinstance(op.auth[0].credentials, stellar_xdr.SorobanCredentials.Address)
+    assert op.auth[0].credentials.address.signature != stellar_xdr.SCVal.Void()
+    assert assembled._needs_preparation is False
+
+
+async def test_async_sign_and_submit_auto_prepares_contract_address_auth(monkeypatch):
+    contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+    server = _FakeSorobanServerAsync()
+    assembled, _, _ = _assembled_async_with_auth(contract_id, server)
+
+    await assembled.authorize(
+        address=contract_id,
+        signer=lambda _: scval.to_bytes(b"sig"),
+        valid_until_ledger_sequence=120,
+    )
+
+    def fake_assemble(transaction, simulation):
+        return transaction
+
+    async def fake_submit(self):
+        return scval.to_void()
+
+    monkeypatch.setattr(
+        assembled_transaction_async_module,
+        "_assemble_transaction",
+        fake_assemble,
+    )
+    monkeypatch.setattr(AssembledTransactionAsync, "submit", fake_submit)
+
+    assert await assembled.sign_and_submit(force=True) == scval.to_void()
+    assert len(server.simulated_transactions) == 1
+    assert assembled._needs_preparation is False
+
+
+async def test_async_prepare_restores_footprint_after_contract_address_auth(
+    monkeypatch,
+):
+    contract_id = "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
+    restore_preamble = object()
+    server = _FakeSorobanServerAsync([restore_preamble])
+    assembled, _, _ = _assembled_async_with_auth(contract_id, server)
+    restored = []
+
+    await assembled.authorize(
+        address=contract_id,
+        signer=lambda _: scval.to_bytes(b"sig"),
+        valid_until_ledger_sequence=120,
+    )
+
+    def fake_assemble(transaction, simulation):
+        return transaction
+
+    async def fake_restore_footprint(preamble):
+        restored.append(preamble)
+
+    monkeypatch.setattr(
+        assembled_transaction_async_module,
+        "_assemble_transaction",
+        fake_assemble,
+    )
+    monkeypatch.setattr(
+        assembled,
+        "_is_current_simulation_read_call",
+        lambda: False,
+    )
+    monkeypatch.setattr(assembled, "restore_footprint", fake_restore_footprint)
+
+    assert await assembled.prepare() is assembled
+    assert restored == [restore_preamble]
+    assert len(server.simulated_transactions) == 2
+    assert assembled._needs_preparation is False
+
+
+def test_sign_auth_entries_signs_v2_entry():
+    signer = Keypair.random()
+    assembled, _, _ = _assembled_with_auth(
+        signer.public_key,
+        entries=[
+            _sample_auth_entry(
+                signer.public_key,
+                stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+            )
+        ],
+    )
+
+    assembled.sign_auth_entries(signer, valid_until_ledger_sequence=120)
+
+    entry = _invoke_op(assembled).auth[0]
+    assert isinstance(entry.credentials, stellar_xdr.SorobanCredentials.AddressV2)
+    credentials = entry.credentials.address_v2
+    assert isinstance(credentials.signature, stellar_xdr.SCVal.Vec)
+    assert credentials.signature_expiration_ledger == 120
+
+
+async def test_async_sign_auth_entries_signs_v2_entry():
+    signer = Keypair.random()
+    assembled, _, _ = _assembled_async_with_auth(
+        signer.public_key,
+        entries=[
+            _sample_auth_entry(
+                signer.public_key,
+                stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+            )
+        ],
+    )
+
+    await assembled.sign_auth_entries(signer, valid_until_ledger_sequence=120)
+
+    entry = _invoke_op(assembled).auth[0]
+    assert isinstance(entry.credentials, stellar_xdr.SorobanCredentials.AddressV2)
+    assert isinstance(entry.credentials.address_v2.signature, stellar_xdr.SCVal.Vec)
+
+
+def _mixed_credential_entries():
+    legacy_signer = Keypair.random()
+    v2_signer = Keypair.random()
+    delegating_signer = Keypair.random()
+    delegate = Keypair.random()
+    entries = [
+        _sample_auth_entry(legacy_signer.public_key),
+        _sample_auth_entry(
+            v2_signer.public_key,
+            stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+        ),
+        build_with_delegates_entry(
+            _sample_auth_entry(
+                delegating_signer.public_key,
+                stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+            ),
+            120,
+            [DelegateSignature(delegate.public_key)],
+        ),
+        stellar_xdr.SorobanAuthorizationEntry(
+            credentials=stellar_xdr.SorobanCredentials.SourceAccount(),
+            root_invocation=_sample_invocation(),
+        ),
+    ]
+    return entries, legacy_signer, v2_signer, delegating_signer, delegate
+
+
+def test_needs_non_invoker_signing_by_counts_all_address_credential_types():
+    entries, legacy_signer, v2_signer, delegating_signer, delegate = (
+        _mixed_credential_entries()
+    )
+    assembled, _, _ = _assembled_with_auth(legacy_signer.public_key, entries=entries)
+
+    needs = assembled.needs_non_invoker_signing_by()
+
+    # top-level addresses of every address-based credential type are reported,
+    # delegate signers and source-account entries are not
+    assert needs == {
+        legacy_signer.public_key,
+        v2_signer.public_key,
+        delegating_signer.public_key,
+    }
+    assert delegate.public_key not in needs
+
+    assembled.sign_auth_entries(v2_signer, valid_until_ledger_sequence=120)
+    assert assembled.needs_non_invoker_signing_by() == {
+        legacy_signer.public_key,
+        delegating_signer.public_key,
+    }
+    assert v2_signer.public_key in assembled.needs_non_invoker_signing_by(
+        include_already_signed=True
+    )
+
+
+async def test_async_needs_non_invoker_signing_by_counts_all_address_credential_types():
+    entries, legacy_signer, v2_signer, delegating_signer, delegate = (
+        _mixed_credential_entries()
+    )
+    assembled, _, _ = _assembled_async_with_auth(
+        legacy_signer.public_key, entries=entries
+    )
+
+    needs = assembled.needs_non_invoker_signing_by()
+
+    assert needs == {
+        legacy_signer.public_key,
+        v2_signer.public_key,
+        delegating_signer.public_key,
+    }
+    assert delegate.public_key not in needs
+
+    await assembled.sign_auth_entries(v2_signer, valid_until_ledger_sequence=120)
+    assert assembled.needs_non_invoker_signing_by() == {
+        legacy_signer.public_key,
+        delegating_signer.public_key,
+    }
+
+
+def _pre_signed_delegates_entry(top: Keypair, delegate: Keypair, valid_until: int):
+    """A delegates entry whose delegate has already signed at ``valid_until``."""
+    entry = build_with_delegates_entry(
+        _sample_auth_entry(
+            top.public_key,
+            stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+        ),
+        0,
+        [DelegateSignature(delegate.public_key)],
+    )
+    return authorize_entry(
+        entry,
+        delegate,
+        valid_until,
+        Network.TESTNET_NETWORK_PASSPHRASE,
+        for_address=delegate.public_key,
+    )
+
+
+def _invoke_op(assembled) -> InvokeHostFunction:
+    assert assembled.built_transaction is not None
+    op = assembled.built_transaction.transaction.operations[0]
+    assert isinstance(op, InvokeHostFunction)
+    return op
+
+
+def _with_delegates_of(
+    entry: stellar_xdr.SorobanAuthorizationEntry,
+) -> stellar_xdr.SorobanAddressCredentialsWithDelegates:
+    assert isinstance(
+        entry.credentials, stellar_xdr.SorobanCredentials.AddressWithDelegates
+    )
+    return entry.credentials.address_with_delegates
+
+
+def _assert_top_level_signed_at(assembled, delegate_signature, valid_until: int):
+    with_delegates = _with_delegates_of(_invoke_op(assembled).auth[0])
+    assert isinstance(
+        with_delegates.address_credentials.signature, stellar_xdr.SCVal.Vec
+    )
+    assert with_delegates.address_credentials.signature_expiration_ledger == valid_until
+    # the delegate's signature is still the one it produced
+    assert with_delegates.delegates[0].signature == delegate_signature
+
+
+def test_authorize_rejects_expiration_change_on_pre_signed_delegates_entry():
+    # authorize() can only sign the top-level node of a delegates entry, but the
+    # expiration ledger it stamps is shared with the delegates. Re-stamping it
+    # with the library default used to silently invalidate their signatures.
+    top = Keypair.random()
+    delegate = Keypair.random()
+    entry = _pre_signed_delegates_entry(top, delegate, 1000)
+    delegate_signature = _with_delegates_of(entry).delegates[0].signature
+    assembled, _, _ = _assembled_with_auth(top.public_key, entries=[entry])
+
+    with pytest.raises(ValueError, match=r"signature_expiration_ledger=1000"):
+        assembled.authorize(top)
+    assert assembled.needs_non_invoker_signing_by() == {top.public_key}
+
+    # passing the delegate's expiration through signs the top level for real
+    assembled.authorize(top, valid_until_ledger_sequence=1000)
+    _assert_top_level_signed_at(assembled, delegate_signature, 1000)
+    assert assembled.needs_non_invoker_signing_by() == set()
+
+
+def test_authorize_leaves_every_entry_untouched_when_one_is_rejected():
+    # Two entries for the same address: a plain one that signs fine, and a
+    # delegates one the guard rejects. Nothing is written back.
+    top = Keypair.random()
+    delegate = Keypair.random()
+    plain = _sample_auth_entry(
+        top.public_key,
+        stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+    )
+    delegated = _pre_signed_delegates_entry(top, delegate, 1000)
+    assembled, _, _ = _assembled_with_auth(top.public_key, entries=[plain, delegated])
+    before = list(_invoke_op(assembled).auth)
+
+    with pytest.raises(ValueError, match=r"signature_expiration_ledger=1000"):
+        assembled.authorize(top)
+
+    assert _invoke_op(assembled).auth == before
+
+    assembled.authorize(top, valid_until_ledger_sequence=1000)
+    for e in _invoke_op(assembled).auth:
+        match e.credentials:
+            case stellar_xdr.SorobanCredentials.AddressV2(addr_auth):
+                pass
+            case _:
+                addr_auth = _with_delegates_of(e).address_credentials
+        assert isinstance(addr_auth.signature, stellar_xdr.SCVal.Vec)
+        assert addr_auth.signature_expiration_ledger == 1000
+
+
+async def test_async_authorize_leaves_every_entry_untouched_when_one_is_rejected():
+    top = Keypair.random()
+    delegate = Keypair.random()
+    plain = _sample_auth_entry(
+        top.public_key,
+        stellar_xdr.SorobanCredentialsType.SOROBAN_CREDENTIALS_ADDRESS_V2,
+    )
+    delegated = _pre_signed_delegates_entry(top, delegate, 1000)
+    assembled, _, _ = _assembled_async_with_auth(
+        top.public_key, entries=[plain, delegated]
+    )
+    before = list(_invoke_op(assembled).auth)
+
+    with pytest.raises(ValueError, match=r"signature_expiration_ledger=1000"):
+        await assembled.authorize(top)
+
+    assert _invoke_op(assembled).auth == before

@@ -8,14 +8,9 @@ Updated: 2019-06-12
 Version: 2.1.0
 """
 
-import sys
 from collections.abc import MutableMapping
+from tomllib import loads as toml_loads
 from typing import Any
-
-if sys.version_info >= (3, 11):
-    from tomllib import loads as toml_loads
-else:
-    from toml import loads as toml_loads
 
 from ..client.aiohttp_client import AiohttpClient
 from ..client.base_async_client import BaseAsyncClient
@@ -25,6 +20,10 @@ from ..client.response import Response
 from .exceptions import StellarTomlNotFoundError
 
 __all__ = ["fetch_stellar_toml", "fetch_stellar_toml_async"]
+
+# Maximum allowed size for stellar.toml file (512 KB).
+# This limit helps prevent denial-of-service attacks via memory exhaustion.
+STELLAR_TOML_MAX_SIZE = 512 * 1024
 
 
 def fetch_stellar_toml(
@@ -45,11 +44,13 @@ def fetch_stellar_toml(
     :return: The stellar.toml file as an object via :func:`toml.loads`.
     :raises: :exc:`StellarTomlNotFoundError <stellar_sdk.sep.exceptions.StellarTomlNotFoundError>`:
         if the Stellar toml file could not be found.
+    :raises: :exc:`ContentSizeLimitExceededError <stellar_sdk.exceptions.ContentSizeLimitExceededError>`:
+        if the response size exceeds the maximum allowed size.
     """
     if not client:
         client = RequestsClient()
     url = _build_request_url(domain, use_http)
-    raw_resp = client.get(url)
+    raw_resp = client.get(url, max_content_size=STELLAR_TOML_MAX_SIZE)
     return _handle_raw_response(raw_resp)
 
 
@@ -71,12 +72,14 @@ async def fetch_stellar_toml_async(
     :return: The stellar.toml file as a dict object.
     :raises: :exc:`StellarTomlNotFoundError <stellar_sdk.sep.exceptions.StellarTomlNotFoundError>`:
         if the Stellar toml file could not be found.
+    :raises: :exc:`ContentSizeLimitExceededError <stellar_sdk.exceptions.ContentSizeLimitExceededError>`:
+        if the response size exceeds the maximum allowed size.
     """
 
     if not client:
         client = AiohttpClient()
     url = _build_request_url(domain, use_http)
-    raw_resp = await client.get(url)
+    raw_resp = await client.get(url, max_content_size=STELLAR_TOML_MAX_SIZE)
     return _handle_raw_response(raw_resp)
 
 

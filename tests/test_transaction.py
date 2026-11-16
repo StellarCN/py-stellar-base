@@ -37,7 +37,7 @@ class TestTransaction:
         tx = Transaction(source, sequence, fee, ops, memo, cond, v1=True)
         tx_object = tx.to_xdr_object()
         assert (
-            tx_object.to_xdr()
+            tx_object.to_xdr_base64()
             == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
         )
 
@@ -65,7 +65,7 @@ class TestTransaction:
         tx_object = tx.to_xdr_object()
         xdr = "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
 
-        assert tx_object.to_xdr() == xdr
+        assert tx_object.to_xdr_base64() == xdr
 
         restore_transaction = Transaction.from_xdr(xdr, True)
         assert isinstance(restore_transaction, Transaction)
@@ -78,7 +78,6 @@ class TestTransaction:
 
     def test_to_xdr_str_source_muxed_v1(self):
         source = "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
-        source2 = "GDL635DMMORJHKEHHQIIB4VPYM6YGEMPLORYHHM2DEHAUOUXLSTMHQDV"
         destination = "GDJJRRMBK4IWLEPJGIE6SXD2LP7REGZODU7WDC3I2D6MR37F4XSHBKX2"
         amount = "1000.0"
         sequence = 1
@@ -92,7 +91,7 @@ class TestTransaction:
         tx = Transaction(source, sequence, fee, ops, memo, cond, v1=True)
         tx_object = tx.to_xdr_object()
         restore_tx = Transaction.from_xdr_object(tx_object, v1=True)
-        assert restore_tx.to_xdr_object().to_xdr() == tx_object.to_xdr()
+        assert restore_tx.to_xdr_object() == tx_object
         assert restore_tx.source.account_id == source
         assert restore_tx == tx
 
@@ -111,7 +110,7 @@ class TestTransaction:
         tx_object = Transaction(
             source, sequence, fee, ops, memo, cond, None, True
         ).to_xdr_object()
-        restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), True)
+        restore_transaction = Transaction.from_xdr(tx_object.to_xdr_base64(), True)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == MuxedAccount.from_account(source)
         assert restore_transaction.fee == fee
@@ -136,7 +135,7 @@ class TestTransaction:
         tx_object = Transaction(
             source, sequence, fee, ops, memo, cond, None, True
         ).to_xdr_object()
-        restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), True)
+        restore_transaction = Transaction.from_xdr(tx_object.to_xdr_base64(), True)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source == source
         assert restore_transaction.fee == fee
@@ -201,7 +200,7 @@ class TestTransaction:
         #     == "AAAAAImbKEDtVjbFbdxfFLI5dfefG6I4jSaU5MVuzd3JYOXvAAAAyAAAAAAAAAABAAAAAQAAAAAAADA5AAAAAAAA3dUAAAACAAAAAAAAAGQAAAACAAAAAAAAAAEAAAAA0pjFgVcRZZHpMgnpXHpb/xIbLh0/YYto0PzI7+Xl5HAAAAAAAAAAAlQL5AAAAAAAAAAACgAAAAVoZWxsbwAAAAAAAAEAAAAFd29ybGQAAAAAAAAA"
         # )
 
-        restore_transaction = Transaction.from_xdr(tx_object.to_xdr(), False)
+        restore_transaction = Transaction.from_xdr(tx_object.to_xdr_base64(), False)
         assert isinstance(restore_transaction, Transaction)
         assert restore_transaction.source.account_id == source
         assert restore_transaction.fee == fee
@@ -225,7 +224,7 @@ class TestTransaction:
         assert tx.memo == NoneMemo()
 
     # def test_no_operation_raise(self):
-    #     with pytest.raises(ValueError, match="At least one operation required."):
+    #     with pytest.raises(ValueError, match=r"At least one operation required."):
     #         source = Keypair.from_public_key(
     #             "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
     #         )
@@ -310,7 +309,7 @@ class TestTransaction:
         tx = Transaction(source, sequence, fee, [op])
         with pytest.raises(
             TypeError,
-            match="Type of the operation must be <class 'stellar_sdk.operation.create_claimable_balance.CreateClaimableBalance'>, got <class 'stellar_sdk.operation.manage_data.ManageData'> instead",
+            match=r"Type of the operation must be <class 'stellar_sdk.operation.create_claimable_balance.CreateClaimableBalance'>, got <class 'stellar_sdk.operation.manage_data.ManageData'> instead",
         ):
             tx.get_claimable_balance_id(0)
 
@@ -347,15 +346,14 @@ class TestTransaction:
         soroban_data = SorobanDataBuilder().set_resources(1, 2, 3).build()
         time_bounds = TimeBounds(12345, 56789)
 
-        host_function = stellar_xdr.HostFunction(
-            stellar_xdr.HostFunctionType.HOST_FUNCTION_TYPE_INVOKE_CONTRACT,
-            invoke_contract=stellar_xdr.InvokeContractArgs(
+        host_function = stellar_xdr.HostFunction.InvokeContract(
+            stellar_xdr.InvokeContractArgs(
                 contract_address=Address(
                     "CDCYWK73YTYFJZZSJ5V7EDFNHYBG4QN3VUNG2IGD27KJDDPNCZKBCBXK"
                 ).to_xdr_sc_address(),
-                function_name=stellar_xdr.SCSymbol(sc_symbol="hello".encode("utf-8")),
+                function_name="hello",
                 args=[],
-            ),
+            )
         )
         ops = [InvokeHostFunction(host_function=host_function, auth=[])]
         cond = Preconditions(time_bounds=time_bounds)

@@ -1,13 +1,22 @@
 import pytest
 
-from stellar_sdk import Operation, SetTrustLineFlags, TrustLineFlags
-
-from . import *
+from stellar_sdk import (
+    Operation,
+    SetTrustLineFlags,
+    TrustLineFlags,
+)
+from tests.operation.helpers import (
+    asset1,
+    check_source,
+    kp1,
+    kp2,
+    muxed1,
+)
 
 
 class TestSetTrustLineFlags:
     @pytest.mark.parametrize(
-        "clear_flags, set_flags, source, xdr",
+        ("clear_flags", "set_flags", "source", "xdr"),
         [
             pytest.param(
                 TrustLineFlags.AUTHORIZED_TO_MAINTAIN_LIABILITIES_FLAG,
@@ -70,7 +79,7 @@ class TestSetTrustLineFlags:
         assert op.set_flags == set_flags
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_trustor_raise(self):

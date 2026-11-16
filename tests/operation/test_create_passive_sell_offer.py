@@ -2,14 +2,23 @@ from decimal import Decimal
 
 import pytest
 
-from stellar_sdk import CreatePassiveSellOffer, Operation, Price
-
-from . import *
+from stellar_sdk import (
+    CreatePassiveSellOffer,
+    Operation,
+    Price,
+)
+from tests.operation.helpers import (
+    asset1,
+    check_source,
+    kp1,
+    muxed1,
+    native_asset,
+)
 
 
 class TestCreatePassiveSellOffer:
     @pytest.mark.parametrize(
-        "amount, price, source, xdr",
+        ("amount", "price", "source", "xdr"),
         [
             pytest.param(
                 "100",
@@ -76,7 +85,7 @@ class TestCreatePassiveSellOffer:
         )
         check_source(op.source, source)
         xdr_object = op.to_xdr_object()
-        assert xdr_object.to_xdr() == xdr
+        assert xdr_object.to_xdr_base64() == xdr
         assert Operation.from_xdr_object(xdr_object) == op
 
     def test_invalid_amount_raise(self):

@@ -26,13 +26,12 @@ kp = Keypair.from_secret(secret)
 soroban_server = SorobanServer(rpc_server_url)
 source = soroban_server.load_account(kp.public_key)
 
-ledger_key = stellar_xdr.LedgerKey(
-    stellar_xdr.LedgerEntryType.CONTRACT_DATA,
-    contract_data=stellar_xdr.LedgerKeyContractData(
+ledger_key = stellar_xdr.LedgerKey.ContractData(
+    stellar_xdr.LedgerKeyContractData(
         contract=Address(contract_id).to_xdr_sc_address(),
-        key=stellar_xdr.SCVal(stellar_xdr.SCValType.SCV_LEDGER_KEY_CONTRACT_INSTANCE),
+        key=stellar_xdr.SCVal.LedgerKeyContractInstance(),
         durability=stellar_xdr.ContractDataDurability.PERSISTENT,
-    ),
+    )
 )
 soroban_data = SorobanDataBuilder().set_read_only([ledger_key]).build()
 
@@ -67,6 +66,6 @@ while True:
 print(f"transaction: {get_transaction_data}")
 
 if get_transaction_data.status == GetTransactionStatus.SUCCESS:
-    print(f"transaction success")
+    print("transaction success")
 else:
     print(f"Transaction failed: {get_transaction_data.result_xdr}")

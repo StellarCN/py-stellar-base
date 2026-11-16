@@ -40,9 +40,7 @@ class TimeBounds:
 
         :return: XDR TimeBounds object
         """
-        min_time = stellar_xdr.TimePoint(stellar_xdr.Uint64(self.min_time))
-        max_time = stellar_xdr.TimePoint(stellar_xdr.Uint64(self.max_time))
-        return stellar_xdr.TimeBounds(min_time, max_time)
+        return stellar_xdr.TimeBounds(self.min_time, self.max_time)
 
     @classmethod
     def from_xdr_object(cls, xdr_object: stellar_xdr.TimeBounds) -> "TimeBounds":
@@ -52,8 +50,8 @@ class TimeBounds:
         :return: A new :class:`TimeBounds` object from the given XDR TimeBounds object.
         """
         return cls(
-            min_time=xdr_object.min_time.time_point.uint64,
-            max_time=xdr_object.max_time.time_point.uint64,
+            min_time=int(xdr_object.min_time),
+            max_time=int(xdr_object.max_time),
         )
 
     def __hash__(self):
