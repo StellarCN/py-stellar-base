@@ -5,6 +5,8 @@ from stellar_sdk import (
     Operation,
     TrustLineEntryFlag,
 )
+from stellar_sdk import xdr as stellar_xdr
+from stellar_sdk.exceptions import AssetCodeInvalidError
 from tests.operation.helpers import (
     check_source,
     kp1,
@@ -131,3 +133,12 @@ class TestAllowTrust:
                 TrustLineEntryFlag.UNAUTHORIZED_FLAG,
                 kp1.public_key,
             )
+
+    def test_from_xdr_object_short_alphanum12_code_raise(self):
+        code = stellar_xdr.AssetCode.CreditAlphaNum12(b"USD".ljust(12, b"\x00"))
+        allow_trust = stellar_xdr.AllowTrustOp(kp2.xdr_account_id(), code, 1)
+        xdr_object = stellar_xdr.Operation(
+            None, stellar_xdr.OperationBody.AllowTrust(allow_trust)
+        )
+        with pytest.raises(AssetCodeInvalidError, match="'USD' is shorter than 5"):
+            Operation.from_xdr_object(xdr_object)

@@ -1,6 +1,7 @@
 import pytest
 
-from stellar_sdk import Network
+from stellar_sdk import Keypair, Network
+from stellar_sdk import xdr as stellar_xdr
 from stellar_sdk.asset import Asset
 from stellar_sdk.exceptions import AssetCodeInvalidError, AssetIssuerInvalidError
 
@@ -181,6 +182,20 @@ class TestAsset:
         xdr_object = asset.to_change_trust_asset_xdr_object()
         assert xdr_object.to_xdr_base64() == xdr
         assert Asset.from_xdr_object(xdr_object) == asset
+
+    @pytest.mark.parametrize(
+        "union",
+        [stellar_xdr.Asset, stellar_xdr.TrustLineAsset, stellar_xdr.ChangeTrustAsset],
+    )
+    def test_from_xdr_object_short_alphanum12_code_raise(self, union):
+        # The network takes 5 to 12 characters in an ALPHANUM12 code; a shorter one
+        # can't be read as the ALPHANUM4 asset of the same code, which differs.
+        issuer = Keypair.from_public_key(
+            "GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY"
+        ).xdr_account_id()
+        alpha_num = stellar_xdr.AlphaNum12(b"ABCD".ljust(12, b"\x00"), issuer)
+        with pytest.raises(AssetCodeInvalidError, match="'ABCD' is shorter than 5"):
+            Asset.from_xdr_object(union.CreditAlphaNum12(alpha_num))
 
     @pytest.mark.parametrize(
         ("asset", "network_passphrase", "contract_id"),

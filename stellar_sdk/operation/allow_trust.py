@@ -4,6 +4,7 @@ from typing import ClassVar
 
 from .. import xdr as stellar_xdr
 from ..asset import Asset
+from ..exceptions import AssetCodeInvalidError
 from ..keypair import Keypair
 from ..muxed_account import MuxedAccount
 from ..strkey import Ed25519PublicKey
@@ -108,10 +109,16 @@ class AllowTrust(Operation):
         assert isinstance(body, stellar_xdr.OperationBody.AllowTrust)
         op = body.allow_trust_op
         match op.asset:
-            case stellar_xdr.AssetCode.CreditAlphaNum4(
-                code
-            ) | stellar_xdr.AssetCode.CreditAlphaNum12(code):
+            case stellar_xdr.AssetCode.CreditAlphaNum4(code):
                 asset_code = code.rstrip(b"\x00").decode()
+            case stellar_xdr.AssetCode.CreditAlphaNum12(code):
+                asset_code = code.rstrip(b"\x00").decode()
+                # As in Asset.from_xdr_object: a shorter code would be written back
+                # as ALPHANUM4.
+                if len(asset_code) < 5:
+                    raise AssetCodeInvalidError(
+                        f"ALPHANUM12 asset code {asset_code!r} is shorter than 5 characters."
+                    )
             case asset:
                 raise ValueError(f"Unsupported asset code type: {asset.type!r}")
         return cls(
