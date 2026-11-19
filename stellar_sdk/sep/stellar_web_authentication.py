@@ -111,7 +111,7 @@ def build_challenge_transaction(
     :param memo: The ID memo to attach to the transaction. Not permitted if `client_account_id` is a muxed account
     :return: A base64 encoded string of the raw TransactionEnvelope xdr struct for the transaction.
     """
-    if client_account_id.startswith(MUXED_ACCOUNT_STARTING_LETTER) and memo:
+    if client_account_id.startswith(MUXED_ACCOUNT_STARTING_LETTER) and memo is not None:
         raise ValueError(
             "memos are not valid for challenge transactions with a muxed client account"
         )
@@ -142,7 +142,7 @@ def build_challenge_transaction(
             data_value=client_domain,
             source=client_signing_key,
         )
-    if memo:
+    if memo is not None:
         transaction_builder.add_id_memo(memo)
     transaction = transaction_builder.build()
     transaction.sign(server_keypair)
@@ -283,7 +283,7 @@ def read_challenge_transaction(
 
     if not transaction.memo or isinstance(transaction.memo, NoneMemo):
         memo = None
-    elif client_account.account_muxed_id:
+    elif client_account.account_muxed_id is not None:
         raise InvalidSep10ChallengeError(
             "Invalid challenge, memos are not permitted if the client account is muxed"
         )

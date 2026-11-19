@@ -3,7 +3,7 @@ from random import randrange
 
 import pytest
 
-from stellar_sdk import Account, Asset, Keypair, Network
+from stellar_sdk import Account, Asset, Keypair, MuxedAccount, Network
 from stellar_sdk.sep.exceptions import InvalidSep10ChallengeError
 from stellar_sdk.sep.stellar_web_authentication import (
     build_challenge_transaction,
@@ -96,6 +96,30 @@ class TestReadChallenge:
         )
         assert challenge_transaction.memo == memo
 
+    def test_read_challenge_transaction_with_memo_zero_permitted(self, frozen_web_auth):
+        server_kp = deterministic_keypair("server")
+        client_account_id = deterministic_keypair("client-account").public_key
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_account_id,
+            home_domain=home_domain,
+            web_auth_domain=web_auth_domain,
+            network_passphrase=network_passphrase,
+            memo=0,
+        )
+        challenge_transaction = read_challenge_transaction(
+            challenge_transaction=challenge,
+            server_account_id=server_kp.public_key,
+            network_passphrase=network_passphrase,
+            web_auth_domain=web_auth_domain,
+            home_domains=home_domain,
+        )
+        assert challenge_transaction.memo == 0
+
     def test_read_challenge_transaction_mux_client_id_with_memo_not_permitted(
         self, frozen_web_auth
     ):
@@ -136,6 +160,51 @@ class TestReadChallenge:
             read_challenge_transaction(
                 challenge_transaction=challenge.to_xdr(),
                 server_account_id=server_account.account.account_id,
+                network_passphrase=network_passphrase,
+                web_auth_domain=web_auth_domain,
+                home_domains=home_domain,
+            )
+
+    def test_read_challenge_transaction_mux_client_id_zero_with_memo_not_permitted(
+        self, frozen_web_auth
+    ):
+        server_kp = deterministic_keypair("server")
+        server_account = Account(server_kp.public_key, -1)
+        client_account_id = MuxedAccount(
+            deterministic_keypair("client-account").public_key, 0
+        ).account_muxed
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        home_domain = "example.com"
+        web_auth_domain = "auth.example.com"
+        nonce_encoded = base64.b64encode(bytes(48))
+
+        challenge = (
+            TransactionBuilder(
+                source_account=server_account, network_passphrase=network_passphrase
+            )
+            .append_manage_data_op(
+                data_name=f"{home_domain} auth",
+                data_value=nonce_encoded,
+                source=client_account_id,
+            )
+            .append_manage_data_op(
+                data_name="web_auth_domain",
+                data_value=web_auth_domain,
+                source=server_account.account,
+            )
+            .add_id_memo(1)
+            .set_timeout(600)
+            .build()
+        )
+        challenge.sign(server_kp)
+
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match=r"Invalid challenge, memos are not permitted if the client account is muxed",
+        ):
+            read_challenge_transaction(
+                challenge_transaction=challenge.to_xdr(),
+                server_account_id=server_kp.public_key,
                 network_passphrase=network_passphrase,
                 web_auth_domain=web_auth_domain,
                 home_domains=home_domain,
