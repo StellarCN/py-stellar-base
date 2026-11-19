@@ -30,6 +30,7 @@ Release History
 - `build_challenge_transaction` no longer drops `memo=0`, and `read_challenge_transaction` rejects a memo on a muxed client account whose ID is `0`.
 - Liquidity pool IDs and claimable balance IDs that contain non-hexadecimal characters are now rejected when the object is created, instead of failing later in `bytes.fromhex`.
 - Adding an extra signer to a `TransactionBuilder` no longer changes transactions it has already built, because `Preconditions` now copies the `extra_signers` it is given.
+- `ClaimPredicate.from_xdr_object` raises `ValueError` for a NOT predicate without the predicate it negates, and for an AND or OR predicate without exactly two predicates, which the network rejects. It used to raise `AssertionError` and `IndexError`.
 
 ### Version 17.0.1
 

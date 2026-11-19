@@ -200,6 +200,18 @@ class TestClaimPredicate:
         xdr_object = XdrClaimPredicate.from_xdr_base64(xdr)
         assert predicate == ClaimPredicate.from_xdr_object(xdr_object)
 
+    def test_from_xdr_object_not_without_predicate_raise(self):
+        # XDR allows it, and the network rejects it as malformed.
+        with pytest.raises(ValueError, match="NOT needs the predicate it negates"):
+            ClaimPredicate.from_xdr_object(XdrClaimPredicate.Not(None))
+
+    @pytest.mark.parametrize("arm", [XdrClaimPredicate.And, XdrClaimPredicate.Or])
+    @pytest.mark.parametrize("count", [0, 1])
+    def test_from_xdr_object_and_or_without_two_predicates_raise(self, arm, count):
+        predicates = [XdrClaimPredicate.Unconditional()] * count
+        with pytest.raises(ValueError, match=f"needs 2 predicates, not {count}"):
+            ClaimPredicate.from_xdr_object(arm(predicates))
+
 
 class TestClaimant:
     @staticmethod
