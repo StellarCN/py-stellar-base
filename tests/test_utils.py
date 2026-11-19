@@ -135,6 +135,7 @@ class TestUtils:
                 "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7123",
                 False,
             ),
+            ("gd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7", False),
             ("dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7", True),
             ("DD7B1AB831C273310DDBEC6F97870AA83C2FBD78CE22ADED37ECBF4F3380FAC7", True),
             ("DD7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7", True),
@@ -280,6 +281,11 @@ class TestUtils:
             ),
             (
                 "00000001da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be",
+                "balance_id",
+                True,
+            ),
+            (
+                "00000000ga0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be",
                 "balance_id",
                 True,
             ),

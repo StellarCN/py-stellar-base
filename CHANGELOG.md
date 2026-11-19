@@ -28,6 +28,7 @@ Release History
 - `Operation.from_xdr_amount` (and so the `amount` of operations decoded from XDR) returned amounts below 0.000001 in scientific notation, e.g. `"1E-7"` for 1 stroop. It now returns `"0.0000001"`.
 - `scval.to_native` now raises `ValueError` when two keys of an `SCV_MAP` convert to equal Python keys, such as the string `"1"` and the symbol `"1"`, or the u32 `1` and the i64 `1`. It used to keep only the last of them and drop the others without an error. `scval.from_map` and `scval.from_struct` raise the same way when a key repeats. ([#1252](https://github.com/StellarCN/py-stellar-base/pull/1252))
 - `build_challenge_transaction` no longer drops `memo=0`, and `read_challenge_transaction` rejects a memo on a muxed client account whose ID is `0`.
+- Liquidity pool IDs and claimable balance IDs that contain non-hexadecimal characters are now rejected when the object is created, instead of failing later in `bytes.fromhex`.
 
 ### Version 17.0.1
 

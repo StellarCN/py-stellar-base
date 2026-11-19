@@ -88,8 +88,8 @@ def urljoin_with_query(base: str, path: str | None) -> str:
 def is_valid_hash(data: str) -> bool:
     if not data:
         return False
-    asset_code_re = re.compile(r"^[a-zA-Z0-9]{64}$")
-    return bool(asset_code_re.match(data))
+    hash_re = re.compile(r"^[0-9a-fA-F]{64}$")
+    return bool(hash_re.match(data))
 
 
 def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> None:
