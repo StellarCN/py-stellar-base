@@ -112,6 +112,25 @@ class TestBuildChallenge:
         ).transaction
         assert transaction.memo == IdMemo(memo)
 
+    def test_challenge_transaction_id_memo_zero_permitted(self, frozen_web_auth):
+        server_kp = deterministic_keypair("server")
+        client_account_id = deterministic_keypair("client-account").public_key
+        network_passphrase = Network.TESTNET_NETWORK_PASSPHRASE
+
+        challenge = build_challenge_transaction(
+            server_secret=server_kp.secret,
+            client_account_id=client_account_id,
+            home_domain="example.com",
+            web_auth_domain="auth.example.com",
+            network_passphrase=network_passphrase,
+            memo=0,
+        )
+
+        transaction = TransactionEnvelope.from_xdr(
+            challenge, network_passphrase
+        ).transaction
+        assert transaction.memo == IdMemo(0)
+
     def test_challenge_transaction_muxed_client_account_with_memo_not_permitted(
         self, frozen_web_auth
     ):
@@ -137,6 +156,27 @@ class TestBuildChallenge:
                 network_passphrase=network_passphrase,
                 timeout=timeout,
                 memo=memo,
+            )
+
+    def test_challenge_transaction_muxed_client_account_with_memo_zero_not_permitted(
+        self, frozen_web_auth
+    ):
+        server_kp = deterministic_keypair("server")
+        client_account_id = (
+            "MAAAAAAAAAAAJURAAB2X52XFQP6FBXLGT6LWOOWMEXWHEWBDVRZ7V5WH34Y22MPFBHUHY"
+        )
+
+        with pytest.raises(
+            ValueError,
+            match=r"memos are not valid for challenge transactions with a muxed client account",
+        ):
+            build_challenge_transaction(
+                server_secret=server_kp.secret,
+                client_account_id=client_account_id,
+                home_domain="example.com",
+                web_auth_domain="auth.example.com",
+                network_passphrase=Network.TESTNET_NETWORK_PASSPHRASE,
+                memo=0,
             )
 
     def test_challenge_transaction_with_client_domain(self, frozen_web_auth):
