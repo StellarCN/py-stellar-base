@@ -237,7 +237,10 @@ class ClaimPredicate:
             case stellar_xdr.ClaimPredicate.BeforeRelativeTime(rel_before):
                 return cls.predicate_before_relative_time(rel_before)
             case stellar_xdr.ClaimPredicate.Not(not_predicate):
-                assert not_predicate is not None
+                if not_predicate is None:
+                    raise ValueError(
+                        "CLAIM_PREDICATE_NOT needs the predicate it negates."
+                    )
                 return cls.predicate_not(cls.from_xdr_object(not_predicate))
             case stellar_xdr.ClaimPredicate.And((left, right)):
                 return cls.predicate_and(
@@ -246,6 +249,12 @@ class ClaimPredicate:
             case stellar_xdr.ClaimPredicate.Or((left, right)):
                 return cls.predicate_or(
                     cls.from_xdr_object(left), cls.from_xdr_object(right)
+                )
+            case stellar_xdr.ClaimPredicate.And(
+                predicates
+            ) | stellar_xdr.ClaimPredicate.Or(predicates):
+                raise ValueError(
+                    f"{xdr_object.type.name} needs 2 predicates, not {len(predicates)}."
                 )
             case _:
                 raise ValueError(
