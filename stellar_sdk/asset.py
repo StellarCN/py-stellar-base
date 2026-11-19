@@ -231,6 +231,12 @@ class Asset:
                 raise ValueError(f"Invalid asset type: {xdr_object.type}")
         issuer = str(Ed25519PublicKey(alpha_num.issuer.ed25519))
         code = alpha_num.asset_code.decode().rstrip("\x00")
+        # The network takes 5 to 12 characters in an ALPHANUM12 code. A shorter one
+        # would be written back as ALPHANUM4, which is another asset.
+        if isinstance(alpha_num, stellar_xdr.AlphaNum12) and len(code) < 5:
+            raise AssetCodeInvalidError(
+                f"ALPHANUM12 asset code {code!r} is shorter than 5 characters."
+            )
         return cls(code, issuer)
 
     def __hash__(self) -> int:
