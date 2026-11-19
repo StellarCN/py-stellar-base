@@ -704,6 +704,20 @@ class TestTransaction:
 
         assert tx2.transaction.preconditions == cond
 
+    def test_add_extra_signer_does_not_change_built_transaction(self):
+        builder = (
+            get_tx_builder().append_bump_sequence_op(0).add_extra_signer(kp2.public_key)
+        )
+        first = builder.build()
+        first_xdr = first.to_xdr()
+
+        builder.add_extra_signer(kp3.public_key)
+        second = builder.build()
+
+        assert first.to_xdr() == first_xdr
+        assert second.transaction.preconditions is not None
+        assert len(second.transaction.preconditions.extra_signers) == 2
+
     def test_append_invoke_contract_function_op(self):
         auth = [
             stellar_xdr.SorobanAuthorizationEntry(

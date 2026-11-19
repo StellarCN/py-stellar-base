@@ -46,7 +46,7 @@ class Preconditions:
         self.min_sequence_number = min_sequence_number
         self.min_sequence_age = min_sequence_age
         self.min_sequence_ledger_gap = min_sequence_ledger_gap
-        self.extra_signers = extra_signers
+        self.extra_signers = list(extra_signers)
 
         if self._is_v2():
             self.min_sequence_age = (

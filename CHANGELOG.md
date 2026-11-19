@@ -29,6 +29,7 @@ Release History
 - `scval.to_native` now raises `ValueError` when two keys of an `SCV_MAP` convert to equal Python keys, such as the string `"1"` and the symbol `"1"`, or the u32 `1` and the i64 `1`. It used to keep only the last of them and drop the others without an error. `scval.from_map` and `scval.from_struct` raise the same way when a key repeats. ([#1252](https://github.com/StellarCN/py-stellar-base/pull/1252))
 - `build_challenge_transaction` no longer drops `memo=0`, and `read_challenge_transaction` rejects a memo on a muxed client account whose ID is `0`.
 - Liquidity pool IDs and claimable balance IDs that contain non-hexadecimal characters are now rejected when the object is created, instead of failing later in `bytes.fromhex`.
+- Adding an extra signer to a `TransactionBuilder` no longer changes transactions it has already built, because `Preconditions` now copies the `extra_signers` it is given.
 
 ### Version 17.0.1
 
