@@ -67,6 +67,20 @@ class TestPreconditions:
         assert cond == restore_cond
         assert xdr_object == restore_cond.to_xdr_object()
 
+    def test_extra_signers_are_copied(self):
+        extra_signers = [
+            SignerKey.from_encoded_signer_key(
+                "GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC"
+            )
+        ]
+        cond = Preconditions(extra_signers=extra_signers)
+        extra_signers.append(
+            SignerKey.from_encoded_signer_key(
+                "GDQERENWDDSQZS7R7WKHZI3BSOYMV3FSWR7TFUYFTKQ447PIX6NREOJM"
+            )
+        )
+        assert len(cond.extra_signers) == 1
+
     def test_xdr_with_one_extra_signers(self):
         extra_signers = [
             SignerKey.from_encoded_signer_key(
