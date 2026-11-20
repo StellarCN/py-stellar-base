@@ -3,12 +3,12 @@ tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.fee: 100
 tx.seqNum: 46489056724385793
 tx.cond.type: PRECOND_V2
-tx.cond.timeBounds._present: false
-tx.cond.ledgerBounds._present: false
-tx.cond.minSeqNum._present: false
-tx.cond.minSeqAge: 0
-tx.cond.minSeqLedgerGap: 30
-tx.cond.extraSigners.len: 0
+tx.cond.v2.timeBounds._present: false
+tx.cond.v2.ledgerBounds._present: false
+tx.cond.v2.minSeqNum._present: false
+tx.cond.v2.minSeqAge: 0
+tx.cond.v2.minSeqLedgerGap: 30
+tx.cond.v2.extraSigners.len: 0
 tx.memo.type: MEMO_TEXT
 tx.memo.text: "Enjoy this transaction"
 tx.operations.len: 1
