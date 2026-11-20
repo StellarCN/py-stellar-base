@@ -34,6 +34,7 @@ Release History
 - Liquidity pool IDs and claimable balance IDs that contain non-hexadecimal characters are now rejected when the object is created, instead of failing later in `bytes.fromhex`.
 - Adding an extra signer to a `TransactionBuilder` no longer changes transactions it has already built, because `Preconditions` now copies the `extra_signers` it is given.
 - `ClaimPredicate.from_xdr_object` raises `ValueError` for a NOT predicate without the predicate it negates, and for an AND or OR predicate without exactly two predicates, which the network rejects. It used to raise `AssertionError` and `IndexError`.
+- `Server.data()` and `ServerAsync.data()` keep the path of a Horizon URL such as `https://example.org/horizon`, as the other endpoints do, instead of requesting the data from the root of the host.
 - `Asset.from_xdr_object` and `AllowTrust.from_xdr_object` raise `AssetCodeInvalidError` for an ALPHANUM12 asset code shorter than 5 characters, which the network rejects, instead of reading it as an ALPHANUM4 code. Encoding such a transaction again used to change it.
 
 
