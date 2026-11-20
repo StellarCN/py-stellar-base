@@ -1,10 +1,15 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+import requests
 from requests import RequestException
 
 from stellar_sdk.client.requests_client import USER_AGENT, RequestsClient
-from stellar_sdk.exceptions import ConnectionError, ContentSizeLimitExceededError
+from stellar_sdk.exceptions import (
+    ConnectionError,
+    ContentSizeLimitExceededError,
+    StreamClientError,
+)
 from tests import _horizon_fixtures as hf
 
 
@@ -34,6 +39,19 @@ class TestRequestsClient:
         json = resp.json()
         assert json["headers"]["Content-Type"] == "application/x-www-form-urlencoded"
         assert json["form"] == data
+
+    @pytest.mark.parametrize(
+        ("params", "cursor"), [(None, None), ({"cursor": "now"}, "now")]
+    )
+    def test_stream_error_before_the_first_event(self, params, cursor):
+        client = RequestsClient()
+        error = requests.ConnectionError("refused")
+        with (
+            patch("stellar_sdk.client.requests_client.EventSource", side_effect=error),
+            pytest.raises(StreamClientError) as raised,
+        ):
+            next(client.stream("https://example.invalid", params))
+        assert raised.value.current_cursor == cursor
 
     def test_stream(self, horizon_mock):
         client = RequestsClient()

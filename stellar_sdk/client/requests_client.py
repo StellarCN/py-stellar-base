@@ -240,7 +240,7 @@ class RequestsClient(BaseSyncClient):
                 time.sleep(retry)
             except requests.RequestException as e:
                 raise StreamClientError(
-                    query_params["cursor"], "Failed to get stream message."
+                    query_params.get("cursor"), "Failed to get stream message."
                 ) from e
 
     def close(self) -> None:
