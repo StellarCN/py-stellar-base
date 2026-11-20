@@ -4,7 +4,11 @@ import aiohttp
 import pytest
 
 from stellar_sdk.client.aiohttp_client import USER_AGENT, AiohttpClient
-from stellar_sdk.exceptions import ConnectionError, ContentSizeLimitExceededError
+from stellar_sdk.exceptions import (
+    ConnectionError,
+    ContentSizeLimitExceededError,
+    StreamClientError,
+)
 from tests import _horizon_fixtures as hf
 
 
@@ -37,6 +41,22 @@ class TestAiohttpClient:
         assert json["headers"]["Content-Type"] == "application/x-www-form-urlencoded"
         assert json["form"] == data
         await client.close()
+
+    @pytest.mark.parametrize(
+        ("params", "cursor"), [(None, None), ({"cursor": "now"}, "now")]
+    )
+    async def test_stream_error_before_the_first_event(self, params, cursor):
+        error = aiohttp.ClientConnectionError("refused")
+        async with AiohttpClient() as client:
+            stream = client.stream("https://example.invalid", params)
+            with (
+                patch(
+                    "stellar_sdk.client.aiohttp_client.EventSource", side_effect=error
+                ),
+                pytest.raises(StreamClientError) as raised,
+            ):
+                await anext(stream)
+        assert raised.value.current_cursor == cursor
 
     async def test_stream(self, horizon_mock):
         horizon_mock.expect(

@@ -265,7 +265,7 @@ class AiohttpClient(BaseAsyncClient):
                             pass
             except aiohttp.ClientError as e:
                 raise StreamClientError(
-                    query_params["cursor"], "Failed to get stream message."
+                    query_params.get("cursor"), "Failed to get stream message."
                 ) from e
             except TimeoutError:
                 logger.warning(

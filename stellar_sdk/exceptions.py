@@ -105,7 +105,7 @@ class BaseHorizonError(BaseRequestError):
         self.title: str | None = message.get("title")
         self.detail: str | None = message.get("detail")
         self.extras: dict | None = message.get("extras")
-        self.result_xdr: str | None = message.get("extras", {}).get("result_xdr")
+        self.result_xdr: str | None = (self.extras or {}).get("result_xdr")
 
     def __repr__(self):
         return self.message
@@ -154,10 +154,12 @@ class StreamClientError(BaseRequestError):
     """Failed to fetch stream resource.
 
     :param current_cursor: The cursor of the last message obtained can be used for reconnect.
+        It is the cursor the stream started from if no message was obtained, or ``None``
+        if it started without one.
     :param message: error message
     """
 
-    def __init__(self, current_cursor: str, message: str) -> None:
+    def __init__(self, current_cursor: str | None, message: str) -> None:
         super().__init__(message)
         self.current_cursor = current_cursor
 
