@@ -24,6 +24,7 @@ Release History
 - Rewrite `to_txrep` and `from_txrep` to follow SEP-11. They now support every operation, Soroban included.
   - Some fields are written differently, such as `tx.cond.v2.minSeqNum`, signer keys as strkeys and `authorize: 1`. Text written by earlier versions may not be readable.
   - `from_txrep` raises `InvalidTxrepError`, a `ValueError` that names the line, for invalid text, including a line the transaction doesn't use.
+- `Price` raises `ValueError` for a numerator or denominator that is not positive, which the network rejects. Equality wasn't consistent for them: `Price(0, 0)` equaled every price.
 
 #### Fixes
 - `StrKey.decode_ed25519_signed_payload` and `StrKey.is_valid_ed25519_signed_payload` now reject a signed payload strkey (`P...`) whose padding bytes after the payload are not zero, as SEP-23 requires. Such a key used to decode to the same signer as the valid key.
@@ -37,6 +38,7 @@ Release History
 - `Server.data()` and `ServerAsync.data()` keep the path of a Horizon URL such as `https://example.org/horizon`, as the other endpoints do, instead of requesting the data from the root of the host.
 - A stream that fails before its first message raises `StreamClientError`, whose `current_cursor` is the cursor it started from or `None`, instead of `KeyError: 'cursor'`.
 - Horizon errors whose `extras` is `null` no longer raise `AttributeError`.
+- Equal `Price` objects, such as `Price(1, 2)` and `Price(2, 4)`, have equal hashes, so they work as dict keys and in sets.
 - `Asset.from_xdr_object` and `AllowTrust.from_xdr_object` raise `AssetCodeInvalidError` for an ALPHANUM12 asset code shorter than 5 characters, which the network rejects, instead of reading it as an ALPHANUM4 code. Encoding such a transaction again used to change it.
 
 

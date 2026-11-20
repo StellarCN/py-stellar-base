@@ -1,4 +1,5 @@
 from decimal import Decimal
+from fractions import Fraction
 
 from . import xdr as stellar_xdr
 from .utils import best_rational_approximation
@@ -18,9 +19,15 @@ class Price:
 
     :param n: numerator
     :param d: denominator
+    :raises: :exc:`ValueError`: if ``n`` or ``d`` is not positive, as the network
+        requires.
     """
 
     def __init__(self, n: int, d: int) -> None:
+        if n <= 0 or d <= 0:
+            raise ValueError(
+                f"A price needs a positive numerator and denominator, not {n}/{d}."
+            )
         self.n: int = n
         self.d: int = d
 
@@ -65,7 +72,8 @@ class Price:
         return (self.n * other.d) <= (other.n * self.d)
 
     def __hash__(self):
-        return hash((self.n, self.d))
+        # Equal prices are the same fraction, such as 1/2 and 2/4.
+        return hash(Fraction(self.n, self.d))
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
