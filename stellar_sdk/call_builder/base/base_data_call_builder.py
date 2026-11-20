@@ -15,4 +15,4 @@ class BaseDataCallBuilder(BaseCallBuilder):
 
     def __init__(self, account_id: str, data_name: str, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.endpoint: str = f"/accounts/{account_id}/data/{data_name}"
+        self.endpoint: str = f"accounts/{account_id}/data/{data_name}"
