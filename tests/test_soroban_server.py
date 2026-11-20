@@ -46,6 +46,7 @@ class TestSorobanServer:
                 {
                     "key": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA==",
                     "xdr": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JAAAABdIcDhpAAADHAAAAAwAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAABfI8AAAAAZMK3qQ==",
+                    "extXdr": "AAAAAA==",
                     "lastModifiedLedgerSeq": "97423",
                     "liveUntilLedgerSeq": "97999",
                 }
@@ -157,6 +158,7 @@ class TestSorobanServer:
                 {
                     "key": "AAAABgAAAAFbihjlAiytnchoNOQZzgshTg9sfCxcBnTGO2xwtRu0awAAABQAAAAB",
                     "xdr": "AAAABgAAAAAAAAABW4oY5QIsrZ3IaDTkGc4LIU4PbHwsXAZ0xjtscLUbtGsAAAAUAAAAAQAAABMAAAAAJEKO7o0EZBi/DpFId2xLI1yGppi+ADrnh9IIE/CfJEcAAAAA",
+                    "extXdr": "AAAAAA==",
                     "lastModifiedLedgerSeq": "11715",
                     "liveUntilLedgerSeq": "17882",
                 }
@@ -329,12 +331,15 @@ class TestSorobanServer:
                 {
                     "key": "AAAAAAAAAACynni6I2ACEzWuORVM1b2y0k1ZDni0W6JlC/Ad/mfCSg==",
                     "xdr": "AAAAAAAAAACynni6I2ACEzWuORVM1b2y0k1ZDni0W6JlC/Ad/mfCSgAAABdIdugAAAAAnwAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA",
+                    "extXdr": "AAAAAA==",
                     "lastModifiedLedgerSeq": "159",
                     "liveUntilLedgerSeq": "288",
                 },
                 {
                     "key": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JA==",
                     "xdr": "AAAAAAAAAADBPp7TMinJylnn+6dQXJACNc15LF+aJ2Py1BaR4P10JAAAABdIcmH6AAAAoQAAAAgAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAAHAkAAAAAZMPQ0g==",
+                    # Sponsored by the account of the first entry.
+                    "extXdr": "AAAAAQAAAAEAAAAAsp54uiNgAhM1rjkVTNW9stJNWQ54tFuiZQvwHf5nwkoAAAAA",
                     "lastModifiedLedgerSeq": "7177",
                     "liveUntilLedgerSeq": "8392",
                 },
@@ -360,9 +365,15 @@ class TestSorobanServer:
             )
         )
         rpc_mock.expect_response(data)
-        assert await resolve(
-            soroban_server.get_ledger_entries([key0, key1])
-        ) == GetLedgerEntriesResponse.model_validate(result)
+        response = await resolve(soroban_server.get_ledger_entries([key0, key1]))
+        assert response == GetLedgerEntriesResponse.model_validate(result)
+        unsponsored, sponsored = (
+            stellar_xdr.LedgerEntryExt.from_xdr_base64(entry.ext_xdr)
+            for entry in response.entries
+        )
+        assert isinstance(unsponsored, stellar_xdr.LedgerEntryExt.V0)
+        assert isinstance(sponsored, stellar_xdr.LedgerEntryExt.V1)
+        assert sponsored.v1.sponsoring_id == key0.account.account_id
 
         rpc_mock.assert_request(
             "getLedgerEntries",
@@ -913,6 +924,7 @@ class TestSorobanServer:
                 {
                     "key": expected_key,
                     "xdr": "AAAABgAAAAAAAAABJbT82FmuwvpjSEOMSJs8PBDJi20hvk/TyzDLaJU++XcAAAAQAAAAAQAAAAIAAAAPAAAAB0JhbGFuY2UAAAAAEgAAAAEltPzYWa7C+mNIQ4xImzw8EMmLbSG+T9PLMMtolT75dwAAAAEAAAARAAAAAQAAAAMAAAAPAAAABmFtb3VudAAAAAAACgAAAAAAAAAAAAAAABFKkyUAAAAPAAAACmF1dGhvcml6ZWQAAAAAAAAAAAABAAAADwAAAAhjbGF3YmFjawAAAAAAAAAA",
+                    "extXdr": "AAAAAA==",
                     "lastModifiedLedgerSeq": last_modified_ledger,
                     "liveUntilLedgerSeq": live_until_ledger,
                 }

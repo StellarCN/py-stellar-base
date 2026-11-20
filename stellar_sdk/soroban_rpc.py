@@ -129,6 +129,9 @@ class GetLedgerEntriesRequest(BaseModel):
 class LedgerEntryResult(BaseModel):
     key: str
     xdr: str
+    # The entry's `LedgerEntryExt`, which names its sponsor, if any. stellar-rpc
+    # sends it since version 23.
+    ext_xdr: str = Field(alias="extXdr")
     last_modified_ledger: int = Field(alias="lastModifiedLedgerSeq")
     live_until_ledger: int | None = Field(alias="liveUntilLedgerSeq", default=None)
 
