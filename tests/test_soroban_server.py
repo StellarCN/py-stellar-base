@@ -93,7 +93,9 @@ class TestSorobanServer:
         result = {
             "status": "healthy",
             "latestLedger": 50000,
+            "latestLedgerCloseTime": "1795159084",
             "oldestLedger": 1,
+            "oldestLedgerCloseTime": "1794554287",
             "ledgerRetentionWindow": 10000,
         }
         data = {
@@ -102,9 +104,12 @@ class TestSorobanServer:
             "result": result,
         }
         rpc_mock.expect_response(data)
-        assert await resolve(
-            soroban_server.get_health()
-        ) == GetHealthResponse.model_validate(result)
+        health = await resolve(soroban_server.get_health())
+        assert health == GetHealthResponse.model_validate(result)
+        assert (health.latest_ledger_close_time, health.oldest_ledger_close_time) == (
+            1795159084,
+            1794554287,
+        )
 
         rpc_mock.assert_request("getHealth", None)
 
@@ -479,6 +484,18 @@ class TestSorobanServer:
                 ],
                 "value": "AAAACgAAAAAAAAAAAAAAAACYluQ=",
             },
+            {
+                # An event without topics, whose "topic" the server leaves out.
+                "type": "contract",
+                "ledger": 318987,
+                "ledgerClosedAt": "2025-07-07T04:50:24Z",
+                "contractId": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+                "id": "0001370038732849152-0000000001",
+                "operationIndex": 0,
+                "transactionIndex": 0,
+                "txHash": "bdfe344060decbfd77ce0022538633de63947d85774434be8573b14fc870ce21",
+                "value": "AAAAAQ==",
+            },
         ]
         result = {
             "events": events,
@@ -508,6 +525,8 @@ class TestSorobanServer:
             )
         ]
         events_response = GetEventsResponse.model_validate(result)
+        assert events_response.events[2].topic == []
+        assert events_response.latest_ledger_close_time == 1751863824
         limit = 10
         rpc_mock.expect_response(data)
         assert (

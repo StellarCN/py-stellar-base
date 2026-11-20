@@ -64,7 +64,8 @@ class EventInfo(BaseModel):
     ledger_close_at: datetime = Field(alias="ledgerClosedAt")
     contract_id: str = Field(alias="contractId")
     id: str = Field(alias="id")
-    topic: list[str] = Field(alias="topic")
+    # Left out by the server when the event has no topics.
+    topic: list[str] = Field(alias="topic", default_factory=list)
     value: str = Field(alias="value")
     operation_index: int = Field(alias="operationIndex")
     transaction_index: int = Field(alias="transactionIndex")
@@ -111,7 +112,7 @@ class GetEventsResponse(BaseModel):
     events: list[EventInfo] = Field(alias="events")
     latest_ledger: int = Field(alias="latestLedger")
     oldest_ledger: int = Field(alias="oldestLedger")
-    latest_Ledger_close_time: int = Field(alias="latestLedgerCloseTime")
+    latest_ledger_close_time: int = Field(alias="latestLedgerCloseTime")
     oldest_ledger_close_time: int = Field(alias="oldestLedgerCloseTime")
     cursor: str
 
@@ -168,7 +169,9 @@ class GetHealthResponse(BaseModel):
 
     status: str
     latest_ledger: int = Field(alias="latestLedger")
+    latest_ledger_close_time: int = Field(alias="latestLedgerCloseTime")
     oldest_ledger: int = Field(alias="oldestLedger")
+    oldest_ledger_close_time: int = Field(alias="oldestLedgerCloseTime")
     ledger_retention_window: int = Field(alias="ledgerRetentionWindow")
 
 
@@ -209,18 +212,6 @@ class SimulateTransactionRequest(BaseModel):
     auth_mode: AuthMode | None = Field(alias="authMode", default=None)
     use_upgraded_auth: bool = Field(alias="useUpgradedAuth", default=True)
     model_config = ConfigDict(populate_by_name=True)
-
-
-class SimulateTransactionCost(BaseModel):
-    cpu_insns: int = Field(alias="cpuInsns")
-    mem_bytes: int = Field(alias="memBytes")
-
-
-class SimulateTransactionResult(BaseModel):
-    auth: list[str] | None = None
-    events: list[str] | None = None
-    footprint: str
-    xdr: str
 
 
 class SimulateHostFunctionResult(BaseModel):
