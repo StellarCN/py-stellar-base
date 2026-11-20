@@ -25,6 +25,7 @@ Release History
   - Some fields are written differently, such as `tx.cond.v2.minSeqNum`, signer keys as strkeys and `authorize: 1`. Text written by earlier versions may not be readable.
   - `from_txrep` raises `InvalidTxrepError`, a `ValueError` that names the line, for invalid text, including a line the transaction doesn't use.
 - `Price` raises `ValueError` for a numerator or denominator that is not positive, which the network rejects. Equality wasn't consistent for them: `Price(0, 0)` equaled every price.
+- `LedgerEntryResult` has `ext_xdr`, the entry's `LedgerEntryExt`, which names its sponsor. It requires stellar-rpc 23 or later.
 
 #### Fixes
 - `StrKey.decode_ed25519_signed_payload` and `StrKey.is_valid_ed25519_signed_payload` now reject a signed payload strkey (`P...`) whose padding bytes after the payload are not zero, as SEP-23 requires. Such a key used to decode to the same signer as the valid key.
