@@ -3,21 +3,19 @@ tx.sourceAccount: GBEFNJVA2347XAJ4HYAECN5S7DIMLRDKXYT7BSFGF6SDM4VH5TD5HGJB
 tx.fee: 100
 tx.seqNum: 46489056724385793
 tx.cond.type: PRECOND_V2
-tx.cond.timeBounds._present: true
-tx.cond.timeBounds.minTime: 1649237469 (2022-04-06 09:31:09.000000+00:00 (UTC))
-tx.cond.timeBounds.maxTime: 1649238469 (2022-04-06 09:47:49.000000+00:00 (UTC))
-tx.cond.ledgerBounds._present: true
-tx.cond.ledgerBounds.minLedger: 40351800
-tx.cond.ledgerBounds.maxLedger: 40352000
-tx.cond.minSeqNum._present: true
-tx.cond.minSeqNum: 103420918407103888
-tx.cond.minSeqAge: 1649239999
-tx.cond.minSeqLedgerGap: 30
-tx.cond.extraSigners.len: 2
-tx.cond.extraSigners[0].type: SIGNER_KEY_TYPE_ED25519
-tx.cond.extraSigners[0].ed25519: GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC
-tx.cond.extraSigners[1].type: SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD
-tx.cond.extraSigners[1].ed25519SignedPayload: PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM
+tx.cond.v2.timeBounds._present: true
+tx.cond.v2.timeBounds.minTime: 1649237469 (2022-04-06T09:31:09Z)
+tx.cond.v2.timeBounds.maxTime: 1649238469 (2022-04-06T09:47:49Z)
+tx.cond.v2.ledgerBounds._present: true
+tx.cond.v2.ledgerBounds.minLedger: 40351800
+tx.cond.v2.ledgerBounds.maxLedger: 40352000
+tx.cond.v2.minSeqNum._present: true
+tx.cond.v2.minSeqNum: 103420918407103888
+tx.cond.v2.minSeqAge: 1649239999
+tx.cond.v2.minSeqLedgerGap: 30
+tx.cond.v2.extraSigners.len: 2
+tx.cond.v2.extraSigners[0]: GBJCHUKZMTFSLOMNC7P4TS4VJJBTCYL3XKSOLXAUJSD56C4LHND5TWUC
+tx.cond.v2.extraSigners[1]: PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM
 tx.memo.type: MEMO_TEXT
 tx.memo.text: "Enjoy this transaction"
 tx.operations.len: 1

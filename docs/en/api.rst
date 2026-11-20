@@ -968,6 +968,7 @@ Exceptions
 .. autoclass:: stellar_sdk.sep.exceptions.FederationServerNotFoundError
 .. autoclass:: stellar_sdk.sep.exceptions.BadFederationResponseError
 .. autoclass:: stellar_sdk.sep.exceptions.InvalidSep10ChallengeError
+.. autoclass:: stellar_sdk.sep.exceptions.InvalidTxrepError
 .. autoclass:: stellar_sdk.sep.exceptions.AccountRequiresMemoError
 
 .. _stellar_sdk_xdr:

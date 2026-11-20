@@ -37,6 +37,13 @@ class InvalidWasmError(SdkError, ValueError):
     """Raised when a contract Wasm file or section cannot be decoded."""
 
 
+class InvalidTxrepError(SdkError, ValueError):
+    """Raised when a text is not valid SEP-0011 txrep of a transaction envelope.
+
+    The message names the line that is wrong.
+    """
+
+
 class AccountRequiresMemoError(SdkError):
     """AccountRequiresMemoError is raised when a transaction is trying to submit an
     operation to an account which requires a memo.
