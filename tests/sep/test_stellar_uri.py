@@ -529,6 +529,13 @@ class TestPayStellarUri:
             "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO"
         ) == PayStellarUri("GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO")
 
+    def test_small_decimal_amount(self):
+        uri = PayStellarUri(
+            "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",
+            amount=Decimal("0.0000001"),
+        )
+        assert uri.amount == "0.0000001"
+
     def test_invalid_callback_raise(self):
         uri = "web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=120.1234567&asset_code=Hello&asset_issuer=GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF&memo=Hello%20World&memo_type=MEMO_TEXT&callback=https%3A%2F%2Fexample.com%2Fcallback&msg=pay%20me%20with%20lumens&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=k5cDMVTD2W2lKeEGqakjOTf3aPuPumlr8ObBOvauaa2QiXqa7%2Bw9WRgtmo6NaPXdOoFG5ScUIp9k7PdeuPieCw%3D%3D"
         with pytest.raises(ValueError, match=r"`callback` should start with `url:`."):

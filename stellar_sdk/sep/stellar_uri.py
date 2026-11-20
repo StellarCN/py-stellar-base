@@ -110,7 +110,7 @@ class PayStellarUri(StellarUri):
         self.memo_type, self.memo = self._encode_memo(memo)
         self.destination = destination
         if isinstance(amount, Decimal):
-            amount = str(amount)
+            amount = format(amount, "f")
         self.amount = amount
         self.callback = callback
         self.msg = message
