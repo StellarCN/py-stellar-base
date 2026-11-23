@@ -1,3 +1,5 @@
+from decimal import localcontext
+
 import pytest
 
 from stellar_sdk.exceptions import NoApproximationError
@@ -44,6 +46,26 @@ class TestUtils:
     @pytest.mark.parametrize("v", ["0.0000000003", 2147483648])
     def test_best_rational_approximation_raise(self, v):
         with pytest.raises(NoApproximationError, match=r"Couldn't find approximation."):
+            best_rational_approximation(v)
+
+    @pytest.mark.parametrize("precision", [5, 9, 18])
+    def test_best_rational_approximation_does_not_depend_on_the_decimal_context(
+        self, precision
+    ):
+        with localcontext() as ctx:
+            ctx.prec = precision
+            assert best_rational_approximation("1234.5678901") == {
+                "n": 655680241,
+                "d": 531101,
+            }
+            assert best_rational_approximation("2.93850088") == {
+                "n": 36731261,
+                "d": 12500000,
+            }
+
+    @pytest.mark.parametrize("v", ["abc", "", "NaN"])
+    def test_best_rational_approximation_not_a_number_raise(self, v):
+        with pytest.raises(ValueError, match=f"Value of '{v}' is not a number."):
             best_rational_approximation(v)
 
     @pytest.mark.parametrize(
@@ -200,6 +222,13 @@ class TestUtils:
                 raise_if_not_valid_amount(amount, argument_name)
         else:
             raise_if_not_valid_amount(amount, argument_name)
+
+    @pytest.mark.parametrize("amount", ["abc", ""])
+    def test_raise_if_not_valid_amount_not_a_number(self, amount):
+        with pytest.raises(
+            ValueError, match=f'Value of argument "amount" is not a number: {amount}'
+        ):
+            raise_if_not_valid_amount(amount, "amount")
 
     @pytest.mark.parametrize(
         ("amount", "argument_name", "raise_err"),

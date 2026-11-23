@@ -5,7 +5,17 @@ They may change at any time, so please do not use them directly.
 import hashlib
 import re
 from collections.abc import Sequence
-from decimal import ROUND_FLOOR, Context, Decimal, Inexact
+from decimal import (
+    ROUND_FLOOR,
+    ROUND_HALF_EVEN,
+    Context,
+    Decimal,
+    DivisionByZero,
+    Inexact,
+    InvalidOperation,
+    Overflow,
+    localcontext,
+)
 from typing import TYPE_CHECKING
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
@@ -23,6 +33,14 @@ _LOWER_LIMIT = "0"
 _UPPER_LIMIT = "922337203685.4775807"
 _EXPONENT = 7
 _ONE = Decimal(10**7)
+# Amounts and prices are computed in this context, which is Python's default one,
+# instead of the caller's. An application may lower its own precision below the 19
+# digits an amount can have, which used to round amounts without an error.
+_DECIMAL_CONTEXT = Context(
+    prec=28,
+    rounding=ROUND_HALF_EVEN,
+    traps=[InvalidOperation, DivisionByZero, Overflow],
+)
 
 
 def sha256(data: bytes) -> bytes:
@@ -30,7 +48,14 @@ def sha256(data: bytes) -> bytes:
 
 
 def best_rational_approximation(x) -> dict[str, int]:
-    x = Decimal(x)
+    try:
+        with localcontext(_DECIMAL_CONTEXT):
+            return _best_rational_approximation(Decimal(x))
+    except InvalidOperation as e:
+        raise ValueError(f"Value of '{x}' is not a number.") from e
+
+
+def _best_rational_approximation(x: Decimal) -> dict[str, int]:
     int32_max = Decimal(2147483647)
     fractions = [[Decimal(0), Decimal(1)], [Decimal(1), Decimal(0)]]
     i = 2
@@ -102,7 +127,12 @@ def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> Non
 
 
 def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
-    amount = Decimal(value)
+    try:
+        amount = Decimal(value)
+    except InvalidOperation as e:
+        raise ValueError(
+            f'Value of argument "{argument_name}" is not a number: {value}'
+        ) from e
     exponent = amount.as_tuple().exponent
     if not isinstance(exponent, int) or abs(exponent) > _EXPONENT:
         raise ValueError(
@@ -196,13 +226,18 @@ def to_xdr_amount(value: str | Decimal) -> int:
     """
     # throw exception if value * ONE has decimal places (it can't be represented as int64)
     try:
-        amount = int(
-            (Decimal(value) * _ONE).to_integral_exact(context=Context(traps=[Inexact]))
-        )
+        with localcontext(_DECIMAL_CONTEXT):
+            amount = int(
+                (Decimal(value) * _ONE).to_integral_exact(
+                    context=Context(traps=[Inexact])
+                )
+            )
     except Inexact as e:
         raise ValueError(
             f"Value of '{value}' must have at most 7 digits after the decimal."
         ) from e
+    except (InvalidOperation, OverflowError) as e:  # not a number; infinity
+        raise ValueError(f"Value of '{value}' is not a number.") from e
 
     if amount < 0 or amount > 9223372036854775807:
         raise ValueError(
@@ -220,4 +255,5 @@ def from_xdr_amount(value: int) -> str:
         amount.
 
     """
-    return format(Decimal(value) / _ONE, "f")
+    with localcontext(_DECIMAL_CONTEXT):
+        return format(Decimal(value) / _ONE, "f")
