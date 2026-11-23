@@ -529,12 +529,29 @@ class TestPayStellarUri:
             "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO"
         ) == PayStellarUri("GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO")
 
-    def test_small_decimal_amount(self):
+    @pytest.mark.parametrize(
+        ("amount", "expected"),
+        [
+            # str() writes these with an exponent.
+            (Decimal("0.0000001"), "0.0000001"),
+            (Decimal("100").normalize(), "100"),
+            (Decimal("1E+11"), "100000000000"),
+            (Decimal("1.23E+3"), "1230"),
+            # str() writes these plain, whether given with an exponent or not.
+            (Decimal("1.2E-6"), "0.0000012"),
+            (Decimal("9.223372036854775807E+11"), "922337203685.4775807"),
+            (Decimal("922337203685.4775807"), "922337203685.4775807"),
+            (Decimal("12.3400"), "12.3400"),
+            (Decimal("5"), "5"),
+        ],
+    )
+    def test_decimal_amount_without_exponent(self, amount, expected):
         uri = PayStellarUri(
-            "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO",
-            amount=Decimal("0.0000001"),
+            "GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO", amount=amount
         )
-        assert uri.amount == "0.0000001"
+        assert uri.amount == expected
+        assert f"&amount={expected}" in uri.to_uri()
+        assert PayStellarUri.from_uri(uri.to_uri()).amount == expected
 
     def test_invalid_callback_raise(self):
         uri = "web+stellar:pay?destination=GCALNQQBXAPZ2WIRSDDBMSTAKCUH5SG6U76YBFLQLIXJTF7FE5AX7AOO&amount=120.1234567&asset_code=Hello&asset_issuer=GBDIT5GUJ7R5BXO3GJHFXJ6AZ5UQK6MNOIDMPQUSMXLIHTUNR2Q5CFNF&memo=Hello%20World&memo_type=MEMO_TEXT&callback=https%3A%2F%2Fexample.com%2Fcallback&msg=pay%20me%20with%20lumens&network_passphrase=Test%20SDF%20Network%20%3B%20September%202015&origin_domain=someDomain.com&signature=k5cDMVTD2W2lKeEGqakjOTf3aPuPumlr8ObBOvauaa2QiXqa7%2Bw9WRgtmo6NaPXdOoFG5ScUIp9k7PdeuPieCw%3D%3D"
