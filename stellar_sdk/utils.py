@@ -113,8 +113,7 @@ def urljoin_with_query(base: str, path: str | None) -> str:
 def is_valid_hash(data: str) -> bool:
     if not data:
         return False
-    hash_re = re.compile(r"^[0-9a-fA-F]{64}$")
-    return bool(hash_re.match(data))
+    return bool(re.fullmatch(r"[0-9a-fA-F]{64}", data))
 
 
 def raise_if_not_valid_ed25519_public_key(value: str, argument_name: str) -> None:

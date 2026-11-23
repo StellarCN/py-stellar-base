@@ -45,6 +45,7 @@ Release History
 - Equal `Price` objects, such as `Price(1, 2)` and `Price(2, 4)`, have equal hashes, so they work as dict keys and in sets.
 - `SorobanServer.get_events` reads an event without topics, whose `topic` stellar-rpc leaves out, as `topic == []`. It used to fail with a validation error for the whole page.
 - `Asset.from_xdr_object` and `AllowTrust.from_xdr_object` raise `AssetCodeInvalidError` for an ALPHANUM12 asset code shorter than 5 characters, which the network rejects, instead of reading it as an ALPHANUM4 code. Encoding such a transaction again used to change it.
+- An asset code or a liquidity pool ID that ends with a newline is rejected. `Asset("USD\n", issuer)` used to write the newline to the XDR.
 - `PayStellarUri` no longer writes a small `Decimal` amount in scientific notation, e.g. `amount=1E-7` for `Decimal("0.0000001")`. It now writes `amount=0.0000001`.
 - Amounts and prices no longer depend on the caller's `decimal` context. With a precision below 19, amounts were rounded without an error: at a precision of 9, `1234.5678901` was written as `1234.56789`.
 - An amount or price that isn't a number, such as `"abc"`, raises `ValueError` instead of `decimal.InvalidOperation`.
