@@ -13,6 +13,8 @@ class TestOperation:
             ("0.10", 1000000),
             ("0.1234567", 1234567),
             ("922337203685.4775807", 9223372036854775807),
+            # Zeros are not digits of the amount, however many there are.
+            ("1." + "0" * 40, 10000000),
         ],
     )
     def test_to_xdr_amount(self, origin_amount, expect_value):
@@ -39,6 +41,23 @@ class TestOperation:
             ("abc", ValueError, "Value of 'abc' is not a number."),
             ("", ValueError, "Value of '' is not a number."),
             ("Infinity", ValueError, "Value of 'Infinity' is not a number."),
+            ("NaN", ValueError, "Value of 'NaN' is not a number."),
+            # A fraction of a stroop past the 28 digits a product is computed to.
+            (
+                "1." + "0" * 27 + "1",
+                ValueError,
+                "must have at most 7 digits after the decimal.",
+            ),
+            (
+                "1E-999999999",
+                ValueError,
+                "Value of '1E-999999999' must have at most 7 digits after the decimal.",
+            ),
+            (
+                "1" * 30,
+                ValueError,
+                "must represent a positive number and the max valid value is",
+            ),
         ],
     )
     def test_to_xdr_amount_raise(self, origin_amount, exception, reason):
