@@ -45,6 +45,7 @@ Release History
 - Equal `Price` objects, such as `Price(1, 2)` and `Price(2, 4)`, have equal hashes, so they work as dict keys and in sets.
 - `SorobanServer.get_events` reads an event without topics, whose `topic` stellar-rpc leaves out, as `topic == []`. It used to fail with a validation error for the whole page.
 - `Asset.from_xdr_object` and `AllowTrust.from_xdr_object` raise `AssetCodeInvalidError` for an ALPHANUM12 asset code shorter than 5 characters, which the network rejects, instead of reading it as an ALPHANUM4 code. Encoding such a transaction again used to change it.
+- `PayStellarUri` no longer writes a small `Decimal` amount in scientific notation, e.g. `amount=1E-7` for `Decimal("0.0000001")`. It now writes `amount=0.0000001`.
 
 
 ### Version 17.0.1
