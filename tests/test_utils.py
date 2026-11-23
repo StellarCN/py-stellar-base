@@ -158,6 +158,10 @@ class TestUtils:
                 False,
             ),
             ("gd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7", False),
+            (
+                "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7\n",
+                False,
+            ),
             ("dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7", True),
             ("DD7B1AB831C273310DDBEC6F97870AA83C2FBD78CE22ADED37ECBF4F3380FAC7", True),
             ("DD7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7", True),

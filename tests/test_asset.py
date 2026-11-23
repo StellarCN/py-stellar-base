@@ -21,6 +21,7 @@ class TestAsset:
             "",
             "1234567890123",
             "ab_",
+            "USD\n",
         ],
     )
     def test_invalid_code(self, code):

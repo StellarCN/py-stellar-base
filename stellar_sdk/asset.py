@@ -64,8 +64,8 @@ class Asset:
         :param code: The asset code.
         :raises: :exc:`AssetCodeInvalidError <stellar_sdk.exceptions.AssetCodeInvalidError>`: if ``code`` is invalid.
         """
-        asset_code_re = re.compile(r"^[a-zA-Z0-9]{1,12}$")
-        if not asset_code_re.match(code):
+        # `fullmatch`, since `$` also matches before a newline that ends the text.
+        if not re.fullmatch(r"[a-zA-Z0-9]{1,12}", code):
             raise AssetCodeInvalidError(
                 "Asset code is invalid (maximum alphanumeric, 12 characters at max)."
             )
