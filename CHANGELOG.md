@@ -24,6 +24,11 @@ Release History
 - Rewrite `to_txrep` and `from_txrep` to follow SEP-11. They now support every operation, Soroban included.
   - Some fields are written differently, such as `tx.cond.v2.minSeqNum`, signer keys as strkeys and `authorize: 1`. Text written by earlier versions may not be readable.
   - `from_txrep` raises `InvalidTxrepError`, a `ValueError` that names the line, for invalid text, including a line the transaction doesn't use.
+- Rewrite SEP-7 (`stellar_sdk.sep.stellar_uri`). A URI object holds the text of its URI and can't be changed, so a received URI is verified against the text that was signed.
+  - `sign(signer, origin_domain)` returns a signed copy, and the new `verify_signature(signing_key)` checks one. `origin_domain` and `signature` are no longer constructor arguments, and every other argument but the first is keyword-only.
+  - `PayStellarUri` has `asset`, `memo` and `message` in place of `asset_code`, `asset_issuer`, `memo_type` and `msg`.
+  - `TransactionStellarUri` has `xdr`, `to_transaction_envelope()` and `message` in place of `transaction_envelope` and `msg`, and takes its network from the envelope or the URI. `Replacement` is `Replacement(identifier=..., hint=..., fields=[...])`.
+  - An invalid URI raises `InvalidStellarUriError`, a `ValueError` that names the parameter. The new `parse_stellar_uri` reads a URI of either kind.
 - `Price` raises `ValueError` for a numerator or denominator that is not positive, which the network rejects. Equality wasn't consistent for them: `Price(0, 0)` equaled every price.
 - `LedgerEntryResult` has `ext_xdr`, the entry's `LedgerEntryExt`, which names its sponsor. It requires stellar-rpc 23 or later.
 - `GetHealthResponse` has `latest_ledger_close_time` and `oldest_ledger_close_time`, which require stellar-rpc 27.1 or later.
