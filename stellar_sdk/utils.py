@@ -223,28 +223,27 @@ def to_xdr_amount(value: str | Decimal) -> int:
         serialization.
 
     """
-    # throw exception if value * ONE has decimal places (it can't be represented as int64)
-    try:
-        with localcontext(_DECIMAL_CONTEXT):
-            amount = int(
-                (Decimal(value) * _ONE).to_integral_exact(
-                    context=Context(traps=[Inexact])
-                )
+    with localcontext(_DECIMAL_CONTEXT) as context:
+        # An amount is a whole number of stroops. Rounding any digit of it away is
+        # an error, in the product too, which holds no more than 28 digits.
+        context.traps[Inexact] = True
+        try:
+            amount = Decimal(value)
+        except InvalidOperation as e:
+            raise ValueError(f"Value of '{value}' is not a number.") from e
+        if not amount.is_finite():
+            raise ValueError(f"Value of '{value}' is not a number.")
+        if amount < 0 or amount > Decimal(_UPPER_LIMIT):
+            raise ValueError(
+                f"Value of '{value}' must represent a positive number "
+                f"and the max valid value is {_UPPER_LIMIT}."
             )
-    except Inexact as e:
-        raise ValueError(
-            f"Value of '{value}' must have at most 7 digits after the decimal."
-        ) from e
-    except (InvalidOperation, OverflowError) as e:  # not a number; infinity
-        raise ValueError(f"Value of '{value}' is not a number.") from e
-
-    if amount < 0 or amount > 9223372036854775807:
-        raise ValueError(
-            f"Value of '{value}' must represent a positive number "
-            "and the max valid value is 922337203685.4775807."
-        )
-
-    return amount
+        try:
+            return int((amount * _ONE).to_integral_exact())
+        except Inexact as e:
+            raise ValueError(
+                f"Value of '{value}' must have at most 7 digits after the decimal."
+            ) from e
 
 
 def from_xdr_amount(value: int) -> str:

@@ -49,6 +49,7 @@ Release History
 - `PayStellarUri` no longer writes a small `Decimal` amount in scientific notation, e.g. `amount=1E-7` for `Decimal("0.0000001")`. It now writes `amount=0.0000001`.
 - Amounts and prices no longer depend on the caller's `decimal` context. With a precision below 19, amounts were rounded without an error: at a precision of 9, `1234.5678901` was written as `1234.56789`.
 - An amount or price that isn't a number, such as `"abc"`, raises `ValueError` instead of `decimal.InvalidOperation`.
+- An amount with more than 28 digits is no longer rounded: `Operation.to_xdr_amount("1.0000000000000000000000000001")` raises `ValueError` instead of returning `10000000`.
 
 
 ### Version 17.0.1
