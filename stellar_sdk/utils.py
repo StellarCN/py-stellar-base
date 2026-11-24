@@ -133,7 +133,8 @@ def raise_if_not_valid_amount(value: str, argument_name: str) -> None:
             f'Value of argument "{argument_name}" is not a number: {value}'
         ) from e
     exponent = amount.as_tuple().exponent
-    if not isinstance(exponent, int) or abs(exponent) > _EXPONENT:
+    # Only a negative exponent is decimal places: 1E+8 is a whole number.
+    if not isinstance(exponent, int) or exponent < -_EXPONENT:
         raise ValueError(
             f'Value of argument "{argument_name}" must have at most 7 digits after the decimal: {amount}'
         )

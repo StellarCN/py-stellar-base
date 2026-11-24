@@ -50,6 +50,8 @@ Release History
 - Amounts and prices no longer depend on the caller's `decimal` context. With a precision below 19, amounts were rounded without an error: at a precision of 9, `1234.5678901` was written as `1234.56789`.
 - An amount or price that isn't a number, such as `"abc"`, raises `ValueError` instead of `decimal.InvalidOperation`.
 - An amount with more than 28 digits is no longer rounded: `Operation.to_xdr_amount("1.0000000000000000000000000001")` raises `ValueError` instead of returning `10000000`.
+- A whole `Decimal` amount written with an exponent, such as `Decimal("100000000").normalize()` (`1E+8`), is no longer rejected as having more than 7 decimal places.
+- `strict_receive_paths` and `strict_send_paths` no longer send a `Decimal` amount in scientific notation, such as `1E-7`, which Horizon rejects.
 
 
 ### Version 17.0.1

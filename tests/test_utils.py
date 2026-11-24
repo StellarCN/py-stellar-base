@@ -1,4 +1,4 @@
-from decimal import localcontext
+from decimal import Decimal, localcontext
 
 import pytest
 
@@ -241,6 +241,10 @@ class TestUtils:
             ("922337203685.47758070", "amount2", True),
             ("0.0000001", "amount", False),
             ("922337203685.4775807", "amount", False),
+            # A positive exponent is a whole number, as Decimal.normalize() writes it.
+            (Decimal("100000000").normalize(), "amount", False),
+            ("1E+8", "amount", False),
+            ("1E-8", "amount", True),
         ],
     )
     def test_raise_if_not_valid_too_many_digits(self, amount, argument_name, raise_err):

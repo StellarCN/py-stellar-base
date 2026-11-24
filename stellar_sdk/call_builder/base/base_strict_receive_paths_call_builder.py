@@ -46,7 +46,8 @@ class BaseStrictReceivePathsCallBuilder(BaseCallBuilder):
         self.endpoint: str = "paths/strict-receive"
 
         if isinstance(destination_amount, Decimal):
-            destination_amount = str(destination_amount)
+            # str() writes 1E-7 or 1E+2, which Horizon rejects.
+            destination_amount = format(destination_amount, "f")
 
         params = {
             "destination_amount": destination_amount,
