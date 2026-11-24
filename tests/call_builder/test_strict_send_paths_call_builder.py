@@ -65,3 +65,20 @@ class TestStrictSendPathsCallBuilder:
             "source_asset_issuer": "GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46UIGTHVWGWJGQKH3AFNHXHXN",
             "destination_assets": "USD:GAYSHLG75RPSMXWJ5KX7O7STE6RSZTD6NE4CTWAXFZYYVYIFRUVJIBJH,native,XCN:GCNY5OXYSY4FKHOPT2SPOQZAOEIGXB5LBYW3HVU3OWSTQITS65M5RCNY",
         }
+
+    @pytest.mark.parametrize(
+        ("amount", "expected"),
+        [
+            (Decimal("0.0000001"), "0.0000001"),
+            (Decimal("100").normalize(), "100"),
+            (Decimal("12.50"), "12.50"),
+        ],
+    )
+    def test_decimal_amount_without_exponent(self, builder_factory, amount, expected):
+        # Horizon accepts only plain decimal numbers, while str() writes 1E-7 and 1E+2.
+        builder = builder_factory(
+            source_asset=Asset.native(),
+            destination="GARSFJNXJIHO6ULUBK3DBYKVSIZE7SC72S5DYBCHU7DKL22UXKVD7MXP",
+            source_amount=amount,
+        )
+        assert builder.params["source_amount"] == expected
