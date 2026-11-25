@@ -52,6 +52,7 @@ Release History
 - An amount with more than 28 digits is no longer rounded: `Operation.to_xdr_amount("1.0000000000000000000000000001")` raises `ValueError` instead of returning `10000000`.
 - A whole `Decimal` amount written with an exponent, such as `Decimal("100000000").normalize()` (`1E+8`), is no longer rejected as having more than 7 decimal places.
 - `strict_receive_paths` and `strict_send_paths` no longer send a `Decimal` amount in scientific notation, such as `1E-7`, which Horizon rejects.
+- Liquidity pool and claimable balance IDs are stored in lower case, as XDR decodes them, so an ID given in upper case equals itself after an XDR round trip.
 
 
 ### Version 17.0.1

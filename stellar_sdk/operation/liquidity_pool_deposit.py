@@ -43,7 +43,7 @@ class LiquidityPoolDeposit(Operation):
         source: MuxedAccount | str | None = None,
     ):
         super().__init__(source)
-        self.liquidity_pool_id: str = liquidity_pool_id
+        self.liquidity_pool_id: str = liquidity_pool_id.lower()
         self.max_amount_a: str = str(max_amount_a)
         self.max_amount_b: str = str(max_amount_b)
         if isinstance(min_price, Price):

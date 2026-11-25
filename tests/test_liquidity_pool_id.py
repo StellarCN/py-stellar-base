@@ -59,3 +59,16 @@ class TestLiquidityPoolId:
         asset = Asset(asset_code, asset_issuer)
         with pytest.raises(ValueError, match=f"Unexpected asset type: {asset_type}"):
             LiquidityPoolId.from_xdr_object(asset.to_trust_line_asset_xdr_object())
+
+    def test_upper_case_id(self):
+        pool_id = LiquidityPoolId(
+            "DD7B1AB831C273310DDBEC6F97870AA83C2FBD78CE22ADED37ECBF4F3380FAC7"
+        )
+        assert (
+            pool_id.liquidity_pool_id
+            == "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
+        )
+        restored = LiquidityPoolId.from_xdr_object(
+            pool_id.to_trust_line_asset_xdr_object()
+        )
+        assert restored == pool_id

@@ -153,9 +153,13 @@ class RevokeSponsorship(Operation):
         self.trustline: TrustLine | None = trustline
         self.offer: Offer | None = offer
         self.data: Data | None = data
-        self.claimable_balance_id: str | None = claimable_balance_id
+        self.claimable_balance_id: str | None = (
+            claimable_balance_id and claimable_balance_id.lower()
+        )
         self.signer: Signer | None = signer
-        self.liquidity_pool_id: str | None = liquidity_pool_id
+        self.liquidity_pool_id: str | None = (
+            liquidity_pool_id and liquidity_pool_id.lower()
+        )
 
         if self.account_id is not None:
             raise_if_not_valid_ed25519_public_key(self.account_id, "account_id")

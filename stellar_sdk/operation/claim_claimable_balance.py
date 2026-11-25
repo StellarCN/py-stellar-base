@@ -32,7 +32,7 @@ class ClaimClaimableBalance(Operation):
         source: MuxedAccount | str | None = None,
     ) -> None:
         super().__init__(source)
-        self.balance_id: str = balance_id
+        self.balance_id: str = balance_id.lower()
         raise_if_not_valid_balance_id(self.balance_id, "balance_id")
 
     def _to_operation_body(self) -> stellar_xdr.OperationBody.Any:

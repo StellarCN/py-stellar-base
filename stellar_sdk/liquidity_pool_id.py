@@ -12,7 +12,7 @@ class LiquidityPoolId:
     """
 
     def __init__(self, liquidity_pool_id: str) -> None:
-        self.liquidity_pool_id: str = liquidity_pool_id
+        self.liquidity_pool_id: str = liquidity_pool_id.lower()
         self.type: str = "liquidity_pool_shares"
         raise_if_not_valid_hash(self.liquidity_pool_id, "liquidity_pool_id")
 

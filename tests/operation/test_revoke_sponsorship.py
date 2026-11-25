@@ -227,3 +227,18 @@ class TestRevokeSponsorship:
         assert RevokeSponsorshipSigner(account1, signer1) != RevokeSponsorshipSigner(
             account2, signer1
         )
+
+    def test_upper_case_ids_equal_after_round_trip(self):
+        for op in (
+            RevokeSponsorship.revoke_claimable_balance_sponsorship(
+                "00000000DA0D57DA7D4850E7FC10D2A9D0EBC731F7AFB40574C03395B17D49149B91F5BE"
+            ),
+            RevokeSponsorship.revoke_liquidity_pool_sponsorship(
+                "DD7B1AB831C273310DDBEC6F97870AA83C2FBD78CE22ADED37ECBF4F3380FAC7"
+            ),
+        ):
+            assert Operation.from_xdr_object(op.to_xdr_object()) == op
+        assert (
+            op.liquidity_pool_id
+            == "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
+        )
