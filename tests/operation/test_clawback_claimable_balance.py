@@ -57,3 +57,16 @@ class TestClawbackClaimableBalance:
             match=f'Value of argument "balance_id" is not a valid balance id: {balance_id}',
         ):
             ClawbackClaimableBalance(balance_id, kp1.public_key)
+
+    def test_upper_case_id(self):
+        op = ClawbackClaimableBalance(
+            "00000000DA0D57DA7D4850E7FC10D2A9D0EBC731F7AFB40574C03395B17D49149B91F5BE"
+        )
+        assert (
+            op.balance_id
+            == "00000000da0d57da7d4850e7fc10d2a9d0ebc731f7afb40574c03395b17d49149b91f5be"
+        )
+        assert (
+            ClawbackClaimableBalance.from_xdr_object(op.to_xdr_object()).balance_id
+            == op.balance_id
+        )

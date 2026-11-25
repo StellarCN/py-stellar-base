@@ -138,3 +138,19 @@ class TestLiquidityPoolWithdraw:
             LiquidityPoolWithdraw(
                 liquidity_pool_id, amount, min_amount_a, min_amount_b, kp1.public_key
             )
+
+    def test_upper_case_id(self):
+        op = LiquidityPoolWithdraw(
+            "DD7B1AB831C273310DDBEC6F97870AA83C2FBD78CE22ADED37ECBF4F3380FAC7",
+            "1",
+            "1",
+            "1",
+        )
+        assert (
+            op.liquidity_pool_id
+            == "dd7b1ab831c273310ddbec6f97870aa83c2fbd78ce22aded37ecbf4f3380fac7"
+        )
+        assert (
+            LiquidityPoolWithdraw.from_xdr_object(op.to_xdr_object()).liquidity_pool_id
+            == op.liquidity_pool_id
+        )
