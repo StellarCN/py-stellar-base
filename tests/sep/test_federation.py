@@ -246,6 +246,21 @@ class TestFederation:
             )
         assert err.value.status == 404
 
+    @pytest.mark.parametrize("body", ["[]", "null", '"not found"', "<html></html>", ""])
+    async def test_answer_that_is_not_a_json_object(
+        self, federation_api, httpserver, body
+    ):
+        stellar_address = f"hello*{_local_domain(httpserver)}"
+        _expect_toml(httpserver)
+        httpserver.expect_request(
+            "/federation", query_string={"type": "name", "q": stellar_address}
+        ).respond_with_data(body)
+        with pytest.raises(BadFederationResponseError) as err:
+            await resolve(
+                federation_api.resolve_stellar_address(stellar_address, use_http=True)
+            )
+        assert err.value.status == 200
+
     async def test_federation_response_size_limit_exceeded(
         self, federation_api, httpserver
     ):

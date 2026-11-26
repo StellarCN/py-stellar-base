@@ -233,7 +233,12 @@ def _handle_raw_response(
 ) -> FederationRecord:
     if not 200 <= raw_resp.status_code < 300:
         raise BadFederationResponseError(raw_resp)
-    data = raw_resp.json()
+    try:
+        data = raw_resp.json()
+    except ValueError as e:
+        raise BadFederationResponseError(raw_resp) from e
+    if not isinstance(data, dict):
+        raise BadFederationResponseError(raw_resp)
     account_id = account_id or data.get("account_id")
     stellar_address = stellar_address or data.get("stellar_address")
     memo_type = data.get("memo_type")
