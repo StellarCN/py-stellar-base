@@ -57,6 +57,7 @@ Release History
 - The SEP-29 memo check of `submit_transaction` skips muxed (`M...`) destinations, as SEP-29 says. It checked their base account and refused the payment.
 - `read_challenge_transaction` raises `InvalidSep10ChallengeError` for a challenge that isn't valid base64 XDR, and for a nonce that isn't base64. It raised `XdrDecodeError` and `binascii.Error`.
 - `ServerAsync.offers().stream()` streams offers, as `Server.offers().stream()` does. It raised `NotImplementedError`.
+- `RequestsClient` sends stream requests through its `stream_session`, so the session's headers, proxies and adapters apply to them. It used a new default session.
 
 
 ### Version 17.0.1
