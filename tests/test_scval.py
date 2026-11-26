@@ -131,6 +131,21 @@ def test_from_map_duplicate_key_raises():
         from_struct(sc_val)
 
 
+@pytest.mark.parametrize(
+    ("sc_val", "readers"),
+    [
+        # SCVal holds `SCVec *vec` and `SCMap *map`, so these are valid XDR.
+        (xdr.SCVal.Vec(None), (to_native, from_vec, from_tuple_struct, from_enum)),
+        (xdr.SCVal.Map(None), (to_native, from_map, from_struct)),
+    ],
+)
+def test_vec_and_map_without_a_body_raise(sc_val, readers):
+    kind = "SCV_VEC" if sc_val.type == xdr.SCValType.SCV_VEC else "SCV_MAP"
+    for read in readers:
+        with pytest.raises(ValueError, match=f"The {kind} has no body"):
+            read(sc_val.to_xdr_base64())
+
+
 def test_address():
     addr = Address("GAHJJJKMOKYE4RVPZEWZTKH5FVI4PA3VL7GK2LFNUBSGBV6OJP7TQSLX")
     scval = to_address(addr)
