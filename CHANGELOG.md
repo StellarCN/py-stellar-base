@@ -61,6 +61,7 @@ Release History
 - `HashMemo` and `ReturnHashMemo` raise `MemoInvalidException` for a string that isn't hex, as documented. It raised a plain `ValueError`.
 - `TransactionBuilder.build_fee_bump_transaction` raises `ValueError` for an inner transaction without operations. It raised `ZeroDivisionError`.
 - `scval.to_native`, `from_vec`, `from_map` and the helpers built on them raise `ValueError` for an `SCV_VEC` or `SCV_MAP` without a body. They raised `AssertionError`.
+- `fetch_stellar_toml` and the federation lookups decode a response without a charset as UTF-8. A stellar.toml served as `text/plain`, as SEP-1 recommends, was decoded as ISO-8859-1, which garbled non-ASCII text.
 
 
 ### Version 17.0.1

@@ -2,6 +2,7 @@ import json
 import logging
 import time
 from collections.abc import Generator
+from email.message import Message
 from typing import Any
 
 import requests
@@ -156,8 +157,11 @@ class RequestsClient(BaseSyncClient):
         finally:
             resp.close()
         content = b"".join(chunks)
-        encoding = resp.encoding or "utf-8"
-        return content.decode(encoding)
+        # Not `resp.encoding`, which is ISO-8859-1 for any `text/*` type without a
+        # charset, such as the `text/plain` SEP-1 recommends for stellar.toml.
+        content_type = Message()
+        content_type["content-type"] = resp.headers.get("content-type", "")
+        return content.decode(content_type.get_content_charset() or "utf-8")
 
     def post(
         self,
