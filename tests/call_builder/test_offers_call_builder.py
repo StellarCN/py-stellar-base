@@ -1,3 +1,5 @@
+from collections.abc import AsyncGenerator
+
 import pytest
 
 from stellar_sdk import Asset
@@ -5,7 +7,9 @@ from stellar_sdk.call_builder.call_builder_async import (
     OffersCallBuilder as OffersCallBuilderAsync,
 )
 from stellar_sdk.call_builder.call_builder_sync import OffersCallBuilder
+from tests import _horizon_fixtures as hf
 from tests.call_builder import ASYNC_CLIENT, HORIZON_URL, SYNC_CLIENT
+from tests.helpers import take
 
 
 @pytest.fixture(params=["sync", "async"])
@@ -80,3 +84,20 @@ class TestOffersCallBuilder:
         builder = builder_factory().for_account(account_id)
         assert builder.endpoint == f"accounts/{account_id}/offers"
         assert builder.params == {}
+
+
+async def test_stream(horizon_server, horizon_mock):
+    account = "GCDNJUBQSX7AJWLJACMJ7I4BC3Z47BQUTMHEICZLE6MU4KQBRYG5JY6B"
+    horizon_mock.expect(
+        f"/accounts/{account}/offers",
+        body=hf.stream_body(),
+        content_type="text/event-stream",
+    )
+    stream = horizon_server.offers().for_account(account).stream()
+    try:
+        assert len(await take(stream, 2)) == 2
+    finally:
+        if isinstance(stream, AsyncGenerator):
+            await stream.aclose()
+        else:
+            stream.close()
