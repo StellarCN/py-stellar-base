@@ -56,6 +56,7 @@ Release History
 - `Keypair.from_mnemonic_phrase` and `Keypair.from_shamir_mnemonic_phrases` raise `ValueError` for an `index` outside `0` to `2**31 - 1`. A negative index used to derive a key from a non-hardened path, e.g. `-1` gave the key at `m/44'/148'/2147483647`.
 - The SEP-29 memo check of `submit_transaction` skips muxed (`M...`) destinations, as SEP-29 says. It checked their base account and refused the payment.
 - `read_challenge_transaction` raises `InvalidSep10ChallengeError` for a challenge that isn't valid base64 XDR, and for a nonce that isn't base64. It raised `XdrDecodeError` and `binascii.Error`.
+- `ServerAsync.offers().stream()` streams offers, as `Server.offers().stream()` does. It raised `NotImplementedError`.
 
 
 ### Version 17.0.1
