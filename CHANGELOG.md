@@ -55,6 +55,7 @@ Release History
 - Liquidity pool and claimable balance IDs are stored in lower case, as XDR decodes them, so an ID given in upper case equals itself after an XDR round trip.
 - `Keypair.from_mnemonic_phrase` and `Keypair.from_shamir_mnemonic_phrases` raise `ValueError` for an `index` outside `0` to `2**31 - 1`. A negative index used to derive a key from a non-hardened path, e.g. `-1` gave the key at `m/44'/148'/2147483647`.
 - The SEP-29 memo check of `submit_transaction` skips muxed (`M...`) destinations, as SEP-29 says. It checked their base account and refused the payment.
+- `read_challenge_transaction` raises `InvalidSep10ChallengeError` for a challenge that isn't valid base64 XDR, and for a nonce that isn't base64. It raised `XdrDecodeError` and `binascii.Error`.
 
 
 ### Version 17.0.1

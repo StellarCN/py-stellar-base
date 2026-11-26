@@ -299,3 +299,53 @@ class TestReadChallenge:
                 web_auth_domain,
                 Network.TESTNET_NETWORK_PASSPHRASE,
             )
+
+    @pytest.mark.parametrize(
+        "challenge", ["not a transaction", "", "AAAA", "AAAAAgAAAAA=\n"]
+    )
+    def test_read_challenge_transaction_undecodable_raise(self, challenge):
+        server_kp = deterministic_keypair("server")
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match=r"Importing XDR failed, please check if XDR is correct.",
+        ):
+            read_challenge_transaction(
+                challenge,
+                server_kp.public_key,
+                "example.com",
+                "auth.example.com",
+                Network.PUBLIC_NETWORK_PASSPHRASE,
+            )
+
+    @pytest.mark.parametrize("nonce", [b"A" * 63 + b"!", b"A" * 61 + b"==="])
+    def test_read_challenge_transaction_nonce_not_base64_raise(
+        self, frozen_web_auth, nonce
+    ):
+        server_kp = deterministic_keypair("server")
+        client_kp = deterministic_keypair("client")
+        network_passphrase = Network.PUBLIC_NETWORK_PASSPHRASE
+        now = frozen_web_auth
+        challenge_te = (
+            TransactionBuilder(
+                Account(server_kp.public_key, -1), network_passphrase, 100
+            )
+            .append_manage_data_op(
+                data_name="example.com auth",
+                data_value=nonce,
+                source=client_kp.public_key,
+            )
+            .add_time_bounds(now, now + 900)
+            .build()
+        )
+        challenge_te.sign(server_kp)
+        with pytest.raises(
+            InvalidSep10ChallengeError,
+            match=r"Operation value should be encoded as base64.",
+        ):
+            read_challenge_transaction(
+                challenge_te.to_xdr(),
+                server_kp.public_key,
+                "example.com",
+                "auth.example.com",
+                network_passphrase,
+            )
