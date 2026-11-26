@@ -8,6 +8,7 @@ from stellar_sdk import (
     AiohttpClient,
     Asset,
     Keypair,
+    MuxedAccount,
     Network,
     Server,
     ServerAsync,
@@ -202,6 +203,26 @@ class TestAccountMemoRequirements:
             f"/accounts/{NO_MEMO_REQUIRED}",
             f"/accounts/{MEMO_REQUIRED_D}",
         ]
+
+    async def test_check_memo_required_skips_muxed_destinations(
+        self, memo_server, httpserver
+    ):
+        # SEP-29 doesn't apply to muxed accounts: their ID takes the place of the memo.
+        a, b, c = (
+            MuxedAccount(account, 1234).universal_account_id
+            for account in (MEMO_REQUIRED_A, MEMO_REQUIRED_B, MEMO_REQUIRED_C)
+        )
+        transaction = build_transaction(a, b, c, MEMO_REQUIRED_D)
+        with pytest.raises(AccountRequiresMemoError) as err:
+            await resolve(memo_server.submit_transaction(transaction))
+        assert err.value.account_id == MEMO_REQUIRED_D
+        assert _account_check_requests(httpserver) == [f"/accounts/{MEMO_REQUIRED_D}"]
+
+        transaction = build_transaction(
+            a, b, c, MuxedAccount(MEMO_REQUIRED_D, 0).universal_account_id
+        )
+        resp = await resolve(memo_server.submit_transaction(transaction))
+        assert resp["hash"] == SUCCESS_TRANSACTION_RESPONSE["hash"]
 
     async def test_check_memo_required_with_no_destination_operation(
         self, memo_server, httpserver
