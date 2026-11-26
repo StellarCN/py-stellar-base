@@ -78,6 +78,10 @@ class StellarMnemonic(Mnemonic):
     def derive(seed: bytes, index: int) -> bytes:
         """Derive an ED25519 key from a BIP-39 seed."""
         # References https://github.com/satoshilabs/slips/blob/master/slip-0010.md
+        if not 0 <= index <= 2**31 - 1:
+            raise ValueError(
+                f"Index should be between 0 and 2147483647, but it is {index}."
+            )
         master_hmac = hmac.new(StellarMnemonic.SEED_MODIFIER, digestmod=hashlib.sha512)
         master_hmac.update(seed)
         il = master_hmac.digest()[:32]

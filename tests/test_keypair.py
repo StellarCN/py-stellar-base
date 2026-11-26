@@ -488,6 +488,11 @@ class TestKeypair:
         ):
             Keypair.generate_mnemonic_phrase(strength=strength)
 
+    @pytest.mark.parametrize("index", [-1, 2**31])
+    def test_from_mnemonic_phrase_invalid_index_raise(self, index):
+        with pytest.raises(ValueError, match=r"Index should be between"):
+            Keypair.from_mnemonic_phrase(SEP_5_CASES[0]["mnemonic"], index=index)
+
     def test_from_mnemonic_phrase(self):
         for data in SEP_5_CASES:
             for i in range(len(data["accounts"])):
