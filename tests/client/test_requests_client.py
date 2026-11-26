@@ -113,6 +113,25 @@ class TestRequestsClient:
         assert resp.status_code == 200
         assert resp.text == content
 
+    @pytest.mark.parametrize(
+        ("content_type", "encoding"),
+        [
+            ("text/plain", "utf-8"),
+            ("application/toml", "utf-8"),
+            ("text/plain; charset=utf-8", "utf-8"),
+            ('text/plain; charset="iso-8859-1"', "iso-8859-1"),
+        ],
+    )
+    def test_get_with_max_content_size_decodes_utf_8_by_default(
+        self, httpserver, content_type, encoding
+    ):
+        content = 'ORG_NAME = "Société Générale"'
+        httpserver.expect_request("/data").respond_with_data(
+            content.encode(encoding), content_type=content_type
+        )
+        resp = RequestsClient().get(httpserver.url_for("/data"), max_content_size=1024)
+        assert resp.text == content
+
     def test_get_with_max_content_size_exceeded(self, httpserver):
         client = RequestsClient()
         content = "x" * 1000
