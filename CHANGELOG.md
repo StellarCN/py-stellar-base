@@ -58,6 +58,7 @@ Release History
 - `read_challenge_transaction` raises `InvalidSep10ChallengeError` for a challenge that isn't valid base64 XDR, and for a nonce that isn't base64. It raised `XdrDecodeError` and `binascii.Error`.
 - `ServerAsync.offers().stream()` streams offers, as `Server.offers().stream()` does. It raised `NotImplementedError`.
 - `RequestsClient` sends stream requests through its `stream_session`, so the session's headers, proxies and adapters apply to them. It used a new default session.
+- `HashMemo` and `ReturnHashMemo` raise `MemoInvalidException` for a string that isn't hex, as documented. It raised a plain `ValueError`.
 
 
 ### Version 17.0.1
