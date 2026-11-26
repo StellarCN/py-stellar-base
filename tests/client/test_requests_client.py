@@ -65,6 +65,23 @@ class TestRequestsClient:
         finally:
             stream.close()
 
+    def test_stream_uses_the_stream_session(self, horizon_mock):
+        horizon_mock.expect(
+            "/ledgers", body=hf.stream_body(), content_type="text/event-stream"
+        )
+        stream_session = requests.Session()
+        stream_session.headers["Authorization"] = "Bearer token"
+        client = RequestsClient(stream_session=stream_session)
+        stream = client.stream(horizon_mock.url + "ledgers", {"cursor": "now"})
+        try:
+            assert next(stream) == {"id": "1"}
+        finally:
+            stream.close()
+        ((request, _),) = horizon_mock.httpserver.log
+        assert request.headers["Authorization"] == "Bearer token"
+        assert f"stream_session={stream_session}" in repr(client)
+        client.close()
+
     def test_with(self, httpbin_url):
         with RequestsClient() as client:
             url = httpbin_url + "get"

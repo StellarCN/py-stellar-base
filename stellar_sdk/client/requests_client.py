@@ -214,6 +214,7 @@ class RequestsClient(BaseSyncClient):
                 with EventSource(
                     url,
                     timeout=60,
+                    session=self._stream_session,
                     params=query_params,
                     headers=self.headers,
                 ) as client:
@@ -266,5 +267,5 @@ class RequestsClient(BaseSyncClient):
             f"post_timeout={self.post_timeout}, "
             f"backoff_factor={self.backoff_factor}, "
             f"session={self._session}, "
-            f"stream_session={self.backoff_factor}]>"
+            f"stream_session={self._stream_session}]>"
         )
