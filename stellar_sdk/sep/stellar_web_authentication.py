@@ -185,15 +185,22 @@ def read_challenge_transaction(
             "Invalid server_account_id, multiplexed account are not supported."
         )
 
-    xdr_object = stellar_xdr.TransactionEnvelope.from_xdr_base64(challenge_transaction)
+    try:
+        xdr_object = stellar_xdr.TransactionEnvelope.from_xdr_base64(
+            challenge_transaction
+        )
+    except stellar_xdr.XdrError as e:
+        raise InvalidSep10ChallengeError(
+            "Importing XDR failed, please check if XDR is correct."
+        ) from e
     if xdr_object.type == stellar_xdr.EnvelopeType.ENVELOPE_TYPE_TX_FEE_BUMP:
         raise ValueError(
             "Invalid challenge, expected a TransactionEnvelope but received a FeeBumpTransactionEnvelope."
         )
 
     try:
-        transaction_envelope = TransactionEnvelope.from_xdr(
-            challenge_transaction, network_passphrase=network_passphrase
+        transaction_envelope = TransactionEnvelope.from_xdr_object(
+            xdr_object, network_passphrase=network_passphrase
         )
     except Exception as e:
         raise InvalidSep10ChallengeError(
@@ -275,7 +282,12 @@ def read_challenge_transaction(
             "Operation value encoded as base64 should be 64 bytes long."
         )
 
-    nonce = base64.b64decode(manage_data_op.data_value)
+    try:
+        nonce = base64.b64decode(manage_data_op.data_value, validate=True)
+    except ValueError as e:
+        raise InvalidSep10ChallengeError(
+            "Operation value should be encoded as base64."
+        ) from e
     if len(nonce) != 48:
         raise InvalidSep10ChallengeError(
             "Operation value before encoding as base64 should be 48 bytes long."
