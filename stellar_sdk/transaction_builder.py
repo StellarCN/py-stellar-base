@@ -197,6 +197,8 @@ class TransactionBuilder:
                 inner_transaction_envelope.transaction.soroban_data.resource_fee
             )
 
+        if not inner_transaction_envelope.transaction.operations:
+            raise ValueError("The inner transaction has no operations.")
         inner_include_fee = (
             inner_transaction_envelope.transaction.fee - soroban_resource_fee
         )  # dont include soroban resource fee

@@ -59,6 +59,7 @@ Release History
 - `ServerAsync.offers().stream()` streams offers, as `Server.offers().stream()` does. It raised `NotImplementedError`.
 - `RequestsClient` sends stream requests through its `stream_session`, so the session's headers, proxies and adapters apply to them. It used a new default session.
 - `HashMemo` and `ReturnHashMemo` raise `MemoInvalidException` for a string that isn't hex, as documented. It raised a plain `ValueError`.
+- `TransactionBuilder.build_fee_bump_transaction` raises `ValueError` for an inner transaction without operations. It raised `ZeroDivisionError`.
 
 
 ### Version 17.0.1
