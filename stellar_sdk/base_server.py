@@ -288,7 +288,7 @@ class BaseServer:
                     PathPaymentStrictReceive,
                 ),
             ):
-                destination: str = operation.destination.account_id
+                destination: str = operation.destination.universal_account_id
             else:
                 continue
             if destination in destinations:

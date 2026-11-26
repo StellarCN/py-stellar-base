@@ -54,6 +54,7 @@ Release History
 - `strict_receive_paths` and `strict_send_paths` no longer send a `Decimal` amount in scientific notation, such as `1E-7`, which Horizon rejects.
 - Liquidity pool and claimable balance IDs are stored in lower case, as XDR decodes them, so an ID given in upper case equals itself after an XDR round trip.
 - `Keypair.from_mnemonic_phrase` and `Keypair.from_shamir_mnemonic_phrases` raise `ValueError` for an `index` outside `0` to `2**31 - 1`. A negative index used to derive a key from a non-hardened path, e.g. `-1` gave the key at `m/44'/148'/2147483647`.
+- The SEP-29 memo check of `submit_transaction` skips muxed (`M...`) destinations, as SEP-29 says. It checked their base account and refused the payment.
 
 
 ### Version 17.0.1
