@@ -95,6 +95,14 @@ class TestMemo:
         ):
             HashMemo(bytes(length))
 
+    @pytest.mark.parametrize("memo_class", [HashMemo, ReturnHashMemo])
+    @pytest.mark.parametrize("value", ["not hex", "abc", "0x" + "ab" * 32])
+    def test_hash_memo_not_hex_raise(self, memo_class, value):
+        with pytest.raises(
+            MemoInvalidException, match=f"{memo_class.__name__} is not hex"
+        ):
+            memo_class(value)
+
     def test_return_hash_memo(self):
         hex = "573c10b148fc4bc7db97540ce49da22930f4bcd48a060dc7347be84ea9f52d9f"
         xdr = "AAAABFc8ELFI/EvH25dUDOSdoikw9LzUigYNxzR76E6p9S2f"

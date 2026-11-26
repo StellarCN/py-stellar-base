@@ -179,7 +179,10 @@ class HashMemo(Memo):
     """
 
     def __init__(self, memo_hash: bytes | str) -> None:
-        memo_hash = hex_to_bytes(memo_hash)
+        try:
+            memo_hash = hex_to_bytes(memo_hash)
+        except ValueError as e:
+            raise MemoInvalidException(f"HashMemo is not hex: {memo_hash!r}") from e
         length = len(memo_hash)
         if length != 32:
             raise MemoInvalidException(
@@ -224,7 +227,12 @@ class ReturnHashMemo(Memo):
     """
 
     def __init__(self, memo_return: bytes | str) -> None:
-        memo_return = hex_to_bytes(memo_return)
+        try:
+            memo_return = hex_to_bytes(memo_return)
+        except ValueError as e:
+            raise MemoInvalidException(
+                f"ReturnHashMemo is not hex: {memo_return!r}"
+            ) from e
         length = len(memo_return)
         if length != 32:
             raise MemoInvalidException(
