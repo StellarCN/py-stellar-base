@@ -627,6 +627,18 @@ class TestTransaction:
         assert isinstance(new_te, FeeBumpTransactionEnvelope)
         assert new_te.to_xdr() == xdr
 
+    def test_build_fee_bump_tx_without_operations_raise(self):
+        # Such an envelope decodes, e.g. from XDR a client sent to a fee-bump service.
+        inner_tx = get_tx_builder().add_time_bounds(0, 0).build()
+        inner_tx.transaction.operations = []
+        inner_tx = TransactionEnvelope.from_xdr(
+            inner_tx.to_xdr(), Network.TESTNET_NETWORK_PASSPHRASE
+        )
+        with pytest.raises(ValueError, match="The inner transaction has no operations"):
+            TransactionBuilder.build_fee_bump_transaction(
+                kp2.public_key, 200, inner_tx, Network.TESTNET_NETWORK_PASSPHRASE
+            )
+
     def test_set_conds(self):
         source_account = Account(kp1.public_key, 100000000000000000)
         time_bounds = TimeBounds(1649237469, 1649238469)
