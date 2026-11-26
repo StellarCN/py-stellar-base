@@ -124,10 +124,12 @@ def to_native(
     if sc_val.type == stellar_xdr.SCValType.SCV_SYMBOL:
         return from_symbol(sc_val)
     if sc_val.type == stellar_xdr.SCValType.SCV_VEC:
-        assert sc_val.vec is not None
+        if sc_val.vec is None:
+            raise ValueError("The SCV_VEC has no body.")
         return [to_native(val) for val in sc_val.vec]
     if sc_val.type == stellar_xdr.SCValType.SCV_MAP:
-        assert sc_val.map is not None
+        if sc_val.map is None:
+            raise ValueError("The SCV_MAP has no body.")
         return _dict_from_unique_keys(
             (to_native(entry.key), to_native(entry.val)) for entry in sc_val.map
         )
@@ -466,12 +468,13 @@ def from_map(
         It can also be an :class:`stellar_sdk.xdr.SCVal` expressed in base64 or bytes.
     :return: The map value.
     :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_MAP`,
-        or if the map has the same key twice.
+        if the map has no body, or if it has the same key twice.
     """
     sc_val = _parse_sc_val(sc_val)
     if sc_val.type != stellar_xdr.SCValType.SCV_MAP:
         raise ValueError(f"Invalid sc_val type, must be SCV_MAP, got {sc_val.type}")
-    assert sc_val.map is not None
+    if sc_val.map is None:
+        raise ValueError("The SCV_MAP has no body.")
     return _dict_from_unique_keys((entry.key, entry.val) for entry in sc_val.map)
 
 
@@ -703,12 +706,14 @@ def from_vec(
     :param sc_val: The :class:`stellar_sdk.xdr.SCVal` XDR object to convert.
         It can also be an :class:`stellar_sdk.xdr.SCVal` expressed in base64 or bytes.
     :return: The list of :class:`stellar_sdk.xdr.SCVal` XDR objects.
-    :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_VEC`.
+    :raises: :exc:`ValueError` if ``sc_val`` is not of type :class:`stellar_sdk.xdr.SCValType.SCV_VEC`,
+        or if the vec has no body.
     """
     sc_val = _parse_sc_val(sc_val)
     if sc_val.type != stellar_xdr.SCValType.SCV_VEC:
         raise ValueError(f"Invalid sc_val type, must be VEC, got {sc_val.type}")
-    assert sc_val.vec is not None
+    if sc_val.vec is None:
+        raise ValueError("The SCV_VEC has no body.")
     return list(sc_val.vec)
 
 
