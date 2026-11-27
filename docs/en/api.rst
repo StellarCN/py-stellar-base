@@ -929,6 +929,7 @@ SEP 0005: Key Derivation Methods for Stellar Accounts
 
 SEP 0007: URI Scheme to facilitate delegated signing
 -----------------------------------------------------
+.. autofunction:: stellar_sdk.sep.stellar_uri.parse_stellar_uri
 .. autoclass:: stellar_sdk.sep.stellar_uri.PayStellarUri
    :members:
    :inherited-members:
@@ -936,8 +937,6 @@ SEP 0007: URI Scheme to facilitate delegated signing
    :members:
    :inherited-members:
 .. autoclass:: stellar_sdk.sep.stellar_uri.Replacement
-   :members:
-   :inherited-members:
 
 SEP 0010: Stellar Web Authentication
 ------------------------------------
@@ -969,6 +968,7 @@ Exceptions
 .. autoclass:: stellar_sdk.sep.exceptions.BadFederationResponseError
 .. autoclass:: stellar_sdk.sep.exceptions.InvalidSep10ChallengeError
 .. autoclass:: stellar_sdk.sep.exceptions.InvalidTxrepError
+.. autoclass:: stellar_sdk.sep.exceptions.InvalidStellarUriError
 .. autoclass:: stellar_sdk.sep.exceptions.AccountRequiresMemoError
 
 .. _stellar_sdk_xdr:

@@ -44,6 +44,14 @@ class InvalidTxrepError(SdkError, ValueError):
     """
 
 
+class InvalidStellarUriError(SdkError, ValueError):
+    """Raised when a text is not a valid SEP-0007 URI, or when the values given for
+    one can't be written as a URI.
+
+    The message names the parameter that is wrong.
+    """
+
+
 class AccountRequiresMemoError(SdkError):
     """AccountRequiresMemoError is raised when a transaction is trying to submit an
     operation to an account which requires a memo.
